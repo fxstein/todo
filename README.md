@@ -1,54 +1,37 @@
-# todo - Simple TODO Tracker
+# todo - AI-Agent TODO Tracker
 
-**AI-agent first TODO management - zero interaction, pure simplicity**
+**Simple, zero-interaction TODO management for AI agents**
 
-## Quick Start
+## For AI Agents
 
-**1. Install**
-```zsh
-git clone https://github.com/fxstein/todo.git
-cd todo
-chmod +x todo.zsh
+Tell your agent to adopt `todo.zsh` for task management. No configuration needed. Just works.
+
+**Example instructions for your agent:**
+```
+Adopt todo.zsh for task tracking. 
+Create a task "Implement user authentication" with subtasks:
+- Design database schema
+- Create API endpoints  
+- Add frontend components
+- Write tests
 ```
 
-**2. Add your first task**
-```zsh
-./todo.zsh add "First task" "#tag"
-```
+The agent uses `todo.zsh` commands automatically:
+- `./todo.zsh add` - Create tasks
+- `./todo.zsh add-subtask` - Add subtasks
+- `./todo.zsh complete` - Mark progress
+- `./todo.zsh list` - View tasks
 
-**3. Done!** Your `TODO.md` is automatically created and ready.
+All tasks are tracked in `TODO.md` in your repository.
 
-## Essential Commands
+## Zero Interaction
 
-```zsh
-# Add tasks
-./todo.zsh add "Task description" "#tag"
+- No prompts or confirmations
+- No configuration required
+- Instant operations
+- Git-friendly (TODO.md tracked in repo)
 
-# Add subtasks
-./todo.zsh add-subtask 1 "Subtask description"
-
-# Complete tasks
-./todo.zsh complete 1
-./todo.zsh complete 1 --with-subtasks  # Include all subtasks
-
-# View tasks
-./todo.zsh list
-./todo.zsh list --incomplete-only
-
-# Archive completed
-./todo.zsh archive 1
-```
-
-That's it. No configuration. No prompts. Just works.
-
-## Why This Tool?
-
-- ✅ **Zero interaction** - Perfect for AI agents
-- ✅ **Git-friendly** - TODO.md tracked in your repo
-- ✅ **Simple IDs** - Sequential numbering (1, 2, 3...)
-- ✅ **Fast** - Local files, instant operations
-
-See `./todo.zsh --help` for complete command reference.
+Perfect for AI agents - just works.
 
 ## License
 

@@ -1,8 +1,9 @@
-# Home Assistant Project Todo List
+# todo ToDo List
 
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `./scripts/todo/todo.zsh` script!**
 
 ## Tasks
+- [ ] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup`
 - [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
   - [ ] **#17.3** Ensure TODO.md and .todo/ are always committed together `#rules` `#git`
   - [ ] **#17.1** Enforce todo.zsh usage for all task tracking `#rules` `#todo`
@@ -29,7 +30,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 21:53:03 CET 2025
+**Last Updated:** Thu Oct 30 21:55:04 CET 2025
 **Repository:** https://github.com/fxstein/homeassistant  
 **Maintenance:** Use `./scripts/todo/todo.zsh` script only
 

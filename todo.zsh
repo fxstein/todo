@@ -878,13 +878,16 @@ modify_todo() {
     fi
     
     # Replace the task line using sed (handle bold formatting and subtasks)
+    # Escape special characters in replacement string for sed
+    local escaped_line=$(echo "$new_task_line" | sed 's/[[\.*^$()+?{|]/\\&/g' | sed 's/\//\\\//g')
+    
     # Use a more specific pattern to avoid double-indentation
     if [[ "$task_id" =~ \. ]]; then
         # For subtasks, replace with proper 2-space indentation
-        sed_inplace "s/^  - \[.*\] \*\*#$task_id\*\* .*/$new_task_line/" "$TODO_FILE"
+        sed_inplace "s|^  - \[.*\] \*\*#$task_id\*\* .*|$new_task_line|" "$TODO_FILE"
     else
         # For main tasks, replace without indentation
-        sed_inplace "s/^- \[.*\] \*\*#$task_id\*\* .*/$new_task_line/" "$TODO_FILE"
+        sed_inplace "s|^- \[.*\] \*\*#$task_id\*\* .*|$new_task_line|" "$TODO_FILE"
     fi
     update_footer
     

@@ -5,7 +5,6 @@
 ## Tasks
 - [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
   - [ ] **#17.3** Ensure TODO.md and .todo/ are always committed together `#rules` `#git`
-  - [ ] **#17.2** Enforce todo.zsh usage for all task tracking `#rules` `#todo`
   - [ ] **#17.1** Enforce todo.zsh usage for all task tracking `#rules` `#todo`
 - [ ] **#15** Setup githooks `#setup` `#git`
   - [ ] **#15.4** TODO linting (using todo.zsh --lint) `#lint`

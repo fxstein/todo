@@ -3,26 +3,10 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#32** Implement nested subtasks support (2-level limit) `#feature`
-  - [ ] **#32.18** Test: Edge cases (nested subtask at max depth, mixing depths) `#test`
-  - [ ] **#32.17** Test: List display shows nested hierarchy correctly `#test`
-  - [ ] **#32.16** Test: Multiple nested subtask chains (e.g., #1.1.1, #1.1.2, #1.2.1) `#test`
-  - [ ] **#32.15** Test: Archive nested subtasks `#test`
-  - [ ] **#32.14** Test: Delete nested subtasks with --with-subtasks flag `#test`
-  - [ ] **#32.13** Test: Complete nested subtasks (parent and sub-subtasks) `#test`
-  - [ ] **#32.12** Test: Error when trying to add 3rd level nesting (should fail with clear message) `#test`
-  - [ ] **#32.11** Test: Add sub-subtask to subtask (new 2-level nesting) `#test`
-  - [ ] **#32.10** Test: Add subtask to main task (existing functionality) `#test`
-  - [ ] **#32.9** Update help text to document nested subtask support `#docs`
-  - [ ] **#32.8** Update complete/delete/archive to handle nested subtasks `#code`
-  - [ ] **#32.7** Update list/display logic to show nested subtasks correctly `#code`
-  - [ ] **#32.6** Add clear error message when nesting would exceed 2-level limit `#code`
-  - [ ] **#32.5** Update subtask insertion logic to handle nested hierarchy `#code`
-  - [ ] **#32.4** Update parent task detection logic to check both patterns (main and subtask) `#code`
-  - [ ] **#32.3** Update subtask numbering to support nested IDs (e.g., #1.4.1, #1.4.2) `#code`
-  - [ ] **#32.2** Implement nesting depth detection and validation (max 2 levels) `#code`
-  - [ ] **#32.1** Update add_subtask() to detect both main tasks and subtasks as parents `#code`
+- [ ] **#34** Final nested subtask test `#test`
+- [ ] **#33** Test nested subtasks implementation `#test`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
+  - [ ] **#.1.1** Add sub-subtask (2-level nesting) `#test`
 - [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#15** Setup githooks `#setup` `#git`
   - [ ] **#15.4** TODO linting (using todo.ai --lint) `#lint`
@@ -36,6 +20,11 @@
 ------------------
 
 ## Deleted Tasks
+    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
+  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#9** Test new formatting fix `#test` (deleted 2025-10-30, expires 2025-11-29)
+    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-10-30, expires 2025-11-29)
+  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#31** Test task after serial rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
@@ -43,6 +32,7 @@
 - [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ## Recently Completed
+- [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
 - [x] **#30** Implement versioned backups and rollback capability `#feature` (2025-10-30)
   - [x] **#30.11** Test backup and rollback functionality `#test` (2025-10-30)
   - [x] **#30.10** Remove old .bak file creation logic `#cleanup` (2025-10-30)
@@ -105,11 +95,10 @@
 - [x] **#11** Test new append method `#test` (2025-10-30)
 - [x] **#10** Verify formatting works correctly `#test` (2025-10-30)
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
-- [x] **#9** Test new formatting fix `#test` (2025-10-30)
 
 ---
 
-**Last Updated:** Thu Oct 30 23:48:44 CET 2025
+**Last Updated:** Thu Oct 30 23:54:38 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

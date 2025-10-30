@@ -2,6 +2,68 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:54:38 | fxstein | ARCHIVE | 32 | Implement nested subtasks support (with 0 subtasks)
+2025-10-30 23:54:38 | fxstein | COMPLETE | 32 | Implement nested subtasks support (2-level limit)
+2025-10-30 23:54:21 | fxstein | ARCHIVE | 32 | Implement nested subtasks support (with 0 subtasks)
+2025-10-30 23:54:20 | fxstein | COMPLETE | 32 | Implement nested subtasks support (2-level limit)
+2025-10-30 23:54:05 | fxstein | ARCHIVE | 32 | Implement nested subtasks support (with 0 subtasks)
+2025-10-30 23:54:05 | fxstein | COMPLETE | 32 | Implement nested subtasks support (2-level limit)
+2025-10-30 23:53:55 | fxstein | ARCHIVE | 32 | Implement nested subtasks support (with 0 subtasks)
+2025-10-30 23:53:55 | fxstein | COMPLETE | 32 | Implement nested subtasks support (2-level limit)
+2025-10-30 23:53:48 | fxstein | RESTORE | 34 | Final nested subtask test
+2025-10-30 23:53:41 | fxstein | DELETE | 34.1.1 | Level 2 sub-subtask
+2025-10-30 23:53:41 | fxstein | DELETE | 34.1 | Level 1 subtask
+2025-10-30 23:53:41 | fxstein | DELETE | 34 | Final nested subtask test
+2025-10-30 23:53:41 | fxstein | UNDO | 34 | Final nested subtask test
+2025-10-30 23:53:39 | fxstein | ARCHIVE | 34 | Final nested subtask test (with 2 subtasks)
+2025-10-30 23:53:39 | fxstein | COMPLETE | 34.1.1 | Level 2 sub-subtask
+2025-10-30 23:53:39 | fxstein | COMPLETE | 34.1 | Level 1 subtask
+2025-10-30 23:53:39 | fxstein | COMPLETE | 34 | Final nested subtask test
+2025-10-30 23:53:10 | fxstein | UNDO | 34 | Final nested subtask test
+2025-10-30 23:53:08 | fxstein | ARCHIVE | 34 | Final nested subtask test (with 2 subtasks)
+2025-10-30 23:52:31 | fxstein | ARCHIVE | 32 | Implement nested subtasks support (with 0 subtasks)
+2025-10-30 23:52:31 | fxstein | COMPLETE | 32 | Implement nested subtasks support (2-level limit)
+2025-10-30 23:52:29 | fxstein | COMPLETE | 34.1.1 | Level 2 sub-subtask
+2025-10-30 23:52:29 | fxstein | COMPLETE | 34.1 | Level 1 subtask
+2025-10-30 23:52:29 | fxstein | COMPLETE | 34 | Final nested subtask test
+2025-10-30 23:52:27 | fxstein | DELETE | 9 | Test new formatting fix
+2025-10-30 23:52:14 | fxstein | ADD_SUBTASK | 34.1.1 | Level 2 sub-subtask (parent: #34.1)
+2025-10-30 23:52:14 | fxstein | ADD_SUBTASK | 34.1 | Level 1 subtask (parent: #34)
+2025-10-30 23:52:14 | fxstein | ADD | 34 | Final nested subtask test
+2025-10-30 23:52:13 | fxstein | DELETE | 9 | Test new formatting fix
+2025-10-30 23:52:03 | fxstein | RESTORE | 33 | Test nested subtasks implementation
+2025-10-30 23:52:01 | fxstein | DELETE | 33.1.1 | Test sub-subtask creation
+2025-10-30 23:52:01 | fxstein | DELETE | 33.1 | Add subtask to main task
+2025-10-30 23:52:01 | fxstein | DELETE | 33 | Test nested subtasks implementation
+2025-10-30 23:52:00 | fxstein | UNDO | 33 | Test nested subtasks implementation
+2025-10-30 23:51:59 | fxstein | COMPLETE | 33.1.1 | Test sub-subtask creation
+2025-10-30 23:51:59 | fxstein | COMPLETE | 33.1 | Add subtask to main task
+2025-10-30 23:51:59 | fxstein | COMPLETE | 33 | Test nested subtasks implementation
+2025-10-30 23:51:56 | fxstein | ADD_SUBTASK | 33.1.1 | Test sub-subtask creation (parent: #33.1)
+2025-10-30 23:51:56 | fxstein | DELETE | 9 | Test new formatting fix
+2025-10-30 23:51:38 | fxstein | ARCHIVE | 32 | Implement nested subtasks support (with 0 subtasks)
+2025-10-30 23:51:38 | fxstein | COMPLETE | 32.1 | Update add_subtask() to detect both main tasks and subtasks as parents
+2025-10-30 23:51:38 | fxstein | COMPLETE | 32.2 | Implement nesting depth detection and validation (max 2 levels)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.3 | Update subtask numbering to support nested IDs (e.g., #1.4.1, #1.4.2)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.4 | Update parent task detection logic to check both patterns (main and subtask)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.5 | Update subtask insertion logic to handle nested hierarchy
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.6 | Add clear error message when nesting would exceed 2-level limit
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.7 | Update list/display logic to show nested subtasks correctly
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.8 | Update complete/delete/archive to handle nested subtasks
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.9 | Update help text to document nested subtask support
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.10 | Test: Add subtask to main task (existing functionality)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.11 | Test: Add sub-subtask to subtask (new 2-level nesting)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.12 | Test: Error when trying to add 3rd level nesting (should fail with clear message)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.13 | Test: Complete nested subtasks (parent and sub-subtasks)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.14 | Test: Delete nested subtasks with --with-subtasks flag
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.15 | Test: Archive nested subtasks
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.16 | Test: Multiple nested subtask chains (e.g., #1.1.1, #1.1.2, #1.2.1)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.17 | Test: List display shows nested hierarchy correctly
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32.18 | Test: Edge cases (nested subtask at max depth, mixing depths)
+2025-10-30 23:51:37 | fxstein | COMPLETE | 32 | Implement nested subtasks support (2-level limit)
+2025-10-30 23:51:29 | fxstein | ADD_SUBTASK | .1.1 | Add sub-subtask (2-level nesting) (parent: #.1)
+2025-10-30 23:51:28 | fxstein | ADD_SUBTASK | 33.1 | Add subtask to main task (parent: #33)
+2025-10-30 23:51:26 | fxstein | ADD | 33 | Test nested subtasks implementation
 2025-10-30 23:48:44 | fxstein | ADD_SUBTASK | 32.18 | Test: Edge cases (nested subtask at max depth, mixing depths) (parent: #32)
 2025-10-30 23:48:44 | fxstein | ADD_SUBTASK | 32.17 | Test: List display shows nested hierarchy correctly (parent: #32)
 2025-10-30 23:48:44 | fxstein | ADD_SUBTASK | 32.16 | Test: Multiple nested subtask chains (e.g., #1.1.1, #1.1.2, #1.2.1) (parent: #32)

@@ -315,7 +315,7 @@ show_usage() {
     echo ""
     echo "Commands:"
     echo "  add <text> [tags]             Add a new todo item with optional tags"
-    echo "  add-subtask <parent-id> <text> [tags]  Add a subtask to an existing task"
+    echo "  add-subtask <parent-id> <text> [tags]  Add a subtask to an existing task (supports 2-level nesting)"
     echo "  list [--tag <tag>] [--incomplete-only] [--parents-only] [--has-subtasks]  Show todo list with filters"
     echo "  complete <id> [<id>...] [--with-subtasks]  Mark item(s) as completed"
     echo "  undo <id>                     Reopen (undo) completed task (use #ID)"
@@ -339,6 +339,7 @@ show_usage() {
     echo "Examples:"
     echo "  ./todo.ai add 'Fix Shelly device naming' '#api'"
     echo "  ./todo.ai add-subtask 39 'Design subtask data structure' '#feature'"
+    echo "  ./todo.ai add-subtask 39.1 'Create nested subtask' '#test'    # 2-level nesting"
     echo "  ./todo.ai complete 1"
     echo "  ./todo.ai complete 107 108 109          # Bulk complete"
     echo "  ./todo.ai complete 104 --with-subtasks  # Complete task and all subtasks"
@@ -611,7 +612,16 @@ add_todo() {
     echo "Added: #$serial $text"
 }
 
-# Function to add subtask to existing task
+# Function to calculate nesting depth from task ID
+get_nesting_depth() {
+    local task_id="$1"
+    # Count the number of dots in the task ID
+    local depth=$(echo "$task_id" | tr -cd '.' | wc -c | tr -d ' ')
+    # Depth is number of dots (0 for main tasks like "1", 1 for "1.1", 2 for "1.1.1")
+    echo "$depth"
+}
+
+# Function to add subtask to existing task (supports nested subtasks up to 2 levels)
 add_subtask() {
     local parent_id="$1"
     local text="$2"
@@ -623,23 +633,52 @@ add_subtask() {
         return 1
     fi
     
-    # Check if parent task exists
-    if ! grep -q "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+    # Check nesting depth of parent
+    local parent_depth=$(get_nesting_depth "$parent_id")
+    
+    # Validate max nesting (2 levels: main task → subtask → sub-subtask)
+    if [[ $parent_depth -ge 2 ]]; then
+        echo "Error: Cannot add subtask to #$parent_id"
+        echo "   Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)"
+        echo "   Task #$parent_id is already at the maximum depth"
+        return 1
+    fi
+    
+    # Check if parent task exists (can be main task or subtask)
+    local parent_found=false
+    local parent_line_num=""
+    local parent_indent=""
+    
+    # Check for main task pattern: `^- \[.*\] \*\*#$parent_id\*\* `
+    if grep -q "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+        parent_found=true
+        parent_line_num=$(grep -n "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        parent_indent="  "  # Main tasks have subtasks indented with 2 spaces
+    # Check for subtask pattern: `^  - \[.*\] \*\*#$parent_id\*\* `
+    elif grep -q "^  - \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+        parent_found=true
+        parent_line_num=$(grep -n "^  - \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        parent_indent="    "  # Subtasks have sub-subtasks indented with 4 spaces
+    fi
+    
+    if [[ "$parent_found" == false ]]; then
         echo "Error: Parent task #$parent_id not found"
         return 1
     fi
     
     # Find the next subtask number for this parent
     local next_subtask_num=1
-    while grep -q "^  - \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* " "$TODO_FILE"; do
+    local subtask_pattern="^$parent_indent- \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* "
+    while grep -q "$subtask_pattern" "$TODO_FILE"; do
         next_subtask_num=$((next_subtask_num + 1))
+        subtask_pattern="^$parent_indent- \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* "
     done
     
     # Create subtask ID
     local subtask_id="$parent_id.$next_subtask_num"
     
     # Format the subtask line with bold task ID and proper indentation
-    local task_line="  - [ ] **#$subtask_id** $text"
+    local task_line="$parent_indent- [ ] **#$subtask_id** $text"
     if [[ -n "$tags" ]]; then
         # Wrap each tag in backticks for code styling
         local styled_tags=""
@@ -655,23 +694,72 @@ add_subtask() {
     fi
     
     # Find the parent task line and add subtask after it
-    local parent_line_num=$(grep -n "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     if [[ -n "$parent_line_num" ]]; then
+        # Find where to insert (after parent and any existing subtasks of the parent)
+        local insert_line=$parent_line_num
+        
+        # If parent is a main task, insert after all its direct subtasks
+        # If parent is a subtask, insert after all its sub-subtasks
+        local current_line=$((parent_line_num + 1))
+        local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
+        
+        while [[ $current_line -le $max_lines ]]; do
+            local line_content
+            line_content=$(sed -n "${current_line}p" "$TODO_FILE" 2>/dev/null || echo "")
+            
+            # Stop if empty line or section header
+            if [[ -z "$line_content" ]] || [[ "$line_content" =~ '^##' ]]; then
+                break
+            fi
+            
+            # Stop if we hit another main task (starts with `- [` but not `  -`)
+            if [[ "$line_content" =~ '^- \[.*\]' ]] && [[ ! "$line_content" =~ '^[[:space:]]{2,}-' ]]; then
+                break
+            fi
+            
+            # Check if this is a subtask of our parent (at correct indent level)
+            local parent_pattern="^${parent_indent}- \[.*\] \*\*#${parent_id}\\.*"
+            if [[ "$line_content" =~ "$parent_pattern" ]]; then
+                insert_line=$current_line
+                current_line=$((current_line + 1))
+            # If this is a task but not of our parent, stop
+            elif [[ "$line_content" =~ '^- \[.*\]' ]] || [[ "$line_content" =~ '^[[:space:]]{2,}- \[.*\]' ]]; then
+                # Check if it's at shallower depth or different parent
+                if [[ ! "$line_content" =~ "\*\*#${parent_id}" ]]; then
+                    break
+                fi
+            else
+                current_line=$((current_line + 1))
+            fi
+        done
+        
+        insert_line=$((insert_line + 1))
+        
         if [[ "$(uname)" == "Darwin" ]]; then
             local temp_file=$(mktemp)
-            head -n "$parent_line_num" "$TODO_FILE" > "$temp_file"
-            echo "$task_line" >> "$temp_file"
-            tail -n +$((parent_line_num + 1)) "$TODO_FILE" >> "$temp_file"
+            if [[ $insert_line -gt $max_lines ]]; then
+                # Append to end of file
+                cat "$TODO_FILE" > "$temp_file"
+                echo "$task_line" >> "$temp_file"
+            else
+                head -n $((insert_line - 1)) "$TODO_FILE" > "$temp_file"
+                echo "$task_line" >> "$temp_file"
+                tail -n +$insert_line "$TODO_FILE" >> "$temp_file"
+            fi
             mv "$temp_file" "$TODO_FILE"
         else
-            sed_inplace "${parent_line_num}a\\$task_line" "$TODO_FILE"
+            sed_inplace "${insert_line}i\\$task_line" "$TODO_FILE"
         fi
         update_footer
         
         # Log the action
         log_todo_action "ADD_SUBTASK" "$subtask_id" "$text (parent: #$parent_id)"
         
-        echo "Added subtask: #$subtask_id $text"
+        local depth_label="subtask"
+        if [[ $parent_depth -eq 1 ]]; then
+            depth_label="sub-subtask"
+        fi
+        echo "Added $depth_label: #$subtask_id $text"
     else
         echo "Error: Could not find parent task #$parent_id"
         return 1
@@ -934,24 +1022,29 @@ complete_todo() {
         fi
     done
     
-    # If --with-subtasks, add all subtasks for parent tasks
+    # If --with-subtasks, add all subtasks for parent tasks (including nested subtasks)
     if [[ "$with_subtasks" == "true" ]]; then
         local expanded_ids=()
         for id in "${all_ids[@]}"; do
             expanded_ids+=("$id")
-            # Find all subtasks for this parent (e.g., if id is 104, find 104.1, 104.2, etc.)
-            # Check if this is a parent task (doesn't contain a dot)
-            if [[ "$id" != *.* ]]; then
-                # This is a parent task, find its subtasks
-                # Find all subtasks (both [ ] and [x] checkboxes)
-                while IFS= read -r line; do
-                    # Extract subtask ID from line
-                    if [[ "$line" =~ '#([0-9]+\.[0-9]+)' ]]; then
-                        local subtask_id="${match[1]}"
-                        expanded_ids+=("$subtask_id")
+            # Find all subtasks and sub-subtasks for this parent
+            # Check if this is a parent task (may or may not contain dots)
+            local id_depth=$(get_nesting_depth "$id")
+            
+            # Find all direct subtasks and nested subtasks
+            # Pattern matches: id.1, id.2, id.1.1, id.1.2, id.2.1, etc.
+            while IFS= read -r line; do
+                # Extract task ID from line (handles nested IDs)
+                if [[ "$line" =~ '#([0-9]+(\.[0-9]+)+)' ]]; then
+                    local task_id="${match[1]}"
+                    # Check if this task belongs to our parent (direct or nested subtask)
+                    # For main task 1, match: 1.1, 1.2, 1.1.1, 1.1.2, etc.
+                    # For subtask 1.1, match: 1.1.1, 1.1.2, etc.
+                    if [[ "$task_id" =~ ^$id\. ]]; then
+                        expanded_ids+=("$task_id")
                     fi
-                done < <(grep "^  - \[.\] \*\*#${id}\." "$TODO_FILE")
-            fi
+                fi
+            done < "$TODO_FILE"
         done
         all_ids=("${expanded_ids[@]}")
     fi
@@ -1143,7 +1236,9 @@ archive_task() {
     
     # Simple implementation: move the task to Recently Completed section
     # Get the task line (either completed or incomplete)
-    local task_line=$(grep "^- \[[x ]\] \*\*#$task_id\*\* " "$TODO_FILE")
+    # Escape task_id for grep pattern (escape dots and asterisks)
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    local task_line=$(grep "^- \[[x ]\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE")
     if [[ -z "$task_line" ]]; then
         echo "Error: Could not find task #$task_id"
         return 1
@@ -1161,10 +1256,14 @@ archive_task() {
         task_line="$task_line${status_note} ($archive_date)"
     fi
     
-    # Collect all subtasks (completed or not)
+    # Collect all subtasks and nested subtasks (completed or not)
     local subtasks=()
+    # Escape task_id for regex matching (escape dots)
+    local escaped_task_id_regex=$(echo "$task_id" | sed 's/\./\\./g')
     while IFS= read -r line; do
-        if [[ "$line" =~ "^  - \[.*\] \*\*#$task_id\." ]]; then
+        # Match subtasks at any nesting level: #task_id.1, #task_id.1.1, etc.
+        # Use grep pattern instead of regex to avoid issues with asterisks
+        if echo "$line" | grep -q "\*\*#${escaped_task_id_regex}\."; then
             # Add completion date if not already present
             if [[ ! "$line" =~ "\([0-9]{4}-[0-9]{2}-[0-9]{2}\)" ]]; then
                 line="$line ($archive_date)"
@@ -1173,10 +1272,14 @@ archive_task() {
         fi
     done < "$TODO_FILE"
     
-    # Remove from Tasks section (main task and all subtasks)
+    # Remove from Tasks section (main task and all subtasks at any nesting level)
     # Handle both completed [x] and incomplete [ ] tasks
-    sed_inplace "/^- \[[x ]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
-    sed_inplace "/^  - \[.*\] \*\*#$task_id\\./d" "$TODO_FILE"
+    # Escape task_id for use in sed pattern
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    sed_inplace "/^- \[[x ]\] \*\*#${escaped_task_id}\*\* /d" "$TODO_FILE"
+    # Remove subtasks (2 spaces) and sub-subtasks (4 spaces)
+    sed_inplace "/^  - \[.*\] \*\*#${escaped_task_id}\\./d" "$TODO_FILE"
+    sed_inplace "/^    - \[.*\] \*\*#${escaped_task_id}\\./d" "$TODO_FILE"
     
     # Create a complete block with main task and subtasks
     local complete_block="$task_line"
@@ -1274,19 +1377,22 @@ delete_task() {
         fi
     done
     
-    # If --with-subtasks, add all subtasks
+    # If --with-subtasks, add all subtasks (including nested subtasks)
     if [[ "$with_subtasks" == "true" ]]; then
         local expanded_ids=()
         for id in "${all_ids[@]}"; do
             expanded_ids+=("$id")
-            if [[ "$id" != *.* ]]; then
-                while IFS= read -r line; do
-                    if [[ "$line" =~ '#([0-9]+\.[0-9]+)' ]]; then
-                        local subtask_id="${match[1]}"
-                        expanded_ids+=("$subtask_id")
+            # Find all direct subtasks and nested subtasks
+            while IFS= read -r line; do
+                # Extract task ID from line (handles nested IDs)
+                if [[ "$line" =~ '#([0-9]+(\.[0-9]+)+)' ]]; then
+                    local task_id="${match[1]}"
+                    # Check if this task belongs to our parent (direct or nested subtask)
+                    if [[ "$task_id" =~ ^$id\. ]]; then
+                        expanded_ids+=("$task_id")
                     fi
-                done < <(grep "^  - \[.\] \*\*#${id}\." "$TODO_FILE")
-            fi
+                fi
+            done < "$TODO_FILE"
         done
         all_ids=("${expanded_ids[@]}")
     fi
@@ -1297,8 +1403,8 @@ delete_task() {
     local expire_date=$(date -d "+30 days" +"%Y-%m-%d" 2>/dev/null || date -v+30d +"%Y-%m-%d" 2>/dev/null || echo "2025-11-29")
     
     for number in "${all_ids[@]}"; do
-        # Find task (anywhere - Tasks or Recently Completed)
-        local task_line=$(grep "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1)
+        # Find task (anywhere - Tasks or Recently Completed, handles nested subtasks)
+        local task_line=$(grep "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1)
         
         if [[ -z "$task_line" ]]; then
             echo "Warning: Task #$number not found, skipping"
@@ -1312,18 +1418,18 @@ delete_task() {
         task_line=$(echo "$task_line" | sed 's/ *([^)]*)$//')
         task_line="$task_line (deleted $delete_date, expires $expire_date)"
         
-        # Find task line number to also remove following notes
-        local task_line_num=$(grep -n "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        # Find task line number to also remove following notes (handles nested subtasks at any level)
+        local task_line_num=$(grep -n "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
         
         if [[ -n "$task_line_num" ]]; then
             # Remove the task line
             sed_inplace "${task_line_num}d" "$TODO_FILE"
             
-            # Remove any following blockquote notes (lines starting with "  > " or "    > ")
+            # Remove any following blockquote notes (lines starting with "  > ", "    > ", or "      > ")
             # Keep removing lines as long as they're blockquotes
             while true; do
                 local next_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
-                if [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]]; then
+                if [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]] || [[ "$next_line" =~ ^"      > " ]]; then
                     sed_inplace "${task_line_num}d" "$TODO_FILE"
                 else
                     break

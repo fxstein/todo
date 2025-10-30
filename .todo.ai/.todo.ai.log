@@ -2,6 +2,19 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:18:06 | fxstein | ARCHIVE | 28 | Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial (with 4 subtasks)
+2025-10-30 23:18:06 | fxstein | COMPLETE | 28.1 | Rename .todo.log to .todo.ai.log using git mv
+2025-10-30 23:18:06 | fxstein | COMPLETE | 28.2 | Rename .todo_serial to .todo.ai_serial using git mv
+2025-10-30 23:18:05 | fxstein | COMPLETE | 28.3 | Update LOG_FILE path reference in todo.ai script
+2025-10-30 23:18:05 | fxstein | COMPLETE | 28.4 | Update SERIAL_FILE path reference in todo.ai script
+2025-10-30 23:18:05 | fxstein | COMPLETE | 28 | Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial
+2025-10-30 23:18:03 | fxstein | DELETE | 29 | Test task after file rename
+2025-10-30 23:18:03 | fxstein | ADD | 29 | Test task after file rename
+2025-10-30 23:17:56 | fxstein | ADD_SUBTASK | 28.4 | Update SERIAL_FILE path reference in todo.ai script (parent: #28)
+2025-10-30 23:17:56 | fxstein | ADD_SUBTASK | 28.3 | Update LOG_FILE path reference in todo.ai script (parent: #28)
+2025-10-30 23:17:55 | fxstein | ADD_SUBTASK | 28.2 | Rename .todo_serial to .todo.ai_serial using git mv (parent: #28)
+2025-10-30 23:17:55 | fxstein | ADD_SUBTASK | 28.1 | Rename .todo.log to .todo.ai.log using git mv (parent: #28)
+2025-10-30 23:17:53 | fxstein | ADD | 28 | Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial
 2025-10-30 23:09:51 | fxstein | ARCHIVE | 17 | Create Cursor rules for repository (with 2 subtasks)
 2025-10-30 23:09:51 | fxstein | COMPLETE | 17.1 | Enforce todo.ai usage for all task tracking
 2025-10-30 23:09:51 | fxstein | COMPLETE | 17.3 | Ensure TODO.md and .todo.ai/ are always committed together

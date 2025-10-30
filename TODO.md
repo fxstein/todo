@@ -17,11 +17,17 @@
 ------------------
 
 ## Deleted Tasks
+- [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#24** Test task after rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ## Recently Completed
+- [x] **#28** Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial `#setup` (2025-10-30)
+  - [x] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (2025-10-30)
+  - [x] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (2025-10-30)
+  - [x] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (2025-10-30)
+  - [x] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (2025-10-30)
 - [x] **#17** Create Cursor rules for repository `#setup` `#docs` (2025-10-30)
   - [x] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (2025-10-30)
   - [x] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (2025-10-30)
@@ -71,7 +77,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 23:09:51 CET 2025
+**Last Updated:** Thu Oct 30 23:18:06 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

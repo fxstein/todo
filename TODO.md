@@ -22,6 +22,7 @@
 - [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ## Recently Completed
+- [x] **#20** Create radically simplified README.md `#docs` (2025-10-30)
 - [x] **#6** Update TODO.md template for this repository `#setup` `#docs` (2025-10-30)
 - [x] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup` (2025-10-30)
   - [x] **#18.1** Remove path from todo.zsh upon init `#fix` `#setup` (2025-10-30)
@@ -34,7 +35,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 22:08:43 CET 2025
+**Last Updated:** Thu Oct 30 22:11:16 CET 2025
 **Repository:** https://github.com/fxstein/todo  
 **Maintenance:** Use `todo.zsh` script only
 

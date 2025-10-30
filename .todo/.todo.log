@@ -2,3 +2,7 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 21:49:49 | fxstein | MODIFY | 7 | Remove gitignore entry for .todo directory - .todo/ must be tracked in git
+2025-10-30 21:49:44 | fxstein | MODIFY | 7 | Remove gitignore entry for .todo directory - .todo/ must be tracked in git
+2025-10-30 21:49:39 | fxstein | MODIFY | 7 | Test with special chars / - & |
+2025-10-30 21:49:38 | fxstein | MODIFY | 7 | Remove gitignore entry for .todo directory - .todo/ must be tracked in git

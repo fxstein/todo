@@ -3,13 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `./scripts/todo/todo.zsh` script!**
 
 ## Tasks
+- [ ] **#15** Setup githooks `#setup` `#git`
+  - [ ] **#15.4** TODO linting (using todo.zsh --lint) `#lint`
+  - [ ] **#15.3** JSON linting `#lint`
+  - [ ] **#15.2** YAML linting `#lint`
+  - [ ] **#15.1** Markdown linting `#lint`
 - [ ] **#14** Formatting fixes complete `#setup`
-- [ ] **#13** All formatting fixes complete `#setup`
-- [ ] **#12** Final formatting test `#test`
-- [ ] **#11** Test new append method `#test`
-- [ ] **#10** Verify formatting works correctly `#test`
-- [ ] **#9** Test new formatting fix `#test`
-- [ ] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix`
 - [ ] **#7** Create .gitignore for .todo directory `#setup` `#git`
 - [ ] **#6** Update TODO.md template for this repository `#setup` `#docs`
 - [ ] **#5** Initialize repository structure and configuration `#setup` `#repo`
@@ -17,10 +16,16 @@
 ------------------
 
 ## Recently Completed
+- [x] **#13** All formatting fixes complete `#setup` (2025-10-30)
+- [x] **#12** Final formatting test `#test` (2025-10-30)
+- [x] **#11** Test new append method `#test` (2025-10-30)
+- [x] **#10** Verify formatting works correctly `#test` (2025-10-30)
+- [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
+- [x] **#9** Test new formatting fix `#test` (2025-10-30)
 
 ---
 
-**Last Updated:** Thu Oct 30 21:27:24 CET 2025
+**Last Updated:** Thu Oct 30 21:42:55 CET 2025
 **Repository:** https://github.com/fxstein/homeassistant  
 **Maintenance:** Use `./scripts/todo/todo.zsh` script only
 

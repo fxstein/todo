@@ -789,8 +789,8 @@ complete_todo() {
     # Complete all tasks
     local completed_count=0
     for number in "${all_ids[@]}"; do
-        # Skip if task doesn't exist
-        if ! grep -q "**#$number**" "$TODO_FILE"; then
+        # Skip if task doesn't exist (escape asterisks for grep)
+        if ! grep -q "\*\*#$number\*\*" "$TODO_FILE"; then
             echo "Warning: Task #$number not found, skipping"
             continue
         fi
@@ -800,7 +800,7 @@ complete_todo() {
         sed_inplace "s/  - \[ \] \*\*#$number\*\* /  - [x] **#$number** /" "$TODO_FILE"
         
         # Get task description for logging
-        local task_description=$(grep "**#$number**" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
+        local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
         
         # Log the action
         log_todo_action "COMPLETE" "$number" "$task_description"
@@ -830,7 +830,7 @@ undo_todo() {
     update_footer
     
     # Get task description for logging
-    local task_description=$(grep "**#$number**" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
+    local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
     
     # Log the action
     log_todo_action "UNDO" "$number" "$task_description"
@@ -1592,7 +1592,7 @@ lint_todo() {
                 issues_found=$((issues_found + 1))
             fi
         fi
-    done < <(grep "**#[0-9]\+\.[0-9]\+\*\*" "$TODO_FILE")
+    done < <(grep "\*\*#[0-9]\+\.[0-9]\+\*\*" "$TODO_FILE")
     
     if [[ $orphan_issues -eq 0 ]]; then
         echo "  ✅ No orphaned subtasks"
@@ -1621,7 +1621,7 @@ lint_todo() {
                 task_ids+=("$task_id")
             fi
         fi
-    done < <(grep "**#[0-9]\|**#[0-9]\+\.[0-9]\+" "$TODO_FILE")
+    done < <(grep "\*\*#[0-9]\|\*\*#[0-9]\+\.[0-9]\+" "$TODO_FILE")
     
     if [[ $duplicate_issues -eq 0 ]]; then
         echo "  ✅ No duplicate task IDs"

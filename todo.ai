@@ -47,6 +47,12 @@ LOG_FILE="${TODO_LOG:-$(pwd)/.todo.ai/.todo.ai.log}"
 
 # Function to get next serial number
 increment_serial() {
+    # Ensure .todo.ai directory exists
+    local serial_dir=$(dirname "$SERIAL_FILE")
+    if [[ ! -d "$serial_dir" ]]; then
+        mkdir -p "$serial_dir" 2>/dev/null || return 1
+    fi
+    
     if [[ -f "$SERIAL_FILE" ]]; then
         local current=$(cat "$SERIAL_FILE")
         local next=$((current + 1))
@@ -67,6 +73,12 @@ update_footer() {
 
 # Function to log TODO operations
 log_todo_action() {
+    # Ensure .todo.ai directory exists
+    local log_dir=$(dirname "$LOG_FILE")
+    if [[ ! -d "$log_dir" ]]; then
+        mkdir -p "$log_dir" 2>/dev/null || return 1
+    fi
+    
     local action="$1"
     local task_id="$2"
     local description="$3"
@@ -94,6 +106,12 @@ log_todo_action() {
 
 # Function to initialize log file if it doesn't exist
 init_log_file() {
+    # Ensure .todo.ai directory exists
+    local log_dir=$(dirname "$LOG_FILE")
+    if [[ ! -d "$log_dir" ]]; then
+        mkdir -p "$log_dir" 2>/dev/null || return 1
+    fi
+    
     if [[ ! -f "$LOG_FILE" ]]; then
         echo "# TODO Tool Log File" > "$LOG_FILE"
         echo "# Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION" >> "$LOG_FILE"

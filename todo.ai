@@ -712,47 +712,11 @@ add_subtask() {
         task_line="$task_line $styled_tags"
     fi
     
-    # Find the parent task line and add subtask after it
+    # Find the parent task line and add subtask after it (newest first)
     if [[ -n "$parent_line_num" ]]; then
-        # Find where to insert (after parent and any existing subtasks of the parent)
-        local insert_line=$parent_line_num
-        
-        # If parent is a main task, insert after all its direct subtasks
-        # If parent is a subtask, insert after all its sub-subtasks
-        local current_line=$((parent_line_num + 1))
+        # Insert right after the parent line (newest subtasks appear first)
+        local insert_line=$((parent_line_num + 1))
         local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
-        
-        while [[ $current_line -le $max_lines ]]; do
-            local line_content
-            line_content=$(sed -n "${current_line}p" "$TODO_FILE" 2>/dev/null || echo "")
-            
-            # Stop if empty line or section header
-            if [[ -z "$line_content" ]] || [[ "$line_content" =~ '^##' ]]; then
-                break
-            fi
-            
-            # Stop if we hit another main task (starts with `- [` but not `  -`)
-            if [[ "$line_content" =~ '^- \[.*\]' ]] && [[ ! "$line_content" =~ '^[[:space:]]{2,}-' ]]; then
-                break
-            fi
-            
-            # Check if this is a subtask of our parent (at correct indent level)
-            local parent_pattern="^${parent_indent}- \[.*\] \*\*#${parent_id}\\.*"
-            if [[ "$line_content" =~ "$parent_pattern" ]]; then
-                insert_line=$current_line
-                current_line=$((current_line + 1))
-            # If this is a task but not of our parent, stop
-            elif [[ "$line_content" =~ '^- \[.*\]' ]] || [[ "$line_content" =~ '^[[:space:]]{2,}- \[.*\]' ]]; then
-                # Check if it's at shallower depth or different parent
-                if [[ ! "$line_content" =~ "\*\*#${parent_id}" ]]; then
-                    break
-                fi
-            else
-                current_line=$((current_line + 1))
-            fi
-        done
-        
-        insert_line=$((insert_line + 1))
         
         if [[ "$(uname)" == "Darwin" ]]; then
             local temp_file=$(mktemp)

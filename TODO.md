@@ -3,6 +3,7 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.zsh` script!**
 
 ## Tasks
+- [ ] **#21** Ensure .todo/ is tracked in git - not in gitignore or explicitly added `#setup`
 - [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
   - [ ] **#17.3** Ensure TODO.md and .todo/ are always committed together `#rules` `#git`
@@ -35,7 +36,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 22:11:16 CET 2025
+**Last Updated:** Thu Oct 30 22:34:00 CET 2025
 **Repository:** https://github.com/fxstein/todo  
 **Maintenance:** Use `todo.zsh` script only
 

@@ -147,6 +147,67 @@ EOF
     fi
 }
 
+# Function to ensure Cursor rules include todo.zsh requirement
+init_cursor_rules() {
+    local cursor_rules_file="$(pwd)/.cursorrules"
+    local todo_rule="It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools"
+    
+    # Check if .cursorrules exists
+    if [[ ! -f "$cursor_rules_file" ]]; then
+        # Create .cursorrules with todo.zsh rule
+        cat > "$cursor_rules_file" << 'EOF'
+## Task Management
+It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools
+EOF
+        echo ""
+        echo "⚠️  IMPORTANT: Created .cursorrules file"
+        echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
+        echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
+        return 0
+    fi
+    
+    # Check if rule already exists
+    if grep -q "todo.zsh" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
+        # Rule already exists, don't add it again
+        return 0
+    fi
+    
+    # Add rule to existing file (append after last line or in a new section)
+    local section_added=false
+    if ! grep -q "^## Task Management" "$cursor_rules_file"; then
+        # Add new section at the end
+        echo "" >> "$cursor_rules_file"
+        echo "## Task Management" >> "$cursor_rules_file"
+        section_added=true
+    fi
+    
+    # Add the rule (check if we need to add it to existing section)
+    if grep -q "^## Task Management" "$cursor_rules_file"; then
+        # Find the line number of "## Task Management"
+        local section_line=$(grep -n "^## Task Management" "$cursor_rules_file" | head -1 | cut -d: -f1)
+        if [[ -n "$section_line" ]]; then
+            # Add rule after the section header
+            if [[ "$(uname)" == "Darwin" ]]; then
+                local temp_file=$(mktemp)
+                head -n "$section_line" "$cursor_rules_file" > "$temp_file"
+                echo "$todo_rule" >> "$temp_file"
+                tail -n +$((section_line + 1)) "$cursor_rules_file" >> "$temp_file"
+                mv "$temp_file" "$cursor_rules_file"
+            else
+                sed_inplace "${section_line}a$todo_rule" "$cursor_rules_file"
+            fi
+        fi
+    fi
+    
+    echo ""
+    echo "⚠️  IMPORTANT: Updated .cursorrules file"
+    if [[ "$section_added" == true ]]; then
+        echo "   📝 Added new section: '## Task Management'"
+    fi
+    echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
+    echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
+}
+
 # Function to get current serial number
 get_current_serial() {
     if [[ -f "$SERIAL_FILE" ]]; then
@@ -1837,6 +1898,9 @@ init_log_file
 
 # Initialize TODO file
 init_todo_file
+
+# Initialize Cursor rules if needed (check on every run, add if missing)
+init_cursor_rules
 
 # Main script logic
 case "${1:-}" in

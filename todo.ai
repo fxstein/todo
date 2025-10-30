@@ -2341,7 +2341,8 @@ update_tool() {
             fi
             
             # If hashes are available and match, files are identical - skip update
-            if [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" == "$remote_hash" ]]; then
+            # But only if we verified the files are different (checked above)
+            if [[ "$script_realpath" != "$temp_realpath" ]] && [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" == "$remote_hash" ]]; then
                 echo "✅ todo.ai is already at the latest version ($VERSION)"
                 echo "   Content hash matches - no update needed"
                 echo "   Checking cursor rules..."
@@ -2353,20 +2354,21 @@ update_tool() {
                     init_cursor_rules
                 fi
                 return 0
-            elif [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" != "$remote_hash" ]]; then
+            elif [[ "$script_realpath" != "$temp_realpath" ]] && [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" != "$remote_hash" ]]; then
                 # Version matches but content differs - proceed with update
                 echo "⚠️  Version matches ($VERSION), but content differs"
                 echo "   Updating to latest content..."
             else
-                # Hash comparison not available - assume up to date if version matches
-                echo "✅ todo.ai is already at the latest version ($VERSION)"
-                echo "   Checking cursor rules..."
-                if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-                    echo ""
-                    echo "🔄 Updating cursor rules..."
-                    init_cursor_rules
+                # Hash comparison not available or files are same - proceed with update to be safe
+                if [[ "$script_realpath" == "$temp_realpath" ]]; then
+                    echo "⚠️  Cannot verify update - files appear identical"
+                    echo "   Proceeding with update to ensure latest version..."
+                elif [[ -z "$local_hash" ]] || [[ -z "$remote_hash" ]]; then
+                    echo "⚠️  Hash comparison not available - proceeding with update"
+                    echo "   Content may have changed even though version matches"
+                else
+                    echo "⚠️  Proceeding with update to ensure latest version"
                 fi
-                return 0
             fi
         else
             rm -f "$temp_check_file"

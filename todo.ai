@@ -1991,14 +1991,31 @@ check_version() {
 
 # Function to update todo.ai to latest version
 update_tool() {
-    local script_path="${0:a}"
+    # Get the actual script path (handle both direct calls and sourced calls)
+    local script_path
+    if [[ -f "${0:a}" ]]; then
+        script_path="${0:a}"
+    elif [[ -f "$(pwd)/todo.ai" ]]; then
+        script_path="$(pwd)/todo.ai"
+    else
+        # Try to find todo.ai in current directory or common locations
+        if [[ -f "./todo.ai" ]]; then
+            script_path="./todo.ai"
+        else
+            echo "Error: Cannot locate todo.ai script"
+            return 1
+        fi
+    fi
+    
     local script_dir="$(dirname "$script_path")"
     local script_name="$(basename "$script_path")"
+    local backup_file="${script_path}.bak"
     
-    # If script is not in current directory, we need to be in the directory where it is
-    if [[ "$script_dir" != "." ]]; then
-        cd "$script_dir"
-        script_path="./$script_name"
+    # Ensure we're using absolute path for the backup
+    if [[ "$script_dir" != "." ]] && [[ ! "$script_path" =~ ^/ ]]; then
+        cd "$script_dir" || return 1
+        script_path="$(pwd)/$script_name"
+        backup_file="${script_path}.bak"
     fi
     
     echo "🔄 Updating todo.ai..."
@@ -2009,13 +2026,28 @@ update_tool() {
         return 1
     fi
     
+    # Check if already at latest version
+    local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+    if [[ -n "$remote_version" ]] && [[ "$remote_version" == "$VERSION" ]]; then
+        echo "✅ todo.ai is already at the latest version ($VERSION)"
+        echo "   Checking cursor rules..."
+        # Still update cursor rules even if script is up to date
+        if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+            echo ""
+            echo "🔄 Updating cursor rules..."
+            # Call init_cursor_rules directly since we're in the same script
+            init_cursor_rules
+        fi
+        return 0
+    fi
+    
     # Download latest version
     local temp_file=$(mktemp)
     if curl -s -o "$temp_file" "$SCRIPT_URL"; then
         # Check if download was successful
         if [[ -s "$temp_file" ]] && grep -q "todo - AI-Agent First TODO List Tracker" "$temp_file"; then
-            # Backup current version
-            cp "$script_path" "${script_path}.bak" 2>/dev/null || true
+            # Backup current version using absolute path
+            cp "$script_path" "$backup_file" 2>/dev/null || true
             
             # Replace with new version
             mv "$temp_file" "$script_path"
@@ -2025,7 +2057,7 @@ update_tool() {
             local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
             
             echo "✅ Updated todo.ai to version $new_version"
-            echo "   Backup saved as ${script_path}.bak"
+            echo "   Backup saved as $backup_file"
             
             # Update cursor rules after successful update to ensure latest rules are applied
             if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
@@ -2052,9 +2084,14 @@ update_tool() {
                     # Extract init_cursor_rules function
                     sed -n "${function_start},${function_end}p" "$script_path" >> "$temp_script"
                     
-                    # Source and execute
-                    source "$temp_script" 2>/dev/null && init_cursor_rules || echo "   ⚠️  Could not update cursor rules automatically. They will be updated on next script run."
+                    # Source and execute - ensure we're in the right directory
+                    local current_dir=$(pwd)
+                    cd "$(dirname "$script_path")" 2>/dev/null || true
+                    source "$temp_script" 2>/dev/null && init_cursor_rules
+                    cd "$current_dir" 2>/dev/null || true
                     rm -f "$temp_script"
+                else
+                    echo "   ⚠️  Could not extract cursor rules function. They will be updated on next script run."
                 fi
             fi
             

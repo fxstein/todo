@@ -2,6 +2,18 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.11 | Test backup and rollback functionality (parent: #30)
+2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.10 | Remove old .bak file creation logic (parent: #30)
+2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.9 | Update help text and show_usage() to include new commands (parent: #30)
+2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.8 | Add 'backups' or 'list-backups' command to view available backups (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.7 | Add 'rollback' command to main script command handler (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.6 | Implement version-specific rollback (restore by timestamp or version) (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.5 | Implement default rollback (restore latest backup) (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.4 | Create rollback() function to restore from backup (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.3 | Create list_backups() function to show available backup versions (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.2 | Modify update_tool() to save backups with timestamp to .todo.ai/backups/ (parent: #30)
+2025-10-30 23:31:45 | fxstein | ADD_SUBTASK | 30.1 | Create .todo.ai/backups/ directory for storing versioned backups (parent: #30)
+2025-10-30 23:31:41 | fxstein | ADD | 30 | Implement versioned backups and rollback capability
 2025-10-30 23:18:06 | fxstein | ARCHIVE | 28 | Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial (with 4 subtasks)
 2025-10-30 23:18:06 | fxstein | COMPLETE | 28.1 | Rename .todo.log to .todo.ai.log using git mv
 2025-10-30 23:18:06 | fxstein | COMPLETE | 28.2 | Rename .todo_serial to .todo.ai_serial using git mv

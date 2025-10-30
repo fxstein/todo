@@ -20,7 +20,7 @@
 #
 # Version: 1.0.0
 # Repository: https://github.com/fxstein/todo
-# Update: ./todo.zsh update
+# Update: ./todo.ai update
 
 set -e
 
@@ -36,7 +36,7 @@ sed_inplace() {
 # Version
 VERSION="1.0.0"
 REPO_URL="https://github.com/fxstein/todo"
-SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo/main/todo.zsh"
+SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo/main/todo.ai"
 
 # Configuration
 # Can be overridden with environment variables
@@ -132,7 +132,7 @@ init_todo_file() {
         cat > "$TODO_FILE" << EOF
 # ${repo_name} ToDo List
 
-> **⚠️ IMPORTANT: This file should ONLY be edited through the \`todo.zsh\` script!**
+> **⚠️ IMPORTANT: This file should ONLY be edited through the \`todo.ai\` script!**
 
 ## Tasks
 
@@ -148,7 +148,7 @@ EOF
         if [[ -n "$repo_url" ]]; then
             echo "**Repository:** ${repo_url}  " >> "$TODO_FILE"
         fi
-        echo "**Maintenance:** Use \`todo.zsh\` script only" >> "$TODO_FILE"
+        echo "**Maintenance:** Use \`todo.ai\` script only" >> "$TODO_FILE"
         
         # Replace the $(date) placeholder with actual date
         local current_date=$(date)
@@ -156,26 +156,26 @@ EOF
     fi
 }
 
-# Function to ensure Cursor rules include todo.zsh requirement
+# Function to ensure Cursor rules include todo.ai requirement
 init_cursor_rules() {
     local cursor_rules_file="$(pwd)/.cursorrules"
-    local todo_rule="It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools"
+    local todo_rule="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools"
     local commit_rule="TODO.md and .todo/ must always be committed together"
     local rules_added=0
     
     # Check if .cursorrules exists
     if [[ ! -f "$cursor_rules_file" ]]; then
-        # Create .cursorrules with todo.zsh rules
+        # Create .cursorrules with todo.ai rules
         cat > "$cursor_rules_file" << 'EOF'
 ## Task Management
-It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools
+It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo/ must always be committed together
 EOF
         echo ""
         echo "⚠️  IMPORTANT: Created .cursorrules file"
-        echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
+        echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
         echo "   📝 Added rule: 'TODO.md and .todo/ must always be committed together'"
-        echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
+        echo "   This ensures AI agents will automatically use todo.ai for task tracking"
         return 0
     fi
     
@@ -183,7 +183,7 @@ EOF
     local todo_rule_exists=false
     local commit_rule_exists=false
     
-    if grep -q "todo.zsh" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
+    if grep -q "todo.ai" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
         todo_rule_exists=true
     fi
     
@@ -252,12 +252,12 @@ EOF
             echo "   📝 Added new section: '## Task Management'"
         fi
         if [[ "$todo_rule_exists" == false ]]; then
-            echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
+            echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
         fi
         if [[ "$commit_rule_exists" == false ]]; then
             echo "   📝 Added rule: 'TODO.md and .todo/ must always be committed together'"
         fi
-        echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
+        echo "   This ensures AI agents will automatically use todo.ai for task tracking"
     fi
 }
 
@@ -294,7 +294,7 @@ normalize_checkboxes() {
 
 # Function to show usage
 show_usage() {
-    echo "Usage: ./todo.zsh [command] [options]"
+    echo "Usage: ./todo.ai [command] [options]"
     echo ""
     echo "Version: $VERSION"
     echo ""
@@ -315,44 +315,44 @@ show_usage() {
     echo "  --reformat [--dry-run]        Apply formatting fixes (use --dry-run to preview)"
     echo "  edit                          Edit todo file in editor"
     echo "  log [--filter <text>] [--lines <n>] View TODO operation log"
-    echo "  update                        Update todo.zsh to latest version"
+    echo "  update                        Update todo.ai to latest version"
     echo "  version, -v, --version        Show version information"
     echo ""
     echo ""
     echo "Examples:"
-    echo "  ./todo.zsh add 'Fix Shelly device naming' '#api'"
-    echo "  ./todo.zsh add-subtask 39 'Design subtask data structure' '#feature'"
-    echo "  ./todo.zsh complete 1"
-    echo "  ./todo.zsh complete 107 108 109          # Bulk complete"
-    echo "  ./todo.zsh complete 104 --with-subtasks  # Complete task and all subtasks"
-    echo "  ./todo.zsh complete 104.3-104.10         # Complete range of subtasks"
-    echo "  ./todo.zsh undo 1"
-    echo "  ./todo.zsh modify 1 'Updated task description' '#api'"
-    echo "  ./todo.zsh delete 115                    # Soft delete (30-day recovery)"
-    echo "  ./todo.zsh delete 110 --with-subtasks    # Delete task and all subtasks"
-    echo "  ./todo.zsh delete 120.5-120.10           # Delete range"
-    echo "  ./todo.zsh archive 1"
-    echo "  ./todo.zsh archive 107 108 109           # Bulk archive"
-    echo "  ./todo.zsh archive 109 --reason obsolete # Archive incomplete task"
-    echo "  ./todo.zsh archive 104 --reason 'completed-by:107,108'"
-    echo "  ./todo.zsh relate 110 --depends-on 104  # Add dependency"
-    echo "  ./todo.zsh relate 104 --completed-by '107,108'"
-    echo "  ./todo.zsh note 110 'Testing shows issues'  # Add note"
-    echo "  ./todo.zsh show 110                    # Show task with relationships & notes"
-    echo "  ./todo.zsh restore 1"
-    echo "  ./todo.zsh --lint"
-    echo "  ./todo.zsh --reformat --dry-run"
-    echo "  ./todo.zsh --reformat"
-    echo "  ./todo.zsh list"
-    echo "  ./todo.zsh list --tag api"
-    echo "  ./todo.zsh list --incomplete-only     # Show only pending tasks"
-    echo "  ./todo.zsh list --parents-only        # Hide subtasks"
-    echo "  ./todo.zsh list --has-subtasks        # Only tasks with subtasks"
-    echo "  ./todo.zsh log"
-    echo "  ./todo.zsh log --filter ADD"
-    echo "  ./todo.zsh log --lines 20"
-    echo "  ./todo.zsh update                     # Update to latest version"
-    echo "  ./todo.zsh version                    # Show version"
+    echo "  ./todo.ai add 'Fix Shelly device naming' '#api'"
+    echo "  ./todo.ai add-subtask 39 'Design subtask data structure' '#feature'"
+    echo "  ./todo.ai complete 1"
+    echo "  ./todo.ai complete 107 108 109          # Bulk complete"
+    echo "  ./todo.ai complete 104 --with-subtasks  # Complete task and all subtasks"
+    echo "  ./todo.ai complete 104.3-104.10         # Complete range of subtasks"
+    echo "  ./todo.ai undo 1"
+    echo "  ./todo.ai modify 1 'Updated task description' '#api'"
+    echo "  ./todo.ai delete 115                    # Soft delete (30-day recovery)"
+    echo "  ./todo.ai delete 110 --with-subtasks    # Delete task and all subtasks"
+    echo "  ./todo.ai delete 120.5-120.10           # Delete range"
+    echo "  ./todo.ai archive 1"
+    echo "  ./todo.ai archive 107 108 109           # Bulk archive"
+    echo "  ./todo.ai archive 109 --reason obsolete # Archive incomplete task"
+    echo "  ./todo.ai archive 104 --reason 'completed-by:107,108'"
+    echo "  ./todo.ai relate 110 --depends-on 104  # Add dependency"
+    echo "  ./todo.ai relate 104 --completed-by '107,108'"
+    echo "  ./todo.ai note 110 'Testing shows issues'  # Add note"
+    echo "  ./todo.ai show 110                    # Show task with relationships & notes"
+    echo "  ./todo.ai restore 1"
+    echo "  ./todo.ai --lint"
+    echo "  ./todo.ai --reformat --dry-run"
+    echo "  ./todo.ai --reformat"
+    echo "  ./todo.ai list"
+    echo "  ./todo.ai list --tag api"
+    echo "  ./todo.ai list --incomplete-only     # Show only pending tasks"
+    echo "  ./todo.ai list --parents-only        # Hide subtasks"
+    echo "  ./todo.ai list --has-subtasks        # Only tasks with subtasks"
+    echo "  ./todo.ai log"
+    echo "  ./todo.ai log --filter ADD"
+    echo "  ./todo.ai log --lines 20"
+    echo "  ./todo.ai update                     # Update to latest version"
+    echo "  ./todo.ai version                    # Show version"
 }
 
 # Function to validate command arguments and detect invalid options
@@ -598,7 +598,7 @@ add_subtask() {
     
     if [[ -z "$parent_id" || -z "$text" ]]; then
         echo "Error: Please provide parent task ID and subtask text"
-        echo "Usage: ./scripts/todo/todo.zsh add-subtask <parent-id> \"<subtask text>\" [\"<tags>\"]"
+        echo "Usage: ./todo.ai add-subtask <parent-id> \"<subtask text>\" [\"<tags>\"]"
         return 1
     fi
     
@@ -995,7 +995,7 @@ modify_todo() {
     
     if [[ -z "$task_id" || -z "$new_text" ]]; then
         echo "Error: Please provide task ID and new text"
-        echo "Usage: ./scripts/todo/todo.zsh modify <id> \"<new text>\" [\"<new tags>\"]"
+        echo "Usage: ./todo.ai modify <id> \"<new text>\" [\"<new tags>\"]"
         return 1
     fi
     
@@ -1068,7 +1068,7 @@ archive_task() {
     
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
-        echo "Usage: ./scripts/todo/todo.zsh archive <id> [--reason <reason>]"
+        echo "Usage: ./todo.ai archive <id> [--reason <reason>]"
         return 1
     fi
     
@@ -1387,7 +1387,7 @@ restore_task() {
     
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
-        echo "Usage: ./scripts/todo/todo.zsh restore <id>"
+        echo "Usage: ./todo.ai restore <id>"
         return 1
     fi
     
@@ -1442,8 +1442,8 @@ ensure_metadata_section() {
         echo "" >> "$TODO_FILE"
         echo "## Task Metadata" >> "$TODO_FILE"
         echo "" >> "$TODO_FILE"
-        echo "Task relationships and dependencies (managed by todo.zsh tool)." >> "$TODO_FILE"
-        echo "View with: \`./scripts/todo/todo.zsh show <task-id>\`" >> "$TODO_FILE"
+        echo "Task relationships and dependencies (managed by todo.ai tool)." >> "$TODO_FILE"
+        echo "View with: \`./todo.ai show <task-id>\`" >> "$TODO_FILE"
         echo "" >> "$TODO_FILE"
         echo "<!-- TASK RELATIONSHIPS" >> "$TODO_FILE"
         echo "-->" >> "$TODO_FILE"
@@ -1504,7 +1504,7 @@ show_task() {
     
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
-        echo "Usage: ./scripts/todo/todo.zsh show <id>"
+        echo "Usage: ./todo.ai show <id>"
         return 1
     fi
     
@@ -1606,7 +1606,7 @@ relate_task() {
     
     if [[ -z "$task_id" ]] || [[ -z "$rel_type" ]] || [[ -z "$targets" ]]; then
         echo "Error: Missing required parameters"
-        echo "Usage: ./scripts/todo/todo.zsh relate <id> --<relation-type> <target-ids>"
+        echo "Usage: ./todo.ai relate <id> --<relation-type> <target-ids>"
         echo ""
         echo "Relation types:"
         echo "  --completed-by <ids>   Task completed by other task(s)"
@@ -1639,7 +1639,7 @@ add_note() {
     
     if [[ -z "$task_id" ]] || [[ -z "$note_text" ]]; then
         echo "Error: Please provide task ID and note text"
-        echo "Usage: ./scripts/todo/todo.zsh note <id> <note-text>"
+        echo "Usage: ./todo.ai note <id> <note-text>"
         return 1
     fi
     
@@ -1830,8 +1830,8 @@ lint_todo() {
         echo "🎉 No formatting issues found! TODO.md is properly formatted."
     else
         echo "⚠️  Found $issues_found total formatting issues"
-        echo "💡 Run './scripts/todo/todo.zsh --reformat --dry-run' to see what would be fixed"
-        echo "💡 Run './scripts/todo/todo.zsh --reformat' to apply fixes"
+        echo "💡 Run './todo.ai --reformat --dry-run' to see what would be fixed"
+        echo "💡 Run './todo.ai --reformat' to apply fixes"
     fi
 }
 
@@ -1914,7 +1914,7 @@ reformat_todo() {
     
     # Summary
     if [[ "$dry_run" == true ]]; then
-        echo "💡 Run './scripts/todo/todo.zsh --reformat' to apply these fixes"
+        echo "💡 Run './todo.ai --reformat' to apply these fixes"
     elif [[ $fixes_applied -gt 0 ]]; then
         echo "🎉 Applied $fixes_applied formatting fixes to TODO.md"
     else
@@ -1967,14 +1967,14 @@ check_version() {
     if [[ -n "$remote_version" && "$remote_version" != "$VERSION" ]]; then
         echo ""
         echo "💡 Update available: $VERSION → $remote_version"
-        echo "   Run './todo.zsh update' to update to latest version"
+        echo "   Run './todo.ai update' to update to latest version"
         return 1
     fi
     
     return 0
 }
 
-# Function to update todo.zsh to latest version
+# Function to update todo.ai to latest version
 update_tool() {
     local script_path="${0:a}"
     local script_dir="$(dirname "$script_path")"
@@ -1986,10 +1986,10 @@ update_tool() {
         script_path="./$script_name"
     fi
     
-    echo "🔄 Updating todo.zsh..."
+    echo "🔄 Updating todo.ai..."
     
     if ! command -v curl >/dev/null 2>&1; then
-        echo "Error: curl is required to update todo.zsh"
+        echo "Error: curl is required to update todo.ai"
         echo "Please download manually from: $REPO_URL"
         return 1
     fi
@@ -2009,7 +2009,7 @@ update_tool() {
             # Get new version
             local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
             
-            echo "✅ Updated todo.zsh to version $new_version"
+            echo "✅ Updated todo.ai to version $new_version"
             echo "   Backup saved as ${script_path}.bak"
             return 0
         else
@@ -2189,9 +2189,9 @@ case "${1:-}" in
         update_tool
         ;;
     "version"|"--version"|"-v")
-        echo "todo.zsh version $VERSION"
+        echo "todo.ai version $VERSION"
         echo "Repository: $REPO_URL"
-        echo "Update: ./todo.zsh update"
+        echo "Update: ./todo.ai update"
         ;;
     "--help"|"help"|"-h")
         show_usage

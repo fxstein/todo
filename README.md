@@ -4,14 +4,14 @@
 
 ## For AI Agents
 
-Tell your agent to adopt `todo.zsh` for task management.
+Tell your agent to adopt `todo.ai` for task management.
 
 **Repository:** https://github.com/fxstein/todo
 
 **Copy-paste this to your agent:**
 ```
-Adopt todo.zsh for task tracking from https://github.com/fxstein/todo.
-Download todo.zsh into this project, then create a task "Implement user authentication" 
+Adopt todo.ai for task tracking from https://github.com/fxstein/todo.
+Download todo.ai into this project, then create a task "Implement user authentication" 
 with subtasks:
 - Design database schema
 - Create API endpoints  
@@ -21,18 +21,18 @@ with subtasks:
 
 The agent will automatically install by downloading:
 ```bash
-curl -o todo.zsh https://raw.githubusercontent.com/fxstein/todo/main/todo.zsh
-chmod +x todo.zsh
+curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo/main/todo.ai
+chmod +x todo.ai
 ```
 
-**To update:** Re-run the curl command, or use `./todo.zsh update`
+**To update:** Re-run the curl command, or use `./todo.ai update`
 
-The agent uses `todo.zsh` commands automatically:
-- `./todo.zsh --help` - Shows the agent all available commands
-- `./todo.zsh add` - Create tasks
-- `./todo.zsh add-subtask` - Add subtasks
-- `./todo.zsh complete` - Mark progress
-- `./todo.zsh list` - View tasks
+The agent uses `todo.ai` commands automatically:
+- `./todo.ai --help` - Shows the agent all available commands
+- `./todo.ai add` - Create tasks
+- `./todo.ai add-subtask` - Add subtasks
+- `./todo.ai complete` - Mark progress
+- `./todo.ai list` - View tasks
 
 All tasks are tracked in `TODO.md` in your repository.
 

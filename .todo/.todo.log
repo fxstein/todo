@@ -2,6 +2,23 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:01:35 | fxstein | DELETE | 24 | Test task after rename
+2025-10-30 23:01:34 | fxstein | ADD | 24 | Test task after rename
+2025-10-30 23:01:28 | fxstein | ARCHIVE | 23 | Rename todo.ai to todo.ai (with 10 subtasks)
+2025-10-30 23:01:28 | fxstein | COMPLETE | 23.1 | Update script filename: todo.zsh -> todo.ai
+2025-10-30 23:01:28 | fxstein | COMPLETE | 23.2 | Update all references in README.md (installation, examples, commands)
+2025-10-30 23:01:28 | fxstein | COMPLETE | 23.3 | Update TODO.md template path references
+2025-10-30 23:01:28 | fxstein | COMPLETE | 23.4 | Update self-references in update_tool() function
+2025-10-30 23:01:28 | fxstein | COMPLETE | 23.5 | Update Cursor rules to reference todo.ai instead of todo.zsh
+2025-10-30 23:01:27 | fxstein | COMPLETE | 23.6 | Update help text and show_usage() examples
+2025-10-30 23:01:27 | fxstein | COMPLETE | 23.7 | Update init_cursor_rules() to reference todo.ai
+2025-10-30 23:01:27 | fxstein | COMPLETE | 23.8 | Update all inline comments and documentation in script
+2025-10-30 23:01:27 | fxstein | COMPLETE | 23.9 | Test installation and execution after rename
+2025-10-30 23:01:27 | fxstein | COMPLETE | 23.10 | Test update command works with new filename
+2025-10-30 23:01:27 | fxstein | COMPLETE | 23 | Rename todo.ai to todo.ai
+2025-10-30 23:01:26 | fxstein | MODIFY | 23.5 | Update Cursor rules to reference todo.ai instead of todo.zsh
+2025-10-30 23:01:26 | fxstein | MODIFY | 23.1 | Update script filename: todo.zsh -> todo.ai
+2025-10-30 23:01:25 | fxstein | MODIFY | 23 | Rename todo.zsh to todo.ai
 2025-10-30 22:59:14 | fxstein | ADD_SUBTASK | 23.10 | Test update command works with new filename (parent: #23)
 2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.9 | Test installation and execution after rename (parent: #23)
 2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.8 | Update all inline comments and documentation in script (parent: #23)

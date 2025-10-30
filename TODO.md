@@ -3,6 +3,17 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#26** Rename .todo/ directory to .todo.ai/ `#setup`
+  - [ ] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup`
+  - [ ] **#26.9** Verify git tracking of .todo.ai/ `#test`
+  - [ ] **#26.8** Test script execution after rename `#test`
+  - [ ] **#26.7** Update any documentation files `#docs`
+  - [ ] **#26.6** Update README.md if it mentions .todo/ `#docs`
+  - [ ] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code`
+  - [ ] **#26.4** Update all references to .todo/ in script code `#code`
+  - [ ] **#26.3** Update LOG_FILE path in todo.ai script `#code`
+  - [ ] **#26.2** Update SERIAL_FILE path in todo.ai script `#code`
+  - [ ] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo`
 - [ ] **#21** Ensure .todo/ is tracked in git - not in gitignore or explicitly added `#setup`
 - [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
@@ -59,7 +70,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 23:04:55 CET 2025
+**Last Updated:** Thu Oct 30 23:07:26 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

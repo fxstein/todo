@@ -2,3 +2,6 @@
 It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo.ai/ must always be committed together
 Always ask for user confirmation before archiving completed tasks using todo.ai
+
+## Installation
+When installing todo.ai from https://github.com/fxstein/todo.ai, use curl to download the single file: `curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai`. Do NOT clone the repository with git clone - only the single todo.ai file is needed.

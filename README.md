@@ -11,7 +11,7 @@ Tell your agent to adopt `todo.ai` for task management.
 **Copy-paste this to your agent:**
 ```
 Adopt todo.ai for task tracking from https://github.com/fxstein/todo.ai.
-Download todo.ai into this project, then create a task "Implement user authentication" 
+Download todo.ai into this project using curl (DO NOT clone the repository), then create a task "Implement user authentication" 
 with subtasks:
 - Design database schema
 - Create API endpoints  
@@ -19,11 +19,13 @@ with subtasks:
 - Write tests
 ```
 
-The agent will automatically install by downloading:
+**Installation (use curl - DO NOT clone the repo):**
 ```bash
 curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai
 chmod +x todo.ai
 ```
+
+⚠️ **Important:** Use `curl` to download the single file. Do not clone the entire repository with `git clone`.
 
 **To update:** Re-run the curl command, or use `./todo.ai update`
 

@@ -17,6 +17,10 @@
 
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
+#
+# Version: 1.0.0
+# Repository: https://github.com/fxstein/todo
+# Update: ./todo.zsh update
 
 set -e
 
@@ -28,6 +32,11 @@ sed_inplace() {
         sed -i "$@"
     fi
 }
+
+# Version
+VERSION="1.0.0"
+REPO_URL="https://github.com/fxstein/todo"
+SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo/main/todo.zsh"
 
 # Configuration
 # Can be overridden with environment variables
@@ -285,7 +294,9 @@ normalize_checkboxes() {
 
 # Function to show usage
 show_usage() {
-    echo "Usage: ./scripts/todo/todo.zsh [command] [options]"
+    echo "Usage: ./todo.zsh [command] [options]"
+    echo ""
+    echo "Version: $VERSION"
     echo ""
     echo "Commands:"
     echo "  add <text> [tags]             Add a new todo item with optional tags"
@@ -304,39 +315,44 @@ show_usage() {
     echo "  --reformat [--dry-run]        Apply formatting fixes (use --dry-run to preview)"
     echo "  edit                          Edit todo file in editor"
     echo "  log [--filter <text>] [--lines <n>] View TODO operation log"
+    echo "  update                        Update todo.zsh to latest version"
+    echo "  version, -v, --version        Show version information"
+    echo ""
     echo ""
     echo "Examples:"
-    echo "  ./scripts/todo/todo.zsh add 'Fix Shelly device naming' '#api'"
-    echo "  ./scripts/todo/todo.zsh add-subtask 39 'Design subtask data structure' '#feature'"
-    echo "  ./scripts/todo/todo.zsh complete 1"
-    echo "  ./scripts/todo/todo.zsh complete 107 108 109          # Bulk complete"
-    echo "  ./scripts/todo/todo.zsh complete 104 --with-subtasks  # Complete task and all subtasks"
-    echo "  ./scripts/todo/todo.zsh complete 104.3-104.10         # Complete range of subtasks"
-    echo "  ./scripts/todo/todo.zsh undo 1"
-    echo "  ./scripts/todo/todo.zsh modify 1 'Updated task description' '#api'"
-    echo "  ./scripts/todo/todo.zsh delete 115                    # Soft delete (30-day recovery)"
-    echo "  ./scripts/todo/todo.zsh delete 110 --with-subtasks    # Delete task and all subtasks"
-    echo "  ./scripts/todo/todo.zsh delete 120.5-120.10           # Delete range"
-    echo "  ./scripts/todo/todo.zsh archive 1"
-    echo "  ./scripts/todo/todo.zsh archive 107 108 109           # Bulk archive"
-    echo "  ./scripts/todo/todo.zsh archive 109 --reason obsolete # Archive incomplete task"
-    echo "  ./scripts/todo/todo.zsh archive 104 --reason 'completed-by:107,108'"
-    echo "  ./scripts/todo/todo.zsh relate 110 --depends-on 104  # Add dependency"
-    echo "  ./scripts/todo/todo.zsh relate 104 --completed-by '107,108'"
-    echo "  ./scripts/todo/todo.zsh note 110 'Testing shows issues'  # Add note"
-    echo "  ./scripts/todo/todo.zsh show 110                    # Show task with relationships & notes"
-    echo "  ./scripts/todo/todo.zsh restore 1"
-    echo "  ./scripts/todo/todo.zsh --lint"
-    echo "  ./scripts/todo/todo.zsh --reformat --dry-run"
-    echo "  ./scripts/todo/todo.zsh --reformat"
-    echo "  ./scripts/todo/todo.zsh list"
-    echo "  ./scripts/todo/todo.zsh list --tag api"
-    echo "  ./scripts/todo/todo.zsh list --incomplete-only     # Show only pending tasks"
-    echo "  ./scripts/todo/todo.zsh list --parents-only        # Hide subtasks"
-    echo "  ./scripts/todo/todo.zsh list --has-subtasks        # Only tasks with subtasks"
-    echo "  ./scripts/todo/todo.zsh log"
-    echo "  ./scripts/todo/todo.zsh log --filter ADD"
-    echo "  ./scripts/todo/todo.zsh log --lines 20"
+    echo "  ./todo.zsh add 'Fix Shelly device naming' '#api'"
+    echo "  ./todo.zsh add-subtask 39 'Design subtask data structure' '#feature'"
+    echo "  ./todo.zsh complete 1"
+    echo "  ./todo.zsh complete 107 108 109          # Bulk complete"
+    echo "  ./todo.zsh complete 104 --with-subtasks  # Complete task and all subtasks"
+    echo "  ./todo.zsh complete 104.3-104.10         # Complete range of subtasks"
+    echo "  ./todo.zsh undo 1"
+    echo "  ./todo.zsh modify 1 'Updated task description' '#api'"
+    echo "  ./todo.zsh delete 115                    # Soft delete (30-day recovery)"
+    echo "  ./todo.zsh delete 110 --with-subtasks    # Delete task and all subtasks"
+    echo "  ./todo.zsh delete 120.5-120.10           # Delete range"
+    echo "  ./todo.zsh archive 1"
+    echo "  ./todo.zsh archive 107 108 109           # Bulk archive"
+    echo "  ./todo.zsh archive 109 --reason obsolete # Archive incomplete task"
+    echo "  ./todo.zsh archive 104 --reason 'completed-by:107,108'"
+    echo "  ./todo.zsh relate 110 --depends-on 104  # Add dependency"
+    echo "  ./todo.zsh relate 104 --completed-by '107,108'"
+    echo "  ./todo.zsh note 110 'Testing shows issues'  # Add note"
+    echo "  ./todo.zsh show 110                    # Show task with relationships & notes"
+    echo "  ./todo.zsh restore 1"
+    echo "  ./todo.zsh --lint"
+    echo "  ./todo.zsh --reformat --dry-run"
+    echo "  ./todo.zsh --reformat"
+    echo "  ./todo.zsh list"
+    echo "  ./todo.zsh list --tag api"
+    echo "  ./todo.zsh list --incomplete-only     # Show only pending tasks"
+    echo "  ./todo.zsh list --parents-only        # Hide subtasks"
+    echo "  ./todo.zsh list --has-subtasks        # Only tasks with subtasks"
+    echo "  ./todo.zsh log"
+    echo "  ./todo.zsh log --filter ADD"
+    echo "  ./todo.zsh log --lines 20"
+    echo "  ./todo.zsh update                     # Update to latest version"
+    echo "  ./todo.zsh version                    # Show version"
 }
 
 # Function to validate command arguments and detect invalid options
@@ -1934,6 +1950,81 @@ view_log() {
     fi
 }
 
+# Function to check for updates (informational only)
+check_version() {
+    if ! command -v curl >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    # Try to get version from remote script
+    local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "^# Version:" | head -1 | sed 's/.*Version:[ ]*\([0-9.]*\).*/\1/' || echo "")
+    
+    if [[ -z "$remote_version" ]]; then
+        # Try alternative extraction method
+        remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+    fi
+    
+    if [[ -n "$remote_version" && "$remote_version" != "$VERSION" ]]; then
+        echo ""
+        echo "💡 Update available: $VERSION → $remote_version"
+        echo "   Run './todo.zsh update' to update to latest version"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Function to update todo.zsh to latest version
+update_tool() {
+    local script_path="${0:a}"
+    local script_dir="$(dirname "$script_path")"
+    local script_name="$(basename "$script_path")"
+    
+    # If script is not in current directory, we need to be in the directory where it is
+    if [[ "$script_dir" != "." ]]; then
+        cd "$script_dir"
+        script_path="./$script_name"
+    fi
+    
+    echo "🔄 Updating todo.zsh..."
+    
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "Error: curl is required to update todo.zsh"
+        echo "Please download manually from: $REPO_URL"
+        return 1
+    fi
+    
+    # Download latest version
+    local temp_file=$(mktemp)
+    if curl -s -o "$temp_file" "$SCRIPT_URL"; then
+        # Check if download was successful
+        if [[ -s "$temp_file" ]] && grep -q "todo - AI-Agent First TODO List Tracker" "$temp_file"; then
+            # Backup current version
+            cp "$script_path" "${script_path}.bak" 2>/dev/null || true
+            
+            # Replace with new version
+            mv "$temp_file" "$script_path"
+            chmod +x "$script_path"
+            
+            # Get new version
+            local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+            
+            echo "✅ Updated todo.zsh to version $new_version"
+            echo "   Backup saved as ${script_path}.bak"
+            return 0
+        else
+            echo "Error: Downloaded file appears invalid"
+            rm -f "$temp_file"
+            return 1
+        fi
+    else
+        echo "Error: Failed to download latest version"
+        echo "Please check your internet connection or download manually from: $REPO_URL"
+        rm -f "$temp_file"
+        return 1
+    fi
+}
+
 
 
 
@@ -2093,6 +2184,14 @@ case "${1:-}" in
         else
             view_log
         fi
+        ;;
+    "update")
+        update_tool
+        ;;
+    "version"|"--version"|"-v")
+        echo "todo.zsh version $VERSION"
+        echo "Repository: $REPO_URL"
+        echo "Update: ./todo.zsh update"
         ;;
     *)
         show_usage

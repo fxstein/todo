@@ -25,6 +25,8 @@ curl -o todo.zsh https://raw.githubusercontent.com/fxstein/todo/main/todo.zsh
 chmod +x todo.zsh
 ```
 
+**To update:** Re-run the curl command, or use `./todo.zsh update`
+
 The agent uses `todo.zsh` commands automatically:
 - `./todo.zsh add` - Create tasks
 - `./todo.zsh add-subtask` - Add subtasks

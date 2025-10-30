@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 22:47:46 | fxstein | ARCHIVE | 22 | Create update instructions and functions for todo.zsh (with 3 subtasks)
+2025-10-30 22:47:45 | fxstein | COMPLETE | 22.1 | Option 1: Simple re-download instruction in README
+2025-10-30 22:47:45 | fxstein | COMPLETE | 22.2 | Option 2: Add version info + update command
+2025-10-30 22:47:45 | fxstein | COMPLETE | 22.3 | Option 3: Auto-check version on startup (informational only)
+2025-10-30 22:47:45 | fxstein | COMPLETE | 22 | Create update instructions and functions for todo.zsh
 2025-10-30 22:45:42 | fxstein | ADD_SUBTASK | 22.3 | Option 3: Auto-check version on startup (informational only) (parent: #22)
 2025-10-30 22:45:42 | fxstein | ADD_SUBTASK | 22.2 | Option 2: Add version info + update command (parent: #22)
 2025-10-30 22:45:42 | fxstein | ADD_SUBTASK | 22.1 | Option 1: Simple re-download instruction in README (parent: #22)

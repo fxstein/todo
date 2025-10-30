@@ -1,6 +1,6 @@
 # todo ToDo List
 
-> **⚠️ IMPORTANT: This file should ONLY be edited through the `./todo.zsh` script!**
+> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.zsh` script!**
 
 ## Tasks
 - [ ] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup`
@@ -33,5 +33,5 @@
 
 **Last Updated:** Thu Oct 30 21:57:16 CET 2025
 **Repository:** https://github.com/fxstein/todo  
-**Maintenance:** Use `./todo.zsh` script only
+**Maintenance:** Use `todo.zsh` script only
 

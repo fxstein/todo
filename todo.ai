@@ -2026,6 +2026,38 @@ update_tool() {
             
             echo "✅ Updated todo.ai to version $new_version"
             echo "   Backup saved as ${script_path}.bak"
+            
+            # Update cursor rules after successful update to ensure latest rules are applied
+            if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                echo ""
+                echo "🔄 Updating cursor rules..."
+                # Extract and source the init_cursor_rules function from the updated script
+                local function_start=$(grep -n "^init_cursor_rules()" "$script_path" | head -1 | cut -d: -f1)
+                local function_end=$(awk "NR>$function_start && /^[a-zA-Z_]/ && /\(\) \{/ {print NR-1; exit}" "$script_path" | head -1)
+                
+                if [[ -n "$function_start" ]] && [[ -n "$function_end" ]]; then
+                    local temp_script=$(mktemp)
+                    # Also need sed_inplace function
+                    local sed_inplace_start=$(grep -n "^sed_inplace()" "$script_path" | head -1 | cut -d: -f1)
+                    local sed_inplace_end
+                    
+                    if [[ -n "$sed_inplace_start" ]] && [[ "$sed_inplace_start" -lt "$function_start" ]]; then
+                        sed_inplace_end=$(awk "NR>$sed_inplace_start && /^[a-zA-Z_]/ && /\(\) \{/ {print NR-1; exit}" "$script_path" | head -1)
+                        if [[ -n "$sed_inplace_end" ]]; then
+                            sed -n "${sed_inplace_start},${sed_inplace_end}p" "$script_path" >> "$temp_script"
+                            echo "" >> "$temp_script"
+                        fi
+                    fi
+                    
+                    # Extract init_cursor_rules function
+                    sed -n "${function_start},${function_end}p" "$script_path" >> "$temp_script"
+                    
+                    # Source and execute
+                    source "$temp_script" 2>/dev/null && init_cursor_rules || echo "   ⚠️  Could not update cursor rules automatically. They will be updated on next script run."
+                    rm -f "$temp_script"
+                fi
+            fi
+            
             return 0
         else
             echo "Error: Downloaded file appears invalid"

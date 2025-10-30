@@ -19,7 +19,7 @@
 # Keep AI agents on track and help humans supervise their work
 #
 # Version: 1.0.0
-# Repository: https://github.com/fxstein/todo
+# Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
 set -e
@@ -35,8 +35,8 @@ sed_inplace() {
 
 # Version
 VERSION="1.0.0"
-REPO_URL="https://github.com/fxstein/todo"
-SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo/main/todo.ai"
+REPO_URL="https://github.com/fxstein/todo.ai"
+SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
 # Configuration
 # Can be overridden with environment variables

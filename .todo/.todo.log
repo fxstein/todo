@@ -2,6 +2,21 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:04:55 | fxstein | ARCHIVE | 25 | Rename repository from todo to todo.ai (with 6 subtasks)
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25.1 | Rename repository on GitHub (manual step)
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25.2 | Update local git remote URL after GitHub rename
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25.3 | Update REPO_URL in todo.ai script
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25.4 | Update SCRIPT_URL in todo.ai script
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25.5 | Update README.md repository references
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25.6 | Update header comment in todo.ai
+2025-10-30 23:04:55 | fxstein | COMPLETE | 25 | Rename repository from todo to todo.ai
+2025-10-30 23:03:48 | fxstein | ADD_SUBTASK | 25.6 | Update header comment in todo.ai (parent: #25)
+2025-10-30 23:03:48 | fxstein | ADD_SUBTASK | 25.5 | Update README.md repository references (parent: #25)
+2025-10-30 23:03:48 | fxstein | ADD_SUBTASK | 25.4 | Update SCRIPT_URL in todo.ai script (parent: #25)
+2025-10-30 23:03:48 | fxstein | ADD_SUBTASK | 25.3 | Update REPO_URL in todo.ai script (parent: #25)
+2025-10-30 23:03:48 | fxstein | ADD_SUBTASK | 25.2 | Update local git remote URL after GitHub rename (parent: #25)
+2025-10-30 23:03:48 | fxstein | ADD_SUBTASK | 25.1 | Rename repository on GitHub (manual step) (parent: #25)
+2025-10-30 23:03:46 | fxstein | ADD | 25 | Rename repository from todo to todo.ai
 2025-10-30 23:01:35 | fxstein | DELETE | 24 | Test task after rename
 2025-10-30 23:01:34 | fxstein | ADD | 24 | Test task after rename
 2025-10-30 23:01:28 | fxstein | ARCHIVE | 23 | Rename todo.ai to todo.ai (with 10 subtasks)

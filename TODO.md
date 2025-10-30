@@ -24,6 +24,13 @@
 - [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ## Recently Completed
+- [x] **#25** Rename repository from todo to todo.ai `#setup` (2025-10-30)
+  - [x] **#25.6** Update header comment in todo.ai `#code` (2025-10-30)
+  - [x] **#25.5** Update README.md repository references `#docs` (2025-10-30)
+  - [x] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (2025-10-30)
+  - [x] **#25.3** Update REPO_URL in todo.ai script `#code` (2025-10-30)
+  - [x] **#25.2** Update local git remote URL after GitHub rename `#repo` (2025-10-30)
+  - [x] **#25.1** Rename repository on GitHub (manual step) `#repo` (2025-10-30)
 - [x] **#23** Rename todo.ai to todo.ai `#setup` (2025-10-30)
   - [x] **#23.10** Test update command works with new filename `#test` (2025-10-30)
   - [x] **#23.9** Test installation and execution after rename `#test` (2025-10-30)
@@ -52,7 +59,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 23:01:35 CET 2025
-**Repository:** https://github.com/fxstein/todo  
+**Last Updated:** Thu Oct 30 23:04:55 CET 2025
+**Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

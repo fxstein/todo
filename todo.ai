@@ -1099,8 +1099,21 @@ modify_todo() {
     # Normalize any malformed checkboxes first
     normalize_checkboxes
     
-    # Get the current completion status (handle both bold and non-bold formatting, and subtasks)
-    local current_status=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/' | head -1)
+    # Get the current completion status and existing line (handle both bold and non-bold formatting, and subtasks)
+    local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
+    local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/')
+    
+    # Extract existing tags from current line (tags are in backticks after the task text)
+    local existing_tags=""
+    if echo "$current_line" | grep -q '\`#'; then
+        # Extract tags (everything in backticks)
+        existing_tags=$(echo "$current_line" | sed 's/.*\(`#[^`]*`\).*/\1/' | sed 's/`//g')
+        # Handle multiple tags
+        local all_tags=$(echo "$current_line" | grep -o '\`#[^`]*`' | sed 's/`//g' | tr '\n' ' ' | sed 's/ $//')
+        if [[ -n "$all_tags" ]]; then
+            existing_tags="$all_tags"
+        fi
+    fi
     
     # Format the new task line preserving completion status with bold task ID
     # Check if this is a subtask (has decimal point) and add proper indentation
@@ -1109,11 +1122,20 @@ modify_todo() {
     else
         local new_task_line="- [$current_status] **#$task_id** $new_text"
     fi
+    
+    # Use new_tags if provided, otherwise preserve existing tags
+    local tags_to_use=""
     if [[ -n "$new_tags" ]]; then
+        tags_to_use="$new_tags"
+    elif [[ -n "$existing_tags" ]]; then
+        tags_to_use="$existing_tags"
+    fi
+    
+    if [[ -n "$tags_to_use" ]]; then
         # Wrap each tag in backticks for code styling
         local styled_tags=""
         # Split tags by space and process each one
-        for tag in $(echo "$new_tags" | tr ' ' '\n'); do
+        for tag in $(echo "$tags_to_use" | tr ' ' '\n'); do
             if [[ -n "$styled_tags" ]]; then
                 styled_tags="$styled_tags \`$tag\`"
             else
@@ -1124,16 +1146,19 @@ modify_todo() {
     fi
     
     # Replace the task line using sed (handle bold formatting and subtasks)
+    # The pattern needs to match the entire line including any existing tags (with backticks)
     # Escape special characters for sed replacement (using pipe as delimiter)
-    # Need to escape: backslash first, then &, then pipe delimiter
     local escaped_line=$(printf '%s\n' "$new_task_line" | sed 's/\\/\\\\/g' | sed 's/&/\\&/g' | sed 's/|/\\|/g')
     
     # Use pipe delimiter to avoid conflicts with / and other characters in replacement
+    # Match everything after task ID including text and tags (with backticks)
     if [[ "$task_id" =~ \. ]]; then
         # For subtasks, replace with proper 2-space indentation
+        # Pattern matches: checkbox, task ID, then everything (text and tags)
         sed_inplace "s|^  - \[.*\] \*\*#$task_id\*\* .*|$escaped_line|" "$TODO_FILE"
     else
         # For main tasks, replace without indentation
+        # Pattern matches: checkbox, task ID, then everything (text and tags)
         sed_inplace "s|^- \[.*\] \*\*#$task_id\*\* .*|$escaped_line|" "$TODO_FILE"
     fi
     update_footer

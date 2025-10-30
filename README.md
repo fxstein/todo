@@ -28,6 +28,7 @@ chmod +x todo.zsh
 **To update:** Re-run the curl command, or use `./todo.zsh update`
 
 The agent uses `todo.zsh` commands automatically:
+- `./todo.zsh --help` - Show all available commands
 - `./todo.zsh add` - Create tasks
 - `./todo.zsh add-subtask` - Add subtasks
 - `./todo.zsh complete` - Mark progress

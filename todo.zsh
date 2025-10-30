@@ -2193,6 +2193,9 @@ case "${1:-}" in
         echo "Repository: $REPO_URL"
         echo "Update: ./todo.zsh update"
         ;;
+    "--help"|"help"|"-h")
+        show_usage
+        ;;
     *)
         show_usage
         ;;

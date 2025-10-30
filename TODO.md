@@ -10,6 +10,7 @@
   - [ ] **#15.1** Markdown linting `#lint`
 - [ ] **#14** Formatting fixes complete `#setup`
 - [ ] **#7** Create .gitignore for .todo directory `#setup` `#git`
+  - [ ] **#7.1** Add setup instructions documenting that .todo/ must be tracked in git `#docs` `#setup`
 - [ ] **#6** Update TODO.md template for this repository `#setup` `#docs`
 - [ ] **#5** Initialize repository structure and configuration `#setup` `#repo`
 - [ ] **#4** Test task `#test`
@@ -25,7 +26,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 21:42:55 CET 2025
+**Last Updated:** Thu Oct 30 21:45:48 CET 2025
 **Repository:** https://github.com/fxstein/homeassistant  
 **Maintenance:** Use `./scripts/todo/todo.zsh` script only
 

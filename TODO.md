@@ -17,6 +17,7 @@
 ------------------
 
 ## Deleted Tasks
+- [D] **#31** Test task after serial rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#24** Test task after rename `#test` (deleted 2025-10-30, expires 2025-11-29)
@@ -89,7 +90,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 23:33:42 CET 2025
+**Last Updated:** Thu Oct 30 23:38:45 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

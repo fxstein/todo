@@ -41,7 +41,7 @@ SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 # Configuration
 # Can be overridden with environment variables
 TODO_FILE="${TODO_FILE:-$(pwd)/TODO.md}"
-SERIAL_FILE="${TODO_SERIAL:-$(pwd)/.todo.ai/.todo.ai_serial}"
+SERIAL_FILE="${TODO_SERIAL:-$(pwd)/.todo.ai/.todo.ai.serial}"
 LOG_FILE="${TODO_LOG:-$(pwd)/.todo.ai/.todo.ai.log}"
 
 # Function to get next serial number

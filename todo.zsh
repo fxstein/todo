@@ -879,7 +879,7 @@ modify_todo() {
     
     # Replace the task line using sed (handle bold formatting and subtasks)
     # Escape special characters for sed replacement (using pipe as delimiter)
-    # Need to escape: & \ and any pipes in the replacement text
+    # Need to escape: backslash first, then &, then pipe delimiter
     local escaped_line=$(printf '%s\n' "$new_task_line" | sed 's/\\/\\\\/g' | sed 's/&/\\&/g' | sed 's/|/\\|/g')
     
     # Use pipe delimiter to avoid conflicts with / and other characters in replacement

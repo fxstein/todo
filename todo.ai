@@ -349,7 +349,7 @@ show_usage() {
     echo "  --reformat [--dry-run]        Apply formatting fixes (use --dry-run to preview)"
     echo "  edit                          Edit todo file in editor"
     echo "  log [--filter <text>] [--lines <n>] View TODO operation log"
-    echo "  update                        Update todo.ai to latest version"
+    echo "  update [--force]              Update todo.ai to latest version (--force to update even if hash matches)"
     echo "  backups, list-backups         List available backup versions"
     echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
     echo "  version, -v, --version        Show version information"
@@ -2276,6 +2276,13 @@ rollback() {
 
 # Function to update todo.ai to latest version
 update_tool() {
+    local force_update=false
+    
+    # Check for --force flag
+    if [[ "$1" == "--force" ]]; then
+        force_update=true
+    fi
+    
     # Get the actual script path
     local script_path
     script_path=$(get_script_path) || {
@@ -2325,33 +2332,40 @@ update_tool() {
             
             rm -f "$temp_check_file"
             
-            # If hashes are available and match, files are identical - skip update
+            # If hashes are available and match, files are identical - skip update (unless forced)
             if [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" == "$remote_hash" ]]; then
-                echo "✅ todo.ai is already at the latest version ($VERSION)"
-                echo "   Content hash matches - no update needed"
-                echo "   Checking cursor rules..."
-                # Still update cursor rules even if script is up to date
-                if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-                    echo ""
-                    echo "🔄 Updating cursor rules..."
-                    # Call init_cursor_rules directly since we're in the same script
-                    init_cursor_rules
+                if [[ "$force_update" == true ]]; then
+                    echo "⚠️  Forcing update even though content hash matches"
+                    echo "   Updating to latest version..."
+                    # Continue with update below
+                else
+                    echo "✅ todo.ai is already at the latest version ($VERSION)"
+                    echo "   Content hash matches - no update needed"
+                    echo "   Checking cursor rules..."
+                    # Still update cursor rules even if script is up to date
+                    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                        echo ""
+                        echo "🔄 Updating cursor rules..."
+                        # Call init_cursor_rules directly since we're in the same script
+                        init_cursor_rules
+                    fi
+                    return 0
                 fi
-                return 0
             elif [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" != "$remote_hash" ]]; then
                 # Version matches but content differs - proceed with update
                 echo "⚠️  Version matches ($VERSION), but content differs"
                 echo "   Updating to latest content..."
             else
-                # Hash comparison not available - assume up to date if version matches
-                echo "✅ todo.ai is already at the latest version ($VERSION)"
-                echo "   Checking cursor rules..."
-                if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-                    echo ""
-                    echo "🔄 Updating cursor rules..."
-                    init_cursor_rules
+                # Hash comparison not available - still proceed with update to be safe
+                # or force update if requested
+                if [[ "$force_update" == true ]]; then
+                    echo "⚠️  Forcing update (hash tools not available)"
+                    echo "   Updating to latest version..."
+                else
+                    echo "⚠️  Hash comparison not available - updating to be safe"
+                    echo "   Content may have changed even though version matches"
+                    echo "   Use './todo.ai update --force' to force updates in the future"
                 fi
-                return 0
             fi
         else
             rm -f "$temp_check_file"
@@ -2606,7 +2620,8 @@ case "${1:-}" in
         fi
         ;;
     "update")
-        update_tool
+        shift
+        update_tool "$@"
         ;;
     "backups"|"list-backups")
         list_backups

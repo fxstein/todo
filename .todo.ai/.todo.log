@@ -2,6 +2,30 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:09:51 | fxstein | ARCHIVE | 17 | Create Cursor rules for repository (with 2 subtasks)
+2025-10-30 23:09:51 | fxstein | COMPLETE | 17.1 | Enforce todo.ai usage for all task tracking
+2025-10-30 23:09:51 | fxstein | COMPLETE | 17.3 | Ensure TODO.md and .todo.ai/ are always committed together
+2025-10-30 23:09:51 | fxstein | COMPLETE | 17 | Create Cursor rules for repository
+2025-10-30 23:09:08 | fxstein | MODIFY | 7 | Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git
+2025-10-30 23:09:07 | fxstein | MODIFY | 21 | Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added
+2025-10-30 23:08:56 | fxstein | ARCHIVE | 26 | Rename .todo/ directory to .todo.ai/ (with 10 subtasks)
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.1 | Rename directory using git mv: .todo/ -> .todo.ai/
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.2 | Update SERIAL_FILE path in todo.ai script
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.3 | Update LOG_FILE path in todo.ai script
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.4 | Update all references to .todo/ in script code
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.5 | Update environment variable names (TODO_SERIAL, TODO_LOG)
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.6 | Update README.md if it mentions .todo/
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.7 | Update any documentation files
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.8 | Test script execution after rename
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.9 | Verify git tracking of .todo.ai/
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26.10 | Update .cursorrules to reference .todo.ai/ instead of .todo/
+2025-10-30 23:08:56 | fxstein | COMPLETE | 26 | Rename .todo/ directory to .todo.ai/
+2025-10-30 23:08:47 | fxstein | DELETE | 27 | Test task after .todo.ai rename
+2025-10-30 23:08:46 | fxstein | ADD | 27 | Test task after .todo.ai rename
+2025-10-30 23:08:45 | fxstein | MODIFY | 7.1 | Add setup instructions documenting that .todo.ai/ must be tracked in git
+2025-10-30 23:08:45 | fxstein | MODIFY | 7 | Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git
+2025-10-30 23:08:45 | fxstein | MODIFY | 17.3 | Ensure TODO.md and .todo.ai/ are always committed together
+2025-10-30 23:08:45 | fxstein | MODIFY | 21 | Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added
 2025-10-30 23:07:26 | fxstein | ADD_SUBTASK | 26.10 | Update .cursorrules to reference .todo.ai/ instead of .todo/ (parent: #26)
 2025-10-30 23:06:47 | fxstein | ADD_SUBTASK | 26.9 | Verify git tracking of .todo.ai/ (parent: #26)
 2025-10-30 23:06:47 | fxstein | ADD_SUBTASK | 26.8 | Test script execution after rename (parent: #26)

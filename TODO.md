@@ -3,38 +3,39 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#26** Rename .todo/ directory to .todo.ai/ `#setup`
-  - [ ] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup`
-  - [ ] **#26.9** Verify git tracking of .todo.ai/ `#test`
-  - [ ] **#26.8** Test script execution after rename `#test`
-  - [ ] **#26.7** Update any documentation files `#docs`
-  - [ ] **#26.6** Update README.md if it mentions .todo/ `#docs`
-  - [ ] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code`
-  - [ ] **#26.4** Update all references to .todo/ in script code `#code`
-  - [ ] **#26.3** Update LOG_FILE path in todo.ai script `#code`
-  - [ ] **#26.2** Update SERIAL_FILE path in todo.ai script `#code`
-  - [ ] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo`
-- [ ] **#21** Ensure .todo/ is tracked in git - not in gitignore or explicitly added `#setup`
+- [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
 - [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
-- [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
-  - [ ] **#17.3** Ensure TODO.md and .todo/ are always committed together `#rules` `#git`
-  - [ ] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo`
 - [ ] **#15** Setup githooks `#setup` `#git`
   - [ ] **#15.4** TODO linting (using todo.ai --lint) `#lint`
   - [ ] **#15.3** JSON linting `#lint`
   - [ ] **#15.2** YAML linting `#lint`
   - [ ] **#15.1** Markdown linting `#lint`
 - [ ] **#14** Formatting fixes complete `#setup`
-- [ ] **#7** Remove gitignore entry for .todo directory - .todo/ must be tracked in git `#setup` `#git`
-  - [ ] **#7.1** Add setup instructions documenting that .todo/ must be tracked in git `#docs` `#setup`
+- [ ] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#setup` `#git`
+  - [ ] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs`
 - [ ] **#5** Initialize repository structure and configuration `#setup` `#repo`
 ------------------
 
 ## Deleted Tasks
+- [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#24** Test task after rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ## Recently Completed
+- [x] **#17** Create Cursor rules for repository `#setup` `#docs` (2025-10-30)
+  - [x] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (2025-10-30)
+  - [x] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (2025-10-30)
+- [x] **#26** Rename .todo/ directory to .todo.ai/ `#setup` (2025-10-30)
+  - [x] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (2025-10-30)
+  - [x] **#26.9** Verify git tracking of .todo.ai/ `#test` (2025-10-30)
+  - [x] **#26.8** Test script execution after rename `#test` (2025-10-30)
+  - [x] **#26.7** Update any documentation files `#docs` (2025-10-30)
+  - [x] **#26.6** Update README.md if it mentions .todo/ `#docs` (2025-10-30)
+  - [x] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (2025-10-30)
+  - [x] **#26.4** Update all references to .todo/ in script code `#code` (2025-10-30)
+  - [x] **#26.3** Update LOG_FILE path in todo.ai script `#code` (2025-10-30)
+  - [x] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (2025-10-30)
+  - [x] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (2025-10-30)
 - [x] **#25** Rename repository from todo to todo.ai `#setup` (2025-10-30)
   - [x] **#25.6** Update header comment in todo.ai `#code` (2025-10-30)
   - [x] **#25.5** Update README.md repository references `#docs` (2025-10-30)
@@ -70,7 +71,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 23:07:26 CET 2025
+**Last Updated:** Thu Oct 30 23:09:51 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

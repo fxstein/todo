@@ -3,6 +3,10 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.zsh` script!**
 
 ## Tasks
+- [ ] **#22** Create update instructions and functions for todo.zsh `#setup`
+  - [ ] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup`
+  - [ ] **#22.2** Option 2: Add version info + update command `#setup`
+  - [ ] **#22.1** Option 1: Simple re-download instruction in README `#docs`
 - [ ] **#21** Ensure .todo/ is tracked in git - not in gitignore or explicitly added `#setup`
 - [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
@@ -36,7 +40,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 22:34:00 CET 2025
+**Last Updated:** Thu Oct 30 22:45:42 CET 2025
 **Repository:** https://github.com/fxstein/todo  
 **Maintenance:** Use `todo.zsh` script only
 

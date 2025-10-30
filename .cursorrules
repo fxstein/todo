@@ -1,0 +1,3 @@
+## Task Management
+It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools
+TODO.md and .todo/ must always be committed together

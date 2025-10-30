@@ -151,24 +151,39 @@ EOF
 init_cursor_rules() {
     local cursor_rules_file="$(pwd)/.cursorrules"
     local todo_rule="It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools"
+    local commit_rule="TODO.md and .todo/ must always be committed together"
+    local rules_added=0
     
     # Check if .cursorrules exists
     if [[ ! -f "$cursor_rules_file" ]]; then
-        # Create .cursorrules with todo.zsh rule
+        # Create .cursorrules with todo.zsh rules
         cat > "$cursor_rules_file" << 'EOF'
 ## Task Management
 It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools
+TODO.md and .todo/ must always be committed together
 EOF
         echo ""
         echo "⚠️  IMPORTANT: Created .cursorrules file"
         echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
+        echo "   📝 Added rule: 'TODO.md and .todo/ must always be committed together'"
         echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
         return 0
     fi
     
-    # Check if rule already exists
+    # Check if rules already exist
+    local todo_rule_exists=false
+    local commit_rule_exists=false
+    
     if grep -q "todo.zsh" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
-        # Rule already exists, don't add it again
+        todo_rule_exists=true
+    fi
+    
+    if grep -q "TODO.md and .todo" "$cursor_rules_file" || grep -q "committed together" "$cursor_rules_file"; then
+        commit_rule_exists=true
+    fi
+    
+    # If both rules exist, nothing to do
+    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]]; then
         return 0
     fi
     
@@ -181,31 +196,60 @@ EOF
         section_added=true
     fi
     
-    # Add the rule (check if we need to add it to existing section)
+    # Add the rules (check if we need to add them to existing section)
     if grep -q "^## Task Management" "$cursor_rules_file"; then
         # Find the line number of "## Task Management"
         local section_line=$(grep -n "^## Task Management" "$cursor_rules_file" | head -1 | cut -d: -f1)
         if [[ -n "$section_line" ]]; then
-            # Add rule after the section header
-            if [[ "$(uname)" == "Darwin" ]]; then
-                local temp_file=$(mktemp)
-                head -n "$section_line" "$cursor_rules_file" > "$temp_file"
-                echo "$todo_rule" >> "$temp_file"
-                tail -n +$((section_line + 1)) "$cursor_rules_file" >> "$temp_file"
-                mv "$temp_file" "$cursor_rules_file"
-            else
-                sed_inplace "${section_line}a$todo_rule" "$cursor_rules_file"
+            # Build list of rules to add
+            local rules_to_add=()
+            
+            if [[ "$todo_rule_exists" == false ]]; then
+                rules_to_add+=("$todo_rule")
+            fi
+            
+            if [[ "$commit_rule_exists" == false ]]; then
+                rules_to_add+=("$commit_rule")
+            fi
+            
+            # Add rules after the section header
+            if [[ ${#rules_to_add[@]} -gt 0 ]]; then
+                if [[ "$(uname)" == "Darwin" ]]; then
+                    local temp_file=$(mktemp)
+                    head -n "$section_line" "$cursor_rules_file" > "$temp_file"
+                    for rule in "${rules_to_add[@]}"; do
+                        echo "$rule" >> "$temp_file"
+                    done
+                    tail -n +$((section_line + 1)) "$cursor_rules_file" >> "$temp_file"
+                    mv "$temp_file" "$cursor_rules_file"
+                    rules_added=${#rules_to_add[@]}
+                else
+                    local last_line=$section_line
+                    for rule in "${rules_to_add[@]}"; do
+                        last_line=$((last_line + 1))
+                        sed_inplace "${last_line}a$rule" "$cursor_rules_file"
+                        rules_added=$((rules_added + 1))
+                    done
+                fi
             fi
         fi
     fi
     
-    echo ""
-    echo "⚠️  IMPORTANT: Updated .cursorrules file"
-    if [[ "$section_added" == true ]]; then
-        echo "   📝 Added new section: '## Task Management'"
+    # Show explicit callouts
+    if [[ $rules_added -gt 0 ]]; then
+        echo ""
+        echo "⚠️  IMPORTANT: Updated .cursorrules file"
+        if [[ "$section_added" == true ]]; then
+            echo "   📝 Added new section: '## Task Management'"
+        fi
+        if [[ "$todo_rule_exists" == false ]]; then
+            echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
+        fi
+        if [[ "$commit_rule_exists" == false ]]; then
+            echo "   📝 Added rule: 'TODO.md and .todo/ must always be committed together'"
+        fi
+        echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
     fi
-    echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.zsh and not via built in TODO tools'"
-    echo "   This ensures AI agents will automatically use todo.zsh for task tracking"
 }
 
 # Function to get current serial number

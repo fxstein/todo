@@ -2,6 +2,17 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 22:59:14 | fxstein | ADD_SUBTASK | 23.10 | Test update command works with new filename (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.9 | Test installation and execution after rename (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.8 | Update all inline comments and documentation in script (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.7 | Update init_cursor_rules() to reference todo.ai (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.6 | Update help text and show_usage() examples (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.5 | Update Cursor rules to reference todo.ai instead of todo.zsh (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.4 | Update self-references in update_tool() function (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.3 | Update TODO.md template path references (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.2 | Update all references in README.md (installation, examples, commands) (parent: #23)
+2025-10-30 22:59:13 | fxstein | ADD_SUBTASK | 23.1 | Update script filename: todo.zsh -> todo.ai (parent: #23)
+2025-10-30 22:59:11 | fxstein | ADD | 23 | Rename todo.zsh to todo.ai
 2025-10-30 22:47:46 | fxstein | ARCHIVE | 22 | Create update instructions and functions for todo.zsh (with 3 subtasks)
 2025-10-30 22:47:45 | fxstein | COMPLETE | 22.1 | Option 1: Simple re-download instruction in README
 2025-10-30 22:47:45 | fxstein | COMPLETE | 22.2 | Option 2: Add version info + update command

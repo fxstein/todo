@@ -4,16 +4,25 @@
 
 ## For AI Agents
 
-Tell your agent to adopt `todo.zsh` for task management. No configuration needed. Just works.
+Tell your agent to adopt `todo.zsh` for task management.
 
-**Example instructions for your agent:**
+**Repository:** https://github.com/fxstein/todo
+
+**Copy-paste this to your agent:**
 ```
-Adopt todo.zsh for task tracking. 
-Create a task "Implement user authentication" with subtasks:
+Adopt todo.zsh for task tracking from https://github.com/fxstein/todo.
+Download todo.zsh into this project, then create a task "Implement user authentication" 
+with subtasks:
 - Design database schema
 - Create API endpoints  
 - Add frontend components
 - Write tests
+```
+
+The agent will automatically install by downloading:
+```bash
+curl -o todo.zsh https://raw.githubusercontent.com/fxstein/todo/main/todo.zsh
+chmod +x todo.zsh
 ```
 
 The agent uses `todo.zsh` commands automatically:

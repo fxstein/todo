@@ -4,6 +4,7 @@
 
 ## Tasks
 - [ ] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup`
+  - [ ] **#18.1** Remove path from todo.zsh upon init `#fix` `#setup`
 - [ ] **#17** Create Cursor rules for repository `#setup` `#docs`
   - [ ] **#17.3** Ensure TODO.md and .todo/ are always committed together `#rules` `#git`
   - [ ] **#17.1** Enforce todo.zsh usage for all task tracking `#rules` `#todo`
@@ -30,7 +31,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 21:55:04 CET 2025
-**Repository:** https://github.com/fxstein/homeassistant  
+**Last Updated:** Thu Oct 30 21:57:16 CET 2025
+**Repository:** https://github.com/fxstein/todo  
 **Maintenance:** Use `./scripts/todo/todo.zsh` script only
 

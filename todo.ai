@@ -161,6 +161,7 @@ init_cursor_rules() {
     local cursor_rules_file="$(pwd)/.cursorrules"
     local todo_rule="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools"
     local commit_rule="TODO.md and .todo.ai/ must always be committed together"
+    local archive_rule="Always ask for user confirmation before archiving completed tasks using todo.ai"
     local rules_added=0
     
     # Check if .cursorrules exists
@@ -170,11 +171,13 @@ init_cursor_rules() {
 ## Task Management
 It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo.ai/ must always be committed together
+Always ask for user confirmation before archiving completed tasks using todo.ai
 EOF
         echo ""
         echo "⚠️  IMPORTANT: Created .cursorrules file"
         echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
         echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
+        echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
         echo "   This ensures AI agents will automatically use todo.ai for task tracking"
         return 0
     fi
@@ -182,6 +185,7 @@ EOF
     # Check if rules already exist
     local todo_rule_exists=false
     local commit_rule_exists=false
+    local archive_rule_exists=false
     
     if grep -q "todo.ai" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
         todo_rule_exists=true
@@ -191,8 +195,12 @@ EOF
         commit_rule_exists=true
     fi
     
-    # If both rules exist, nothing to do
-    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]]; then
+    if grep -q "archiving completed tasks" "$cursor_rules_file" || grep -q "confirmation before archiving" "$cursor_rules_file"; then
+        archive_rule_exists=true
+    fi
+    
+    # If all rules exist, nothing to do
+    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]]; then
         return 0
     fi
     
@@ -219,6 +227,10 @@ EOF
             
             if [[ "$commit_rule_exists" == false ]]; then
                 rules_to_add+=("$commit_rule")
+            fi
+            
+            if [[ "$archive_rule_exists" == false ]]; then
+                rules_to_add+=("$archive_rule")
             fi
             
             # Add rules after the section header
@@ -256,6 +268,9 @@ EOF
         fi
         if [[ "$commit_rule_exists" == false ]]; then
             echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
+        fi
+        if [[ "$archive_rule_exists" == false ]]; then
+            echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
         fi
         echo "   This ensures AI agents will automatically use todo.ai for task tracking"
     fi

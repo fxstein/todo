@@ -95,10 +95,35 @@ init_log_file() {
 # Function to initialize TODO file if it doesn't exist
 init_todo_file() {
     if [[ ! -f "$TODO_FILE" ]]; then
-        cat > "$TODO_FILE" << 'EOF'
-# Home Assistant Project Todo List
+        # Detect repository name and URL from git
+        local repo_name="Project"
+        local repo_url=""
+        
+        # Try to get repository name from git remote
+        if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+            local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
+            if [[ -n "$remote_url" ]]; then
+                # Extract repository name from URL (handle both https:// and git@ formats)
+                if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/]+)(\.git)?$ ]]; then
+                    repo_name="${match[2]}"
+                    # Remove .git suffix if present
+                    repo_name="${repo_name%.git}"
+                    # Convert to title case (first letter uppercase)
+                    repo_name="$(echo "${repo_name:0:1}" | tr '[:lower:]' '[:upper:]')${repo_name:1}"
+                    # Clean up URL (remove .git suffix if present, ensure https://)
+                    repo_url="${remote_url%.git}"
+                    if [[ ! "$repo_url" =~ ^https:// ]]; then
+                        # Convert git@ format to https://
+                        repo_url=$(echo "$repo_url" | sed 's/git@github\.com:/https:\/\/github.com\//')
+                    fi
+                fi
+            fi
+        fi
+        
+        cat > "$TODO_FILE" << EOF
+# ${repo_name} ToDo List
 
-> **⚠️ IMPORTANT: This file should ONLY be edited through the `./scripts/todo/todo.zsh` script!**
+> **⚠️ IMPORTANT: This file should ONLY be edited through the \`todo.zsh\` script!**
 
 ## Tasks
 
@@ -109,10 +134,13 @@ init_todo_file() {
 ---
 
 **Last Updated:** $(date)
-**Repository:** https://github.com/fxstein/homeassistant  
-**Maintenance:** Use `./scripts/todo/todo.zsh` script only
-
 EOF
+        # Add repository URL if detected
+        if [[ -n "$repo_url" ]]; then
+            echo "**Repository:** ${repo_url}  " >> "$TODO_FILE"
+        fi
+        echo "**Maintenance:** Use \`todo.zsh\` script only" >> "$TODO_FILE"
+        
         # Replace the $(date) placeholder with actual date
         local current_date=$(date)
         sed_inplace "s/\$(date)/$current_date/" "$TODO_FILE"
@@ -1194,7 +1222,17 @@ ensure_deleted_section() {
         # Add Deleted section before Recently Completed
         local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
         if [[ -n "$recently_completed_line" ]]; then
-            sed_inplace "${recently_completed_line}i## Deleted Tasks\n" "$TODO_FILE"
+            if [[ "$(uname)" == "Darwin" ]]; then
+                # Use temporary file approach for macOS compatibility
+                local temp_file=$(mktemp)
+                head -n $((recently_completed_line - 1)) "$TODO_FILE" > "$temp_file"
+                echo "## Deleted Tasks" >> "$temp_file"
+                echo "" >> "$temp_file"
+                tail -n +$recently_completed_line "$TODO_FILE" >> "$temp_file"
+                mv "$temp_file" "$TODO_FILE"
+            else
+                sed_inplace "${recently_completed_line}i## Deleted Tasks\n" "$TODO_FILE"
+            fi
         fi
     fi
 }

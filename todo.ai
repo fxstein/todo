@@ -23,6 +23,7 @@
 # Update: ./todo.ai update
 
 set -e
+set +x  # Explicitly disable debug/trace output
 
 # Cross-platform sed in-place editing function
 sed_inplace() {

@@ -70,7 +70,7 @@ log_todo_action() {
     local temp_file=$(mktemp)
     
     # Extract header lines (lines starting with #)
-    grep "^#" "$LOG_FILE" > "$temp_file"
+    grep "^#" "$LOG_FILE" > "$temp_file" || true
     echo "" >> "$temp_file"
     
     # Add new entry

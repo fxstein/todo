@@ -77,7 +77,7 @@ log_todo_action() {
     echo "$log_entry" >> "$temp_file"
     
     # Add existing log entries (skip header lines)
-    grep -v "^#" "$LOG_FILE" | grep -v "^$" >> "$temp_file"
+    grep -v "^#" "$LOG_FILE" | grep -v "^$" >> "$temp_file" || true
     
     mv "$temp_file" "$LOG_FILE"
 }

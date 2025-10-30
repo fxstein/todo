@@ -20,6 +20,15 @@
 
 set -e
 
+# Cross-platform sed in-place editing function
+sed_inplace() {
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' "$@"
+    else
+        sed -i "$@"
+    fi
+}
+
 # Configuration
 # Can be overridden with environment variables
 TODO_FILE="${TODO_FILE:-$(pwd)/TODO.md}"
@@ -43,7 +52,7 @@ increment_serial() {
 update_footer() {
     local current_date=$(date)
     # Update the Last Updated line in the footer
-    sed -i "s/\*\*Last Updated:\*\* .*/\*\*Last Updated:\*\* $current_date/" "$TODO_FILE"
+    sed_inplace "s/\*\*Last Updated:\*\* .*/\*\*Last Updated:\*\* $current_date/" "$TODO_FILE"
 }
 
 # Function to log TODO operations
@@ -106,7 +115,7 @@ init_todo_file() {
 EOF
         # Replace the $(date) placeholder with actual date
         local current_date=$(date)
-        sed -i "s/\$(date)/$current_date/" "$TODO_FILE"
+        sed_inplace "s/\$(date)/$current_date/" "$TODO_FILE"
     fi
 }
 
@@ -133,12 +142,12 @@ parse_task() {
 # Function to normalize malformed checkboxes
 normalize_checkboxes() {
     # Fix malformed checkboxes like [  ], [   ], [] to proper [ ] or [x]
-    sed -i 's/\[  \]/[ ]/g' "$TODO_FILE"
-    sed -i 's/\[   \]/[ ]/g' "$TODO_FILE"
-    sed -i 's/\[    \]/[ ]/g' "$TODO_FILE"
-    sed -i 's/\[\]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[  \]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[   \]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[    \]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[\]/[ ]/g' "$TODO_FILE"
     # Fix any other malformed patterns with multiple spaces
-    sed -i 's/\[[ ]*\]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[[ ]*\]/[ ]/g' "$TODO_FILE"
 }
 
 # Function to show usage
@@ -410,7 +419,20 @@ add_todo() {
     fi
     
     # Add to Tasks section
-    sed -i "/^## Tasks$/a$task_line" "$TODO_FILE"
+    local tasks_line=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
+    if [[ -n "$tasks_line" ]]; then
+        # Use awk or a simpler approach for macOS compatibility
+        if [[ "$(uname)" == "Darwin" ]]; then
+            # Insert after the ## Tasks line with proper newline
+            local temp_file=$(mktemp)
+            head -n "$tasks_line" "$TODO_FILE" > "$temp_file"
+            echo "$task_line" >> "$temp_file"
+            tail -n +$((tasks_line + 1)) "$TODO_FILE" >> "$temp_file"
+            mv "$temp_file" "$TODO_FILE"
+        else
+            sed_inplace "/^## Tasks$/a$task_line" "$TODO_FILE"
+        fi
+    fi
     update_footer
     
     # Log the action
@@ -465,7 +487,15 @@ add_subtask() {
     # Find the parent task line and add subtask after it
     local parent_line_num=$(grep -n "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     if [[ -n "$parent_line_num" ]]; then
-        sed -i "${parent_line_num}a\\$task_line" "$TODO_FILE"
+        if [[ "$(uname)" == "Darwin" ]]; then
+            local temp_file=$(mktemp)
+            head -n "$parent_line_num" "$TODO_FILE" > "$temp_file"
+            echo "$task_line" >> "$temp_file"
+            tail -n +$((parent_line_num + 1)) "$TODO_FILE" >> "$temp_file"
+            mv "$temp_file" "$TODO_FILE"
+        else
+            sed_inplace "${parent_line_num}a\\$task_line" "$TODO_FILE"
+        fi
         update_footer
         
         # Log the action
@@ -766,8 +796,8 @@ complete_todo() {
         fi
         
         # Complete the task
-        sed -i "s/- \[ \] \*\*#$number\*\* /- [x] **#$number** /" "$TODO_FILE"
-        sed -i "s/  - \[ \] \*\*#$number\*\* /  - [x] **#$number** /" "$TODO_FILE"
+        sed_inplace "s/- \[ \] \*\*#$number\*\* /- [x] **#$number** /" "$TODO_FILE"
+        sed_inplace "s/  - \[ \] \*\*#$number\*\* /  - [x] **#$number** /" "$TODO_FILE"
         
         # Get task description for logging
         local task_description=$(grep "**#$number**" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
@@ -795,8 +825,8 @@ undo_todo() {
     normalize_checkboxes
     
     # Use sed to directly find and replace the specific task (handle bold formatting and subtasks)
-    sed -i "s/- \[x\] \*\*#$number\*\* /- [ ] **#$number** /" "$TODO_FILE"
-    sed -i "s/  - \[x\] \*\*#$number\*\* /  - [ ] **#$number** /" "$TODO_FILE"
+    sed_inplace "s/- \[x\] \*\*#$number\*\* /- [ ] **#$number** /" "$TODO_FILE"
+    sed_inplace "s/  - \[x\] \*\*#$number\*\* /  - [ ] **#$number** /" "$TODO_FILE"
     update_footer
     
     # Get task description for logging
@@ -851,10 +881,10 @@ modify_todo() {
     # Use a more specific pattern to avoid double-indentation
     if [[ "$task_id" =~ \. ]]; then
         # For subtasks, replace with proper 2-space indentation
-        sed -i "s/^  - \[.*\] \*\*#$task_id\*\* .*/$new_task_line/" "$TODO_FILE"
+        sed_inplace "s/^  - \[.*\] \*\*#$task_id\*\* .*/$new_task_line/" "$TODO_FILE"
     else
         # For main tasks, replace without indentation
-        sed -i "s/^- \[.*\] \*\*#$task_id\*\* .*/$new_task_line/" "$TODO_FILE"
+        sed_inplace "s/^- \[.*\] \*\*#$task_id\*\* .*/$new_task_line/" "$TODO_FILE"
     fi
     update_footer
     
@@ -971,8 +1001,8 @@ archive_task() {
     
     # Remove from Tasks section (main task and all subtasks)
     # Handle both completed [x] and incomplete [ ] tasks
-    sed -i "/^- \[[x ]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
-    sed -i "/^  - \[.*\] \*\*#$task_id\\./d" "$TODO_FILE"
+    sed_inplace "/^- \[[x ]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
+    sed_inplace "/^  - \[.*\] \*\*#$task_id\\./d" "$TODO_FILE"
     
     # Create a complete block with main task and subtasks
     local complete_block="$task_line"
@@ -989,7 +1019,7 @@ $subtasks_text"
         # Insert the complete block after the "## Recently Completed" line
         local temp_file=$(mktemp)
         echo -e "$complete_block" > "$temp_file"
-        sed -i "${recently_completed_section}r $temp_file" "$TODO_FILE"
+        sed_inplace "${recently_completed_section}r $temp_file" "$TODO_FILE"
         rm -f "$temp_file"
     else
         # Add Recently Completed section if it doesn't exist
@@ -1113,14 +1143,14 @@ delete_task() {
         
         if [[ -n "$task_line_num" ]]; then
             # Remove the task line
-            sed -i "${task_line_num}d" "$TODO_FILE"
+            sed_inplace "${task_line_num}d" "$TODO_FILE"
             
             # Remove any following blockquote notes (lines starting with "  > " or "    > ")
             # Keep removing lines as long as they're blockquotes
             while true; do
                 local next_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
                 if [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]]; then
-                    sed -i "${task_line_num}d" "$TODO_FILE"
+                    sed_inplace "${task_line_num}d" "$TODO_FILE"
                 else
                     break
                 fi
@@ -1131,7 +1161,15 @@ delete_task() {
         ensure_deleted_section
         local deleted_section=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1)
         if [[ -n "$deleted_section" ]]; then
-            sed -i "${deleted_section}a$task_line" "$TODO_FILE"
+            if [[ "$(uname)" == "Darwin" ]]; then
+                local temp_file=$(mktemp)
+                head -n "$deleted_section" "$TODO_FILE" > "$temp_file"
+                echo "$task_line" >> "$temp_file"
+                tail -n +$((deleted_section + 1)) "$TODO_FILE" >> "$temp_file"
+                mv "$temp_file" "$TODO_FILE"
+            else
+                sed_inplace "${deleted_section}a$task_line" "$TODO_FILE"
+            fi
         fi
         
         # Log the action
@@ -1152,7 +1190,7 @@ ensure_deleted_section() {
         # Add Deleted section before Recently Completed
         local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
         if [[ -n "$recently_completed_line" ]]; then
-            sed -i "${recently_completed_line}i## Deleted Tasks\n" "$TODO_FILE"
+            sed_inplace "${recently_completed_line}i## Deleted Tasks\n" "$TODO_FILE"
         fi
     fi
 }
@@ -1169,7 +1207,7 @@ purge_expired_deleted_tasks() {
             # Compare dates (simple string comparison works for YYYY-MM-DD format)
             if [[ "$expire_date" < "$current_date" ]]; then
                 # Task expired, remove it
-                sed -i "/$(echo "$line" | sed 's/[]\/$*.^[]/\\&/g')/d" "$TODO_FILE"
+                sed_inplace "/$(echo "$line" | sed 's/[]\/$*.^[]/\\&/g')/d" "$TODO_FILE"
                 purged_count=$((purged_count + 1))
             fi
         fi
@@ -1203,13 +1241,21 @@ restore_task() {
     task_line=$(echo "$task_line" | sed 's/ *(deleted.*//' | sed 's/ *(completed.*//' | sed 's/ *(.*)$//')
     
     # Remove from current section (Recently Completed or Deleted)
-    sed -i "/^- \[[xD~>\-]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
+    sed_inplace "/^- \[[xD~>\-]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
     
     # Add to Tasks section
     local tasks_section=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
     if [[ -n "$tasks_section" ]]; then
         # Insert after the "## Tasks" line
-        sed -i "${tasks_section}a$task_line" "$TODO_FILE"
+        if [[ "$(uname)" == "Darwin" ]]; then
+            local temp_file=$(mktemp)
+            head -n "$tasks_section" "$TODO_FILE" > "$temp_file"
+            echo "$task_line" >> "$temp_file"
+            tail -n +$((tasks_section + 1)) "$TODO_FILE" >> "$temp_file"
+            mv "$temp_file" "$TODO_FILE"
+        else
+            sed_inplace "${tasks_section}a$task_line" "$TODO_FILE"
+        fi
     else
         echo "Error: Tasks section not found"
         return 1
@@ -1251,10 +1297,10 @@ add_relationship() {
     ensure_metadata_section
     
     # Remove any existing relationship of this type for this task
-    sed -i "/^$task_id:$rel_type:/d" "$TODO_FILE"
+    sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
     
     # Add new relationship before the closing -->
-    sed -i "/^-->/i$task_id:$rel_type:$target_tasks" "$TODO_FILE"
+    sed_inplace "/^-->/i$task_id:$rel_type:$target_tasks" "$TODO_FILE"
     
     update_footer
 }
@@ -1268,10 +1314,10 @@ remove_relationship() {
     if [[ -n "$target_task" ]]; then
         # Remove specific target from relationship list
         # This is complex, for now just remove the whole relationship
-        sed -i "/^$task_id:$rel_type:/d" "$TODO_FILE"
+        sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
     else
         # Remove all relationships of this type for this task
-        sed -i "/^$task_id:$rel_type:/d" "$TODO_FILE"
+        sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
     fi
     
     update_footer
@@ -1454,8 +1500,15 @@ add_note() {
     local note_line="${indent}  > ${note_text}"
     
     # Insert note after the task line
-    sed -i "${task_line_num}a\\
-$note_line" "$TODO_FILE"
+    if [[ "$(uname)" == "Darwin" ]]; then
+        local temp_file=$(mktemp)
+        head -n "$task_line_num" "$TODO_FILE" > "$temp_file"
+        echo "$note_line" >> "$temp_file"
+        tail -n +$((task_line_num + 1)) "$TODO_FILE" >> "$temp_file"
+        mv "$temp_file" "$TODO_FILE"
+    else
+        sed_inplace "${task_line_num}a\\$note_line" "$TODO_FILE"
+    fi
     
     update_footer
     
@@ -1646,7 +1699,7 @@ reformat_todo() {
                 echo "  🔄 Would fix: $line"
                 echo "  ➡️  To:        $fixed_line"
             else
-                sed -i "s|^$line|$fixed_line|" "$TODO_FILE"
+                sed_inplace "s|^$line|$fixed_line|" "$TODO_FILE"
                 echo "  ✅ Fixed: $line"
             fi
             indent_fixes=$((indent_fixes + 1))

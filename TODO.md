@@ -3,18 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#30** Implement versioned backups and rollback capability `#feature`
-  - [ ] **#30.11** Test backup and rollback functionality `#test`
-  - [ ] **#30.10** Remove old .bak file creation logic `#cleanup`
-  - [ ] **#30.9** Update help text and show_usage() to include new commands `#docs`
-  - [ ] **#30.8** Add 'backups' or 'list-backups' command to view available backups `#code`
-  - [ ] **#30.7** Add 'rollback' command to main script command handler `#code`
-  - [ ] **#30.6** Implement version-specific rollback (restore by timestamp or version) `#code`
-  - [ ] **#30.5** Implement default rollback (restore latest backup) `#code`
-  - [ ] **#30.4** Create rollback() function to restore from backup `#code`
-  - [ ] **#30.3** Create list_backups() function to show available backup versions `#code`
-  - [ ] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code`
-  - [ ] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
 - [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#15** Setup githooks `#setup` `#git`
@@ -35,6 +23,18 @@
 - [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ## Recently Completed
+- [x] **#30** Implement versioned backups and rollback capability `#feature` (2025-10-30)
+  - [x] **#30.11** Test backup and rollback functionality `#test` (2025-10-30)
+  - [x] **#30.10** Remove old .bak file creation logic `#cleanup` (2025-10-30)
+  - [x] **#30.9** Update help text and show_usage() to include new commands `#docs` (2025-10-30)
+  - [x] **#30.8** Add 'backups' or 'list-backups' command to view available backups `#code` (2025-10-30)
+  - [x] **#30.7** Add 'rollback' command to main script command handler `#code` (2025-10-30)
+  - [x] **#30.6** Implement version-specific rollback (restore by timestamp or version) `#code` (2025-10-30)
+  - [x] **#30.5** Implement default rollback (restore latest backup) `#code` (2025-10-30)
+  - [x] **#30.4** Create rollback() function to restore from backup `#code` (2025-10-30)
+  - [x] **#30.3** Create list_backups() function to show available backup versions `#code` (2025-10-30)
+  - [x] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (2025-10-30)
+  - [x] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (2025-10-30)
 - [x] **#28** Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial `#setup` (2025-10-30)
   - [x] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (2025-10-30)
   - [x] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (2025-10-30)
@@ -89,7 +89,7 @@
 
 ---
 
-**Last Updated:** Thu Oct 30 23:31:46 CET 2025
+**Last Updated:** Thu Oct 30 23:33:42 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

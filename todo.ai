@@ -331,6 +331,8 @@ show_usage() {
     echo "  edit                          Edit todo file in editor"
     echo "  log [--filter <text>] [--lines <n>] View TODO operation log"
     echo "  update                        Update todo.ai to latest version"
+    echo "  backups, list-backups         List available backup versions"
+    echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
     echo "  version, -v, --version        Show version information"
     echo ""
     echo ""
@@ -367,6 +369,10 @@ show_usage() {
     echo "  ./todo.ai log --filter ADD"
     echo "  ./todo.ai log --lines 20"
     echo "  ./todo.ai update                     # Update to latest version"
+    echo "  ./todo.ai backups                    # List available backups"
+    echo "  ./todo.ai rollback                   # Rollback to latest backup"
+    echo "  ./todo.ai rollback 2                 # Rollback to backup #2"
+    echo "  ./todo.ai rollback 20251030231500     # Rollback by timestamp"
     echo "  ./todo.ai version                    # Show version"
 }
 
@@ -1989,34 +1995,185 @@ check_version() {
     return 0
 }
 
-# Function to update todo.ai to latest version
-update_tool() {
-    # Get the actual script path (handle both direct calls and sourced calls)
+# Function to ensure backups directory exists
+init_backups_dir() {
+    local backups_dir="$(pwd)/.todo.ai/backups"
+    if [[ ! -d "$backups_dir" ]]; then
+        mkdir -p "$backups_dir" 2>/dev/null || return 1
+    fi
+    echo "$backups_dir"
+}
+
+# Function to get script path
+get_script_path() {
     local script_path
     if [[ -f "${0:a}" ]]; then
         script_path="${0:a}"
     elif [[ -f "$(pwd)/todo.ai" ]]; then
         script_path="$(pwd)/todo.ai"
+    elif [[ -f "./todo.ai" ]]; then
+        script_path="./todo.ai"
     else
-        # Try to find todo.ai in current directory or common locations
-        if [[ -f "./todo.ai" ]]; then
-            script_path="./todo.ai"
+        return 1
+    fi
+    
+    # Ensure absolute path
+    if [[ ! "$script_path" =~ ^/ ]]; then
+        script_path="$(cd "$(dirname "$script_path")" && pwd)/$(basename "$script_path")"
+    fi
+    
+    echo "$script_path"
+}
+
+# Function to list available backups
+list_backups() {
+    local backups_dir
+    backups_dir=$(init_backups_dir) || {
+        echo "Error: Cannot access backups directory"
+        return 1
+    }
+    
+    # Check if any backups exist using find to avoid glob expansion issues
+    local backup_files=$(find "$backups_dir" -maxdepth 1 -name "todo.ai.*" -type f 2>/dev/null)
+    if [[ -z "$backup_files" ]]; then
+        echo "No backups available"
+        return 0
+    fi
+    
+    echo "Available backups:"
+    echo ""
+    
+    # Sort by modification time (newest first)
+    local sorted_backups=($(echo "$backup_files" | xargs ls -t 2>/dev/null))
+    
+    local index=1
+    for backup in "${sorted_backups[@]}"; do
+        local filename=$(basename "$backup")
+        local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
+        local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+        local date_str=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$backup" 2>/dev/null || stat -c "%y" "$backup" 2>/dev/null | cut -d'.' -f1 || echo "unknown")
+        
+        if [[ $index -eq 1 ]]; then
+            echo "  [$index] $timestamp (v$version) - $date_str [LATEST]"
         else
-            echo "Error: Cannot locate todo.ai script"
+            echo "  [$index] $timestamp (v$version) - $date_str"
+        fi
+        ((index++))
+    done
+    echo ""
+    echo "Use './todo.ai rollback [index|timestamp]' to restore a backup"
+}
+
+# Function to rollback to a previous version
+rollback() {
+    local backups_dir
+    backups_dir=$(init_backups_dir) || {
+        echo "Error: Cannot access backups directory"
+        return 1
+    }
+    
+    local script_path
+    script_path=$(get_script_path) || {
+        echo "Error: Cannot locate todo.ai script"
+        return 1
+    }
+    
+    local backup_files=$(find "$backups_dir" -maxdepth 1 -name "todo.ai.*" -type f 2>/dev/null)
+    if [[ -z "$backup_files" ]]; then
+        echo "Error: No backups available"
+        return 1
+    fi
+    
+    local sorted_backups=($(echo "$backup_files" | xargs ls -t 2>/dev/null))
+    
+    local target_backup=""
+    
+    if [[ $# -eq 0 ]]; then
+        # Default: rollback to latest backup
+        target_backup="${sorted_backups[1]}"
+    elif [[ "$1" =~ ^[0-9]+$ ]]; then
+        # Index specified
+        local index=$1
+        if [[ $index -ge 1 ]] && [[ $index -le ${#sorted_backups[@]} ]]; then
+            target_backup="${sorted_backups[$index]}"
+        else
+            echo "Error: Invalid backup index. Use './todo.ai backups' to see available backups"
+            return 1
+        fi
+    else
+        # Timestamp or version specified
+        local search_term="$1"
+        for backup in "${sorted_backups[@]}"; do
+            local filename=$(basename "$backup")
+            local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
+            local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+            
+            if [[ "$timestamp" == "$search_term" ]] || [[ "$version" == "$search_term" ]]; then
+                target_backup="$backup"
+                break
+            fi
+        done
+        
+        if [[ -z "$target_backup" ]]; then
+            echo "Error: No backup found matching '$search_term'"
+            echo "Use './todo.ai backups' to see available backups"
             return 1
         fi
     fi
     
-    local script_dir="$(dirname "$script_path")"
-    local script_name="$(basename "$script_path")"
-    local backup_file="${script_path}.bak"
-    
-    # Ensure we're using absolute path for the backup
-    if [[ "$script_dir" != "." ]] && [[ ! "$script_path" =~ ^/ ]]; then
-        cd "$script_dir" || return 1
-        script_path="$(pwd)/$script_name"
-        backup_file="${script_path}.bak"
+    if [[ ! -f "$target_backup" ]]; then
+        echo "Error: Backup file not found"
+        return 1
     fi
+    
+    # Confirm rollback
+    local backup_version=$(grep -i "VERSION=" "$target_backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+    local current_version="$VERSION"
+    local backup_name=$(basename "$target_backup")
+    
+    echo "⚠️  Rollback Warning:"
+    echo "   Current version: $current_version"
+    echo "   Backup version:  $backup_version"
+    echo "   Backup file:     $backup_name"
+    echo ""
+    echo "This will replace the current script with the backup version."
+    echo "Continue? (y/N)"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo "Rollback cancelled"
+        return 0
+    fi
+    
+    # Create a backup of current version before rollback
+    local timestamp=$(date +"%Y%m%d%H%M%S")
+    cp "$script_path" "$backups_dir/todo.ai.$timestamp" 2>/dev/null || true
+    
+    # Restore from backup
+    cp "$target_backup" "$script_path" || {
+        echo "Error: Failed to restore backup"
+        return 1
+    }
+    
+    chmod +x "$script_path"
+    
+    echo "✅ Rolled back to version $backup_version"
+    echo "   Current version backed up as: todo.ai.$timestamp"
+}
+
+# Function to update todo.ai to latest version
+update_tool() {
+    # Get the actual script path
+    local script_path
+    script_path=$(get_script_path) || {
+        echo "Error: Cannot locate todo.ai script"
+        return 1
+    }
+    
+    local backups_dir
+    backups_dir=$(init_backups_dir) || {
+        echo "Error: Cannot create backups directory"
+        return 1
+    }
     
     echo "🔄 Updating todo.ai..."
     
@@ -2046,8 +2203,15 @@ update_tool() {
     if curl -s -o "$temp_file" "$SCRIPT_URL"; then
         # Check if download was successful
         if [[ -s "$temp_file" ]] && grep -q "todo - AI-Agent First TODO List Tracker" "$temp_file"; then
-            # Backup current version using absolute path
-            cp "$script_path" "$backup_file" 2>/dev/null || true
+            # Create versioned backup with timestamp
+            local timestamp=$(date +"%Y%m%d%H%M%S")
+            local current_version="$VERSION"
+            local backup_file="$backups_dir/todo.ai.$timestamp"
+            
+            # Backup current version
+            cp "$script_path" "$backup_file" 2>/dev/null || {
+                echo "Warning: Failed to create backup, continuing with update..."
+            }
             
             # Replace with new version
             mv "$temp_file" "$script_path"
@@ -2057,7 +2221,10 @@ update_tool() {
             local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
             
             echo "✅ Updated todo.ai to version $new_version"
-            echo "   Backup saved as $backup_file"
+            if [[ -f "$backup_file" ]]; then
+                echo "   Backup saved as: $(basename "$backup_file") (v$current_version)"
+                echo "   Use './todo.ai rollback' to restore previous version"
+            fi
             
             # Update cursor rules after successful update to ensure latest rules are applied
             if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
@@ -2271,6 +2438,13 @@ case "${1:-}" in
         ;;
     "update")
         update_tool
+        ;;
+    "backups"|"list-backups")
+        list_backups
+        ;;
+    "rollback")
+        shift
+        rollback "$@"
         ;;
     "version"|"--version"|"-v")
         echo "todo.ai version $VERSION"

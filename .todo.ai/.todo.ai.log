@@ -2,6 +2,19 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-10-30 23:33:42 | fxstein | ARCHIVE | 30 | Implement versioned backups and rollback capability (with 11 subtasks)
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.1 | Create .todo.ai/backups/ directory for storing versioned backups
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.2 | Modify update_tool() to save backups with timestamp to .todo.ai/backups/
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.3 | Create list_backups() function to show available backup versions
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.4 | Create rollback() function to restore from backup
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.5 | Implement default rollback (restore latest backup)
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.6 | Implement version-specific rollback (restore by timestamp or version)
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.7 | Add 'rollback' command to main script command handler
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.8 | Add 'backups' or 'list-backups' command to view available backups
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.9 | Update help text and show_usage() to include new commands
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.10 | Remove old .bak file creation logic
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30.11 | Test backup and rollback functionality
+2025-10-30 23:33:41 | fxstein | COMPLETE | 30 | Implement versioned backups and rollback capability
 2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.11 | Test backup and rollback functionality (parent: #30)
 2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.10 | Remove old .bak file creation logic (parent: #30)
 2025-10-30 23:31:46 | fxstein | ADD_SUBTASK | 30.9 | Update help text and show_usage() to include new commands (parent: #30)

@@ -1105,8 +1105,9 @@ modify_todo() {
     normalize_checkboxes
     
     # Get the current completion status and existing line (handle both bold and non-bold formatting, and subtasks)
-    local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
-    local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/')
+    # Check all possible indentations: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
+    local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) |^    - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
+    local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/' | sed 's/    - \[\([^]]*\)\].*/\1/')
     
     # Extract existing tags from current line (tags are in backticks after the task text)
     local existing_tags=""
@@ -1120,13 +1121,27 @@ modify_todo() {
         fi
     fi
     
+    # Determine nesting depth to apply correct indentation
+    local task_depth=$(get_nesting_depth "$task_id")
+    local indent=""
+    
     # Format the new task line preserving completion status with bold task ID
-    # Check if this is a subtask (has decimal point) and add proper indentation
-    if [[ "$task_id" =~ \. ]]; then
-        local new_task_line="  - [$current_status] **#$task_id** $new_text"
+    # Apply indentation based on nesting depth:
+    # Depth 0 (main task): no indentation
+    # Depth 1 (subtask like #2.5): 2 spaces
+    # Depth 2 (sub-subtask like #2.5.4): 4 spaces
+    if [[ $task_depth -eq 0 ]]; then
+        indent=""
+    elif [[ $task_depth -eq 1 ]]; then
+        indent="  "
+    elif [[ $task_depth -eq 2 ]]; then
+        indent="    "
     else
-        local new_task_line="- [$current_status] **#$task_id** $new_text"
+        # Fallback to 2 spaces if depth is unexpected
+        indent="  "
     fi
+    
+    local new_task_line="${indent}- [$current_status] **#$task_id** $new_text"
     
     # Use new_tags if provided, otherwise preserve existing tags
     local tags_to_use=""
@@ -1160,13 +1175,23 @@ modify_todo() {
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
     
     # Match everything after task ID including text and tags (with backticks)
-    if [[ "$task_id" =~ \. ]]; then
+    # Use task depth to determine which pattern to match (handles all indentation levels)
+    if [[ $task_depth -eq 0 ]]; then
+        # For main tasks, replace without indentation
+        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
+        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+    elif [[ $task_depth -eq 1 ]]; then
         # For subtasks, replace with proper 2-space indentation
         # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
         sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
-    else
-        # For main tasks, replace without indentation
+    elif [[ $task_depth -eq 2 ]]; then
+        # For sub-subtasks, replace with proper 4-space indentation
         # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
+        sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+    else
+        # Fallback: try all indentation levels
+        sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
         sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
     fi
     update_footer

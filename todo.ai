@@ -794,15 +794,19 @@ list_todos() {
         fi
         
         # Filter by tag - show tasks with the specified tag
+        # Escape special characters in filter_tag for regex matching
+        local escaped_tag=$(echo "$filter_tag" | sed 's/[.*+?^${}()|\[\]\\]/\\&/g')
+        
         echo "# Home Assistant Project Todo List"
         echo ""
         echo "## Tasks with tag: $filter_tag"
         echo ""
-        grep -E "\`$filter_tag\`|$filter_tag" "$TODO_FILE" | grep "^-.*\[.*\]"
+        # Match tags both with backticks (styled) and without (plain)
+        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep "^-.*\[.*\]"
         echo ""
         echo "## Recently Completed with tag: $filter_tag"
         echo ""
-        grep -E "\`$filter_tag\`|$filter_tag" "$TODO_FILE" | grep "^-.*\[x\]"
+        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep "^-.*\[x\]"
         return
     fi
     
@@ -880,12 +884,13 @@ list_todos() {
                 fi
             fi
             
-            # Filter: tag
+            # Filter: tag (match both styled with backticks and plain)
             if [[ -n "$filter_tag" ]]; then
                 if [[ ! "$filter_tag" =~ ^# ]]; then
                     filter_tag="#$filter_tag"
                 fi
-                if [[ ! "$line" =~ $filter_tag ]]; then
+                # Check if line contains the tag (with or without backticks)
+                if [[ ! "$line" =~ \`${filter_tag}\` ]] && [[ ! "$line" =~ ${filter_tag} ]]; then
                     should_show=false
                 fi
             fi
@@ -901,9 +906,9 @@ list_todos() {
                 # Apply same filters as parent
                 local should_show=true
                 
-                # Tag filter
+                # Tag filter (match both styled with backticks and plain)
                 if [[ -n "$filter_tag" ]]; then
-                    if [[ ! "$line" =~ $filter_tag ]]; then
+                    if [[ ! "$line" =~ \`${filter_tag}\` ]] && [[ ! "$line" =~ ${filter_tag} ]]; then
                         should_show=false
                     fi
                 fi

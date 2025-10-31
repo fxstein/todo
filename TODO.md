@@ -3,6 +3,10 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
+  - [x] **#35.3** Create tests directory and draft detailed test plan document `#tests` `#docs`
+  - [x] **#35.2** Define test framework architecture and tooling `#tests` `#planning`
+  - [x] **#35.1** Research todo.ai testing requirements and existing docs `#tests` `#docs`
 - [ ] **#34** Final nested subtask test `#test`
 - [ ] **#33** Test nested subtasks implementation `#test`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
@@ -98,7 +102,7 @@
 
 ---
 
-**Last Updated:** Fri Oct 31 00:53:25 CET 2025
+**Last Updated:** Fri Oct 31 06:20:27 AM UTC 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

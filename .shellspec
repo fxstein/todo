@@ -1,0 +1,3 @@
+--shell /bin/zsh
+--helperdir tests/spec
+--pattern *_spec.sh

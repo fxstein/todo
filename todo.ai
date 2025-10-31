@@ -802,11 +802,12 @@ list_todos() {
         echo "## Tasks with tag: $filter_tag"
         echo ""
         # Match tags both with backticks (styled) and without (plain)
-        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep "^-.*\[.*\]"
+        # Match all task levels: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
+        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep -E "^-.*\[.*\]|^  -.*\[.*\]|^    -.*\[.*\]"
         echo ""
         echo "## Recently Completed with tag: $filter_tag"
         echo ""
-        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep "^-.*\[x\]"
+        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep -E "^-.*\[x\]|^  -.*\[x\]|^    -.*\[x\]"
         return
     fi
     

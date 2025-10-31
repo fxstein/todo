@@ -1,4 +1,4 @@
-# todo - AI-Agent TODO Tracker
+# todo.ai - For AI Agents and Humans
 
 **Simple, zero-interaction TODO management for AI agents**
 

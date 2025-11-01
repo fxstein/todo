@@ -32,10 +32,12 @@ get_last_tag() {
 analyze_commits() {
     local last_tag="$1"
     local commit_range
-    if [[ "$last_tag" =~ ^[0-9a-f]{40}$ ]] || [[ ! "$last_tag" =~ ^v ]]; then
-        # Last tag is a commit hash or empty
-        commit_range="$(get_last_tag)..HEAD"
+    
+    if [[ -z "$last_tag" ]] || [[ ! "$last_tag" =~ ^v ]]; then
+        # No previous tag or not a version tag - analyze all commits
+        commit_range="HEAD"
     else
+        # Previous tag exists - analyze commits since that tag
         commit_range="${last_tag}..HEAD"
     fi
     
@@ -114,9 +116,11 @@ generate_release_notes() {
     local new_version="$2"
     local commit_range
     
-    if [[ "$last_tag" =~ ^[0-9a-f]{40}$ ]] || [[ ! "$last_tag" =~ ^v ]]; then
-        commit_range="$(get_last_tag)..HEAD"
+    if [[ -z "$last_tag" ]] || [[ ! "$last_tag" =~ ^v ]]; then
+        # No previous tag or not a version tag - use all commits
+        commit_range="HEAD"
     else
+        # Previous tag exists - use commits since that tag
         commit_range="${last_tag}..HEAD"
     fi
     
@@ -292,7 +296,14 @@ main() {
     echo ""
     
     # Ask for human review if major release or many commits
-    local commit_count=$(git log "$(get_last_tag)..HEAD" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
+    local last_tag_for_count=$(get_last_tag)
+    local commit_range_for_count
+    if [[ -z "$last_tag_for_count" ]] || [[ ! "$last_tag_for_count" =~ ^v ]]; then
+        commit_range_for_count="HEAD"
+    else
+        commit_range_for_count="${last_tag_for_count}..HEAD"
+    fi
+    local commit_count=$(git log "$commit_range_for_count" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
     local needs_review=false
     
     if [[ "$BUMP_TYPE" == "major" ]]; then

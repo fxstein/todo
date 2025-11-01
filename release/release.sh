@@ -13,26 +13,57 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Release log file
-RELEASE_LOG="${RELEASE_LOG:-$(pwd)/release/RELEASE_LOG.md}"
+RELEASE_LOG="${RELEASE_LOG:-$(pwd)/release/RELEASE_LOG.log}"
 
-# Log release step with timestamp
+# Get GitHub user ID
+get_github_user() {
+    gh api user --jq .login 2>/dev/null || git config user.email 2>/dev/null | cut -d'@' -f1 || echo "unknown"
+}
+
+# Log release step with timestamp (newest entries on top)
 log_release_step() {
     local step="$1"
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local user_id=$(get_github_user)
     
-    # Ensure release log exists with header
+    # Create header if file doesn't exist
     if [[ ! -f "$RELEASE_LOG" ]]; then
-        echo "# Release Log" > "$RELEASE_LOG"
-        echo "" >> "$RELEASE_LOG"
-        echo "This log contains detailed timestamps of all release operations performed by the release script." >> "$RELEASE_LOG"
-        echo "" >> "$RELEASE_LOG"
+        cat > "$RELEASE_LOG" << 'EOF'
+# Release Log
+# This file contains a chronological log of all release operations performed by the release script.
+# Format: TIMESTAMP USER_ID STEP - MESSAGE
+# Newest entries appear at the top of the file.
+#
+EOF
     fi
     
-    echo "## ${timestamp} - ${step}" >> "$RELEASE_LOG"
-    echo "" >> "$RELEASE_LOG"
-    echo "$message" >> "$RELEASE_LOG"
-    echo "" >> "$RELEASE_LOG"
+    # Create log entry
+    local log_entry="${timestamp} ${user_id} ${step} - ${message}"
+    
+    # Find where header ends (first non-comment line)
+    local header_end=$(awk '/^[^#]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
+    
+    # If no non-comment lines, header is entire file
+    if [[ -z "$header_end" ]] || [[ "$header_end" -eq 0 ]]; then
+        header_end=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 5)
+    fi
+    
+    # Create new log: header + new entry + old entries
+    local temp_log=$(mktemp)
+    
+    # Copy header
+    head -n "$header_end" "$RELEASE_LOG" > "$temp_log" 2>/dev/null
+    
+    # Add new entry
+    echo "$log_entry" >> "$temp_log"
+    
+    # Append existing log entries (skip header)
+    if [[ $header_end -gt 0 ]]; then
+        tail -n +$((header_end + 1)) "$RELEASE_LOG" 2>/dev/null >> "$temp_log" || true
+    fi
+    
+    mv "$temp_log" "$RELEASE_LOG"
 }
 
 # Get current version from todo.ai
@@ -79,7 +110,7 @@ is_backend_only_release() {
         "^\.todo\.ai/"
         "^tests/"
         "^release/RELEASE_SUMMARY\.md$"
-        "^release/RELEASE_LOG\.md$"
+        "^release/RELEASE_LOG\.log$"
         "^release/RELEASE_PROCESS\.md$"
         "^docs/TEST_PLAN\.md$"
         "^release/RELEASE_NUMBERING_ANALYSIS\.md$"
@@ -431,8 +462,8 @@ main() {
         if [[ "$line" =~ ^[?]{2}[[:space:]]+\"todo\.ai ]]; then
             continue
         fi
-        # Skip RELEASE_LOG.md - it will be committed at the end after all release operations
-        if echo "$line" | grep -qE "release/RELEASE_LOG\.md|^RELEASE_LOG\.md"; then
+        # Skip RELEASE_LOG.log - it will be committed at the end after all release operations
+        if echo "$line" | grep -qE "release/RELEASE_LOG\.log|^RELEASE_LOG\.log"; then
             continue
         fi
         # All other files are uncommitted
@@ -645,7 +676,7 @@ Includes release summary from ${SUMMARY_FILE}"
 - URL: ${repo_url}/releases/tag/${TAG}
 - Release log: ${RELEASE_LOG}"
     
-    # Commit and push RELEASE_LOG.md at the very end to capture all release operations
+    # Commit and push RELEASE_LOG.log at the very end to capture all release operations
     # Note: We don't log these operations since they happen after the log is committed
     if [[ -f "$RELEASE_LOG" ]]; then
         echo -e "${BLUE}📋 Committing release log...${NC}"

@@ -367,13 +367,13 @@ The `release/release.sh` script is an intelligent, fully automated release tool 
 
 **Release Logging:**
 
-All release operations are automatically logged to `release/RELEASE_LOG.md`. The log includes:
+All release operations are automatically logged to `release/RELEASE_LOG.log`. The log includes:
 - Timestamp for each step (start, version update, git operations, GitHub release)
 - Success or failure status for each operation
 - Error messages if any step fails
 - Release details (version, tag, URL)
 
-This helps debug issues when releases get stuck or fail. Check `release/RELEASE_LOG.md` to see exactly where and why a release might have failed.
+This helps debug issues when releases get stuck or fail. Check `release/RELEASE_LOG.log` to see exactly where and why a release might have failed.
 
 **Uncommitted Files Handling:**
 
@@ -399,7 +399,7 @@ Before creating a release, ensure:
 - AI-generated summaries (recommended) should be created by the agent and saved to `release/RELEASE_SUMMARY.md`
 - The summary file (`release/RELEASE_SUMMARY.md`) **will be automatically committed** as part of the release process
 - **NEVER** allow release notes or summaries to remain uncommitted - they must be committed as part of the release
-- All release operations are automatically logged to `release/RELEASE_LOG.md` with detailed timestamps for debugging and auditing
+- All release operations are automatically logged to `release/RELEASE_LOG.log` with detailed timestamps for debugging and auditing
 
 ## Post-Release Tasks
 

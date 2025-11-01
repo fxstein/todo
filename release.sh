@@ -55,22 +55,23 @@ analyze_commits() {
     local other_count=0
     
     while IFS= read -r commit || [[ -n "$commit" ]]; do
-        local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]')
+        [[ -z "$commit" ]] && continue
+        local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]' 2>/dev/null || echo "$commit")
         
         # Check for breaking changes
         if [[ "$lower_commit" =~ (breaking|break|major|!:) ]] || 
            [[ "$lower_commit" =~ ^(feat|fix|refactor|perf)!: ]]; then
-            ((breaking_count++))
+            breaking_count=$((breaking_count + 1))
         # Check for features
         elif [[ "$lower_commit" =~ ^(feat|feature): ]] || 
              [[ "$lower_commit" =~ (add|new|implement|create|support) ]]; then
-            ((feature_count++))
+            feature_count=$((feature_count + 1))
         # Check for fixes
         elif [[ "$lower_commit" =~ ^(fix|bugfix|patch): ]] || 
              [[ "$lower_commit" =~ (fix|bug|patch|hotfix|correct) ]]; then
-            ((fix_count++))
+            fix_count=$((fix_count + 1))
         else
-            ((other_count++))
+            other_count=$((other_count + 1))
         fi
     done <<< "$commits"
     

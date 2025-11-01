@@ -50,7 +50,8 @@
   - [x] **#35.1** Research todo.ai testing requirements and existing docs `#tests` `#docs`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
 - [ ] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#setup` `#git` (2025-11-02)
-  - [ ] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs`
+  - [x] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code`
+  - [x] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs`
   - [x] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (2025-11-02)
   - [x] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (2025-11-02)
   - [x] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (2025-11-02)
@@ -205,7 +206,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 00:39:44 CET 2025
+**Last Updated:** Sun Nov  2 00:43:18 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

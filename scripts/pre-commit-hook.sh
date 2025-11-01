@@ -154,8 +154,8 @@ if echo "$staged_files" | grep -q "TODO.md"; then
     fi
 fi
 
-# Validate Markdown files
-md_files=$(echo "$staged_files" | grep -E '\.(md|mdc)$' || true)
+# Validate Markdown files (exclude .mdc files - they have YAML front matter)
+md_files=$(echo "$staged_files" | grep -E '\.md$' || true)
 if [[ -n "$md_files" ]]; then
     echo "📝 Validating Markdown files..."
     if ! validate_markdown "$md_files"; then

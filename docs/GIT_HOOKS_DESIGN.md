@@ -515,27 +515,150 @@ git commit --no-verify -m "message"
 
 ### Installation Instructions
 
+#### Direct Installation Methods
+
+**For Markdown Linting (markdownlint-cli2 or mdl):**
+
 ```bash
-# Install markdownlint-cli2
+# Option 1: markdownlint-cli2 (Recommended - npm/Node.js)
 npm install -g markdownlint-cli2
 
-# Install yamllint (Python)
+# Verify installation
+markdownlint-cli2 --version
+
+# Option 2: mdl (Alternative - Ruby gem)
+gem install mdl
+
+# Verify installation
+mdl --version
+```
+
+**For YAML Linting (yamllint or yq):**
+
+```bash
+# Option 1: yamllint (Recommended - Python)
 pip install yamllint
 
-# Install jq
-# macOS
-brew install jq
+# Or with pip3
+pip3 install yamllint
 
-# Linux
-sudo apt-get install jq
+# Verify installation
+yamllint --version
 
-# Install yq (alternative YAML tool)
+# Option 2: yq (Alternative - YAML processor with validation)
 # macOS
 brew install yq
 
-# Linux
+# Linux (Ubuntu/Debian)
+sudo apt-get install yq
+
+# Linux (Other distributions)
 # Download from https://github.com/mikefarah/yq/releases
+
+# Verify installation
+yq --version
 ```
+
+**For JSON Linting (jq or jsonlint):**
+
+```bash
+# Option 1: jq (Recommended - JSON processor)
+# macOS
+brew install jq
+
+# Linux (Ubuntu/Debian)
+sudo apt-get install jq
+
+# Linux (Fedora/RHEL)
+sudo dnf install jq
+
+# Linux (Arch)
+sudo pacman -S jq
+
+# Verify installation
+jq --version
+
+# Option 2: jsonlint (Alternative - npm/Node.js)
+npm install -g jsonlint
+
+# Verify installation
+jsonlint --version
+
+# Option 3: Python json.tool (Built-in fallback)
+# No installation needed - included with Python 3
+python3 -m json.tool --help
+```
+
+#### Automated Setup Script
+
+After forking the `todo.ai` repository, developers can use the automated setup script to install all required linting tools:
+
+```bash
+# Run the setup script
+./developer/setup-linters.sh
+```
+
+**What the script does:**
+1. **Detects available package managers** (npm, pip3, brew, apt-get, etc.)
+2. **Installs missing tools** automatically based on detected package managers
+3. **Installs git hooks** by running `scripts/setup-git-hooks.sh`
+4. **Provides installation summary** showing which tools were installed or skipped
+
+**For AI Agents (Copy-paste these to your agent):**
+
+```
+Install the required linting tools for git hooks by running the automated setup script:
+
+./developer/setup-linters.sh
+
+The script will:
+- Detect available package managers
+- Install markdownlint-cli2 (via npm) or mdl (via gem)
+- Install yamllint (via pip3) or yq (via brew/apt-get)
+- Install jq (via brew/apt-get/dnf/pacman) or jsonlint (via npm) or use python3 json.tool
+- Install git hooks via scripts/setup-git-hooks.sh
+- Show installation summary
+
+If manual installation is needed, see docs/GIT_HOOKS_DESIGN.md for detailed instructions.
+```
+
+**Manual Installation (Alternative):**
+
+If the automated script doesn't work or you prefer manual installation:
+
+**Agent Installation Workflow:**
+
+1. **Detect platform and package managers:**
+   ```zsh
+   # Check available package managers
+   command -v npm >/dev/null && echo "npm available"
+   command -v pip3 >/dev/null && echo "pip3 available"
+   command -v brew >/dev/null && echo "brew available (macOS)"
+   command -v apt-get >/dev/null && echo "apt-get available (Linux)"
+   ```
+
+2. **Install tools based on availability:**
+   - Prefer npm for markdownlint-cli2
+   - Prefer pip3 for yamllint
+   - Prefer brew on macOS, apt-get on Linux for jq
+   - Use fallbacks (mdl, yq, jsonlint, python3) if primary tools aren't available
+
+3. **Run automated setup script:**
+   ```bash
+   ./developer/setup-linters.sh
+   ```
+   
+   This script will install all tools and then run `./scripts/setup-git-hooks.sh` automatically.
+
+4. **Verify installation:**
+   The setup script will automatically check for all tools and report any missing ones.
+
+#### Installation Notes
+
+- **Tool Availability**: The git hooks will work even if some tools are missing. They will show warnings but won't block commits.
+- **Fallback Support**: Each validator has multiple fallback options, so partial installation is acceptable.
+- **Recommended Setup**: For full validation support, install all recommended tools (markdownlint-cli2, yamllint, jq).
+- **Development Setup**: After forking, developers should install tools to get full validation benefits, but the hooks will still work with basic validation or skipped checks.
 
 ## Decisions Made
 

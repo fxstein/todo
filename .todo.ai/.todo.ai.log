@@ -2,6 +2,9 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 00:43:18 | fxstein | COMPLETE | 15.9 | Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script
+2025-11-02 00:42:37 | fxstein | ADD_SUBTASK | 15.9 | Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script (parent: #15)
+2025-11-02 00:40:54 | fxstein | COMPLETE | 15.8 | Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md
 2025-11-02 00:39:44 | fxstein | ADD_SUBTASK | 15.8 | Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md (parent: #15)
 2025-11-02 00:37:24 | fxstein | UNDO | 15 | Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting
 2025-11-02 00:36:19 | fxstein | ARCHIVE | 15 | Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting (with 7 subtasks)

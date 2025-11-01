@@ -427,10 +427,14 @@ main() {
     local status_output=$(git status -s)
     local uncommitted=""
     
-    # Filter out only weird backup files like "todo.ai ''"
+    # Filter out files that should be ignored during release
     while IFS= read -r line; do
         # Skip weird backup files like "todo.ai ''"
         if [[ "$line" =~ ^[?]{2}[[:space:]]+\"todo\.ai ]]; then
+            continue
+        fi
+        # Skip RELEASE_LOG.md - it will be committed at the end after all release operations
+        if echo "$line" | grep -qE "RELEASE_LOG\.md"; then
             continue
         fi
         # All other files are uncommitted
@@ -642,6 +646,22 @@ Includes release summary from ${SUMMARY_FILE}"
 - Tag: ${TAG}
 - URL: ${repo_url}/releases/tag/${TAG}
 - Release log: ${RELEASE_LOG}"
+    
+    # Commit and push RELEASE_LOG.md at the very end to capture all release operations
+    # Note: We don't log these operations since they happen after the log is committed
+    if [[ -f "$RELEASE_LOG" ]]; then
+        echo -e "${BLUE}📋 Committing release log...${NC}"
+        git add "$RELEASE_LOG"
+        local log_commit=$(git commit -m "Add release log for ${NEW_VERSION}" 2>&1 || echo "no commit needed")
+        
+        if [[ "$log_commit" != "no commit needed" ]]; then
+            echo -e "${GREEN}✓ Release log committed${NC}"
+            echo -e "${BLUE}📤 Pushing release log...${NC}"
+            git push origin main > /dev/null 2>&1 && echo -e "${GREEN}✓ Release log pushed${NC}" || echo -e "${YELLOW}⚠️  Release log push may have failed${NC}"
+        else
+            echo -e "${GREEN}✓ Release log already committed${NC}"
+        fi
+    fi
     
     echo ""
     echo -e "${GREEN}✅ Release ${NEW_VERSION} published successfully!${NC}"

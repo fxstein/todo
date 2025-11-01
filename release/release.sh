@@ -13,7 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Release log file
-RELEASE_LOG="${RELEASE_LOG:-$(pwd)/RELEASE_LOG.md}"
+RELEASE_LOG="${RELEASE_LOG:-$(pwd)/release/RELEASE_LOG.md}"
 
 # Log release step with timestamp
 log_release_step() {
@@ -74,15 +74,15 @@ is_backend_only_release() {
     
     # Backend file patterns (infrastructure only)
     local backend_patterns=(
-        "^release\.sh$"
+        "^release/release\.sh$"
         "^\.cursorrules$"
         "^\.todo\.ai/"
         "^tests/"
-        "^RELEASE_SUMMARY\.md$"
-        "^RELEASE_LOG\.md$"
-        "^docs/RELEASE_PROCESS\.md$"
+        "^release/RELEASE_SUMMARY\.md$"
+        "^release/RELEASE_LOG\.md$"
+        "^release/RELEASE_PROCESS\.md$"
         "^docs/TEST_PLAN\.md$"
-        "^docs/RELEASE_NUMBERING_ANALYSIS\.md$"
+        "^release/RELEASE_NUMBERING_ANALYSIS\.md$"
     )
     
     # Frontend file patterns (user-facing)
@@ -108,9 +108,7 @@ is_backend_only_release() {
         # Check if frontend (user-facing docs)
         if [[ "$file" == "README.md" ]] || [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
             # Exclude backend docs
-            if [[ "$file" != "docs/RELEASE_PROCESS.md" ]] && \
-               [[ "$file" != "docs/TEST_PLAN.md" ]] && \
-               [[ "$file" != "docs/RELEASE_NUMBERING_ANALYSIS.md" ]]; then
+            if [[ "$file" != "docs/TEST_PLAN.md" ]]; then
                 has_frontend=true
             fi
         fi
@@ -434,7 +432,7 @@ main() {
             continue
         fi
         # Skip RELEASE_LOG.md - it will be committed at the end after all release operations
-        if echo "$line" | grep -qE "RELEASE_LOG\.md"; then
+        if echo "$line" | grep -qE "release/RELEASE_LOG\.md|^RELEASE_LOG\.md"; then
             continue
         fi
         # All other files are uncommitted

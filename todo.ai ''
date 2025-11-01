@@ -1,0 +1,2680 @@
+#!/bin/zsh
+# todo - AI-Agent First TODO List Tracker
+# 
+# Copyright 2025 Oliver Ratzesberger
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# AI-agent first TODO list management tool
+# Keep AI agents on track and help humans supervise their work
+#
+# Version: 1.3.0
+# Repository: https://github.com/fxstein/todo.ai
+# Update: ./todo.ai update
+
+set -e
+set +x  # Explicitly disable debug/trace output
+
+# Cross-platform sed in-place editing function
+sed_inplace() {
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' "$@"
+    else
+        sed -i "$@"
+    fi
+}
+
+# Version
+VERSION="1.3.1"
+REPO_URL="https://github.com/fxstein/todo.ai"
+SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
+
+# Configuration
+# Can be overridden with environment variables
+TODO_FILE="${TODO_FILE:-$(pwd)/TODO.md}"
+SERIAL_FILE="${TODO_SERIAL:-$(pwd)/.todo.ai/.todo.ai.serial}"
+LOG_FILE="${TODO_LOG:-$(pwd)/.todo.ai/.todo.ai.log}"
+
+# Function to get next serial number
+increment_serial() {
+    # Ensure .todo.ai directory exists
+    local serial_dir=$(dirname "$SERIAL_FILE")
+    if [[ ! -d "$serial_dir" ]]; then
+        mkdir -p "$serial_dir" 2>/dev/null || return 1
+    fi
+    
+    if [[ -f "$SERIAL_FILE" ]]; then
+        local current=$(cat "$SERIAL_FILE")
+        local next=$((current + 1))
+        echo "$next" > "$SERIAL_FILE"
+        echo "$next"
+    else
+        echo "1" > "$SERIAL_FILE"
+        echo "1"
+    fi
+}
+
+# Function to update the Last Updated date in the footer
+update_footer() {
+    local current_date=$(date)
+    # Update the Last Updated line in the footer
+    sed_inplace "s/\*\*Last Updated:\*\* .*/\*\*Last Updated:\*\* $current_date/" "$TODO_FILE"
+}
+
+# Function to log TODO operations
+log_todo_action() {
+    # Ensure .todo.ai directory exists
+    local log_dir=$(dirname "$LOG_FILE")
+    if [[ ! -d "$log_dir" ]]; then
+        mkdir -p "$log_dir" 2>/dev/null || return 1
+    fi
+    
+    local action="$1"
+    local task_id="$2"
+    local description="$3"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local git_user=$(git config --get user.name 2>/dev/null || echo "unknown")
+    
+    # Create log entry in format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
+    local log_entry="$timestamp | $git_user | $action | $task_id | $description"
+    
+    # Create temporary file with header preserved at top, then new entry, then existing entries
+    local temp_file=$(mktemp)
+    
+    # Extract header lines (lines starting with #)
+    grep "^#" "$LOG_FILE" > "$temp_file" || true
+    echo "" >> "$temp_file"
+    
+    # Add new entry
+    echo "$log_entry" >> "$temp_file"
+    
+    # Add existing log entries (skip header lines)
+    grep -v "^#" "$LOG_FILE" | grep -v "^$" >> "$temp_file" || true
+    
+    mv "$temp_file" "$LOG_FILE"
+}
+
+# Function to initialize log file if it doesn't exist
+init_log_file() {
+    # Ensure .todo.ai directory exists
+    local log_dir=$(dirname "$LOG_FILE")
+    if [[ ! -d "$log_dir" ]]; then
+        mkdir -p "$log_dir" 2>/dev/null || return 1
+    fi
+    
+    if [[ ! -f "$LOG_FILE" ]]; then
+        echo "# TODO Tool Log File" > "$LOG_FILE"
+        echo "# Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION" >> "$LOG_FILE"
+        echo "# Generated: $(date)" >> "$LOG_FILE"
+        echo "" >> "$LOG_FILE"
+    fi
+}
+
+# Function to initialize TODO file if it doesn't exist
+init_todo_file() {
+    if [[ ! -f "$TODO_FILE" ]]; then
+        # Detect repository name and URL from git
+        local repo_name="Project"
+        local repo_url=""
+        
+        # Try to get repository name from git remote
+        if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+            local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
+            if [[ -n "$remote_url" ]]; then
+                # Extract repository name from URL (handle both https:// and git@ formats)
+                if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/]+)(\.git)?$ ]]; then
+                    repo_name="${match[2]}"
+                    # Remove .git suffix if present
+                    repo_name="${repo_name%.git}"
+                    # Convert to title case (first letter uppercase)
+                    repo_name="$(echo "${repo_name:0:1}" | tr '[:lower:]' '[:upper:]')${repo_name:1}"
+                    # Clean up URL (remove .git suffix if present, ensure https://)
+                    repo_url="${remote_url%.git}"
+                    if [[ ! "$repo_url" =~ ^https:// ]]; then
+                        # Convert git@ format to https://
+                        repo_url=$(echo "$repo_url" | sed 's/git@github\.com:/https:\/\/github.com\//')
+                    fi
+                fi
+            fi
+        fi
+        
+        cat > "$TODO_FILE" << EOF
+# ${repo_name} ToDo List
+
+> **⚠️ IMPORTANT: This file should ONLY be edited through the \`todo.ai\` script!**
+
+## Tasks
+
+------------------
+
+## Recently Completed
+
+---
+
+**Last Updated:** $(date)
+EOF
+        # Add repository URL if detected
+        if [[ -n "$repo_url" ]]; then
+            echo "**Repository:** ${repo_url}  " >> "$TODO_FILE"
+        fi
+        echo "**Maintenance:** Use \`todo.ai\` script only" >> "$TODO_FILE"
+        
+        # Replace the $(date) placeholder with actual date
+        local current_date=$(date)
+        sed_inplace "s/\$(date)/$current_date/" "$TODO_FILE"
+    fi
+}
+
+# Function to ensure Cursor rules include todo.ai requirement
+init_cursor_rules() {
+    local cursor_rules_file="$(pwd)/.cursorrules"
+    local todo_rule="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools"
+    local commit_rule="TODO.md and .todo.ai/ must always be committed together"
+    local archive_rule="Always ask for user confirmation before archiving completed tasks using todo.ai"
+    local rules_added=0
+    
+    # Check if .cursorrules exists
+    if [[ ! -f "$cursor_rules_file" ]]; then
+        # Create .cursorrules with todo.ai rules
+        cat > "$cursor_rules_file" << 'EOF'
+## Task Management
+It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
+TODO.md and .todo.ai/ must always be committed together
+Always ask for user confirmation before archiving completed tasks using todo.ai
+EOF
+        echo ""
+        echo "⚠️  IMPORTANT: Created .cursorrules file"
+        echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
+        echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
+        echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
+        echo "   This ensures AI agents will automatically use todo.ai for task tracking"
+        return 0
+    fi
+    
+    # Check if rules already exist
+    local todo_rule_exists=false
+    local commit_rule_exists=false
+    local archive_rule_exists=false
+    
+    if grep -q "todo.ai" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
+        todo_rule_exists=true
+    fi
+    
+    if grep -q "TODO.md and .todo.ai" "$cursor_rules_file" || grep -q "committed together" "$cursor_rules_file"; then
+        commit_rule_exists=true
+    fi
+    
+    if grep -q "archiving completed tasks" "$cursor_rules_file" || grep -q "confirmation before archiving" "$cursor_rules_file"; then
+        archive_rule_exists=true
+    fi
+    
+    # If all rules exist, nothing to do
+    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]]; then
+        return 0
+    fi
+    
+    # Add rule to existing file (append after last line or in a new section)
+    local section_added=false
+    if ! grep -q "^## Task Management" "$cursor_rules_file"; then
+        # Add new section at the end
+        echo "" >> "$cursor_rules_file"
+        echo "## Task Management" >> "$cursor_rules_file"
+        section_added=true
+    fi
+    
+    # Add the rules (check if we need to add them to existing section)
+    if grep -q "^## Task Management" "$cursor_rules_file"; then
+        # Find the line number of "## Task Management"
+        local section_line=$(grep -n "^## Task Management" "$cursor_rules_file" | head -1 | cut -d: -f1)
+        if [[ -n "$section_line" ]]; then
+            # Build list of rules to add
+            local rules_to_add=()
+            
+            if [[ "$todo_rule_exists" == false ]]; then
+                rules_to_add+=("$todo_rule")
+            fi
+            
+            if [[ "$commit_rule_exists" == false ]]; then
+                rules_to_add+=("$commit_rule")
+            fi
+            
+            if [[ "$archive_rule_exists" == false ]]; then
+                rules_to_add+=("$archive_rule")
+            fi
+            
+            # Add rules after the section header
+            if [[ ${#rules_to_add[@]} -gt 0 ]]; then
+                if [[ "$(uname)" == "Darwin" ]]; then
+                    local temp_file=$(mktemp)
+                    head -n "$section_line" "$cursor_rules_file" > "$temp_file"
+                    for rule in "${rules_to_add[@]}"; do
+                        echo "$rule" >> "$temp_file"
+                    done
+                    tail -n +$((section_line + 1)) "$cursor_rules_file" >> "$temp_file"
+                    mv "$temp_file" "$cursor_rules_file"
+                    rules_added=${#rules_to_add[@]}
+                else
+                    local last_line=$section_line
+                    for rule in "${rules_to_add[@]}"; do
+                        last_line=$((last_line + 1))
+                        sed_inplace "${last_line}a$rule" "$cursor_rules_file"
+                        rules_added=$((rules_added + 1))
+                    done
+                fi
+            fi
+        fi
+    fi
+    
+    # Show explicit callouts
+    if [[ $rules_added -gt 0 ]]; then
+        echo ""
+        echo "⚠️  IMPORTANT: Updated .cursorrules file"
+        if [[ "$section_added" == true ]]; then
+            echo "   📝 Added new section: '## Task Management'"
+        fi
+        if [[ "$todo_rule_exists" == false ]]; then
+            echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
+        fi
+        if [[ "$commit_rule_exists" == false ]]; then
+            echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
+        fi
+        if [[ "$archive_rule_exists" == false ]]; then
+            echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
+        fi
+        echo "   This ensures AI agents will automatically use todo.ai for task tracking"
+    fi
+}
+
+# Function to get current serial number
+get_current_serial() {
+    if [[ -f "$SERIAL_FILE" ]]; then
+        cat "$SERIAL_FILE"
+    else
+        echo "0"
+    fi
+}
+
+# Function to parse task line and extract components
+parse_task() {
+    local line="$1"
+    local id=$(echo "$line" | grep -o '^#\([0-9.]*\)' | sed 's/#//')
+    local description=$(echo "$line" | sed 's/^#[0-9.]* *//' | sed 's/ *#.*$//')
+    local tags=$(echo "$line" | grep -o '#[a-zA-Z0-9]*' | grep -v '^#[0-9]' | tr '\n' ' ')
+    local date=$(echo "$line" | grep -o '([^)]*)' | tr -d '()')
+    
+    echo "ID:$id|DESC:$description|TAGS:$tags|DATE:$date"
+}
+
+# Function to normalize malformed checkboxes
+normalize_checkboxes() {
+    # Fix malformed checkboxes like [  ], [   ], [] to proper [ ] or [x]
+    sed_inplace 's/\[  \]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[   \]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[    \]/[ ]/g' "$TODO_FILE"
+    sed_inplace 's/\[\]/[ ]/g' "$TODO_FILE"
+    # Fix any other malformed patterns with multiple spaces
+    sed_inplace 's/\[[ ]*\]/[ ]/g' "$TODO_FILE"
+}
+
+# Function to show usage
+show_usage() {
+    echo "Usage: ./todo.ai [command] [options]"
+    echo ""
+    echo "Version: $VERSION"
+    echo ""
+    echo "Commands:"
+    echo "  add <text> [tags]             Add a new todo item with optional tags"
+    echo "  add-subtask <parent-id> <text> [tags]  Add a subtask to an existing task (supports 2-level nesting)"
+    echo "  list [--tag <tag>] [--incomplete-only] [--parents-only] [--has-subtasks]  Show todo list with filters"
+    echo "  complete <id> [<id>...] [--with-subtasks]  Mark item(s) as completed"
+    echo "  undo <id>                     Reopen (undo) completed task (use #ID)"
+    echo "  modify <id> <text> [tags]     Modify task description and/or tags"
+    echo "  delete <id> [<id>...] [--with-subtasks]  Soft delete task(s) to Deleted section (30-day recovery)"
+    echo "  archive <id> [<id>...] [--reason <reason>]  Move task(s) to Recently Completed (reason for incomplete tasks)"
+    echo "  relate <id> --<type> <targets>  Add task relationship (completed-by, depends-on, blocks, related-to, duplicate-of)"
+    echo "  note <id> <text>              Add note to task (blockquote format)"
+    echo "  show <id>                     Show task with subtasks, relationships, and notes"
+    echo "  restore <id>                  Restore task from Deleted or Recently Completed to active Tasks"
+    echo "  --lint                        Identify formatting issues (indentation, checkboxes)"
+    echo "  --reformat [--dry-run]        Apply formatting fixes (use --dry-run to preview)"
+    echo "  edit                          Edit todo file in editor"
+    echo "  log [--filter <text>] [--lines <n>] View TODO operation log"
+    echo "  update                        Update todo.ai to latest version"
+    echo "  backups, list-backups         List available backup versions"
+    echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
+    echo "  version, -v, --version        Show version information"
+    echo ""
+    echo ""
+    echo "Examples:"
+    echo "  ./todo.ai add 'Fix Shelly device naming' '#api'"
+    echo "  ./todo.ai add-subtask 39 'Design subtask data structure' '#feature'"
+    echo "  ./todo.ai add-subtask 39.1 'Create nested subtask' '#test'    # 2-level nesting"
+    echo "  ./todo.ai complete 1"
+    echo "  ./todo.ai complete 107 108 109          # Bulk complete"
+    echo "  ./todo.ai complete 104 --with-subtasks  # Complete task and all subtasks"
+    echo "  ./todo.ai complete 104.3-104.10         # Complete range of subtasks"
+    echo "  ./todo.ai undo 1"
+    echo "  ./todo.ai modify 1 'Updated task description' '#api'"
+    echo "  ./todo.ai delete 115                    # Soft delete (30-day recovery)"
+    echo "  ./todo.ai delete 110 --with-subtasks    # Delete task and all subtasks"
+    echo "  ./todo.ai delete 120.5-120.10           # Delete range"
+    echo "  ./todo.ai archive 1"
+    echo "  ./todo.ai archive 107 108 109           # Bulk archive"
+    echo "  ./todo.ai archive 109 --reason obsolete # Archive incomplete task"
+    echo "  ./todo.ai archive 104 --reason 'completed-by:107,108'"
+    echo "  ./todo.ai relate 110 --depends-on 104  # Add dependency"
+    echo "  ./todo.ai relate 104 --completed-by '107,108'"
+    echo "  ./todo.ai note 110 'Testing shows issues'  # Add note"
+    echo "  ./todo.ai show 110                    # Show task with relationships & notes"
+    echo "  ./todo.ai restore 1"
+    echo "  ./todo.ai --lint"
+    echo "  ./todo.ai --reformat --dry-run"
+    echo "  ./todo.ai --reformat"
+    echo "  ./todo.ai list"
+    echo "  ./todo.ai list --tag api"
+    echo "  ./todo.ai list --incomplete-only     # Show only pending tasks"
+    echo "  ./todo.ai list --parents-only        # Hide subtasks"
+    echo "  ./todo.ai list --has-subtasks        # Only tasks with subtasks"
+    echo "  ./todo.ai log"
+    echo "  ./todo.ai log --filter ADD"
+    echo "  ./todo.ai log --lines 20"
+    echo "  ./todo.ai update                     # Update to latest version"
+    echo "  ./todo.ai backups                    # List available backups"
+    echo "  ./todo.ai rollback                   # Rollback to latest backup"
+    echo "  ./todo.ai rollback 2                 # Rollback to backup #2"
+    echo "  ./todo.ai rollback 20251030231500     # Rollback by timestamp"
+    echo "  ./todo.ai version                    # Show version"
+}
+
+# Function to validate command arguments and detect invalid options
+validate_command_args() {
+    local command="$1"
+    shift
+    local args=("$@")
+    
+    case "$command" in
+        "add")
+            # add <text> [tags] - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'add' command"
+                    echo "The 'add' command only accepts text and optional tags"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "add-subtask")
+            # add-subtask <parent-id> <text> [tags] - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'add-subtask' command"
+                    echo "The 'add-subtask' command only accepts parent-id, text, and optional tags"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "list")
+            # list [--tag <tag>] [--incomplete-only] [--parents-only] [--has-subtasks]
+            local expecting_tag=false
+            for arg in "${args[@]}"; do
+                if [[ "$arg" == "--tag" ]]; then
+                    expecting_tag=true
+                elif [[ "$arg" =~ ^--(incomplete-only|parents-only|has-subtasks)$ ]]; then
+                    # Valid flags
+                    continue
+                elif [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'list' command"
+                    echo "The 'list' command accepts: --tag <tag>, --incomplete-only, --parents-only, --has-subtasks"
+                    echo ""
+                    show_usage
+                    return 1
+                elif [[ "$expecting_tag" == true ]]; then
+                    expecting_tag=false
+                fi
+            done
+            ;;
+        "complete")
+            # complete <id> [<id>...] [--with-subtasks] - allow multiple IDs and --with-subtasks flag
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]] && [[ "$arg" != "--with-subtasks" ]]; then
+                    echo "Error: Invalid option '$arg' for 'complete' command"
+                    echo "The 'complete' command accepts task ID(s) and optional --with-subtasks flag"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "undo")
+            # undo <id> - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'undo' command"
+                    echo "The 'undo' command only accepts a task ID"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "modify")
+            # modify <id> <text> [tags] - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'modify' command"
+                    echo "The 'modify' command only accepts task-id, text, and optional tags"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "archive")
+            # archive <id> [<id>...] [--reason <reason>] - allow multiple IDs and reason
+            local expecting_reason=false
+            for arg in "${args[@]}"; do
+                if [[ "$arg" == "--reason" ]]; then
+                    expecting_reason=true
+                elif [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'archive' command"
+                    echo "The 'archive' command accepts task ID(s) and optional --reason <reason>"
+                    echo ""
+                    show_usage
+                    return 1
+                elif [[ "$expecting_reason" == true ]]; then
+                    expecting_reason=false
+                fi
+            done
+            ;;
+        "delete")
+            # delete <id> [<id>...] [--with-subtasks] - allow multiple IDs and --with-subtasks
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]] && [[ "$arg" != "--with-subtasks" ]]; then
+                    echo "Error: Invalid option '$arg' for 'delete' command"
+                    echo "The 'delete' command accepts task ID(s) and optional --with-subtasks flag"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "relate")
+            # relate <id> --<relation-type> <targets> - relationship management
+            # Allow all --completed-by, --depends-on, --blocks, --related-to, --duplicate-of
+            ;;
+        "note")
+            # note <id> <text> - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'note' command"
+                    echo "The 'note' command only accepts task ID and note text"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "show")
+            # show <id> - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'show' command"
+                    echo "The 'show' command only accepts a task ID"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "restore")
+            # restore <id> - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'restore' command"
+                    echo "The 'restore' command only accepts a task ID"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "log")
+            # log [--filter <text>] [--lines <n>] - only --filter and --lines allowed
+            local expecting_filter=false
+            local expecting_lines=false
+            for arg in "${args[@]}"; do
+                if [[ "$arg" == "--filter" ]]; then
+                    expecting_filter=true
+                elif [[ "$arg" == "--lines" ]]; then
+                    expecting_lines=true
+                elif [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'log' command"
+                    echo "The 'log' command only accepts --filter <text> and --lines <n> options"
+                    echo ""
+                    show_usage
+                    return 1
+                elif [[ "$expecting_filter" == true ]]; then
+                    expecting_filter=false
+                elif [[ "$expecting_lines" == true ]]; then
+                    expecting_lines=false
+                fi
+            done
+            ;;
+    esac
+    
+    return 0
+}
+
+# Function to add todo item
+add_todo() {
+    local text="$1"
+    local tags="$2"
+    
+    if [[ -z "$text" ]]; then
+        echo "Error: Please provide todo text"
+        return 1
+    fi
+    
+    # Get next serial number
+    local serial=$(increment_serial)
+    
+    # Format the task line with bold task ID
+    local task_line="- [ ] **#$serial** $text"
+    if [[ -n "$tags" ]]; then
+        # Wrap each tag in backticks for code styling
+        local styled_tags=""
+        # Split tags by space and process each one
+        for tag in $(echo "$tags" | tr ' ' '\n'); do
+            if [[ -n "$styled_tags" ]]; then
+                styled_tags="$styled_tags \`$tag\`"
+            else
+                styled_tags="\`$tag\`"
+            fi
+        done
+        task_line="$task_line $styled_tags"
+    fi
+    
+    # Add to Tasks section
+    local tasks_line=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
+    if [[ -n "$tasks_line" ]]; then
+        # Use awk or a simpler approach for macOS compatibility
+        if [[ "$(uname)" == "Darwin" ]]; then
+            # Insert after the ## Tasks line with proper newline
+            local temp_file=$(mktemp)
+            head -n "$tasks_line" "$TODO_FILE" > "$temp_file"
+            echo "$task_line" >> "$temp_file"
+            tail -n +$((tasks_line + 1)) "$TODO_FILE" >> "$temp_file"
+            mv "$temp_file" "$TODO_FILE"
+        else
+            sed_inplace "/^## Tasks$/a$task_line" "$TODO_FILE"
+        fi
+    fi
+    update_footer
+    
+    # Log the action
+    log_todo_action "ADD" "$serial" "$text"
+    
+    echo "Added: #$serial $text"
+}
+
+# Function to calculate nesting depth from task ID
+get_nesting_depth() {
+    local task_id="$1"
+    # Count the number of dots in the task ID
+    local depth=$(echo "$task_id" | tr -cd '.' | wc -c | tr -d ' ')
+    # Depth is number of dots (0 for main tasks like "1", 1 for "1.1", 2 for "1.1.1")
+    echo "$depth"
+}
+
+# Function to add subtask to existing task (supports nested subtasks up to 2 levels)
+add_subtask() {
+    local parent_id="$1"
+    local text="$2"
+    local tags="$3"
+    
+    if [[ -z "$parent_id" || -z "$text" ]]; then
+        echo "Error: Please provide parent task ID and subtask text"
+        echo "Usage: ./todo.ai add-subtask <parent-id> \"<subtask text>\" [\"<tags>\"]"
+        return 1
+    fi
+    
+    # Check nesting depth of parent
+    local parent_depth=$(get_nesting_depth "$parent_id")
+    
+    # Validate max nesting (2 levels: main task → subtask → sub-subtask)
+    if [[ $parent_depth -ge 2 ]]; then
+        echo "Error: Cannot add subtask to #$parent_id"
+        echo "   Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)"
+        echo "   Task #$parent_id is already at the maximum depth"
+        return 1
+    fi
+    
+    # Check if parent task exists (can be main task or subtask)
+    local parent_found=false
+    local parent_line_num=""
+    local parent_indent=""
+    
+    # Check for main task pattern: `^- \[.*\] \*\*#$parent_id\*\* `
+    if grep -q "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+        parent_found=true
+        parent_line_num=$(grep -n "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        parent_indent="  "  # Main tasks have subtasks indented with 2 spaces
+    # Check for subtask pattern: `^  - \[.*\] \*\*#$parent_id\*\* `
+    elif grep -q "^  - \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+        parent_found=true
+        parent_line_num=$(grep -n "^  - \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        parent_indent="    "  # Subtasks have sub-subtasks indented with 4 spaces
+    fi
+    
+    if [[ "$parent_found" == false ]]; then
+        echo "Error: Parent task #$parent_id not found"
+        return 1
+    fi
+    
+    # Find the next subtask number for this parent
+    local next_subtask_num=1
+    local subtask_pattern="^$parent_indent- \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* "
+    while grep -q "$subtask_pattern" "$TODO_FILE"; do
+        next_subtask_num=$((next_subtask_num + 1))
+        subtask_pattern="^$parent_indent- \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* "
+    done
+    
+    # Create subtask ID
+    local subtask_id="$parent_id.$next_subtask_num"
+    
+    # Format the subtask line with bold task ID and proper indentation
+    local task_line="$parent_indent- [ ] **#$subtask_id** $text"
+    if [[ -n "$tags" ]]; then
+        # Wrap each tag in backticks for code styling
+        local styled_tags=""
+        # Split tags by space and process each one
+        for tag in $(echo "$tags" | tr ' ' '\n'); do
+            if [[ -n "$styled_tags" ]]; then
+                styled_tags="$styled_tags \`$tag\`"
+            else
+                styled_tags="\`$tag\`"
+            fi
+        done
+        task_line="$task_line $styled_tags"
+    fi
+    
+    # Find the parent task line and add subtask after it (newest first)
+    if [[ -n "$parent_line_num" ]]; then
+        # Insert right after the parent line (newest subtasks appear first)
+        local insert_line=$((parent_line_num + 1))
+        local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
+        
+        if [[ "$(uname)" == "Darwin" ]]; then
+            local temp_file=$(mktemp)
+            if [[ $insert_line -gt $max_lines ]]; then
+                # Append to end of file
+                cat "$TODO_FILE" > "$temp_file"
+                echo "$task_line" >> "$temp_file"
+            else
+                head -n $((insert_line - 1)) "$TODO_FILE" > "$temp_file"
+                echo "$task_line" >> "$temp_file"
+                tail -n +$insert_line "$TODO_FILE" >> "$temp_file"
+            fi
+            mv "$temp_file" "$TODO_FILE"
+        else
+            sed_inplace "${insert_line}i\\$task_line" "$TODO_FILE"
+        fi
+        update_footer
+        
+        # Log the action
+        log_todo_action "ADD_SUBTASK" "$subtask_id" "$text (parent: #$parent_id)"
+        
+        local depth_label="subtask"
+        if [[ $parent_depth -eq 1 ]]; then
+            depth_label="sub-subtask"
+        fi
+        echo "Added $depth_label: #$subtask_id $text"
+    else
+        echo "Error: Could not find parent task #$parent_id"
+        return 1
+    fi
+}
+
+# Function to list todos
+list_todos() {
+    local filter_tag=""
+    local incomplete_only=false
+    local parents_only=false
+    local has_subtasks_only=false
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --tag)
+                filter_tag="$2"
+                shift 2
+                ;;
+            --incomplete-only)
+                incomplete_only=true
+                shift
+                ;;
+            --parents-only)
+                parents_only=true
+                shift
+                ;;
+            --has-subtasks)
+                has_subtasks_only=true
+                shift
+                ;;
+            *)
+                shift
+                ;;
+        esac
+    done
+    
+    if [[ ! -f "$TODO_FILE" ]]; then
+        echo "Todo file not found: $TODO_FILE"
+        return 1
+    fi
+    
+    # If using tag filter, use original implementation
+    if [[ -n "$filter_tag" ]] && [[ "$incomplete_only" == false ]] && [[ "$parents_only" == false ]] && [[ "$has_subtasks_only" == false ]]; then
+        # Add # prefix if missing
+        if [[ ! "$filter_tag" =~ ^# ]]; then
+            filter_tag="#$filter_tag"
+        fi
+        
+        # Filter by tag - show tasks with the specified tag
+        # Escape special characters in filter_tag for regex matching
+        local escaped_tag=$(echo "$filter_tag" | sed 's/[.*+?^${}()|\[\]\\]/\\&/g')
+        
+        echo "# Home Assistant Project Todo List"
+        echo ""
+        echo "## Tasks with tag: $filter_tag"
+        echo ""
+        # Match tags both with backticks (styled) and without (plain)
+        # Match all task levels: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
+        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep -E "^-.*\[.*\]|^  -.*\[.*\]|^    -.*\[.*\]"
+        echo ""
+        echo "## Recently Completed with tag: $filter_tag"
+        echo ""
+        grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep -E "^-.*\[x\]|^  -.*\[x\]|^    -.*\[x\]"
+        return
+    fi
+    
+    # Enhanced filtering logic
+    local in_tasks_section=false
+    local in_recently_completed=false
+    local current_parent=""
+    local parent_has_subtasks=false
+    local last_parent_shown=false
+    
+    # First pass: identify parents with subtasks if needed
+    local parents_with_subtasks=()
+    if [[ "$has_subtasks_only" == true ]]; then
+        while IFS= read -r line; do
+            # Check if this is a subtask (starts with "  - ")
+            if [[ "$line" =~ ^"  - ".+#([0-9]+)\.([0-9]+) ]]; then
+                local parent_id="${match[1]}"
+                if [[ ! " ${parents_with_subtasks[@]} " =~ " ${parent_id} " ]]; then
+                    parents_with_subtasks+=("$parent_id")
+                fi
+            fi
+        done < "$TODO_FILE"
+    fi
+    
+    # Second pass: filter and display
+    while IFS= read -r line; do
+        # Track sections
+        if [[ "$line" == "## Tasks" ]]; then
+            in_tasks_section=true
+            in_recently_completed=false
+            if [[ "$incomplete_only" == false ]]; then
+                echo "$line"
+            fi
+            continue
+        elif [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks_section=false
+            in_recently_completed=true
+            if [[ "$incomplete_only" == false ]]; then
+                echo "$line"
+            fi
+            continue
+        elif [[ "$line" =~ ^## ]]; then
+            # Other section, stop filtering
+            if [[ "$incomplete_only" == false ]]; then
+                echo "$line"
+            fi
+            in_tasks_section=false
+            in_recently_completed=false
+            continue
+        fi
+        
+        # Skip completed section if --incomplete-only
+        if [[ "$incomplete_only" == true ]] && [[ "$in_recently_completed" == true ]]; then
+            continue
+        fi
+        
+        # Check if this is a parent task (starts with "- [" and has **#num** but not **#num.num**)
+        if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
+            # Extract task ID and checkbox
+            local checkbox=$(echo "$line" | sed 's/^- \[\(.\)\].*/\1/')
+            current_parent=$(echo "$line" | grep -o '#[0-9]\+' | sed 's/#//' | head -1)
+            
+            # Apply filters
+            local should_show=true
+            
+            # Filter: incomplete only (skip completed tasks)
+            if [[ "$incomplete_only" == true ]] && [[ "$checkbox" == "x" ]]; then
+                should_show=false
+            fi
+            
+            # Filter: has-subtasks only
+            if [[ "$has_subtasks_only" == true ]]; then
+                if [[ ! " ${parents_with_subtasks[@]} " =~ " ${current_parent} " ]]; then
+                    should_show=false
+                fi
+            fi
+            
+            # Filter: tag (match both styled with backticks and plain)
+            if [[ -n "$filter_tag" ]]; then
+                if [[ ! "$filter_tag" =~ ^# ]]; then
+                    filter_tag="#$filter_tag"
+                fi
+                # Check if line contains the tag (with or without backticks)
+                if [[ ! "$line" =~ \`${filter_tag}\` ]] && [[ ! "$line" =~ ${filter_tag} ]]; then
+                    should_show=false
+                fi
+            fi
+            
+            last_parent_shown=$should_show
+            if [[ "$should_show" == true ]]; then
+                echo "$line"
+            fi
+        # Check if this is a subtask (starts with "  - ")
+        elif [[ "$line" =~ ^"  - " ]]; then
+            # Show subtasks unless --parents-only, and only if parent was shown
+            if [[ "$parents_only" == false ]] && [[ "$last_parent_shown" == true ]]; then
+                # Apply same filters as parent
+                local should_show=true
+                
+                # Tag filter (match both styled with backticks and plain)
+                if [[ -n "$filter_tag" ]]; then
+                    if [[ ! "$line" =~ \`${filter_tag}\` ]] && [[ ! "$line" =~ ${filter_tag} ]]; then
+                        should_show=false
+                    fi
+                fi
+                
+                if [[ "$should_show" == true ]]; then
+                    echo "$line"
+                fi
+            fi
+        else
+            # Non-task line (headers, footers, blank lines, etc.)
+            # Only show if not heavily filtering
+            if [[ "$incomplete_only" == false ]] && [[ "$parents_only" == false ]] && [[ "$has_subtasks_only" == false ]]; then
+                echo "$line"
+            elif [[ "$in_tasks_section" == true ]] || [[ "$line" == "" ]] || [[ "$line" =~ ^## ]]; then
+                # Always show headers and blank lines in tasks section
+                echo "$line"
+            fi
+        fi
+    done < "$TODO_FILE"
+}
+
+# Function to get line number of task by serial number
+get_task_line() {
+    local task_id="$1"
+    local line_number=0
+    
+    while IFS= read -r line; do
+        line_number=$((line_number + 1))
+        if [[ "$line" =~ "^-.*\[.*\].*" || "$line" =~ "^  -.*\[.*\].*" ]]; then
+            # Extract the ID from the line (handle both bold and non-bold formatting, and subtasks)
+            local line_id=$(echo "$line" | grep -o '\*\*#\([0-9][0-9.]*\)\*\*\|#[0-9][0-9.]*' | sed 's/\*\*#//g' | sed 's/\*\*//g' | sed 's/#//')
+            if [[ "$line_id" == "$task_id" ]]; then
+                echo "$line_number"
+                return 0
+            fi
+        fi
+    done < "$TODO_FILE"
+    
+    echo "Task #$task_id not found"
+    return 1
+}
+
+# Function to mark as complete
+complete_todo() {
+    local with_subtasks=false
+    local task_ids=()
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --with-subtasks)
+                with_subtasks=true
+                shift
+                ;;
+            *)
+                task_ids+=("$1")
+                shift
+                ;;
+        esac
+    done
+    
+    if [[ ${#task_ids[@]} -eq 0 ]]; then
+        echo "Error: Please provide at least one task number"
+        return 1
+    fi
+    
+    # Normalize any malformed checkboxes first
+    normalize_checkboxes
+    
+    # Expand ranges and collect all task IDs to complete
+    local all_ids=()
+    for id in "${task_ids[@]}"; do
+        # Match range format: 104.3-104.10 or 122.3-10 (both formats supported)
+        if [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]]; then
+            # Full format: 122.3-122.10
+            local parent=${match[1]}
+            local start=${match[2]}
+            local end_parent=${match[3]}
+            local end=${match[4]}
+            # Verify parent IDs match
+            if [[ "$parent" == "$end_parent" ]]; then
+                for ((i=start; i<=end; i++)); do
+                    all_ids+=("${parent}.${i}")
+                done
+            else
+                echo "Warning: Range parent IDs don't match ($parent vs $end_parent), treating as literal"
+                all_ids+=("$id")
+            fi
+        elif [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)$ ]]; then
+            # Short format: 122.3-10 (assumes same parent)
+            local parent=${match[1]}
+            local start=${match[2]}
+            local end=${match[3]}
+            for ((i=start; i<=end; i++)); do
+                all_ids+=("${parent}.${i}")
+            done
+        else
+            all_ids+=("$id")
+        fi
+    done
+    
+    # If --with-subtasks, add all subtasks for parent tasks (including nested subtasks)
+    if [[ "$with_subtasks" == "true" ]]; then
+        local expanded_ids=()
+        for id in "${all_ids[@]}"; do
+            expanded_ids+=("$id")
+            # Find all subtasks and sub-subtasks for this parent
+            # Check if this is a parent task (may or may not contain dots)
+            local id_depth=$(get_nesting_depth "$id")
+            
+            # Find all direct subtasks and nested subtasks
+            # Pattern matches: id.1, id.2, id.1.1, id.1.2, id.2.1, etc.
+            while IFS= read -r line; do
+                # Extract task ID from line (handles nested IDs)
+                if [[ "$line" =~ '#([0-9]+(\.[0-9]+)+)' ]]; then
+                    local task_id="${match[1]}"
+                    # Check if this task belongs to our parent (direct or nested subtask)
+                    # For main task 1, match: 1.1, 1.2, 1.1.1, 1.1.2, etc.
+                    # For subtask 1.1, match: 1.1.1, 1.1.2, etc.
+                    if [[ "$task_id" =~ ^$id\. ]]; then
+                        expanded_ids+=("$task_id")
+                    fi
+                fi
+            done < "$TODO_FILE"
+        done
+        all_ids=("${expanded_ids[@]}")
+    fi
+    
+    # Complete all tasks
+    local completed_count=0
+    for number in "${all_ids[@]}"; do
+        # Skip if task doesn't exist (escape asterisks for grep)
+        if ! grep -q "\*\*#$number\*\*" "$TODO_FILE"; then
+            echo "Warning: Task #$number not found, skipping"
+            continue
+        fi
+        
+        # Complete the task
+        sed_inplace "s/- \[ \] \*\*#$number\*\* /- [x] **#$number** /" "$TODO_FILE"
+        sed_inplace "s/  - \[ \] \*\*#$number\*\* /  - [x] **#$number** /" "$TODO_FILE"
+        
+        # Get task description for logging
+        local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
+        
+        # Log the action
+        log_todo_action "COMPLETE" "$number" "$task_description"
+        
+        completed_count=$((completed_count + 1))
+    done
+    
+    update_footer
+    
+    echo "Marked $completed_count task(s) as completed"
+}
+
+# Function to undo completion (reopen task)
+undo_todo() {
+    local number="$1"
+    if [[ -z "$number" ]]; then
+        echo "Error: Please provide todo number"
+        return 1
+    fi
+    
+    # Normalize any malformed checkboxes first
+    normalize_checkboxes
+    
+    # Use sed to directly find and replace the specific task (handle bold formatting and subtasks)
+    sed_inplace "s/- \[x\] \*\*#$number\*\* /- [ ] **#$number** /" "$TODO_FILE"
+    sed_inplace "s/  - \[x\] \*\*#$number\*\* /  - [ ] **#$number** /" "$TODO_FILE"
+    update_footer
+    
+    # Get task description for logging
+    local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
+    
+    # Log the action
+    log_todo_action "UNDO" "$number" "$task_description"
+    
+    echo "Reopened task $number"
+}
+
+# Function to modify a specific task
+modify_todo() {
+    local task_id="$1"
+    local new_text="$2"
+    local new_tags="$3"
+    
+    if [[ -z "$task_id" || -z "$new_text" ]]; then
+        echo "Error: Please provide task ID and new text"
+        echo "Usage: ./todo.ai modify <id> \"<new text>\" [\"<new tags>\"]"
+        return 1
+    fi
+    
+    # Normalize any malformed checkboxes first
+    normalize_checkboxes
+    
+    # Get the current completion status and existing line (handle both bold and non-bold formatting, and subtasks)
+    # Check all possible indentations: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
+    local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) |^    - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
+    local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/' | sed 's/    - \[\([^]]*\)\].*/\1/')
+    
+    # Extract existing tags from current line (tags are in backticks after the task text)
+    local existing_tags=""
+    if echo "$current_line" | grep -q '\`#'; then
+        # Extract tags (everything in backticks)
+        existing_tags=$(echo "$current_line" | sed 's/.*\(`#[^`]*`\).*/\1/' | sed 's/`//g')
+        # Handle multiple tags
+        local all_tags=$(echo "$current_line" | grep -o '\`#[^`]*`' | sed 's/`//g' | tr '\n' ' ' | sed 's/ $//')
+        if [[ -n "$all_tags" ]]; then
+            existing_tags="$all_tags"
+        fi
+    fi
+    
+    # Determine nesting depth to apply correct indentation
+    local task_depth=$(get_nesting_depth "$task_id")
+    local indent=""
+    
+    # Format the new task line preserving completion status with bold task ID
+    # Apply indentation based on nesting depth:
+    # Depth 0 (main task): no indentation
+    # Depth 1 (subtask like #2.5): 2 spaces
+    # Depth 2 (sub-subtask like #2.5.4): 4 spaces
+    if [[ $task_depth -eq 0 ]]; then
+        indent=""
+    elif [[ $task_depth -eq 1 ]]; then
+        indent="  "
+    elif [[ $task_depth -eq 2 ]]; then
+        indent="    "
+    else
+        # Fallback to 2 spaces if depth is unexpected
+        indent="  "
+    fi
+    
+    local new_task_line="${indent}- [$current_status] **#$task_id** $new_text"
+    
+    # Use new_tags if provided, otherwise preserve existing tags
+    local tags_to_use=""
+    if [[ -n "$new_tags" ]]; then
+        tags_to_use="$new_tags"
+    elif [[ -n "$existing_tags" ]]; then
+        tags_to_use="$existing_tags"
+    fi
+    
+    if [[ -n "$tags_to_use" ]]; then
+        # Wrap each tag in backticks for code styling
+        local styled_tags=""
+        # Split tags by space and process each one
+        for tag in $(echo "$tags_to_use" | tr ' ' '\n'); do
+            if [[ -n "$styled_tags" ]]; then
+                styled_tags="$styled_tags \`$tag\`"
+            else
+                styled_tags="\`$tag\`"
+            fi
+        done
+        new_task_line="$new_task_line $styled_tags"
+    fi
+    
+    # Replace the task line using sed (handle bold formatting and subtasks)
+    # The pattern needs to match the entire line including any existing tags (with backticks)
+    # Escape special characters for sed replacement (using pipe as delimiter)
+    local escaped_line=$(printf '%s\n' "$new_task_line" | sed 's/\\/\\\\/g' | sed 's/&/\\&/g' | sed 's/|/\\|/g')
+    
+    # Use pipe delimiter to avoid conflicts with / and other characters in replacement
+    # Escape dots in task_id for sed pattern matching (dots are regex metacharacters)
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    
+    # Match everything after task ID including text and tags (with backticks)
+    # Use task depth to determine which pattern to match (handles all indentation levels)
+    if [[ $task_depth -eq 0 ]]; then
+        # For main tasks, replace without indentation
+        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
+        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+    elif [[ $task_depth -eq 1 ]]; then
+        # For subtasks, replace with proper 2-space indentation
+        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
+        sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+    elif [[ $task_depth -eq 2 ]]; then
+        # For sub-subtasks, replace with proper 4-space indentation
+        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
+        sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+    else
+        # Fallback: try all indentation levels
+        sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+    fi
+    update_footer
+    
+    # Log the action
+    log_todo_action "MODIFY" "$task_id" "$new_text"
+    
+    echo "Modified task #$task_id"
+}
+
+# Function to archive a completed task and its subtasks
+archive_task() {
+    local task_id=""
+    local reason=""
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --reason)
+                reason="$2"
+                shift 2
+                ;;
+            *)
+                task_id="$1"
+                shift
+                ;;
+        esac
+    done
+    
+    if [[ -z "$task_id" ]]; then
+        echo "Error: Please provide task ID"
+        echo "Usage: ./todo.ai archive <id> [--reason <reason>]"
+        return 1
+    fi
+    
+    # Normalize any malformed checkboxes first
+    normalize_checkboxes
+    
+    # Determine task status and checkbox style
+    local checkbox=""
+    local status_note=""
+    local is_completed=false
+    
+    # Check if task exists and its current state
+    if grep -q "^- \[x\] \*\*#$task_id\*\* " "$TODO_FILE"; then
+        # Task is completed
+        is_completed=true
+        checkbox="x"
+    elif grep -q "^- \[ \] \*\*#$task_id\*\* " "$TODO_FILE"; then
+        # Task is incomplete - need reason to archive
+        if [[ -z "$reason" ]]; then
+            echo "Error: Task #$task_id is not completed"
+            echo "To archive incomplete tasks, provide --reason: obsolete, duplicate, wontfix, or completed-by:<tasks>"
+            return 1
+        fi
+        # Set checkbox based on reason
+        case "$reason" in
+            obsolete)
+                checkbox="~"
+                status_note=" (obsolete)"
+                ;;
+            duplicate|duplicate:*)
+                checkbox="~"
+                status_note=" (duplicate)"
+                ;;
+            wontfix)
+                checkbox="-"
+                status_note=" (wontfix)"
+                ;;
+            completed-by:*)
+                checkbox=">"
+                status_note=" (${reason})"
+                ;;
+            *)
+                checkbox="~"
+                status_note=" (${reason})"
+                ;;
+        esac
+    else
+        echo "Error: Task #$task_id not found"
+        return 1
+    fi
+    
+    # Simple implementation: move the task to Recently Completed section
+    # Get the task line (either completed or incomplete)
+    # Escape task_id for grep pattern (escape dots and asterisks)
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    local task_line=$(grep "^- \[[x ]\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE")
+    if [[ -z "$task_line" ]]; then
+        echo "Error: Could not find task #$task_id"
+        return 1
+    fi
+    
+    # Update checkbox in task line if needed (for incomplete tasks with reason)
+    if [[ "$checkbox" != "x" ]]; then
+        # Replace checkbox: [ ] or [x] → [$checkbox]
+        task_line=$(echo "$task_line" | sed "s/\[.\]/[$checkbox]/")
+    fi
+    
+    # Add completion date if not already present
+    local archive_date=$(date +"%Y-%m-%d")
+    if [[ ! "$task_line" =~ "\([0-9]{4}-[0-9]{2}-[0-9]{2}\)" ]]; then
+        task_line="$task_line${status_note} ($archive_date)"
+    fi
+    
+    # Collect all subtasks and nested subtasks (completed or not)
+    local subtasks=()
+    # Escape task_id for regex matching (escape dots)
+    local escaped_task_id_regex=$(echo "$task_id" | sed 's/\./\\./g')
+    while IFS= read -r line; do
+        # Match subtasks at any nesting level: #task_id.1, #task_id.1.1, etc.
+        # Use grep pattern instead of regex to avoid issues with asterisks
+        if echo "$line" | grep -q "\*\*#${escaped_task_id_regex}\."; then
+            # Add completion date if not already present
+            if [[ ! "$line" =~ "\([0-9]{4}-[0-9]{2}-[0-9]{2}\)" ]]; then
+                line="$line ($archive_date)"
+            fi
+            subtasks+=("$line")
+        fi
+    done < "$TODO_FILE"
+    
+    # Remove from Tasks section (main task and all subtasks at any nesting level)
+    # Handle both completed [x] and incomplete [ ] tasks
+    # Escape task_id for use in sed pattern
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    sed_inplace "/^- \[[x ]\] \*\*#${escaped_task_id}\*\* /d" "$TODO_FILE"
+    # Remove subtasks (2 spaces) and sub-subtasks (4 spaces)
+    sed_inplace "/^  - \[.*\] \*\*#${escaped_task_id}\\./d" "$TODO_FILE"
+    sed_inplace "/^    - \[.*\] \*\*#${escaped_task_id}\\./d" "$TODO_FILE"
+    
+    # Create a complete block with main task and subtasks
+    local complete_block="$task_line"
+    if [[ ${#subtasks[@]} -gt 0 ]]; then
+        # Join subtasks with newlines
+        local subtasks_text=$(printf '%s\n' "${subtasks[@]}")
+        complete_block="$complete_block
+$subtasks_text"
+    fi
+    
+    # Add to Recently Completed section
+    local recently_completed_section=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
+    if [[ -n "$recently_completed_section" ]]; then
+        # Insert the complete block after the "## Recently Completed" line
+        local temp_file=$(mktemp)
+        echo -e "$complete_block" > "$temp_file"
+        sed_inplace "${recently_completed_section}r $temp_file" "$TODO_FILE"
+        rm -f "$temp_file"
+    else
+        # Add Recently Completed section if it doesn't exist
+        echo "" >> "$TODO_FILE"
+        echo "------------------" >> "$TODO_FILE"
+        echo "" >> "$TODO_FILE"
+        echo "## Recently Completed" >> "$TODO_FILE"
+        echo -e "$complete_block" >> "$TODO_FILE"
+    fi
+    
+    # Count subtasks for reporting
+    local subtask_count=${#subtasks[@]}
+    update_footer
+    
+    # Get task description for logging
+    local task_description=$(echo "$task_line" | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//' | sed 's/ *([^)]*)$//')
+    
+    # Log the action
+    log_todo_action "ARCHIVE" "$task_id" "$task_description (with $subtask_count subtasks)"
+    
+    echo "Archived task #$task_id and $subtask_count subtasks to Recently Completed section"
+}
+
+# Function to soft delete a task (move to Deleted section)
+delete_task() {
+    local with_subtasks=false
+    local task_ids=()
+    
+    # Parse arguments (same pattern as complete)
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --with-subtasks)
+                with_subtasks=true
+                shift
+                ;;
+            *)
+                task_ids+=("$1")
+                shift
+                ;;
+        esac
+    done
+    
+    if [[ ${#task_ids[@]} -eq 0 ]]; then
+        echo "Error: Please provide at least one task number"
+        return 1
+    fi
+    
+    # Normalize any malformed checkboxes first
+    normalize_checkboxes
+    
+    # Auto-purge expired deleted tasks first
+    purge_expired_deleted_tasks
+    
+    # Expand ranges and collect all task IDs (same logic as complete)
+    local all_ids=()
+    for id in "${task_ids[@]}"; do
+        if [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]]; then
+            local parent=${match[1]}
+            local start=${match[2]}
+            local end_parent=${match[3]}
+            local end=${match[4]}
+            if [[ "$parent" == "$end_parent" ]]; then
+                for ((i=start; i<=end; i++)); do
+                    all_ids+=("${parent}.${i}")
+                done
+            else
+                all_ids+=("$id")
+            fi
+        elif [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)$ ]]; then
+            local parent=${match[1]}
+            local start=${match[2]}
+            local end=${match[3]}
+            for ((i=start; i<=end; i++)); do
+                all_ids+=("${parent}.${i}")
+            done
+        else
+            all_ids+=("$id")
+        fi
+    done
+    
+    # If --with-subtasks, add all subtasks (including nested subtasks)
+    if [[ "$with_subtasks" == "true" ]]; then
+        local expanded_ids=()
+        for id in "${all_ids[@]}"; do
+            expanded_ids+=("$id")
+            # Find all direct subtasks and nested subtasks
+            while IFS= read -r line; do
+                # Extract task ID from line (handles nested IDs)
+                if [[ "$line" =~ '#([0-9]+(\.[0-9]+)+)' ]]; then
+                    local task_id="${match[1]}"
+                    # Check if this task belongs to our parent (direct or nested subtask)
+                    if [[ "$task_id" =~ ^$id\. ]]; then
+                        expanded_ids+=("$task_id")
+                    fi
+                fi
+            done < "$TODO_FILE"
+        done
+        all_ids=("${expanded_ids[@]}")
+    fi
+    
+    # Delete all tasks
+    local deleted_count=0
+    local delete_date=$(date +"%Y-%m-%d")
+    local expire_date=$(date -d "+30 days" +"%Y-%m-%d" 2>/dev/null || date -v+30d +"%Y-%m-%d" 2>/dev/null || echo "2025-11-29")
+    
+    for number in "${all_ids[@]}"; do
+        # Find task (anywhere - Tasks or Recently Completed, handles nested subtasks)
+        local task_line=$(grep "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1)
+        
+        if [[ -z "$task_line" ]]; then
+            echo "Warning: Task #$number not found, skipping"
+            continue
+        fi
+        
+        # Change checkbox to [D] and add deletion metadata
+        task_line=$(echo "$task_line" | sed 's/\[.\]/[D]/')
+        
+        # Remove any existing date, then add deletion metadata
+        task_line=$(echo "$task_line" | sed 's/ *([^)]*)$//')
+        task_line="$task_line (deleted $delete_date, expires $expire_date)"
+        
+        # Find task line number to also remove following notes (handles nested subtasks at any level)
+        local task_line_num=$(grep -n "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        
+        if [[ -n "$task_line_num" ]]; then
+            # Remove the task line
+            sed_inplace "${task_line_num}d" "$TODO_FILE"
+            
+            # Remove any following blockquote notes (lines starting with "  > ", "    > ", or "      > ")
+            # Keep removing lines as long as they're blockquotes
+            while true; do
+                local next_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
+                if [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]] || [[ "$next_line" =~ ^"      > " ]]; then
+                    sed_inplace "${task_line_num}d" "$TODO_FILE"
+                else
+                    break
+                fi
+            done
+        fi
+        
+        # Add to Deleted section
+        ensure_deleted_section
+        local deleted_section=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1)
+        if [[ -n "$deleted_section" ]]; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                local temp_file=$(mktemp)
+                head -n "$deleted_section" "$TODO_FILE" > "$temp_file"
+                echo "$task_line" >> "$temp_file"
+                tail -n +$((deleted_section + 1)) "$TODO_FILE" >> "$temp_file"
+                mv "$temp_file" "$TODO_FILE"
+            else
+                sed_inplace "${deleted_section}a$task_line" "$TODO_FILE"
+            fi
+        fi
+        
+        # Log the action
+        local task_description=$(echo "$task_line" | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//' | sed 's/ *(deleted.*//')
+        log_todo_action "DELETE" "$number" "$task_description"
+        
+        deleted_count=$((deleted_count + 1))
+    done
+    
+    update_footer
+    
+    echo "Moved $deleted_count task(s) to Deleted section"
+}
+
+# Function to ensure Deleted Tasks section exists
+ensure_deleted_section() {
+    if ! grep -q "^## Deleted Tasks" "$TODO_FILE"; then
+        # Add Deleted section before Recently Completed
+        local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
+        if [[ -n "$recently_completed_line" ]]; then
+            if [[ "$(uname)" == "Darwin" ]]; then
+                # Use temporary file approach for macOS compatibility
+                local temp_file=$(mktemp)
+                head -n $((recently_completed_line - 1)) "$TODO_FILE" > "$temp_file"
+                echo "## Deleted Tasks" >> "$temp_file"
+                echo "" >> "$temp_file"
+                tail -n +$recently_completed_line "$TODO_FILE" >> "$temp_file"
+                mv "$temp_file" "$TODO_FILE"
+            else
+                sed_inplace "${recently_completed_line}i## Deleted Tasks\n" "$TODO_FILE"
+            fi
+        fi
+    fi
+}
+
+# Function to purge expired deleted tasks
+purge_expired_deleted_tasks() {
+    local current_date=$(date +"%Y-%m-%d")
+    local purged_count=0
+    
+    # Find and remove expired tasks
+    while IFS= read -r line; do
+        if [[ "$line" =~ "expires ([0-9]{4}-[0-9]{2}-[0-9]{2})" ]]; then
+            local expire_date="${match[1]}"
+            # Compare dates (simple string comparison works for YYYY-MM-DD format)
+            if [[ "$expire_date" < "$current_date" ]]; then
+                # Task expired, remove it
+                sed_inplace "/$(echo "$line" | sed 's/[]\/$*.^[]/\\&/g')/d" "$TODO_FILE"
+                purged_count=$((purged_count + 1))
+            fi
+        fi
+    done < <(grep "^\- \[D\]" "$TODO_FILE")
+    
+    if [[ $purged_count -gt 0 ]]; then
+        echo "Auto-purged $purged_count expired task(s)" >&2
+    fi
+}
+
+# Function to restore a task and its subtasks from Recently Completed to Tasks
+restore_task() {
+    local task_id="$1"
+    
+    if [[ -z "$task_id" ]]; then
+        echo "Error: Please provide task ID"
+        echo "Usage: ./todo.ai restore <id>"
+        return 1
+    fi
+    
+    # Simple implementation: move the task back to Tasks section
+    # Get the task line (from Recently Completed or Deleted section)
+    local task_line=$(grep "^- \[[xD~>\-]\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1)
+    if [[ -z "$task_line" ]]; then
+        echo "Error: Could not find task #$task_id in Recently Completed or Deleted section"
+        return 1
+    fi
+    
+    # Restore to [ ] checkbox and remove metadata
+    task_line=$(echo "$task_line" | sed 's/\[.\]/[ ]/')
+    task_line=$(echo "$task_line" | sed 's/ *(deleted.*//' | sed 's/ *(completed.*//' | sed 's/ *(.*)$//')
+    
+    # Remove from current section (Recently Completed or Deleted)
+    sed_inplace "/^- \[[xD~>\-]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
+    
+    # Add to Tasks section
+    local tasks_section=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
+    if [[ -n "$tasks_section" ]]; then
+        # Insert after the "## Tasks" line
+        if [[ "$(uname)" == "Darwin" ]]; then
+            local temp_file=$(mktemp)
+            head -n "$tasks_section" "$TODO_FILE" > "$temp_file"
+            echo "$task_line" >> "$temp_file"
+            tail -n +$((tasks_section + 1)) "$TODO_FILE" >> "$temp_file"
+            mv "$temp_file" "$TODO_FILE"
+        else
+            sed_inplace "${tasks_section}a$task_line" "$TODO_FILE"
+        fi
+    else
+        echo "Error: Tasks section not found"
+        return 1
+    fi
+    
+    update_footer
+    
+    # Get task description for logging
+    local task_description=$(echo "$task_line" | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//' | sed 's/ *([^)]*)$//')
+    
+    # Log the action
+    log_todo_action "RESTORE" "$task_id" "$task_description"
+    
+    echo "Restored task #$task_id to Tasks section"
+}
+
+# Function to ensure Task Metadata section exists
+ensure_metadata_section() {
+    if ! grep -q "^## Task Metadata" "$TODO_FILE"; then
+        # Add metadata section at the end
+        echo "" >> "$TODO_FILE"
+        echo "## Task Metadata" >> "$TODO_FILE"
+        echo "" >> "$TODO_FILE"
+        echo "Task relationships and dependencies (managed by todo.ai tool)." >> "$TODO_FILE"
+        echo "View with: \`./todo.ai show <task-id>\`" >> "$TODO_FILE"
+        echo "" >> "$TODO_FILE"
+        echo "<!-- TASK RELATIONSHIPS" >> "$TODO_FILE"
+        echo "-->" >> "$TODO_FILE"
+    fi
+}
+
+# Function to add a task relationship
+add_relationship() {
+    local task_id="$1"
+    local rel_type="$2"
+    local target_tasks="$3"
+    
+    # Ensure metadata section exists
+    ensure_metadata_section
+    
+    # Remove any existing relationship of this type for this task
+    sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
+    
+    # Add new relationship before the closing -->
+    sed_inplace "/^-->/i$task_id:$rel_type:$target_tasks" "$TODO_FILE"
+    
+    update_footer
+}
+
+# Function to remove a task relationship
+remove_relationship() {
+    local task_id="$1"
+    local rel_type="$2"
+    local target_task="$3"
+    
+    if [[ -n "$target_task" ]]; then
+        # Remove specific target from relationship list
+        # This is complex, for now just remove the whole relationship
+        sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
+    else
+        # Remove all relationships of this type for this task
+        sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
+    fi
+    
+    update_footer
+}
+
+# Function to get relationships for a task
+get_relationships() {
+    local task_id="$1"
+    
+    # Extract relationships from metadata section
+    sed -n '/<!-- TASK RELATIONSHIPS/,/-->/p' "$TODO_FILE" | \
+        grep "^$task_id:" | \
+        while IFS=: read -r id rel_type targets; do
+            echo "$rel_type:$targets"
+        done
+}
+
+# Function to show a task with its relationships
+show_task() {
+    local task_id="$1"
+    
+    if [[ -z "$task_id" ]]; then
+        echo "Error: Please provide task ID"
+        echo "Usage: ./todo.ai show <id>"
+        return 1
+    fi
+    
+    # Find and display the task
+    local task_line=$(grep "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1)
+    
+    if [[ -z "$task_line" ]]; then
+        echo "Error: Task #$task_id not found"
+        return 1
+    fi
+    
+    echo "$task_line"
+    
+    # Get line number for note detection
+    local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    
+    # Display notes if they exist (blockquotes immediately after task)
+    if [[ -n "$task_line_num" ]]; then
+        local next_line_num=$((task_line_num + 1))
+        local next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
+        while [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]]; do
+            echo "$next_line"
+            next_line_num=$((next_line_num + 1))
+            next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
+        done
+    fi
+    
+    # Find and display subtasks if this is a parent
+    if [[ "$task_id" != *.* ]]; then
+        grep "^  - \[.\] \*\*#$task_id\." "$TODO_FILE" | while read -r subtask; do
+            echo "$subtask"
+        done
+    fi
+    
+    # Display relationships if any exist
+    local has_relationships=false
+    while IFS=: read -r rel_type targets; do
+        if [[ -n "$rel_type" ]]; then
+            has_relationships=true
+            # Format relationship type (replace - with space, capitalize)
+            local formatted_type=""
+            case "$rel_type" in
+                completed-by) formatted_type="Completed by" ;;
+                depends-on) formatted_type="Depends on" ;;
+                blocks) formatted_type="Blocks" ;;
+                related-to) formatted_type="Related to" ;;
+                duplicate-of) formatted_type="Duplicate of" ;;
+                *) formatted_type="$rel_type" ;;
+            esac
+            echo "  ↳ $formatted_type: $targets"
+        fi
+    done < <(get_relationships "$task_id")
+    
+    if [[ "$has_relationships" == false ]]; then
+        echo "  (No relationships)"
+    fi
+}
+
+# Function to manage task relationships
+relate_task() {
+    local task_id=""
+    local rel_type=""
+    local targets=""
+    
+    # Parse arguments
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --completed-by)
+                rel_type="completed-by"
+                targets="$2"
+                shift 2
+                ;;
+            --depends-on)
+                rel_type="depends-on"
+                targets="$2"
+                shift 2
+                ;;
+            --blocks)
+                rel_type="blocks"
+                targets="$2"
+                shift 2
+                ;;
+            --related-to)
+                rel_type="related-to"
+                targets="$2"
+                shift 2
+                ;;
+            --duplicate-of)
+                rel_type="duplicate-of"
+                targets="$2"
+                shift 2
+                ;;
+            *)
+                task_id="$1"
+                shift
+                ;;
+        esac
+    done
+    
+    if [[ -z "$task_id" ]] || [[ -z "$rel_type" ]] || [[ -z "$targets" ]]; then
+        echo "Error: Missing required parameters"
+        echo "Usage: ./todo.ai relate <id> --<relation-type> <target-ids>"
+        echo ""
+        echo "Relation types:"
+        echo "  --completed-by <ids>   Task completed by other task(s)"
+        echo "  --depends-on <ids>     Task depends on other task(s)"
+        echo "  --blocks <ids>         Task blocks other task(s)"
+        echo "  --related-to <ids>     General relationship"
+        echo "  --duplicate-of <id>    Task is duplicate of another"
+        return 1
+    fi
+    
+    # Verify task exists
+    if ! grep -q "\*\*#$task_id\*\*" "$TODO_FILE"; then
+        echo "Error: Task #$task_id not found"
+        return 1
+    fi
+    
+    # Add the relationship
+    add_relationship "$task_id" "$rel_type" "$targets"
+    
+    # Log the action
+    log_todo_action "RELATE" "$task_id" "$rel_type: $targets"
+    
+    echo "Added relationship: #$task_id $rel_type $targets"
+}
+
+# Function to add a note to a task (using blockquote format)
+add_note() {
+    local task_id="$1"
+    local note_text="$2"
+    
+    if [[ -z "$task_id" ]] || [[ -z "$note_text" ]]; then
+        echo "Error: Please provide task ID and note text"
+        echo "Usage: ./todo.ai note <id> <note-text>"
+        return 1
+    fi
+    
+    # Verify task exists
+    local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    
+    if [[ -z "$task_line_num" ]]; then
+        echo "Error: Task #$task_id not found"
+        return 1
+    fi
+    
+    # Format note as blockquote with proper indentation
+    local indent=""
+    local task_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
+    if [[ "$task_line" =~ ^"  - " ]]; then
+        # This is a subtask, needs extra indentation
+        indent="  "
+    fi
+    
+    # Create blockquote note
+    local note_line="${indent}  > ${note_text}"
+    
+    # Insert note after the task line
+    if [[ "$(uname)" == "Darwin" ]]; then
+        local temp_file=$(mktemp)
+        head -n "$task_line_num" "$TODO_FILE" > "$temp_file"
+        echo "$note_line" >> "$temp_file"
+        tail -n +$((task_line_num + 1)) "$TODO_FILE" >> "$temp_file"
+        mv "$temp_file" "$TODO_FILE"
+    else
+        sed_inplace "${task_line_num}a\\$note_line" "$TODO_FILE"
+    fi
+    
+    update_footer
+    
+    # Log the action
+    log_todo_action "NOTE" "$task_id" "$note_text"
+    
+    echo "Added note to task #$task_id"
+}
+
+# Function to lint (identify) formatting issues
+lint_todo() {
+    local issues_found=0
+    
+    echo "🔍 Checking TODO.md for formatting issues..."
+    echo ""
+    
+    # Check for indentation issues
+    echo "📋 Checking indentation:"
+    local indent_issues=0
+    
+    # Find subtasks that are not properly indented (should start with "  -")
+    while IFS= read -r line; do
+        if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
+            echo "  ❌ Subtask not indented: $line"
+            indent_issues=$((indent_issues + 1))
+            issues_found=$((issues_found + 1))
+        fi
+    done < "$TODO_FILE"
+    
+    if [[ $indent_issues -eq 0 ]]; then
+        echo "  ✅ All subtasks properly indented"
+    else
+        echo "  📊 Found $indent_issues indentation issues"
+    fi
+    echo ""
+    
+    # Check for malformed checkboxes
+    echo "☑️  Checking checkboxes:"
+    local checkbox_issues=0
+    
+    # Find malformed checkboxes
+    while IFS= read -r line; do
+        if [[ "$line" =~ "^- \[.*\] " || "$line" =~ "^  - \[.*\] " ]]; then
+            # Check for various malformed checkbox patterns
+            if [[ "$line" =~ "\[  \]" || "$line" =~ "\[   \]" || "$line" =~ "\[    \]" || "$line" =~ "\[\]" ]]; then
+                echo "  ❌ Malformed checkbox: $line"
+                checkbox_issues=$((checkbox_issues + 1))
+                issues_found=$((issues_found + 1))
+            fi
+        fi
+    done < "$TODO_FILE"
+    
+    if [[ $checkbox_issues -eq 0 ]]; then
+        echo "  ✅ All checkboxes properly formatted"
+    else
+        echo "  📊 Found $checkbox_issues checkbox issues"
+    fi
+    echo ""
+    
+    # Check for orphaned subtasks (subtasks without parent tasks)
+    echo "🔗 Checking for orphaned subtasks:"
+    local orphan_issues=0
+    local seen_parents=()
+    
+    # First pass: collect all parent task IDs
+    while IFS= read -r line; do
+        if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
+            local parent_id=$(echo "$line" | grep -o '#[0-9]\+' | sed 's/#//' | head -1)
+            seen_parents+=("$parent_id")
+        fi
+    done < "$TODO_FILE"
+    
+    # Second pass: check all subtasks have parents
+    while IFS= read -r line; do
+        if [[ "$line" =~ '#([0-9]+)\.([0-9]+)' ]]; then
+            local parent_id="${match[1]}"
+            local subtask_id="${match[1]}.${match[2]}"
+            if [[ ! " ${seen_parents[@]} " =~ " ${parent_id} " ]]; then
+                echo "  ❌ Orphaned subtask #$subtask_id (parent #$parent_id not found)"
+                orphan_issues=$((orphan_issues + 1))
+                issues_found=$((issues_found + 1))
+            fi
+        fi
+    done < <(grep "\*\*#[0-9]\+\.[0-9]\+\*\*" "$TODO_FILE")
+    
+    if [[ $orphan_issues -eq 0 ]]; then
+        echo "  ✅ No orphaned subtasks"
+    else
+        echo "  📊 Found $orphan_issues orphaned subtasks"
+    fi
+    echo ""
+    
+    # Check for duplicate task IDs
+    echo "🔢 Checking for duplicate task IDs:"
+    local duplicate_issues=0
+    local task_ids=()
+    local duplicates=()
+    
+    while IFS= read -r line; do
+        if [[ "$line" =~ '#([0-9]+\.[0-9]+|[0-9]+)' ]]; then
+            local task_id="${match[1]}"
+            if [[ " ${task_ids[@]} " =~ " ${task_id} " ]]; then
+                if [[ ! " ${duplicates[@]} " =~ " ${task_id} " ]]; then
+                    echo "  ❌ Duplicate task ID: #$task_id"
+                    duplicates+=("$task_id")
+                    duplicate_issues=$((duplicate_issues + 1))
+                    issues_found=$((issues_found + 1))
+                fi
+            else
+                task_ids+=("$task_id")
+            fi
+        fi
+    done < <(grep "\*\*#[0-9]\|\*\*#[0-9]\+\.[0-9]\+" "$TODO_FILE")
+    
+    if [[ $duplicate_issues -eq 0 ]]; then
+        echo "  ✅ No duplicate task IDs"
+    else
+        echo "  📊 Found $duplicate_issues duplicate task IDs"
+    fi
+    echo ""
+    
+    # Check for empty lines in task sections
+    echo "📄 Checking for problematic empty lines:"
+    local empty_line_issues=0
+    local in_tasks=false
+    local line_num=0
+    
+    while IFS= read -r line; do
+        line_num=$((line_num + 1))
+        if [[ "$line" == "## Tasks" ]] || [[ "$line" == "## Deleted Tasks" ]] || [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            in_tasks=false
+        elif [[ $in_tasks == true ]] && [[ -z "$line" ]]; then
+            # Check if previous and next lines are both tasks (not blockquotes or other content)
+            local prev_line=$(sed -n "$((line_num-1))p" "$TODO_FILE")
+            local next_line=$(sed -n "$((line_num+1))p" "$TODO_FILE")
+            # Empty line between tasks is problematic
+            if [[ "$prev_line" == "- ["*"**#"* ]] && [[ "$next_line" == "- ["*"**#"* ]]; then
+                echo "  ⚠️  Empty line between tasks at line $line_num"
+                empty_line_issues=$((empty_line_issues + 1))
+                issues_found=$((issues_found + 1))
+            fi
+        fi
+    done < "$TODO_FILE"
+    
+    if [[ $empty_line_issues -eq 0 ]]; then
+        echo "  ✅ No problematic empty lines"
+    else
+        echo "  📊 Found $empty_line_issues empty line issues"
+    fi
+    echo ""
+    
+    # Summary
+    if [[ $issues_found -eq 0 ]]; then
+        echo "🎉 No formatting issues found! TODO.md is properly formatted."
+    else
+        echo "⚠️  Found $issues_found total formatting issues"
+        echo "💡 Run './todo.ai --reformat --dry-run' to see what would be fixed"
+        echo "💡 Run './todo.ai --reformat' to apply fixes"
+    fi
+}
+
+# Function to reformat (fix) formatting issues
+reformat_todo() {
+    local dry_run=false
+    
+    # Check for --dry-run flag
+    if [[ "$1" == "--dry-run" ]]; then
+        dry_run=true
+        echo "🔍 DRY RUN: Showing what would be fixed..."
+    else
+        echo "🔧 Applying formatting fixes..."
+    fi
+    echo ""
+    
+    local fixes_applied=0
+    
+    # Fix indentation issues
+    echo "📋 Fixing indentation:"
+    local indent_fixes=0
+    
+    # Find subtasks that are not properly indented
+    while IFS= read -r line; do
+        if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
+            local fixed_line="  $line"
+            if [[ "$dry_run" == true ]]; then
+                echo "  🔄 Would fix: $line"
+                echo "  ➡️  To:        $fixed_line"
+            else
+                sed_inplace "s|^$line|$fixed_line|" "$TODO_FILE"
+                echo "  ✅ Fixed: $line"
+            fi
+            indent_fixes=$((indent_fixes + 1))
+            fixes_applied=$((fixes_applied + 1))
+        fi
+    done < "$TODO_FILE"
+    
+    if [[ $indent_fixes -eq 0 ]]; then
+        echo "  ✅ No indentation issues found"
+    else
+        if [[ "$dry_run" == true ]]; then
+            echo "  📊 Would fix $indent_fixes indentation issues"
+        else
+            echo "  📊 Fixed $indent_fixes indentation issues"
+        fi
+    fi
+    echo ""
+    
+    # Fix checkbox issues
+    echo "☑️  Fixing checkboxes:"
+    local checkbox_fixes=0
+    
+    # Check if there are malformed checkboxes
+    if grep -q "\[  \]\|\[   \]\|\[    \]\|\[\]" "$TODO_FILE"; then
+        if [[ "$dry_run" == true ]]; then
+            echo "  🔄 Would fix malformed checkboxes:"
+            grep -n "\[  \]\|\[   \]\|\[    \]\|\[\]" "$TODO_FILE" | while read -r line; do
+                echo "    Line: $line"
+            done
+        else
+            # Use the existing normalize_checkboxes function directly
+            normalize_checkboxes
+            echo "  ✅ Fixed malformed checkboxes"
+        fi
+        checkbox_fixes=$((checkbox_fixes + 1))
+        fixes_applied=$((fixes_applied + 1))
+    fi
+    
+    if [[ $checkbox_fixes -eq 0 ]]; then
+        echo "  ✅ No checkbox issues found"
+    else
+        if [[ "$dry_run" == true ]]; then
+            echo "  📊 Would fix $checkbox_fixes checkbox patterns"
+        else
+            echo "  📊 Fixed $checkbox_fixes checkbox patterns"
+        fi
+    fi
+    echo ""
+    
+    # Summary
+    if [[ "$dry_run" == true ]]; then
+        echo "💡 Run './todo.ai --reformat' to apply these fixes"
+    elif [[ $fixes_applied -gt 0 ]]; then
+        echo "🎉 Applied $fixes_applied formatting fixes to TODO.md"
+    else
+        echo "🎉 No formatting issues found - TODO.md is already properly formatted!"
+    fi
+}
+
+# Function to edit todo file
+edit_todo() {
+    ${EDITOR:-nano} "$TODO_FILE"
+}
+
+# Function to view TODO log
+view_log() {
+    local filter="$1"
+    local lines="$2"
+    
+    if [[ ! -f "$LOG_FILE" ]]; then
+        echo "No log file found at $LOG_FILE"
+        return 1
+    fi
+    
+    echo "📋 TODO Tool Log"
+    echo "================="
+    echo ""
+    
+    if [[ -n "$filter" ]]; then
+        echo "Filtering by: $filter"
+        echo ""
+        grep -i "$filter" "$LOG_FILE" | head -n "${lines:-50}"
+    else
+        head -n "${lines:-50}" "$LOG_FILE"
+    fi
+}
+
+# Function to check for updates (informational only)
+check_version() {
+    if ! command -v curl >/dev/null 2>&1; then
+        return 0
+    fi
+    
+    # Try to get version from remote script
+    local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "^# Version:" | head -1 | sed 's/.*Version:[ ]*\([0-9.]*\).*/\1/' || echo "")
+    
+    if [[ -z "$remote_version" ]]; then
+        # Try alternative extraction method
+        remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+    fi
+    
+    if [[ -n "$remote_version" && "$remote_version" != "$VERSION" ]]; then
+        echo ""
+        echo "💡 Update available: $VERSION → $remote_version"
+        echo "   Run './todo.ai update' to update to latest version"
+        return 1
+    fi
+    
+    return 0
+}
+
+# Function to ensure backups directory exists
+init_backups_dir() {
+    local backups_dir="$(pwd)/.todo.ai/backups"
+    if [[ ! -d "$backups_dir" ]]; then
+        mkdir -p "$backups_dir" 2>/dev/null || return 1
+    fi
+    echo "$backups_dir"
+}
+
+# Function to get script path
+get_script_path() {
+    local script_path
+    if [[ -f "${0:a}" ]]; then
+        script_path="${0:a}"
+    elif [[ -f "$(pwd)/todo.ai" ]]; then
+        script_path="$(pwd)/todo.ai"
+    elif [[ -f "./todo.ai" ]]; then
+        script_path="./todo.ai"
+    else
+        return 1
+    fi
+    
+    # Ensure absolute path
+    if [[ ! "$script_path" =~ ^/ ]]; then
+        script_path="$(cd "$(dirname "$script_path")" && pwd)/$(basename "$script_path")"
+    fi
+    
+    echo "$script_path"
+}
+
+# Function to list available backups
+list_backups() {
+    local backups_dir
+    backups_dir=$(init_backups_dir) || {
+        echo "Error: Cannot access backups directory"
+        return 1
+    }
+    
+    # Check if any backups exist using find to avoid glob expansion issues
+    local backup_files=$(find "$backups_dir" -maxdepth 1 -name "todo.ai.*" -type f 2>/dev/null)
+    if [[ -z "$backup_files" ]]; then
+        echo "No backups available"
+        return 0
+    fi
+    
+    echo "Available backups:"
+    echo ""
+    
+    # Sort by modification time (newest first)
+    local sorted_backups=($(echo "$backup_files" | xargs ls -t 2>/dev/null))
+    
+    local index=1
+    for backup in "${sorted_backups[@]}"; do
+        local filename=$(basename "$backup")
+        local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
+        local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+        local date_str=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$backup" 2>/dev/null || stat -c "%y" "$backup" 2>/dev/null | cut -d'.' -f1 || echo "unknown")
+        
+        if [[ $index -eq 1 ]]; then
+            echo "  [$index] $timestamp (v$version) - $date_str [LATEST]"
+        else
+            echo "  [$index] $timestamp (v$version) - $date_str"
+        fi
+        ((index++))
+    done
+    echo ""
+    echo "Use './todo.ai rollback [index|timestamp]' to restore a backup"
+}
+
+# Function to rollback to a previous version
+rollback() {
+    local backups_dir
+    backups_dir=$(init_backups_dir) || {
+        echo "Error: Cannot access backups directory"
+        return 1
+    }
+    
+    local script_path
+    script_path=$(get_script_path) || {
+        echo "Error: Cannot locate todo.ai script"
+        return 1
+    }
+    
+    local backup_files=$(find "$backups_dir" -maxdepth 1 -name "todo.ai.*" -type f 2>/dev/null)
+    if [[ -z "$backup_files" ]]; then
+        echo "Error: No backups available"
+        return 1
+    fi
+    
+    local sorted_backups=($(echo "$backup_files" | xargs ls -t 2>/dev/null))
+    
+    local target_backup=""
+    
+    if [[ $# -eq 0 ]]; then
+        # Default: rollback to latest backup
+        target_backup="${sorted_backups[1]}"
+    elif [[ "$1" =~ ^[0-9]+$ ]]; then
+        # Index specified
+        local index=$1
+        if [[ $index -ge 1 ]] && [[ $index -le ${#sorted_backups[@]} ]]; then
+            target_backup="${sorted_backups[$index]}"
+        else
+            echo "Error: Invalid backup index. Use './todo.ai backups' to see available backups"
+            return 1
+        fi
+    else
+        # Timestamp or version specified
+        local search_term="$1"
+        for backup in "${sorted_backups[@]}"; do
+            local filename=$(basename "$backup")
+            local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
+            local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+            
+            if [[ "$timestamp" == "$search_term" ]] || [[ "$version" == "$search_term" ]]; then
+                target_backup="$backup"
+                break
+            fi
+        done
+        
+        if [[ -z "$target_backup" ]]; then
+            echo "Error: No backup found matching '$search_term'"
+            echo "Use './todo.ai backups' to see available backups"
+            return 1
+        fi
+    fi
+    
+    if [[ ! -f "$target_backup" ]]; then
+        echo "Error: Backup file not found"
+        return 1
+    fi
+    
+    # Confirm rollback
+    local backup_version=$(grep -i "VERSION=" "$target_backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+    local current_version="$VERSION"
+    local backup_name=$(basename "$target_backup")
+    
+    echo "⚠️  Rollback Warning:"
+    echo "   Current version: $current_version"
+    echo "   Backup version:  $backup_version"
+    echo "   Backup file:     $backup_name"
+    echo ""
+    echo "This will replace the current script with the backup version."
+    echo "Continue? (y/N)"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        echo "Rollback cancelled"
+        return 0
+    fi
+    
+    # Create a backup of current version before rollback
+    local timestamp=$(date +"%Y%m%d%H%M%S")
+    cp "$script_path" "$backups_dir/todo.ai.$timestamp" 2>/dev/null || true
+    
+    # Restore from backup
+    cp "$target_backup" "$script_path" || {
+        echo "Error: Failed to restore backup"
+        return 1
+    }
+    
+    chmod +x "$script_path"
+    
+    echo "✅ Rolled back to version $backup_version"
+    echo "   Current version backed up as: todo.ai.$timestamp"
+}
+
+# Function to update todo.ai to latest version
+update_tool() {
+    # Get the actual script path
+    local script_path
+    script_path=$(get_script_path) || {
+        echo "Error: Cannot locate todo.ai script"
+        return 1
+    }
+    
+    local backups_dir
+    backups_dir=$(init_backups_dir) || {
+        echo "Error: Cannot create backups directory"
+        return 1
+    }
+    
+    echo "🔄 Updating todo.ai..."
+    
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "Error: curl is required to update todo.ai"
+        echo "Please download manually from: $REPO_URL"
+        return 1
+    fi
+    
+    # Check if already at latest version
+    local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+    
+    # If version matches, check content hash to detect changes even with same version
+    if [[ -n "$remote_version" ]] && [[ "$remote_version" == "$VERSION" ]]; then
+        local local_hash=""
+        local remote_hash=""
+        
+        # Download remote file temporarily to compute hash
+        local temp_check_file=$(mktemp)
+        if curl -s -o "$temp_check_file" "$SCRIPT_URL" && [[ -s "$temp_check_file" ]] && grep -q "todo - AI-Agent First TODO List Tracker" "$temp_check_file"; then
+            # Verify we're not comparing the same file
+            local script_realpath=$(realpath "$script_path" 2>/dev/null || echo "$script_path")
+            local temp_realpath=$(realpath "$temp_check_file" 2>/dev/null || echo "$temp_check_file")
+            
+            # If somehow they're the same file, skip hash comparison and proceed with update
+            if [[ "$script_realpath" == "$temp_realpath" ]] || [[ ! -f "$script_path" ]]; then
+                rm -f "$temp_check_file"
+                echo "⚠️  Cannot compare hashes - proceeding with update to be safe"
+            else
+                # Compute local file hash (prefer sha256sum, fallback to md5 or shasum)
+                if command -v sha256sum >/dev/null 2>&1; then
+                    local_hash=$(sha256sum "$script_path" 2>/dev/null | cut -d' ' -f1)
+                    remote_hash=$(sha256sum "$temp_check_file" 2>/dev/null | cut -d' ' -f1)
+                elif command -v shasum >/dev/null 2>&1; then
+                    local_hash=$(shasum -a 256 "$script_path" 2>/dev/null | cut -d' ' -f1)
+                    remote_hash=$(shasum -a 256 "$temp_check_file" 2>/dev/null | cut -d' ' -f1)
+                elif command -v md5sum >/dev/null 2>&1; then
+                    local_hash=$(md5sum "$script_path" 2>/dev/null | cut -d' ' -f1)
+                    remote_hash=$(md5sum "$temp_check_file" 2>/dev/null | cut -d' ' -f1)
+                elif command -v md5 >/dev/null 2>&1; then
+                    local_hash=$(md5 -q "$script_path" 2>/dev/null)
+                    remote_hash=$(md5 -q "$temp_check_file" 2>/dev/null)
+                fi
+                
+                rm -f "$temp_check_file"
+                
+                # If hashes couldn't be computed, proceed with update to be safe
+                if [[ -z "$local_hash" ]] || [[ -z "$remote_hash" ]]; then
+                    echo "⚠️  Could not compute hashes - proceeding with update to be safe"
+                fi
+            fi
+            
+            # If hashes are available and match, files are identical - skip update
+            # But only if we verified the files are different (checked above)
+            if [[ "$script_realpath" != "$temp_realpath" ]] && [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" == "$remote_hash" ]]; then
+                echo "✅ todo.ai is already at the latest version ($VERSION)"
+                echo "   Content hash matches - no update needed"
+                echo "   Checking cursor rules..."
+                # Still update cursor rules even if script is up to date
+                if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                    echo ""
+                    echo "🔄 Updating cursor rules..."
+                    # Call init_cursor_rules directly since we're in the same script
+                    init_cursor_rules
+                fi
+                return 0
+            elif [[ "$script_realpath" != "$temp_realpath" ]] && [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" != "$remote_hash" ]]; then
+                # Version matches but content differs - proceed with update
+                echo "⚠️  Version matches ($VERSION), but content differs"
+                echo "   Updating to latest content..."
+            else
+                # Hash comparison not available or files are same - proceed with update to be safe
+                if [[ "$script_realpath" == "$temp_realpath" ]]; then
+                    echo "⚠️  Cannot verify update - files appear identical"
+                    echo "   Proceeding with update to ensure latest version..."
+                elif [[ -z "$local_hash" ]] || [[ -z "$remote_hash" ]]; then
+                    echo "⚠️  Hash comparison not available - proceeding with update"
+                    echo "   Content may have changed even though version matches"
+                else
+                    echo "⚠️  Proceeding with update to ensure latest version"
+                fi
+            fi
+        else
+            rm -f "$temp_check_file"
+            # Download failed - assume up to date if version matches
+            echo "✅ todo.ai is already at the latest version ($VERSION)"
+            echo "   Checking cursor rules..."
+            if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                echo ""
+                echo "🔄 Updating cursor rules..."
+                init_cursor_rules
+            fi
+            return 0
+        fi
+    fi
+    
+    # Download latest version
+    local temp_file=$(mktemp)
+    if curl -s -o "$temp_file" "$SCRIPT_URL"; then
+        # Check if download was successful
+        if [[ -s "$temp_file" ]] && grep -q "todo - AI-Agent First TODO List Tracker" "$temp_file"; then
+            # Create versioned backup with timestamp
+            local timestamp=$(date +"%Y%m%d%H%M%S")
+            local current_version="$VERSION"
+            local backup_file="$backups_dir/todo.ai.$timestamp"
+            
+            # Backup current version
+            cp "$script_path" "$backup_file" 2>/dev/null || {
+                echo "Warning: Failed to create backup, continuing with update..."
+            }
+            
+            # Replace with new version
+            mv "$temp_file" "$script_path"
+            chmod +x "$script_path"
+            
+            # Get new version
+            local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+            
+            echo "✅ Updated todo.ai to version $new_version"
+            if [[ -f "$backup_file" ]]; then
+                echo "   Backup saved as: $(basename "$backup_file") (v$current_version)"
+                echo "   Use './todo.ai rollback' to restore previous version"
+            fi
+            
+            # Update cursor rules after successful update to ensure latest rules are applied
+            if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+                echo ""
+                echo "🔄 Updating cursor rules..."
+                # Extract and source the init_cursor_rules function from the updated script
+                local function_start=$(grep -n "^init_cursor_rules()" "$script_path" | head -1 | cut -d: -f1)
+                local function_end=$(awk "NR>$function_start && /^[a-zA-Z_]/ && /\(\) \{/ {print NR-1; exit}" "$script_path" | head -1)
+                
+                if [[ -n "$function_start" ]] && [[ -n "$function_end" ]]; then
+                    local temp_script=$(mktemp)
+                    # Also need sed_inplace function
+                    local sed_inplace_start=$(grep -n "^sed_inplace()" "$script_path" | head -1 | cut -d: -f1)
+                    local sed_inplace_end
+                    
+                    if [[ -n "$sed_inplace_start" ]] && [[ "$sed_inplace_start" -lt "$function_start" ]]; then
+                        sed_inplace_end=$(awk "NR>$sed_inplace_start && /^[a-zA-Z_]/ && /\(\) \{/ {print NR-1; exit}" "$script_path" | head -1)
+                        if [[ -n "$sed_inplace_end" ]]; then
+                            sed -n "${sed_inplace_start},${sed_inplace_end}p" "$script_path" >> "$temp_script"
+                            echo "" >> "$temp_script"
+                        fi
+                    fi
+                    
+                    # Extract init_cursor_rules function
+                    sed -n "${function_start},${function_end}p" "$script_path" >> "$temp_script"
+                    
+                    # Source and execute - ensure we're in the right directory
+                    local current_dir=$(pwd)
+                    cd "$(dirname "$script_path")" 2>/dev/null || true
+                    source "$temp_script" 2>/dev/null && init_cursor_rules
+                    cd "$current_dir" 2>/dev/null || true
+                    rm -f "$temp_script"
+                else
+                    echo "   ⚠️  Could not extract cursor rules function. They will be updated on next script run."
+                fi
+            fi
+            
+            return 0
+        else
+            echo "Error: Downloaded file appears invalid"
+            rm -f "$temp_file"
+            return 1
+        fi
+    else
+        echo "Error: Failed to download latest version"
+        echo "Please check your internet connection or download manually from: $REPO_URL"
+        rm -f "$temp_file"
+        return 1
+    fi
+}
+
+
+
+
+# Initialize log file
+init_log_file
+
+# Initialize TODO file
+init_todo_file
+
+# Initialize Cursor rules if needed (check on every run, add if missing)
+init_cursor_rules
+
+# Main script logic
+case "${1:-}" in
+    "add")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "add" "$@"; then
+            exit 1
+        fi
+        add_todo "$1" "$2"
+        ;;
+    "add-subtask")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "add-subtask" "$@"; then
+            exit 1
+        fi
+        add_subtask "$1" "$2" "$3"
+        ;;
+    "list")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "list" "$@"; then
+            exit 1
+        fi
+        list_todos "$@"
+        ;;
+    "complete")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "complete" "$@"; then
+            exit 1
+        fi
+        complete_todo "$@"
+        ;;
+    "undo")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "undo" "$@"; then
+            exit 1
+        fi
+        undo_todo "$1"
+        ;;
+    "modify")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "modify" "$@"; then
+            exit 1
+        fi
+        modify_todo "$1" "$2" "$3"
+        ;;
+    "archive")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "archive" "$@"; then
+            exit 1
+        fi
+        # Parse task IDs and reason flag
+        local task_ids=()
+        local reason_arg=""
+        while [[ $# -gt 0 ]]; do
+            case "$1" in
+                --reason)
+                    reason_arg="--reason"
+                    reason_value="$2"
+                    shift 2
+                    ;;
+                *)
+                    task_ids+=("$1")
+                    shift
+                    ;;
+            esac
+        done
+        # Archive each task with reason if provided
+        for task_id in "${task_ids[@]}"; do
+            if [[ -n "$reason_arg" ]]; then
+                archive_task "$task_id" --reason "$reason_value"
+            else
+                archive_task "$task_id"
+            fi
+        done
+        ;;
+    "delete")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "delete" "$@"; then
+            exit 1
+        fi
+        delete_task "$@"
+        ;;
+    "relate")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "relate" "$@"; then
+            exit 1
+        fi
+        relate_task "$@"
+        ;;
+    "note")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "note" "$@"; then
+            exit 1
+        fi
+        add_note "$1" "$2"
+        ;;
+    "show")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "show" "$@"; then
+            exit 1
+        fi
+        show_task "$1"
+        ;;
+    "restore")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "restore" "$@"; then
+            exit 1
+        fi
+        restore_task "$1"
+        ;;
+    "--lint")
+        lint_todo
+        ;;
+    "--reformat")
+        if [[ "$2" == "--dry-run" ]]; then
+            reformat_todo "--dry-run"
+        else
+            reformat_todo
+        fi
+        ;;
+    "edit")
+        edit_todo
+        ;;
+    "log")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "log" "$@"; then
+            exit 1
+        fi
+        if [[ "$1" == "--filter" && -n "$2" ]]; then
+            view_log "$2" "$3"
+        elif [[ "$1" == "--lines" && -n "$2" ]]; then
+            view_log "" "$2"
+        else
+            view_log
+        fi
+        ;;
+    "update")
+        update_tool
+        ;;
+    "backups"|"list-backups")
+        list_backups
+        ;;
+    "rollback")
+        shift
+        rollback "$@"
+        ;;
+    "version"|"--version"|"-v")
+        echo "todo.ai version $VERSION"
+        echo "Repository: $REPO_URL"
+        echo "Update: ./todo.ai update"
+        ;;
+    "--help"|"help"|"-h")
+        show_usage
+        ;;
+    *)
+        show_usage
+        ;;
+esac

@@ -347,6 +347,22 @@ The `release.sh` script is an intelligent, fully automated release tool that:
 **Options:**
 - `--summary <file>` or `-s <file>`: Include AI-generated human-readable summary from the specified file
 
+**Release Logging:**
+
+All release operations are automatically logged to `RELEASE_LOG.md` in the repository root. The log includes:
+- Timestamp for each step (start, version update, git operations, GitHub release)
+- Success or failure status for each operation
+- Error messages if any step fails
+- Release details (version, tag, URL)
+
+This helps debug issues when releases get stuck or fail. Check `RELEASE_LOG.md` to see exactly where and why a release might have failed.
+
+**Uncommitted Files Handling:**
+
+The script now properly handles:
+- `RELEASE_SUMMARY.md` - allowed as uncommitted (will be used if present)
+- Other uncommitted files - will block the release (must commit or stash)
+
 The script handles everything automatically - just provide the summary file if you want it included!
 
 ## Pre-Release Checklist
@@ -364,6 +380,8 @@ Before creating a release, ensure:
 - Release notes are automatically generated from commits - no manual preparation needed!
 - AI-generated summaries (recommended) should be created by the agent and saved to `RELEASE_SUMMARY.md`
 - The summary file (`RELEASE_SUMMARY.md`) can be committed or kept as a temporary file - it's included in the release notes but not required in the repository
+- The script allows `RELEASE_SUMMARY.md` as an uncommitted file - you don't need to commit it before releasing
+- All release operations are automatically logged to `RELEASE_LOG.md` with detailed timestamps for debugging and auditing
 
 ## Post-Release Tasks
 

@@ -3,6 +3,16 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
+  - [ ] **#49.9** Implement high-priority security improvements identified in audit `#code`
+  - [ ] **#49.8** Create security improvement recommendations document based on findings `#docs`
+  - [ ] **#49.7** Evaluate supply chain security: repository compromise, MITM attacks, and code signing `#security`
+  - [ ] **#49.6** Review file system access: what files can be read/written and potential data exfiltration risks `#security`
+  - [ ] **#49.5** Analyze prompt injection risks: malicious content in TODO.md affecting AI agent behavior `#security`
+  - [ ] **#49.4** Examine Cursor rules injection vectors: preventing malicious rules from being installed or modified `#security`
+  - [ ] **#49.3** Assess code execution risks: migration system, script execution, and dynamic code loading `#security`
+  - [ ] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security`
+  - [ ] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security`
 - [ ] **#48** Fix update logic error: new version update logic never executes
   - [ ] **#48.4** Test update workflow: verify migrations execute in new version after update `#test`
   - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code`
@@ -189,7 +199,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 23:40:49 CET 2025
+**Last Updated:** Sat Nov  1 23:53:49 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

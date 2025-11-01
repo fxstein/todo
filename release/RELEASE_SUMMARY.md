@@ -31,7 +31,9 @@ For AI Agents:
 
 For Humans:
 ```
-Report this bug to GitHub Issues
+Tell todo.ai to report a bug: Sample bug description
 ```
+
+**Note:** Only bugs related to todo.ai itself should be reported. Use this feature when todo.ai encounters errors or unexpected behavior, not for general project bugs.
 
 This feature significantly improves the feedback loop between users and developers while maintaining full user control and privacy protection.

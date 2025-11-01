@@ -636,12 +636,32 @@ Includes release summary from ${SUMMARY_FILE}"
     local version_commit=$(git commit -m "$commit_msg" 2>&1 || echo "no commit needed")
     log_release_step "VERSION COMMITTED" "Version change committed: ${version_commit}"
     
+    # Get the commit hash of the version update commit
+    local version_commit_hash=$(git rev-parse HEAD)
+    
+    # Verify the version was actually updated in the commit
+    if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
+        echo -e "${RED}❌ Error: Version verification failed${NC}"
+        echo "Tag would point to commit that doesn't have correct version"
+        log_release_step "VERIFY ERROR" "Version verification failed - commit ${version_commit_hash} doesn't have VERSION=${NEW_VERSION}"
+        exit 1
+    fi
+    
     # Create and push tag
     TAG="v${NEW_VERSION}"
     echo -e "${BLUE}🏷️  Creating tag ${TAG}...${NC}"
-    log_release_step "CREATE TAG" "Creating git tag: ${TAG}"
-    git tag -a "$TAG" -m "Release version $NEW_VERSION" > /dev/null 2>&1
-    log_release_step "TAG CREATED" "Git tag ${TAG} created successfully"
+    log_release_step "CREATE TAG" "Creating git tag: ${TAG} pointing to commit ${version_commit_hash}"
+    # Explicitly tag the commit hash to ensure we're tagging the right commit
+    git tag -a "$TAG" -m "Release version $NEW_VERSION" "$version_commit_hash" > /dev/null 2>&1
+    log_release_step "TAG CREATED" "Git tag ${TAG} created successfully at commit ${version_commit_hash}"
+    
+    # Verify tag points to commit with correct version
+    if ! git show "$TAG":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
+        echo -e "${RED}❌ Error: Tag verification failed${NC}"
+        echo "Tag does not point to commit with correct version"
+        log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - tag doesn't point to commit with VERSION=${NEW_VERSION}"
+        exit 1
+    fi
     
     echo -e "${BLUE}📤 Pushing to remote...${NC}"
     log_release_step "PUSH MAIN" "Pushing main branch to origin"

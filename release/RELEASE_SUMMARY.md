@@ -1,6 +1,5 @@
-This release reorganizes all release-related files into a dedicated `release/` directory and updates the release log to use a proper log file format matching the todo.ai log architecture.
+This release fixes a critical bug in the release log prepend logic that was causing incorrect header detection.
 
-The most significant improvement is the complete reorganization of release infrastructure ([b5b1a8f](https://github.com/fxstein/todo.ai/commit/b5b1a8f...)). All release-related files (`release.sh`, `RELEASE_LOG.log`, `RELEASE_PROCESS.md`, `RELEASE_NUMBERING_ANALYSIS.md`) are now organized in a single `release/` directory for better project structure. This makes it easier to find and manage all release-related files in one place.
+The bug fix ([2b7558a](https://github.com/fxstein/todo.ai/commit/2b7558a...)) resolves an issue where the header detection logic was matching the empty line separator instead of the first actual log entry. The header detection now correctly identifies the first line starting with a timestamp (digit), ensuring that new log entries are always prepended correctly after the header and empty line separator, maintaining the newest-first chronological order.
 
-Additionally, the release log has been converted from a Markdown file to a proper log file format ([1c470a1](https://github.com/fxstein/todo.ai/commit/1c470a1...)), matching the architecture of the todo.ai log file. The log now uses a pipe-delimited format (`TIMESTAMP | USER | STEP | MESSAGE`) with newest entries at the top, providing a consistent logging experience across the project and making it easier to parse and analyze release operations.
-
+The log has also been cleaned up to remove duplicates and ensure proper ordering with newest entries at the top, matching the todo.ai log file architecture.

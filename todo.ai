@@ -2586,7 +2586,7 @@ update_tool() {
             # 2. Cursor rules update (runs automatically at startup via init_cursor_rules)
             # The new version's code will execute with its own logic, not the old version's
             # Suppress stdout (version info) but allow stderr (migration/cursor rules messages) through
-            "$temp_file" version >/dev/null 2>&1 || true
+            "$temp_file" version >/dev/null || true
             
             # Now replace the old version with the new version
             mv "$temp_file" "$script_path"

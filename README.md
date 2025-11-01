@@ -101,6 +101,24 @@ Your agent understands natural language requests and translates them to the appr
 
 ---
 
+## See It In Action
+
+This repository uses `todo.ai` for its own development! Check out [`TODO.md`](./TODO.md) to see:
+- **Real examples** of how tasks are structured with subtasks and tags
+- **Current development status** of the tool itself
+- **Live demonstration** of the task management workflow
+
+The TODO.md file showcases features like:
+- Task hierarchies with subtasks
+- Tag-based organization (`#security`, `#feature`, `#bug`)
+- Task relationships and dependencies
+- Completion tracking and archiving
+- Development roadmap and priorities
+
+This is the same file structure and workflow you'll use in your own projects with `todo.ai`.
+
+---
+
 ## Why not GitHub Issues?
 
 Agents need a **fast, local, Markdown-native** way to manage tasks. GitHub Issues adds too much complexity and overhead—API calls, authentication, rate limits, and network latency slow down task management.

@@ -2665,6 +2665,81 @@ run_migrations() {
     # Create lock file
     touch "$lock_file" 2>/dev/null || return 1
     
+    # Find the highest already-executed migration version to determine "from" version
+    local last_migrated_version=""
+    if [[ -d "$migrations_dir" ]]; then
+        # Find highest version from migration marker files
+        for migration_file in "$migrations_dir"/v*_*.migrated; do
+            if [[ -f "$migration_file" ]]; then
+                local filename=$(basename "$migration_file")
+                # Extract version (e.g., v1.3.5_section_order_fix.migrated -> 1.3.5)
+                # Use sed for reliable extraction across shell versions
+                local file_version=$(echo "$filename" | sed -n 's/^v\([0-9]\+\.[0-9]\+\.[0-9]\+\)_.*/\1/p')
+                if [[ -n "$file_version" ]]; then
+                    # Keep track of highest version
+                    if [[ -z "$last_migrated_version" ]]; then
+                        last_migrated_version="$file_version"
+                    elif version_compare "$file_version" "$last_migrated_version" ">"; then
+                        last_migrated_version="$file_version"
+                    fi
+                fi
+            fi
+        done
+    fi
+    
+    # Collect pending migrations
+    local pending_migrations=()
+    local highest_pending_version=""
+    for migration in "${MIGRATIONS[@]}"; do
+        IFS='|' read -r target_version migration_id description function_name <<< "$migration"
+        
+        # Check if this migration applies to current or earlier version
+        if version_compare "$current_version" "$target_version" ">="; then
+            # Check if already executed
+            local migration_file="${migrations_dir}/v${target_version}_${migration_id}.migrated"
+            if [[ ! -f "$migration_file" ]]; then
+                pending_migrations+=("$target_version|$migration_id|$description|$function_name")
+                # Track highest pending migration version
+                if [[ -z "$highest_pending_version" ]]; then
+                    highest_pending_version="$target_version"
+                elif version_compare "$target_version" "$highest_pending_version" ">"; then
+                    highest_pending_version="$target_version"
+                fi
+            fi
+        fi
+    done
+    
+    # Display migration info if there are pending migrations
+    if [[ ${#pending_migrations[@]} -gt 0 ]]; then
+        # Determine from version: use last migrated version, or assume it's lower than first pending
+        local from_version="$last_migrated_version"
+        if [[ -z "$from_version" ]]; then
+            # No migrations executed yet - find lowest pending version
+            local lowest_pending_version=""
+            for migration_data in "${pending_migrations[@]}"; do
+                IFS='|' read -r target_version migration_id description function_name <<< "$migration_data"
+                if [[ -z "$lowest_pending_version" ]]; then
+                    lowest_pending_version="$target_version"
+                elif version_compare "$target_version" "$lowest_pending_version" "<"; then
+                    lowest_pending_version="$target_version"
+                fi
+            done
+            # Estimate previous version (one patch version before lowest pending)
+            # This is an approximation - actual previous version might be lower
+            from_version="$lowest_pending_version"
+        fi
+        
+        # Determine to version: use current version, or highest pending if higher
+        local to_version="$current_version"
+        if [[ -n "$highest_pending_version" ]] && version_compare "$highest_pending_version" "$current_version" ">"; then
+            # This shouldn't happen in normal cases, but handle it
+            to_version="$highest_pending_version"
+        fi
+        
+        # Display migration info
+        echo "🔄 Running migrations: $from_version → $to_version" >&2
+    fi
+    
     # Process each migration
     for migration in "${MIGRATIONS[@]}"; do
         IFS='|' read -r target_version migration_id description function_name <<< "$migration"

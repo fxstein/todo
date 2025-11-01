@@ -1,0 +1,6 @@
+This release enhances the automated release process with AI-generated human-readable summaries and fixes a critical bug in the version update mechanism.
+
+The most significant improvement is the introduction of AI-generated release summaries. When using AI agents like Cursor, agents can now automatically generate a 2-3 paragraph human-readable summary that highlights key improvements and user-facing benefits. This summary appears at the top of release notes, making them much more accessible and informative than raw commit lists alone. The release script now accepts a `--summary` flag to include these AI-generated summaries, transforming technical commit messages into meaningful narratives that help users understand what's changed and why it matters.
+
+Additionally, a critical bug fix ensures that version updates only replace actual `VERSION=` variable assignments, not all occurrences throughout the codebase. This prevents accidental corruption of grep patterns and other code that might contain version-like strings. The release process now includes enhanced cursor rules that guide AI agents to generate summaries automatically, making the entire release workflow more intelligent and user-friendly.
+

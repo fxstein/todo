@@ -11,4 +11,7 @@ These fixes ensure that when users update todo.ai, they will:
 - Have confidence that the new version's code is actually executing
 - Receive proper migration feedback during the update process
 
-The fixes are particularly important for users upgrading from versions 1.5.0 or earlier, as they will now see the proper migration status messages that were introduced in recent releases.
+**Known Limitation:**
+The enhanced migration version messages (e.g., "🔄 Running migrations: 1.5.0 → 1.5.6") are only visible when updating **from version 1.5.6 or later**. Users updating from version 1.5.0 or earlier will still see the legacy message format ("🔄 Running migrations...") during the update process itself, because those messages are printed by the older version's update function, which cannot be modified retroactively.
+
+After successfully updating to version 1.5.6 or later, all subsequent updates will display the new enhanced migration version messages.

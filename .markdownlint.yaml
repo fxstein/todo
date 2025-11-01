@@ -1,0 +1,7 @@
+default: true
+extends: default
+rules:
+  line-length: false  # Allow long lines
+  no-duplicate-heading: false  # Allow duplicate headings
+  no-trailing-punctuation: false  # Allow trailing punctuation
+

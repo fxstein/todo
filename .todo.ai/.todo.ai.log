@@ -2,6 +2,14 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 00:34:48 | fxstein | COMPLETE | 15 | Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting
+2025-11-02 00:34:46 | fxstein | DELETE | 15.4 | TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure
+2025-11-02 00:34:41 | fxstein | COMPLETE | 15.7 | TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure
+2025-11-02 00:34:41 | fxstein | COMPLETE | 15.6 | Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools
+2025-11-02 00:34:41 | fxstein | COMPLETE | 15.5 | Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling
+2025-11-02 00:34:41 | fxstein | COMPLETE | 15.3 | JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors
+2025-11-02 00:34:41 | fxstein | COMPLETE | 15.2 | YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter
+2025-11-02 00:34:41 | fxstein | COMPLETE | 15.1 | Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config
 2025-11-02 00:31:14 | fxstein | ADD_SUBTASK | 15.7 | TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure (parent: #15)
 2025-11-02 00:31:05 | fxstein | ADD_SUBTASK | 15.6 | Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools (parent: #15)
 2025-11-02 00:31:04 | fxstein | ADD_SUBTASK | 15.5 | Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling (parent: #15)

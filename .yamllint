@@ -1,0 +1,13 @@
+extends: default
+
+rules:
+  line-length: disable
+  comments: disable
+  comments-indentation: disable
+  
+# Allow relaxed rules for front matter
+yaml-files:
+  - '*.yml'
+  - '*.yaml'
+  - '*.mdc'
+

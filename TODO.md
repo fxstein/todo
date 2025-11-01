@@ -49,14 +49,13 @@
   - [x] **#35.2** Define test framework architecture and tooling `#tests` `#planning`
   - [x] **#35.1** Research todo.ai testing requirements and existing docs `#tests` `#docs`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
-- [ ] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#setup` `#git`
-  - [ ] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint`
-  - [ ] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code`
-  - [ ] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code`
-  - [   ] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint`
-  - [ ] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint`
-  - [ ] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint`
-  - [ ] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint`
+- [x] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#setup` `#git`
+  - [x] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint`
+  - [x] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code`
+  - [x] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code`
+  - [x] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint`
+  - [x] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint`
+  - [x] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint`
 ------------------
 
 ## Recently Completed
@@ -177,6 +176,7 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
     - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#34** Final nested subtask test `#test` (deleted 2025-11-02, expires 2025-12-02)
@@ -202,7 +202,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 00:31:14 CET 2025
+**Last Updated:** Sun Nov  2 00:34:48 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

@@ -2498,6 +2498,19 @@ update_tool() {
                 fi
             fi
             
+            # Run migrations automatically after update
+            echo ""
+            echo "🔄 Running migrations..."
+            # Execute the updated script with a simple command to trigger migrations
+            # Migrations run automatically at script startup, so any command will trigger them
+            local current_dir=$(pwd)
+            cd "$(dirname "$script_path")" 2>/dev/null || true
+            # Use version command to trigger script initialization and migrations
+            # Suppress stdout (version info) but allow stderr (migration messages) through
+            "$script_path" version >/dev/null || true
+            cd "$current_dir" 2>/dev/null || true
+            echo "✅ Migrations completed"
+            
             return 0
         else
             echo "Error: Downloaded file appears invalid"

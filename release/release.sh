@@ -42,27 +42,35 @@ EOF
     local flat_message=$(echo "$message" | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//')
     local log_entry="${timestamp} | ${user_id} | ${step} | ${flat_message}"
     
-    # Find where header ends (first non-comment, non-empty line - the first actual log entry)
-    # Skip comment lines (#) and empty lines to find first actual log entry
-    local header_end=$(awk '/^[0-9]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
+    # Find where header ends (before the first log entry - the empty line separator)
+    # Find first timestamp line (log entry), then use the line before it as header end
+    local first_log_line=$(awk '/^[0-9]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
     
-    # If no log entries found, header is entire file (includes empty line separator)
-    if [[ -z "$header_end" ]] || [[ "$header_end" -eq 0 ]]; then
-        header_end=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 4)
+    # If no log entries found, header is entire file
+    if [[ -z "$first_log_line" ]] || [[ "$first_log_line" -eq 0 ]]; then
+        first_log_line=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 4)
+    fi
+    
+    # Header ends at the line before first log entry (the empty line separator)
+    local header_end=$((first_log_line - 1))
+    
+    # Ensure header_end is at least the header lines (3 comment lines + empty line = 4)
+    if [[ $header_end -lt 4 ]]; then
+        header_end=4
     fi
     
     # Create new log: header + new entry + old entries
     local temp_log=$(mktemp)
     
-    # Copy header (includes empty line separator)
+    # Copy header (includes empty line separator, stops before first log entry)
     head -n "$header_end" "$RELEASE_LOG" > "$temp_log" 2>/dev/null
     
     # Add new entry (prepend - newest on top)
     echo "$log_entry" >> "$temp_log"
     
-    # Append existing log entries (skip header)
-    if [[ $header_end -gt 0 ]]; then
-        tail -n +$((header_end + 1)) "$RELEASE_LOG" 2>/dev/null >> "$temp_log" || true
+    # Append existing log entries (skip header, start from first log entry)
+    if [[ $first_log_line -gt 0 ]]; then
+        tail -n +$first_log_line "$RELEASE_LOG" 2>/dev/null >> "$temp_log" || true
     fi
     
     mv "$temp_log" "$RELEASE_LOG"

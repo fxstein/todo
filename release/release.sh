@@ -481,14 +481,13 @@ main() {
     # If RELEASE_SUMMARY.md exists and is uncommitted, we'll commit it as part of the release
     local summary_needs_commit=false
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
-        # Escape the file path for regex (escape dots and slashes)
-        local escaped_file=$(echo "$SUMMARY_FILE" | sed 's/\./\\./g' | sed 's/\//\\\//g')
-        # Check if file is untracked (starts with ??) or modified (starts with M)
-        if echo "$status_output" | grep -qE "[?]{2}[[:space:]]+.*${escaped_file}|^[MA ][[:space:]]+.*${escaped_file}"; then
+        # Check if file appears in status output (untracked or modified)
+        if echo "$status_output" | grep -qF "$SUMMARY_FILE"; then
             summary_needs_commit=true
             log_release_step "SUMMARY DETECTED" "Found uncommitted summary file: ${SUMMARY_FILE} - will commit as part of release"
             # Remove it from uncommitted list so it doesn't block the release
-            uncommitted=$(echo -e "$uncommitted" | grep -vE ".*${escaped_file}$" || true)
+            # Use fixed string matching (F flag) instead of regex
+            uncommitted=$(echo -e "$uncommitted" | grep -vF "$SUMMARY_FILE" || true)
         fi
     fi
     

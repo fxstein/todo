@@ -38,8 +38,9 @@ log_release_step() {
 EOF
     fi
     
-    # Create log entry
-    local log_entry="${timestamp} ${user_id} ${step} - ${message}"
+    # Create log entry (flatten multi-line messages to single line)
+    local flat_message=$(echo "$message" | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//')
+    local log_entry="${timestamp} ${user_id} ${step} - ${flat_message}"
     
     # Find where header ends (first non-comment line)
     local header_end=$(awk '/^[^#]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)

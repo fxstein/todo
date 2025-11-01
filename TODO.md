@@ -4,6 +4,7 @@
 
 ## Tasks
 - [ ] **#36** Create release process for todo.ai on GitHub
+  - [ ] **#36.3** Create release management process
   - [ ] **#36.2** Review release process document
   - [x] **#36.1** Create release process document
 - [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
@@ -105,7 +106,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 10:01:03 CET 2025
+**Last Updated:** Sat Nov  1 10:14:27 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

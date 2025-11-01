@@ -42,10 +42,11 @@ EOF
     local flat_message=$(echo "$message" | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//')
     local log_entry="${timestamp} | ${user_id} | ${step} | ${flat_message}"
     
-    # Find where header ends (first non-comment line)
-    local header_end=$(awk '/^[^#]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
+    # Find where header ends (first non-comment, non-empty line - the first actual log entry)
+    # Skip comment lines (#) and empty lines to find first actual log entry
+    local header_end=$(awk '/^[0-9]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
     
-    # If no non-comment lines, header is entire file
+    # If no log entries found, header is entire file (includes empty line separator)
     if [[ -z "$header_end" ]] || [[ "$header_end" -eq 0 ]]; then
         header_end=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 4)
     fi
@@ -53,10 +54,10 @@ EOF
     # Create new log: header + new entry + old entries
     local temp_log=$(mktemp)
     
-    # Copy header
+    # Copy header (includes empty line separator)
     head -n "$header_end" "$RELEASE_LOG" > "$temp_log" 2>/dev/null
     
-    # Add new entry
+    # Add new entry (prepend - newest on top)
     echo "$log_entry" >> "$temp_log"
     
     # Append existing log entries (skip header)

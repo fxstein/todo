@@ -3,6 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#48** Fix update logic error: new version update logic never executes
+  - [ ] **#48.4** Test update workflow: verify migrations execute in new version after update `#test`
+  - [ ] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code`
+  - [ ] **#48.2** Design solution: download → execute new version → replace old version `#docs`
+  - [ ] **#48.1** Research update execution pattern: how to execute new version's code after download `#research`
 - [ ] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature`
   - [ ] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test`
   - [ ] **#47.7** Update help screen and documentation with feature request command `#docs`
@@ -184,7 +189,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 23:07:19 CET 2025
+**Last Updated:** Sat Nov  1 23:10:26 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

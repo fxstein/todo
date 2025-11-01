@@ -1,9 +1,9 @@
-This release fixes a critical update logic error that prevented new versions from properly executing their own update logic, migrations, and cursor rules updates.
+This release enhances the migration system with improved visibility into version updates. When migrations run, users now see exactly which version numbers are being updated, making it easier to track their migration progress.
 
-**The Problem:**
-When users ran the update command, the update process was executed from the old version's code. This meant that any new logic in the updated version (like new migrations, cursor rules updates, or other update-related code) never executed because the old version didn't have knowledge of those features.
+**Enhancement:**
+The migration output has been updated to display version ranges instead of a generic "Running migrations..." message. When migrations execute, users will now see a clear message like "🔄 Running migrations: 1.3.5 → 1.5.4", showing the exact version range being migrated.
 
-**The Solution:**
-The update process now follows a more reliable pattern: download the new version → execute the new version's code directly → then replace the old version. This ensures that migrations, cursor rules updates, and any other update logic in the new version execute with the new version's code, not the old version's code.
+**How it works:**
+The system determines the "from" version by finding the highest already-executed migration version. If no migrations have been executed yet, it uses the lowest pending migration version as an estimate. The "to" version is always the current version of todo.ai. This provides users with better visibility into which version numbers are being updated during the migration process.
 
-This fix ensures that users upgrading from any version to any newer version will reliably have all migrations run and all updates applied, regardless of what version they're upgrading from. The update process is now truly self-contained and future-proof.
+This enhancement is particularly useful when upgrading from older versions, as users can now see exactly which migrations are running and what version range they're transitioning through.

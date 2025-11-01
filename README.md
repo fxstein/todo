@@ -134,6 +134,12 @@ Perfect for AI agents - just works.
 
 ---
 
+## Limitations
+
+At the moment, `todo.ai` is focused on a **single developer-AI agent relationship**. The tool does not yet sync issue numbers across teams, branches, or PRs. This functionality is planned but has not been implemented yet.
+
+---
+
 ## Manual Installation
 
 ```bash

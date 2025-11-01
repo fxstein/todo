@@ -2579,14 +2579,16 @@ update_tool() {
             echo ""
             echo "🔄 Executing new version's update logic (v$new_version)..."
             local current_dir=$(pwd)
-            cd "$(dirname "$script_path")" 2>/dev/null || true
+            local script_dir=$(dirname "$script_path")
+            cd "$script_dir" 2>/dev/null || true
             
-            # Execute new version with a special internal command that runs:
+            # Execute new version's script directly (not via PATH or current directory)
+            # This ensures the new script's code executes, not the old version
             # 1. Migrations (runs automatically at startup via run_migrations)
             # 2. Cursor rules update (runs automatically at startup via init_cursor_rules)
             # The new version's code will execute with its own logic, not the old version's
             # Suppress stdout (version info) but allow stderr (migration/cursor rules messages) through
-            "$temp_file" version >/dev/null || true
+            /bin/zsh "$temp_file" version >/dev/null || true
             
             # Now replace the old version with the new version
             mv "$temp_file" "$script_path"

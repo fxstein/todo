@@ -3,6 +3,13 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
+  - [ ] **#42.6** Test duplicate detection and 'me too' reply flow
+  - [ ] **#42.5** Test bug reporting with GitHub CLI integration
+  - [ ] **#42.4** Create bug report template with logs and data attachment
+  - [ ] **#42.3** Implement duplicate issue detection and 'me too' reply functionality
+  - [ ] **#42.2** Implement bug detection and reporting logic
+  - [x] **#42.1** Create design document for bug reporting feature
 - [ ] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature`
   - [x] **#37.12** Update release process documentation to include migration workflow
   - [x] **#37.11** Document migration creation process for developers
@@ -138,7 +145,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 11:50:36 CET 2025
+**Last Updated:** Sat Nov  1 12:20:33 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

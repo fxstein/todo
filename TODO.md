@@ -9,8 +9,8 @@
   - [ ] **#44.6** Test migration with existing .cursorrules files `#test`
   - [ ] **#44.5** Create migration to convert existing .cursorrules to .cursor/rules/ on update `#migration`
   - [ ] **#44.4** Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file `#code`
-  - [ ] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code`
-  - [ ] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs`
+  - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code`
+  - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs`
   - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research`
 - [ ] **#43** Create uninstall feature
   - [ ] **#43.3** Enhance README.md to show simple uninstall command
@@ -158,7 +158,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 22:13:15 CET 2025
+**Last Updated:** Sat Nov  1 22:29:17 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

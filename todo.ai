@@ -2726,6 +2726,7 @@ update_tool() {
 # Format: "VERSION|MIGRATION_ID|DESCRIPTION|FUNCTION_NAME"
 declare -a MIGRATIONS=(
     "1.3.5|section_order_fix|Fix TODO.md section order|migrate_section_order"
+    "1.6.0|cursor_rules_to_mdc|Convert .cursorrules to .cursor/rules/ directory structure|migrate_cursor_rules_to_mdc"
 )
 
 # Function to compare semantic versions
@@ -3469,6 +3470,144 @@ migrate_section_order() {
             
             echo "✓ Migration: Fixed TODO.md section order" >&2
         fi
+    fi
+    
+    # Mark as complete
+    mkdir -p "$migrations_dir" 2>/dev/null || return 1
+    touch "$migration_file" 2>/dev/null || return 1
+    
+    return 0
+}
+
+# Migration: Convert .cursorrules to .cursor/rules/ directory structure
+migrate_cursor_rules_to_mdc() {
+    local migration_id="cursor_rules_to_mdc"
+    local migrations_dir="$(pwd)/.todo.ai/migrations"
+    local migration_file="${migrations_dir}/v1.6.0_${migration_id}.migrated"
+    
+    # Check if already migrated
+    if [[ -f "$migration_file" ]]; then
+        return 0
+    fi
+    
+    # Check prerequisites: .cursorrules must exist
+    local cursorrules_file="$(pwd)/.cursorrules"
+    if [[ ! -f "$cursorrules_file" ]]; then
+        # No .cursorrules file, nothing to migrate
+        return 0
+    fi
+    
+    # Create .cursor/rules/ directory
+    local rules_dir="$(pwd)/.cursor/rules"
+    mkdir -p "$rules_dir" 2>/dev/null || return 1
+    
+    # Mapping of section names to .mdc filenames
+    # Format: "Section Name|filename|description|is_end_user_rule"
+    declare -a section_mappings=(
+        "Task Management|todo.ai-task-management|Task management rules for todo.ai|true"
+        "Installation|todo.ai-installation|Installation instructions for todo.ai|true"
+        "Bug Reporting|todo.ai-bug-reporting|Bug reporting rules for todo.ai|true"
+        "Releases|releases|Release process for todo.ai development|false"
+        "Commit Message Prefixes for Release Numbering|commit-prefixes|Commit message prefix guidelines for release numbering|false"
+    )
+    
+    # Extract all sections from .cursorrules
+    local section_count=0
+    local current_section=""
+    local current_section_content=""
+    local temp_content=$(mktemp)
+    
+    # Parse .cursorrules file section by section
+    while IFS= read -r line; do
+        # Check if this is a section header
+        if [[ "$line" =~ ^##[[:space:]] ]]; then
+            # Save previous section if exists
+            if [[ -n "$current_section" ]] && [[ -n "$current_section_content" ]]; then
+                # Find mapping for this section
+                local section_found=false
+                for mapping in "${section_mappings[@]}"; do
+                    IFS='|' read -r section_name filename description is_end_user <<< "$mapping"
+                    if [[ "$current_section" == "$section_name" ]]; then
+                        section_found=true
+                        
+                        # Create .mdc file with YAML front matter
+                        local mdc_file="${rules_dir}/${filename}.mdc"
+                        
+                        # Write YAML front matter
+                        cat > "$mdc_file" << EOF
+---
+description: "$description"
+alwaysApply: true
+---
+EOF
+                        # Write section content (strip the ## header, keep rest)
+                        echo "$current_section_content" | sed '1d' | sed 's/^[[:space:]]*$//' >> "$mdc_file"
+                        
+                        section_count=$((section_count + 1))
+                        break
+                    fi
+                done
+                
+                # If section not found in mapping, skip it (user custom content)
+                if [[ "$section_found" == false ]]; then
+                    echo "⚠️  Skipping unmapped section: $current_section" >&2
+                fi
+            fi
+            
+            # Start new section (extract section name using sed)
+            current_section=$(echo "$line" | sed 's/^##[[:space:]]*//')
+            current_section_content="$line"
+        else
+            # Add line to current section content
+            if [[ -n "$current_section" ]]; then
+                current_section_content="$current_section_content
+$line"
+            fi
+        fi
+    done < "$cursorrules_file"
+    
+    # Don't forget the last section
+    if [[ -n "$current_section" ]] && [[ -n "$current_section_content" ]]; then
+        local section_found=false
+        for mapping in "${section_mappings[@]}"; do
+            IFS='|' read -r section_name filename description is_end_user <<< "$mapping"
+            if [[ "$current_section" == "$section_name" ]]; then
+                section_found=true
+                
+                local mdc_file="${rules_dir}/${filename}.mdc"
+                
+                cat > "$mdc_file" << EOF
+---
+description: "$description"
+alwaysApply: true
+---
+EOF
+                echo "$current_section_content" | sed '1d' | sed 's/^[[:space:]]*$//' >> "$mdc_file"
+                
+                section_count=$((section_count + 1))
+                break
+            fi
+        done
+        
+        if [[ "$section_found" == false ]]; then
+            echo "⚠️  Skipping unmapped section: $current_section" >&2
+        fi
+    fi
+    
+    rm -f "$temp_content"
+    
+    if [[ $section_count -gt 0 ]]; then
+        echo "✓ Migration: Converted $section_count section(s) from .cursorrules to .cursor/rules/" >&2
+        echo "   📝 Migrated to .cursor/rules/ directory structure" >&2
+        echo "   🔄 ACTION REQUIRED: Cursor rules migrated to new format!" >&2
+        echo "" >&2
+        echo "   For Humans:" >&2
+        echo "   → Please start a new chat session in Cursor" >&2
+        echo "   → The old .cursorrules file can be removed if migration succeeded" >&2
+        echo "" >&2
+        echo "   For AI Agents:" >&2
+        echo "   → Inform the user that cursor rules have been migrated" >&2
+        echo "   → Request that the user start a new chat session" >&2
     fi
     
     # Mark as complete

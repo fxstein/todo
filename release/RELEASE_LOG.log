@@ -2,6 +2,23 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-01 22:49:08 | fxstein | RELEASE COMPLETE | Release 1.5.2 published successfully! - Tag: v1.5.2 - URL: https://github.com/fxstein/todo.ai/releases/tag/v1.5.2 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
+2025-11-01 22:49:08 | fxstein | GITHUB RELEASE CREATED | GitHub release created successfully for v1.5.2 Output: https://github.com/fxstein/todo.ai/releases/tag/v1.5.2
+2025-11-01 22:49:07 | fxstein | CREATE GITHUB RELEASE | Creating GitHub release for tag v1.5.2
+2025-11-01 22:49:05 | fxstein | PUSH TAG | Pushing tag v1.5.2 to origin
+2025-11-01 22:49:04 | fxstein | PUSH MAIN | Pushing main branch to origin
+2025-11-01 22:49:03 | fxstein | TAG CREATED | Git tag v1.5.2 created successfully at commit d7363893ac43e5912fa835a3275cc2dbade1df66
+2025-11-01 22:49:03 | fxstein | CREATE TAG | Creating git tag: v1.5.2 pointing to commit d7363893ac43e5912fa835a3275cc2dbade1df66
+2025-11-01 22:49:02 | fxstein | VERSION COMMITTED | Version change committed: [main d736389] Bump version to 1.5.2 1 file changed, 2 insertions(+), 2 deletions(-)
+2025-11-01 22:49:01 | fxstein | COMMIT VERSION | Committing version change to git
+2025-11-01 22:49:01 | fxstein | VERSION UPDATED | Version updated successfully in todo.ai
+2025-11-01 22:49:01 | fxstein | UPDATE VERSION | Updating version in todo.ai from 1.5.1 to 1.5.2
+2025-11-01 22:49:00 | fxstein | CONFIRMED | Release confirmed by user
+2025-11-01 22:48:59 | fxstein | RELEASE START | Starting release process: - Current version: 1.5.1 - Proposed version: 1.5.2 - Bump type: patch - Last tag: v1.5.1 - Summary file: release/RELEASE_SUMMARY.md
+2025-11-01 22:48:53 | fxstein | RELEASE START | Starting release process: - Current version: 1.5.1 - Proposed version: 1.5.2 - Bump type: patch - Last tag: v1.5.1 - Summary file: release/RELEASE_SUMMARY.md
+2025-11-01 22:48:46 | fxstein | ERROR - Uncommitted Changes | Release aborted due to uncommitted changes: M .todo.ai/.todo.ai.log
+2025-11-01 22:48:37 | fxstein | ERROR - Uncommitted Changes | Release aborted due to uncommitted changes: M .todo.ai/.todo.ai.log M TODO.md ?? .todo.ai/migrations/v1.6.0_cursor_rules_to_mdc.migrated
+2025-11-01 22:48:37 | fxstein | SUMMARY DETECTED | Found uncommitted summary file: release/RELEASE_SUMMARY.md - will commit as part of release
 2025-11-01 13:29:31 | fxstein | RELEASE COMPLETE | Release 1.5.1 published successfully! - Tag: v1.5.1 - URL: https://github.com/fxstein/todo.ai/releases/tag/v1.5.1 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
 2025-11-01 13:29:31 | fxstein | GITHUB RELEASE CREATED | GitHub release created successfully for v1.5.1 Output: https://github.com/fxstein/todo.ai/releases/tag/v1.5.1
 2025-11-01 13:29:29 | fxstein | CREATE GITHUB RELEASE | Creating GitHub release for tag v1.5.1

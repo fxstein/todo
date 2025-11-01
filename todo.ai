@@ -240,6 +240,7 @@ EOF
     local commit_rule_exists=false
     local archive_rule_exists=false
     local bug_report_section_exists=false
+    local bug_report_section_up_to_date=false
     
     if grep -q "todo.ai" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
         todo_rule_exists=true
@@ -255,10 +256,14 @@ EOF
     
     if grep -q "^## Bug Reporting" "$cursor_rules_file"; then
         bug_report_section_exists=true
+        # Check if Bug Reporting section is up to date (contains new key indicators)
+        if grep -q "CRITICAL REQUIREMENTS" "$cursor_rules_file" && grep -q "MUST use.*report-bug" "$cursor_rules_file" && grep -q "NEVER use.*gh issue create" "$cursor_rules_file"; then
+            bug_report_section_up_to_date=true
+        fi
     fi
     
-    # If all rules exist, nothing to do
-    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]] && [[ "$bug_report_section_exists" == true ]]; then
+    # If all rules exist and are up to date, nothing to do
+    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]] && [[ "$bug_report_section_exists" == true ]] && [[ "$bug_report_section_up_to_date" == true ]]; then
         return 0
     fi
     
@@ -271,8 +276,67 @@ EOF
         section_added=true
     fi
     
-    # Add Bug Reporting section if it doesn't exist
-    if ! grep -q "^## Bug Reporting" "$cursor_rules_file"; then
+    # Update or add Bug Reporting section
+    if [[ "$bug_report_section_exists" == true ]] && [[ "$bug_report_section_up_to_date" == false ]]; then
+        # Section exists but is outdated - replace it
+        local bug_report_start=$(grep -n "^## Bug Reporting" "$cursor_rules_file" | head -1 | cut -d: -f1)
+        local bug_report_end=$(awk "NR>$bug_report_start && /^## / {print NR-1; exit}" "$cursor_rules_file" || echo "")
+        if [[ -z "$bug_report_end" ]]; then
+            # Bug Reporting is the last section, replace to end of file
+            bug_report_end=$(wc -l < "$cursor_rules_file" | tr -d ' ')
+        fi
+        
+        # Create new section content
+        local new_section="## Bug Reporting
+When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:
+
+**CRITICAL REQUIREMENTS:**
+1. **MUST use \`./todo.ai report-bug\` command** - This is the ONLY way to report bugs about todo.ai
+2. **NEVER use \`gh issue create\` directly** - This bypasses all safeguards and duplicate detection
+3. **NEVER use GitHub API directly** for bug reports - Always go through the bug reporting feature
+4. Always require explicit user confirmation before any GitHub API calls
+5. Show preview of bug report before asking for confirmation
+6. Respect privacy: For private repositories, remove all repo identifiers
+
+**Usage:**
+\`\`\`bash
+./todo.ai report-bug \"Error description\" \"Error context\" \"command\"
+\`\`\`
+
+**Examples:**
+- ✅ User says \"report a bug about X\": Use \`./todo.ai report-bug \"X\" \"context\" \"command\"\`
+- ✅ \"An error occurred. Would you like me to report this bug?\" → If yes, use \`./todo.ai report-bug\`
+- ❌ \"Error occurred. Automatically reporting to GitHub...\" (NEVER DO THIS)
+- ❌ Using \`gh issue create\` directly for bug reports (NEVER DO THIS)
+- ❌ Creating GitHub issues manually with \`gh CLI\` for todo.ai bugs (NEVER DO THIS)
+
+**Why this is required:**
+- The bug reporting feature includes duplicate detection
+- It ensures proper formatting and context collection
+- It maintains user control and privacy protection
+- It follows the designed workflow for bug tracking"
+        
+        # Replace the section
+        if [[ "$(uname)" == "Darwin" ]]; then
+            local temp_file=$(mktemp)
+            head -n $((bug_report_start - 1)) "$cursor_rules_file" > "$temp_file" 2>/dev/null || true
+            echo "" >> "$temp_file"
+            echo "$new_section" >> "$temp_file"
+            if [[ $bug_report_end -lt $(wc -l < "$cursor_rules_file" | tr -d ' ') ]]; then
+                tail -n +$((bug_report_end + 1)) "$cursor_rules_file" >> "$temp_file" 2>/dev/null || true
+            fi
+            mv "$temp_file" "$cursor_rules_file"
+        else
+            # Linux: use sed to replace the section
+            sed_inplace "${bug_report_start},${bug_report_end}d" "$cursor_rules_file"
+            sed_inplace "${bug_report_start}i\\
+$new_section" "$cursor_rules_file"
+        fi
+        echo ""
+        echo "⚠️  IMPORTANT: Updated .cursorrules file"
+        echo "   📝 Updated '## Bug Reporting' section with latest rules"
+    elif [[ "$bug_report_section_exists" == false ]]; then
+        # Section doesn't exist - add it
         echo "" >> "$cursor_rules_file"
         echo "## Bug Reporting" >> "$cursor_rules_file"
         echo "When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:" >> "$cursor_rules_file"

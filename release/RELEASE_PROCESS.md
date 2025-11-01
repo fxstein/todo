@@ -103,7 +103,7 @@ The script uses a **hybrid approach** with three priority levels:
 
 **Priority 2: File Analysis** (catches forgotten prefixes)
 - If **only backend files** changed → **PATCH** (infrastructure only)
-- Backend files: `release/release.sh`, `.cursorrules`, `.todo.ai/`, `tests/`, `release/RELEASE_*.md`, `docs/TEST_PLAN.md`
+- Backend files: `release/release.sh`, `.cursor/rules/`, `.todo.ai/`, `tests/`, `release/RELEASE_*.md`, `docs/TEST_PLAN.md`
 - Frontend files: `README.md`, `todo.ai` (functional changes), user-facing docs
 
 **Priority 3: Keyword Analysis** (fallback for mixed/frontend)

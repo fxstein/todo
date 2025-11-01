@@ -8,7 +8,7 @@
 ### Release 1.1.0 (Initial Release)
 
 **Files Changed:**
-- `.cursorrules` (backend - agent config)
+- `.cursor/rules/` (backend - agent config)
 - `.todo.ai/.todo.ai.log` (backend - internal state)
 - `.todo.ai/.todo.ai.serial` (backend - internal state)
 - `.todo.ai/backups/` (backend - backup files)
@@ -33,7 +33,7 @@
 ### Release 1.2.0
 
 **Files Changed:**
-- `.cursorrules` (backend - agent config)
+- `.cursor/rules/` (backend - agent config)
 - `RELEASE_SUMMARY.md` (frontend - release notes)
 - `docs/RELEASE_PROCESS.md` (frontend - user documentation)
 - `release.sh` (backend - release automation)
@@ -51,7 +51,7 @@
 ### Release 1.3.0
 
 **Files Changed:**
-- `.cursorrules` (backend - agent config)
+- `.cursor/rules/` (backend - agent config)
 - `RELEASE_SUMMARY.md` (frontend - release notes)
 - `docs/RELEASE_PROCESS.md` (frontend - user documentation)
 - `release.sh` (backend - release automation)
@@ -81,7 +81,7 @@ Files that directly affect end users or AI agents using the tool:
 Files that don't directly affect end users:
 
 - `release.sh` - Release automation
-- `.cursorrules` - Agent configuration (affects agents but not tool users)
+- `.cursor/rules/` - Agent configuration (affects agents but not tool users)
 - `.todo.ai/` - Internal state/logs
 - `tests/` - Test infrastructure
 - `docs/RELEASE_PROCESS.md` - Developer documentation
@@ -89,7 +89,7 @@ Files that don't directly affect end users:
 - Internal improvements to `todo.ai` script (performance, code quality)
 
 ### Ambiguous Cases
-- `.cursorrules` - Affects AI agents but not end users
+- `.cursor/rules/` - Affects AI agents but not end users
 - Documentation updates - Could be frontend (user-facing) or backend (dev docs)
 - `RELEASE_SUMMARY.md` - Part of release process, not tool functionality
 
@@ -128,7 +128,7 @@ Files that don't directly affect end users:
 
 **Backend File Patterns:**
 - `release.sh`
-- `.cursorrules` (maybe - it affects agents)
+- `.cursor/rules/` (maybe - it affects agents)
 - `.todo.ai/*`
 - `tests/*`
 - `docs/RELEASE_PROCESS.md`
@@ -245,7 +245,7 @@ is_backend_only_release() {
     # Backend file patterns
     local backend_patterns=(
         "release.sh"
-        ".cursorrules"
+        ".cursor/rules/"
         ".todo.ai/"
         "tests/"
         "RELEASE_SUMMARY.md"

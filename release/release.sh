@@ -116,7 +116,7 @@ is_backend_only_release() {
     # Backend file patterns (infrastructure only)
     local backend_patterns=(
         "^release/release\.sh$"
-        "^\.cursorrules$"
+        "^\.cursor/rules/"
         "^\.todo\.ai/"
         "^tests/"
         "^release/RELEASE_SUMMARY\.md$"

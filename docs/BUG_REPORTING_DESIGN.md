@@ -537,7 +537,7 @@ Each installation will automatically add cursor rules that remind AI agents:
 
 ## Cursor Rules Integration
 
-The bug reporting system will automatically add cursor rules to `.cursorrules` on each installation to ensure AI agents follow the correct behavior:
+The bug reporting system will automatically add cursor rules to `.cursor/rules/` on each installation to ensure AI agents follow the correct behavior:
 
 ```markdown
 ## Bug Reporting

@@ -1,30 +1,7 @@
-# Release Summary
+This release implements a comprehensive migration of Cursor rules from the deprecated `.cursorrules` file to the modern `.cursor/rules/` directory structure, significantly improving the maintainability and organization of AI agent configuration.
 
-This release enhances the cursor rules update system to ensure that AI agents always have the latest rules and that users are properly notified when rules are updated.
+The most significant improvement is the complete migration to the official Cursor rules format. The tool now creates individual `.mdc` files in `.cursor/rules/` instead of a single `.cursorrules` file, providing better organization, version control, and scalability. Each rule is now in its own file with proper YAML front matter, making it easier to manage and update individual rules. The migration system automatically converts existing `.cursorrules` files on update, ensuring a smooth transition for all users.
 
-## Key Improvements
+Additionally, this release introduces intelligent path detection for cursor rules. The tool now automatically detects where `todo.ai` is installed (developer repo, global PATH, project-specific, etc.) and dynamically updates cursor rules with the correct paths. This eliminates hardcoded `./todo.ai` references that would fail in most installation scenarios, making the bug reporting and installation instructions work correctly regardless of where the tool is installed.
 
-**Enhanced Cursor Rules Update System:**
-- The `init_cursor_rules` function now intelligently detects and updates outdated sections, not just missing ones. This ensures that existing installations automatically get the latest rules (such as the critical bug reporting requirements) when they update `todo.ai`.
-- When cursor rules are updated, comprehensive prompts are now displayed for both humans and AI agents, clearly explaining that rules only take effect in new chat sessions.
-- The update process now includes automatic cursor rules updates, ensuring users always have the latest rules after updating `todo.ai`.
-
-**Better User Experience:**
-- Clear, actionable instructions are provided when cursor rules are updated, explaining the need to start a new chat session.
-- AI agents are explicitly instructed to inform users about rule updates and request a new session.
-- This prevents confusion when agents bypass required workflows (like using `./todo.ai report-bug` instead of directly creating GitHub issues).
-
-**Usage:**
-
-For AI Agents:
-```
-When cursor rules are updated, inform the user:
-"Cursor rules have been updated. Please start a new chat session for the updated rules to take effect."
-```
-
-For Humans:
-```
-Start a new chat session in Cursor after updating todo.ai to ensure the latest rules are applied.
-```
-
-**Note:** This release ensures that the critical bug reporting requirements (requiring `./todo.ai report-bug` instead of direct `gh issue create`) are automatically updated in all installations, preventing agents from bypassing the bug reporting workflow.
+All documentation has been updated to reflect the new `.cursor/rules/` structure, and the release process now correctly identifies cursor rule changes as backend infrastructure updates.

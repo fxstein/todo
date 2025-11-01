@@ -12,7 +12,7 @@
   - [ ] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code`
   - [ ] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs`
   - [ ] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research`
-- [ ] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration`
+- [x] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration`
   - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code`
   - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs`
   - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs`
@@ -168,7 +168,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 22:46:04 CET 2025
+**Last Updated:** Sat Nov  1 22:47:33 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

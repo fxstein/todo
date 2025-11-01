@@ -33,6 +33,12 @@ Your task list becomes part of your project history, visible in pull requests, a
 
 ---
 
+## For AI Agents
+
+Run `./todo.ai --help` to see all available commands and usage examples. Everything you need to know is there.
+
+---
+
 ## For Humans
 
 With `todo.ai`, you simply tell your AI agent what you want in plain English. Your agent handles all the technical details automatically.

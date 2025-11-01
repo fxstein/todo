@@ -112,6 +112,25 @@ calculate_next_version() {
     echo "${major}.${minor}.${patch}"
 }
 
+# Get GitHub repository URL
+get_repo_url() {
+    local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
+    if [[ -z "$remote_url" ]]; then
+        echo "https://github.com/fxstein/todo.ai"
+        return
+    fi
+    
+    # Convert SSH URL to HTTPS if needed
+    if [[ "$remote_url" =~ git@github.com: ]]; then
+        remote_url=$(echo "$remote_url" | sed 's/git@github.com:/https:\/\/github.com\//')
+    fi
+    
+    # Remove .git suffix if present
+    remote_url=$(echo "$remote_url" | sed 's/\.git$//')
+    
+    echo "$remote_url"
+}
+
 # Generate release notes from commits
 generate_release_notes() {
     local last_tag="$1"
@@ -127,6 +146,7 @@ generate_release_notes() {
         commit_range="${last_tag}..HEAD"
     fi
     
+    local repo_url=$(get_repo_url)
     local temp_notes=$(mktemp)
     
     echo "## Release ${new_version}" > "$temp_notes"
@@ -148,9 +168,11 @@ generate_release_notes() {
     local other_commits=()
     
     while IFS= read -r commit; do
-        local commit_hash=$(echo "$commit" | cut -d'|' -f1)
+        local commit_short=$(echo "$commit" | cut -d'|' -f1)
+        local commit_full=$(git rev-parse "$commit_short" 2>/dev/null || echo "$commit_short")
         local commit_msg=$(echo "$commit" | cut -d'|' -f2- | sed 's/^ *//')
         local lower_msg=$(echo "$commit_msg" | tr '[:upper:]' '[:lower:]')
+        local commit_link="([${commit_short}](${repo_url}/commit/${commit_full}))"
         
         # Skip version bumps
         if [[ "$lower_msg" =~ ^bump.*version ]]; then
@@ -159,17 +181,17 @@ generate_release_notes() {
         
         if [[ "$lower_msg" =~ (breaking|break|major|!:) ]] || 
            [[ "$lower_msg" =~ ^(feat|fix|refactor|perf)!: ]]; then
-            breaking_commits+=("- ${commit_msg}")
+            breaking_commits+=("- ${commit_msg} ${commit_link}")
         elif [[ "$lower_msg" =~ ^(feat|feature): ]] || 
              [[ "$lower_msg" =~ (add|new|implement|create|support) ]]; then
-            added_commits+=("- ${commit_msg}")
+            added_commits+=("- ${commit_msg} ${commit_link}")
         elif [[ "$lower_msg" =~ (change|update|refactor|improve|enhance|modify) ]]; then
-            changed_commits+=("- ${commit_msg}")
+            changed_commits+=("- ${commit_msg} ${commit_link}")
         elif [[ "$lower_msg" =~ ^(fix|bugfix|patch): ]] || 
              [[ "$lower_msg" =~ (fix|bug|patch|hotfix|correct) ]]; then
-            fixed_commits+=("- ${commit_msg}")
+            fixed_commits+=("- ${commit_msg} ${commit_link}")
         else
-            other_commits+=("- ${commit_msg}")
+            other_commits+=("- ${commit_msg} ${commit_link}")
         fi
     done < <(git log "$commit_range" --pretty=format:"%h|%s" --no-merges 2>/dev/null || echo "")
     

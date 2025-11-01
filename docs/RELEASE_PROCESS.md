@@ -145,26 +145,29 @@ release summaries. When using AI agents like Cursor, agents can now
 automatically generate a 2-3 paragraph human-readable summary that 
 highlights key improvements and user-facing benefits...
 
-Additionally, a critical bug fix ensures that version updates only 
-replace actual `VERSION=` variable assignments...
+Additionally, a critical bug fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...)) 
+ensures that version updates only replace actual `VERSION=` variable 
+assignments...
 
 ---
 
 ### Added
-- Add support for AI-generated human-readable release summaries
-- Add release summary for testing AI-generated summary feature
+- Add support for AI-generated human-readable release summaries ([dcbcb66](https://github.com/fxstein/todo.ai/commit/dcbcb66...))
+- Add release summary for testing AI-generated summary feature ([99475d2](https://github.com/fxstein/todo.ai/commit/99475d2...))
 
 ### Changed
-- Update version to 1.1.0 to match release
+- Update version to 1.1.0 to match release ([f3eaeac](https://github.com/fxstein/todo.ai/commit/f3eaeac...))
 
 ### Fixed
-- Fix version update to only replace VERSION assignments
+- Fix version update to only replace VERSION assignments ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...))
 
 ### Other
-- Document AI-generated release summary feature
+- Document AI-generated release summary feature ([9429c14](https://github.com/fxstein/todo.ai/commit/9429c14...))
 
 *Total commits: 5*
 ```
+
+**Note:** All commits in the release notes automatically include GitHub commit links with short hash for readability.
 
 **Creating an AI-generated summary:**
 
@@ -176,17 +179,26 @@ human-readable summaries and fixes a critical bug in the version update
 mechanism.
 
 The most significant improvement is the introduction of AI-generated 
-release summaries. When using AI agents like Cursor, agents can now 
-automatically generate a 2-3 paragraph human-readable summary that 
-highlights key improvements and user-facing benefits. This summary 
-appears at the top of release notes, making them much more accessible 
-and informative than raw commit lists alone.
+release summaries ([dcbcb66](https://github.com/fxstein/todo.ai/commit/dcbcb66...)). 
+When using AI agents like Cursor, agents can now automatically generate 
+a 2-3 paragraph human-readable summary that highlights key improvements 
+and user-facing benefits. This summary appears at the top of release notes, 
+making them much more accessible and informative than raw commit lists alone.
 
-Additionally, a critical bug fix ensures that version updates only 
-replace actual `VERSION=` variable assignments, not all occurrences 
-throughout the codebase. This prevents accidental corruption of grep 
-patterns and other code that might contain version-like strings.
+Additionally, a critical bug fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...)) 
+ensures that version updates only replace actual `VERSION=` variable 
+assignments, not all occurrences throughout the codebase. This prevents 
+accidental corruption of grep patterns and other code that might contain 
+version-like strings.
 ```
+
+**Including commit links in summaries:**
+
+When referencing specific commits in summaries, use this format:
+- `([short-hash](https://github.com/user/repo/commit/full-hash))`
+- Get the repo URL with: `git remote get-url origin` (convert SSH to HTTPS if needed)
+- Get full commit hash: `git rev-parse <short-hash>`
+- Example: `The fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6a1c2...)) resolves...`
 
 **Guidelines for summary writing:**
 - Focus on user-facing benefits and improvements
@@ -194,6 +206,7 @@ patterns and other code that might contain version-like strings.
 - Use 2-3 paragraphs (not too short, not too long)
 - Write in plain language (avoid overly technical jargon)
 - Highlight the most important changes first
+- Optionally include commit links for key changes: `([hash](https://github.com/user/repo/commit/fullhash))`
 
 ### Human Review Safeguards
 

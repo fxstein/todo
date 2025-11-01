@@ -177,130 +177,36 @@ EOF
 
 # Function to ensure Cursor rules include todo.ai requirement
 init_cursor_rules() {
+    local rules_dir="$(pwd)/.cursor/rules"
     local cursor_rules_file="$(pwd)/.cursorrules"
-    local todo_rule="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools"
-    local commit_rule="TODO.md and .todo.ai/ must always be committed together"
-    local archive_rule="Always ask for user confirmation before archiving completed tasks using todo.ai"
-    local bug_report_rule_suggest="When todo.ai encounters errors: Always suggest bug reporting to the user"
-    local bug_report_rule_never="When todo.ai encounters errors: Never automatically send bug reports to GitHub"
-    local bug_report_rule_confirm="When todo.ai encounters errors: Always require explicit user confirmation before any GitHub API calls"
-    local bug_report_rule_preview="When todo.ai encounters errors: Show preview of bug report before asking for confirmation"
-    local bug_report_rule_privacy="When todo.ai encounters errors: For private repositories, remove all repo identifiers"
-    local rules_added=0
+    local rules_created=0
+    local rules_updated=0
     
-    # Check if .cursorrules exists
-    if [[ ! -f "$cursor_rules_file" ]]; then
-        # Create .cursorrules with todo.ai rules
-        cat > "$cursor_rules_file" << 'EOF'
-## Task Management
-It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
+    # If .cursorrules exists but .cursor/rules/ doesn't, let migration handle it
+    if [[ -f "$cursor_rules_file" ]] && [[ ! -d "$rules_dir" ]]; then
+        # Migration will handle the conversion, we just need to ensure rules directory exists
+        mkdir -p "$rules_dir" 2>/dev/null || return 1
+        return 0
+    fi
+    
+    # Create .cursor/rules/ directory if it doesn't exist
+    mkdir -p "$rules_dir" 2>/dev/null || return 1
+    
+    # Define end-user rule files (shipped with tool)
+    local task_mgmt_file="${rules_dir}/todo.ai-task-management.mdc"
+    local installation_file="${rules_dir}/todo.ai-installation.mdc"
+    local bug_reporting_file="${rules_dir}/todo.ai-bug-reporting.mdc"
+    
+    # Task Management rule content
+    local task_mgmt_content="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo.ai/ must always be committed together
-Always ask for user confirmation before archiving completed tasks using todo.ai
-
-## Bug Reporting
-When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:
-
-**CRITICAL REQUIREMENTS:**
-1. **MUST use \`./todo.ai report-bug\` command** - This is the ONLY way to report bugs about todo.ai
-2. **NEVER use \`gh issue create\` directly** - This bypasses all safeguards and duplicate detection
-3. **NEVER use GitHub API directly** for bug reports - Always go through the bug reporting feature
-4. Always require explicit user confirmation before any GitHub API calls
-5. Show preview of bug report before asking for confirmation
-6. Respect privacy: For private repositories, remove all repo identifiers
-
-**Usage:**
-\`\`\`bash
-./todo.ai report-bug "Error description" "Error context" "command"
-\`\`\`
-
-**Examples:**
-- ✅ User says "report a bug about X": Use \`./todo.ai report-bug "X" "context" "command"\`
-- ✅ "An error occurred. Would you like me to report this bug?" → If yes, use \`./todo.ai report-bug\`
-- ❌ "Error occurred. Automatically reporting to GitHub..." (NEVER DO THIS)
-- ❌ Using \`gh issue create\` directly for bug reports (NEVER DO THIS)
-- ❌ Creating GitHub issues manually with \`gh CLI\` for todo.ai bugs (NEVER DO THIS)
-
-**Why this is required:**
-- The bug reporting feature includes duplicate detection
-- It ensures proper formatting and context collection
-- It maintains user control and privacy protection
-- It follows the designed workflow for bug tracking
-EOF
-        echo ""
-        echo "⚠️  IMPORTANT: Created .cursorrules file"
-        echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
-        echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
-        echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
-        echo "   This ensures AI agents will automatically use todo.ai for task tracking"
-        echo ""
-        echo "   🔄 ACTION REQUIRED: Cursor rules file created!"
-        echo ""
-        echo "   For Humans:"
-        echo "   → Please start a new chat session in Cursor"
-        echo "   → Cursor only loads .cursorrules at the start of each chat session"
-        echo "   → The rules will not apply to your current session"
-        echo ""
-        echo "   For AI Agents:"
-        echo "   → Inform the user that cursor rules have been created"
-        echo "   → Request that the user start a new chat session"
-        echo "   → The rules will only take effect in a new session"
-        return 0
-    fi
+Always ask for user confirmation before archiving completed tasks using todo.ai"
     
-    # Check if rules already exist
-    local todo_rule_exists=false
-    local commit_rule_exists=false
-    local archive_rule_exists=false
-    local bug_report_section_exists=false
-    local bug_report_section_up_to_date=false
+    # Installation rule content
+    local installation_content="When installing todo.ai from https://github.com/fxstein/todo.ai, use curl to download the single file: \`curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai\`. Do NOT clone the repository with git clone - only the single todo.ai file is needed."
     
-    if grep -q "todo.ai" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
-        todo_rule_exists=true
-    fi
-    
-    if grep -q "TODO.md and .todo.ai" "$cursor_rules_file" || grep -q "committed together" "$cursor_rules_file"; then
-        commit_rule_exists=true
-    fi
-    
-    if grep -q "archiving completed tasks" "$cursor_rules_file" || grep -q "confirmation before archiving" "$cursor_rules_file"; then
-        archive_rule_exists=true
-    fi
-    
-    if grep -q "^## Bug Reporting" "$cursor_rules_file"; then
-        bug_report_section_exists=true
-        # Check if Bug Reporting section is up to date (contains new key indicators)
-        if grep -q "CRITICAL REQUIREMENTS" "$cursor_rules_file" && grep -q "MUST use.*report-bug" "$cursor_rules_file" && grep -q "NEVER use.*gh issue create" "$cursor_rules_file"; then
-            bug_report_section_up_to_date=true
-        fi
-    fi
-    
-    # If all rules exist and are up to date, nothing to do
-    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]] && [[ "$bug_report_section_exists" == true ]] && [[ "$bug_report_section_up_to_date" == true ]]; then
-        return 0
-    fi
-    
-    # Add rule to existing file (append after last line or in a new section)
-    local section_added=false
-    if ! grep -q "^## Task Management" "$cursor_rules_file"; then
-        # Add new section at the end
-        echo "" >> "$cursor_rules_file"
-        echo "## Task Management" >> "$cursor_rules_file"
-        section_added=true
-    fi
-    
-    # Update or add Bug Reporting section
-    if [[ "$bug_report_section_exists" == true ]] && [[ "$bug_report_section_up_to_date" == false ]]; then
-        # Section exists but is outdated - replace it
-        local bug_report_start=$(grep -n "^## Bug Reporting" "$cursor_rules_file" | head -1 | cut -d: -f1)
-        local bug_report_end=$(awk "NR>$bug_report_start && /^## / {print NR-1; exit}" "$cursor_rules_file" || echo "")
-        if [[ -z "$bug_report_end" ]]; then
-            # Bug Reporting is the last section, replace to end of file
-            bug_report_end=$(wc -l < "$cursor_rules_file" | tr -d ' ')
-        fi
-        
-        # Create new section content
-        local new_section="## Bug Reporting
-When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:
+    # Bug Reporting rule content
+    local bug_reporting_content="When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:
 
 **CRITICAL REQUIREMENTS:**
 1. **MUST use \`./todo.ai report-bug\` command** - This is the ONLY way to report bugs about todo.ai
@@ -327,145 +233,108 @@ When todo.ai encounters errors or unexpected behavior, or when the user asks to 
 - It ensures proper formatting and context collection
 - It maintains user control and privacy protection
 - It follows the designed workflow for bug tracking"
-        
-        # Replace the section
-        if [[ "$(uname)" == "Darwin" ]]; then
-            local temp_file=$(mktemp)
-            head -n $((bug_report_start - 1)) "$cursor_rules_file" > "$temp_file" 2>/dev/null || true
-            echo "" >> "$temp_file"
-            echo "$new_section" >> "$temp_file"
-            if [[ $bug_report_end -lt $(wc -l < "$cursor_rules_file" | tr -d ' ') ]]; then
-                tail -n +$((bug_report_end + 1)) "$cursor_rules_file" >> "$temp_file" 2>/dev/null || true
-            fi
-            mv "$temp_file" "$cursor_rules_file"
-        else
-            # Linux: use sed to replace the section
-            sed_inplace "${bug_report_start},${bug_report_end}d" "$cursor_rules_file"
-            sed_inplace "${bug_report_start}i\\
-$new_section" "$cursor_rules_file"
-        fi
-        echo ""
-        echo "⚠️  IMPORTANT: Updated .cursorrules file"
-        echo "   📝 Updated '## Bug Reporting' section with latest rules"
-        echo ""
-        echo "   🔄 ACTION REQUIRED: Cursor rules have been updated!"
-        echo ""
-        echo "   For Humans:"
-        echo "   → Please start a new chat session in Cursor"
-        echo "   → Cursor only loads .cursorrules at the start of each chat session"
-        echo "   → The updated rules will not apply to your current session"
-        echo ""
-        echo "   For AI Agents:"
-        echo "   → Inform the user that cursor rules have been updated"
-        echo "   → Request that the user start a new chat session"
-        echo "   → The new rules will only take effect in a new session"
-    elif [[ "$bug_report_section_exists" == false ]]; then
-        # Section doesn't exist - add it
-        echo "" >> "$cursor_rules_file"
-        echo "## Bug Reporting" >> "$cursor_rules_file"
-        echo "When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:" >> "$cursor_rules_file"
-        echo "" >> "$cursor_rules_file"
-        echo "**CRITICAL REQUIREMENTS:**" >> "$cursor_rules_file"
-        echo "1. **MUST use \`./todo.ai report-bug\` command** - This is the ONLY way to report bugs about todo.ai" >> "$cursor_rules_file"
-        echo "2. **NEVER use \`gh issue create\` directly** - This bypasses all safeguards and duplicate detection" >> "$cursor_rules_file"
-        echo "3. **NEVER use GitHub API directly** for bug reports - Always go through the bug reporting feature" >> "$cursor_rules_file"
-        echo "4. Always require explicit user confirmation before any GitHub API calls" >> "$cursor_rules_file"
-        echo "5. Show preview of bug report before asking for confirmation" >> "$cursor_rules_file"
-        echo "6. Respect privacy: For private repositories, remove all repo identifiers" >> "$cursor_rules_file"
-        echo "" >> "$cursor_rules_file"
-        echo "**Usage:**" >> "$cursor_rules_file"
-        echo "\`\`\`bash" >> "$cursor_rules_file"
-        echo "./todo.ai report-bug \"Error description\" \"Error context\" \"command\"" >> "$cursor_rules_file"
-        echo "\`\`\`" >> "$cursor_rules_file"
-        echo "" >> "$cursor_rules_file"
-        echo "**Examples:**" >> "$cursor_rules_file"
-        echo "- ✅ User says \"report a bug about X\": Use \`./todo.ai report-bug \"X\" \"context\" \"command\"\`" >> "$cursor_rules_file"
-        echo "- ✅ \"An error occurred. Would you like me to report this bug?\" → If yes, use \`./todo.ai report-bug\`" >> "$cursor_rules_file"
-        echo "- ❌ \"Error occurred. Automatically reporting to GitHub...\" (NEVER DO THIS)" >> "$cursor_rules_file"
-        echo "- ❌ Using \`gh issue create\` directly for bug reports (NEVER DO THIS)" >> "$cursor_rules_file"
-        echo "- ❌ Creating GitHub issues manually with \`gh CLI\` for todo.ai bugs (NEVER DO THIS)" >> "$cursor_rules_file"
-        echo "" >> "$cursor_rules_file"
-        echo "**Why this is required:**" >> "$cursor_rules_file"
-        echo "- The bug reporting feature includes duplicate detection" >> "$cursor_rules_file"
-        echo "- It ensures proper formatting and context collection" >> "$cursor_rules_file"
-        echo "- It maintains user control and privacy protection" >> "$cursor_rules_file"
-        echo "- It follows the designed workflow for bug tracking" >> "$cursor_rules_file"
-        bug_report_section_exists=true
-    fi
     
-    # Add the rules (check if we need to add them to existing section)
-    if grep -q "^## Task Management" "$cursor_rules_file"; then
-        # Find the line number of "## Task Management"
-        local section_line=$(grep -n "^## Task Management" "$cursor_rules_file" | head -1 | cut -d: -f1)
-        if [[ -n "$section_line" ]]; then
-            # Build list of rules to add
-            local rules_to_add=()
-            
-            if [[ "$todo_rule_exists" == false ]]; then
-                rules_to_add+=("$todo_rule")
-            fi
-            
-            if [[ "$commit_rule_exists" == false ]]; then
-                rules_to_add+=("$commit_rule")
-            fi
-            
-            if [[ "$archive_rule_exists" == false ]]; then
-                rules_to_add+=("$archive_rule")
-            fi
-            
-            # Add rules after the section header
-            if [[ ${#rules_to_add[@]} -gt 0 ]]; then
-                if [[ "$(uname)" == "Darwin" ]]; then
-                    local temp_file=$(mktemp)
-                    head -n "$section_line" "$cursor_rules_file" > "$temp_file"
-                    for rule in "${rules_to_add[@]}"; do
-                        echo "$rule" >> "$temp_file"
-                    done
-                    tail -n +$((section_line + 1)) "$cursor_rules_file" >> "$temp_file"
-                    mv "$temp_file" "$cursor_rules_file"
-                    rules_added=${#rules_to_add[@]}
-                else
-                    local last_line=$section_line
-                    for rule in "${rules_to_add[@]}"; do
-                        last_line=$((last_line + 1))
-                        sed_inplace "${last_line}a$rule" "$cursor_rules_file"
-                        rules_added=$((rules_added + 1))
-                    done
-                fi
-            fi
+    # Create or update Task Management rule
+    if [[ ! -f "$task_mgmt_file" ]]; then
+        cat > "$task_mgmt_file" << EOF
+---
+description: "Task management rules for todo.ai"
+alwaysApply: true
+---
+$task_mgmt_content
+EOF
+        rules_created=$((rules_created + 1))
+    else
+        # Check if rule is up to date (contains key indicators)
+        if ! grep -q "track tasks" "$task_mgmt_file" || ! grep -q "committed together" "$task_mgmt_file" || ! grep -q "archiving completed tasks" "$task_mgmt_file"; then
+            # Update existing file
+            cat > "$task_mgmt_file" << EOF
+---
+description: "Task management rules for todo.ai"
+alwaysApply: true
+---
+$task_mgmt_content
+EOF
+            rules_updated=$((rules_updated + 1))
         fi
     fi
     
-    # Show explicit callouts
-    if [[ $rules_added -gt 0 ]]; then
+    # Create or update Installation rule
+    if [[ ! -f "$installation_file" ]]; then
+        cat > "$installation_file" << EOF
+---
+description: "Installation instructions for todo.ai"
+alwaysApply: true
+---
+$installation_content
+EOF
+        rules_created=$((rules_created + 1))
+    else
+        # Check if rule is up to date
+        if ! grep -q "curl -o todo.ai" "$installation_file"; then
+            # Update existing file
+            cat > "$installation_file" << EOF
+---
+description: "Installation instructions for todo.ai"
+alwaysApply: true
+---
+$installation_content
+EOF
+            rules_updated=$((rules_updated + 1))
+        fi
+    fi
+    
+    # Create or update Bug Reporting rule
+    if [[ ! -f "$bug_reporting_file" ]]; then
+        cat > "$bug_reporting_file" << EOF
+---
+description: "Bug reporting rules for todo.ai"
+alwaysApply: true
+---
+$bug_reporting_content
+EOF
+        rules_created=$((rules_created + 1))
+    else
+        # Check if rule is up to date (contains key indicators)
+        if ! grep -q "CRITICAL REQUIREMENTS" "$bug_reporting_file" || ! grep -q "MUST use.*report-bug" "$bug_reporting_file" || ! grep -q "NEVER use.*gh issue create" "$bug_reporting_file"; then
+            # Update existing file
+            cat > "$bug_reporting_file" << EOF
+---
+description: "Bug reporting rules for todo.ai"
+alwaysApply: true
+---
+$bug_reporting_content
+EOF
+            rules_updated=$((rules_updated + 1))
+        fi
+    fi
+    
+    # Show feedback if rules were created or updated
+    if [[ $rules_created -gt 0 ]] || [[ $rules_updated -gt 0 ]]; then
         echo ""
-        echo "⚠️  IMPORTANT: Updated .cursorrules file"
-        if [[ "$section_added" == true ]]; then
-            echo "   📝 Added new section: '## Task Management'"
+        echo "⚠️  IMPORTANT: Cursor rules initialized"
+        if [[ $rules_created -gt 0 ]]; then
+            echo "   📝 Created $rules_created rule file(s) in .cursor/rules/"
         fi
-        if [[ "$todo_rule_exists" == false ]]; then
-            echo "   📝 Added rule: 'It is required to track tasks and subtasks using todo.ai and not via built in TODO tools'"
-        fi
-        if [[ "$commit_rule_exists" == false ]]; then
-            echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
-        fi
-        if [[ "$archive_rule_exists" == false ]]; then
-            echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
+        if [[ $rules_updated -gt 0 ]]; then
+            echo "   📝 Updated $rules_updated rule file(s) in .cursor/rules/"
         fi
         echo "   This ensures AI agents will automatically use todo.ai for task tracking"
         echo ""
-        echo "   🔄 ACTION REQUIRED: Cursor rules have been updated!"
+        echo "   🔄 ACTION REQUIRED: Cursor rules have been initialized!"
         echo ""
         echo "   For Humans:"
         echo "   → Please start a new chat session in Cursor"
-        echo "   → Cursor only loads .cursorrules at the start of each chat session"
-        echo "   → The updated rules will not apply to your current session"
+        echo "   → Cursor only loads rules at the start of each chat session"
+        echo "   → The rules will not apply to your current session"
         echo ""
         echo "   For AI Agents:"
-        echo "   → Inform the user that cursor rules have been updated"
+        echo "   → Inform the user that cursor rules have been initialized"
         echo "   → Request that the user start a new chat session"
-        echo "   → The new rules will only take effect in a new session"
+        echo "   → The rules will only take effect in a new session"
     fi
+    
+    return 0
 }
 
 # Function to get current serial number

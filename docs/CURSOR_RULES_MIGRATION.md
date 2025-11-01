@@ -120,14 +120,164 @@
 - **No Breaking Changes**: Both formats will work during transition
 - **Automatic Migration**: Need to migrate existing `.cursorrules` files on update
 
+### Installation Path Management Challenge (Task #44.9)
+
+**Problem Statement:**
+
+Cursor rules reference `todo.ai` with hardcoded paths that don't work across all installation scenarios:
+
+**Current Hardcoded References:**
+- **Bug Reporting Rule**: `./todo.ai report-bug` - assumes tool is in current directory
+- **Installation Rule**: `curl -o todo.ai` - assumes tool will be in current directory
+
+**Installation Scenarios:**
+
+1. **Developer Repo** (todo.ai repository):
+   - Tool location: `./todo.ai` (repo root)
+   - Works with current hardcoded paths
+   - Repo already has `.cursor/rules/` structure
+
+2. **Standard User Installations**:
+   - Tool location varies:
+     - `~/bin/todo.ai` (user bin directory)
+     - `/usr/local/bin/todo.ai` (system-wide)
+     - `~/projects/myproject/todo.ai` (project-specific)
+     - `/opt/todo.ai` (custom location)
+     - Any other user-defined path
+   - Current hardcoded paths fail in most cases
+
+**Impact:**
+
+1. **Bug Reporting Rule**: Fails when tool is not in current directory
+   - Agent tries to run `./todo.ai report-bug`
+   - Command fails: `./todo.ai: No such file or directory`
+   - Feature becomes unusable
+
+2. **Installation Rule**: Works for initial install but not for updates
+   - Initial install: `curl -o todo.ai` works if user is in desired directory
+   - Updates: Need to know where tool is installed to update it
+   - Rule doesn't specify installation location
+
+**Solution Requirements:**
+
+1. **Path Detection**:
+   - During `init_cursor_rules()` execution, detect where `todo.ai` is actually installed
+   - Options:
+     - Use `which todo.ai` if tool is in PATH
+     - Use script's own path (`$0` or `$BASH_SOURCE`)
+     - Check common locations (`./todo.ai`, `~/bin/todo.ai`, etc.)
+     - Allow user configuration
+
+2. **Dynamic Path Substitution**:
+   - Store detected path in rule files
+   - Use detected path instead of hardcoded `./todo.ai`
+   - Update paths when rules are refreshed
+
+3. **Path Handling Strategies**:
+   - **Relative paths**: If tool is in same directory as project, use `./todo.ai`
+   - **PATH-based**: If tool is in PATH, use `todo.ai` (no path needed)
+   - **Absolute paths**: If tool is at fixed location, use full path
+   - **Smart detection**: Try multiple strategies in order of preference
+
+**Implementation Approach:**
+
+1. **Add Path Detection Function**:
+   ```zsh
+   get_todo_ai_path() {
+       # Strategy 1: Script's own location (most reliable)
+       local script_path=$(realpath "$0" 2>/dev/null || echo "$0")
+       
+       # Strategy 2: Check if in PATH (works for global installs)
+       if command -v todo.ai >/dev/null 2>&1; then
+           local path_location=$(which todo.ai)
+           # If in a standard bin directory, just use "todo.ai"
+           if [[ "$path_location" == *"/bin/todo.ai" ]]; then
+               echo "todo.ai"  # Just use command name
+               return 0
+           fi
+       fi
+       
+       # Strategy 3: Use script location
+       echo "$script_path"
+   }
+   ```
+
+2. **Update Rule Generation**:
+   - Call `get_todo_ai_path()` during rule creation
+   - Substitute detected path in rule templates
+   - Store path in rule files
+
+3. **Path Resolution in Rules**:
+   - **Bug Reporting Rule**: Replace `./todo.ai report-bug` with `${TODO_AI_PATH} report-bug`
+   - **Installation Rule**: Update instructions to show how to install to detected location
+   - Handle special case: If in developer repo, keep `./todo.ai`
+
+4. **Repository Context Detection**:
+   - Check if we're in the todo.ai developer repo
+   - If yes, use `./todo.ai` (current behavior)
+   - If no, detect installation path
+
+**Edge Cases:**
+
+1. **Tool not in PATH**:
+   - Must use full or relative path
+   - User needs to specify location
+
+2. **Multiple installations**:
+   - Detect which one is "active" (the one being run)
+   - Use that path
+
+3. **Developer repo vs. user install**:
+   - Different rules: Developer repo uses `./todo.ai`
+   - User installs use detected path
+
+4. **Symlinks**:
+   - Follow symlinks to find actual location
+   - Use resolved path
+
+5. **Updates**:
+   - Re-detect path after update
+   - Update rules with new path if location changed
+
+**Example Rule Output:**
+
+**Before (hardcoded):**
+```markdown
+./todo.ai report-bug "Error description" "Error context" "command"
+```
+
+**After (dynamic):**
+```markdown
+# Path detected during rule initialization: ~/bin/todo.ai
+~/bin/todo.ai report-bug "Error description" "Error context" "command"
+
+# Or if in PATH:
+todo.ai report-bug "Error description" "Error context" "command"
+
+# Or if in developer repo:
+./todo.ai report-bug "Error description" "Error context" "command"
+```
+
+**Implementation Priority:**
+
+This is a **critical requirement** because:
+- Bug reporting feature fails without correct path
+- Installation instructions are incomplete
+- Rules become unusable for most users
+- Affects core functionality
+
+**Related Tasks:**
+- Task #44.9: Manage installation path of tool relative to cursor rules
+
 ### Next Steps
 
 1. ✅ Verify official implementation (Task #44.1) - **COMPLETE**
-2. Create design document (Task #44.2)
-3. Implement migration logic (Task #44.3)
-4. Update `init_cursor_rules` function (Task #44.4)
-5. Create migration for existing installations (Task #44.5)
+2. ✅ Create design document (Task #44.2) - **COMPLETE**
+3. ✅ Implement migration logic (Task #44.3) - **COMPLETE**
+4. ✅ Update `init_cursor_rules` function (Task #44.4) - **COMPLETE**
+5. ✅ Create migration for existing installations (Task #44.5) - **COMPLETE**
 6. Test migration (Task #44.6)
 7. Update documentation (Task #44.7)
 8. Update release process docs (Task #44.8)
+9. Manage installation path of tool relative to cursor rules (Task #44.9)
 

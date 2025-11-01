@@ -1,0 +1,18 @@
+---
+description: "Repository context for todo.ai development environment"
+alwaysApply: true
+---
+
+This is the development repository for todo.ai itself. We are developing the tool here, NOT installing it.
+
+**Important Rules:**
+- Do NOT run installation commands (curl, download) - the tool is already present in this repo
+- The `todo.ai` file in this directory IS the tool being developed
+- Avoid circular references: don't try to install/update todo.ai when already in the todo.ai repo
+- This repository contains the source code, documentation, and development tools for todo.ai
+
+**When working in this repository:**
+- You are working ON the tool, not WITH the tool
+- The `todo.ai` script in the root directory is the active development version
+- Changes here will be released to end users via GitHub releases
+- Follow the commit prefix guidelines in `commit-prefixes.mdc` for proper release numbering

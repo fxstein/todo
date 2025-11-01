@@ -1,0 +1,24 @@
+---
+description: "Release process for todo.ai development"
+alwaysApply: true
+---
+When the user says "Release todo.ai" or similar:
+
+1. **Generate a human-readable release summary** by analyzing commits since the last release
+   - Review the commit messages to understand the changes
+   - Write a 2-3 paragraph summary highlighting the key improvements, new features, and important changes
+   - Focus on user-facing benefits and notable improvements
+   - Optionally include commit links: `([hash](https://github.com/user/repo/commit/fullhash))` when referencing specific commits
+   - Get the repo URL: `git remote get-url origin` and convert SSH to HTTPS if needed
+   - Save the summary to `release/RELEASE_SUMMARY.md`
+
+2. **Run the intelligent release script** with the summary: `./release/release.sh --summary release/RELEASE_SUMMARY.md`
+   - The script will automatically analyze commits since the last release
+   - Determine version bump type (major/minor/patch) based on commit messages
+   - Generate detailed release notes from commits
+   - Include the AI-generated summary at the top of the release notes
+   - Ask for human review if it's a major release or has many commits (>10)
+   - Execute the release automatically after approval
+
+If the user requests a release review, show them the generated release notes and summary, then wait for approval before proceeding. For major releases or releases with >10 commits, always request human review before executing.
+

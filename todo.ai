@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 1.1.0
+# Version: 1.0.0
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -35,7 +35,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="1.1.0"
+VERSION="1.0.0"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -2130,7 +2130,7 @@ check_version() {
     
     if [[ -z "$remote_version" ]]; then
         # Try alternative extraction method
-        remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION="1.1.0"\([^"]*\)".*/\1/' || echo "")
+        remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
     fi
     
     if [[ -n "$remote_version" && "$remote_version" != "$VERSION" ]]; then
@@ -2198,7 +2198,7 @@ list_backups() {
     for backup in "${sorted_backups[@]}"; do
         local filename=$(basename "$backup")
         local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
-        local version=$(grep -i "VERSION="1.1.0"$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+        local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
         local date_str=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$backup" 2>/dev/null || stat -c "%y" "$backup" 2>/dev/null | cut -d'.' -f1 || echo "unknown")
         
         if [[ $index -eq 1 ]]; then
@@ -2254,7 +2254,7 @@ rollback() {
         for backup in "${sorted_backups[@]}"; do
             local filename=$(basename "$backup")
             local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
-            local version=$(grep -i "VERSION="1.1.0"$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
+            local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
             
             if [[ "$timestamp" == "$search_term" ]] || [[ "$version" == "$search_term" ]]; then
                 target_backup="$backup"
@@ -2275,7 +2275,7 @@ rollback() {
     fi
     
     # Confirm rollback
-    local backup_version=$(grep -i "VERSION="1.1.0"$target_backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+    local backup_version=$(grep -i "VERSION=" "$target_backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
     local current_version="$VERSION"
     local backup_name=$(basename "$target_backup")
     
@@ -2332,7 +2332,7 @@ update_tool() {
     fi
     
     # Check if already at latest version
-    local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION="1.1.0"\([^"]*\)".*/\1/' || echo "")
+    local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
     
     # If version matches, check content hash to detect changes even with same version
     if [[ -n "$remote_version" ]] && [[ "$remote_version" == "$VERSION" ]]; then
@@ -2438,7 +2438,7 @@ update_tool() {
             chmod +x "$script_path"
             
             # Get new version
-            local new_version=$(grep -i "VERSION="1.1.0"$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+            local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
             
             echo "✅ Updated todo.ai to version $new_version"
             if [[ -f "$backup_file" ]]; then

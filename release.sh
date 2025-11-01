@@ -212,11 +212,13 @@ update_version() {
         sed_flag="-i"
     fi
     
-    sed $sed_flag "s/VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
-    sed $sed_flag "s/# Version: [0-9.]*/# Version: $new_version/" todo.ai
+    # Update VERSION variable (line starting with VERSION=)
+    sed $sed_flag "s/^VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
+    # Update Version comment (line starting with # Version:)
+    sed $sed_flag "s/^# Version: [0-9.]*/# Version: $new_version/" todo.ai
     
     # Verify
-    if ! grep -q "VERSION=\"$new_version\"" todo.ai; then
+    if ! grep -q "^VERSION=\"$new_version\"" todo.ai; then
         echo -e "${RED}❌ Error: Version update failed${NC}"
         exit 1
     fi

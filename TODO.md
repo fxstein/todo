@@ -6,8 +6,8 @@
 - [ ] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature`
   - [x] **#37.12** Update release process documentation to include migration workflow
   - [x] **#37.11** Document migration creation process for developers
-  - [ ] **#37.10** Test migration system with real TODO.md files (wrong section order)
-  - [ ] **#37.9** Create integration tests for migration execution during update
+  - [x] **#37.10** Test migration system with real TODO.md files (wrong section order)
+  - [x] **#37.9** Create integration tests for migration execution during update
   - [x] **#37.8** Create unit tests for migration system (version comparison, idempotency)
   - [x] **#37.7** Add migration execution to script startup (after version check)
   - [x] **#37.6** Implement first migration: section order fix (v1.3.5)
@@ -33,6 +33,13 @@
 ------------------
 
 ## Recently Completed
+- [x] **#38** Fix orphaned subtasks bug: delete subtasks when deleting parent task `#bug` (2025-11-01)
+  - [x] **#38.6** Verify orphaned subtask detection still works correctly (2025-11-01)
+  - [x] **#38.5** Test deletion of subtask only (should not delete parent or siblings) (2025-11-01)
+  - [x] **#38.4** Test deletion of parent task with nested subtasks (2-level) (2025-11-01)
+  - [x] **#38.3** Test deletion of parent task with subtasks (verify subtasks deleted) (2025-11-01)
+  - [x] **#38.2** Implement automatic subtask deletion when deleting parent task (2025-11-01)
+  - [x] **#38.1** Analyze current delete_task function behavior (2025-11-01)
 - [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
 - [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#setup` `#git` (2025-11-01)
   - [ ] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (2025-11-01)
@@ -108,6 +115,16 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#40.1** Subtask A (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#40.2** Subtask B (deleted 2025-11-01, expires 2025-12-01)
+- [D] **#40** Test parent task 2 (deleted 2025-11-01, expires 2025-12-01)
+    - [D] **#41.1.1** Level 2 nested subtask (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
+- [D] **#41** Test parent for nested subtasks (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#39.2** Test subtask 2 (deleted 2025-11-01, expires 2025-12-01)
+    - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
+- [D] **#39** Test parent task for deletion bug fix (deleted 2025-11-01, expires 2025-12-01)
     - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
   - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#9** Test new formatting fix `#test` (deleted 2025-10-30, expires 2025-11-29)
@@ -121,7 +138,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 11:41:07 CET 2025
+**Last Updated:** Sat Nov  1 11:50:36 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

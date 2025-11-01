@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 1.4.0
+# Version: 1.3.4
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -1419,14 +1419,11 @@ delete_task() {
         fi
     done
     
-    # Automatically include subtasks when deleting parent tasks (tasks without dots)
-    # This prevents orphaned subtasks when a parent is deleted
-    local expanded_ids=()
-    for id in "${all_ids[@]}"; do
-        expanded_ids+=("$id")
-        # If this is a parent task (no dots), automatically find all subtasks
-        # If --with-subtasks flag is used, also include subtasks for subtasks (but that's unusual)
-        if [[ "$id" != *.* ]] || [[ "$with_subtasks" == "true" ]]; then
+    # If --with-subtasks, add all subtasks (including nested subtasks)
+    if [[ "$with_subtasks" == "true" ]]; then
+        local expanded_ids=()
+        for id in "${all_ids[@]}"; do
+            expanded_ids+=("$id")
             # Find all direct subtasks and nested subtasks
             while IFS= read -r line; do
                 # Extract task ID from line (handles nested IDs)
@@ -1438,9 +1435,9 @@ delete_task() {
                     fi
                 fi
             done < "$TODO_FILE"
-        fi
-    done
-    all_ids=("${expanded_ids[@]}")
+        done
+        all_ids=("${expanded_ids[@]}")
+    fi
     
     # Delete all tasks
     local deleted_count=0

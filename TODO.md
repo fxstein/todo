@@ -4,7 +4,7 @@
 
 ## Tasks
 - [ ] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration`
-  - [ ] **#44.9** Manage installation path of tool relative to cursor rules `#code`
+  - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code`
   - [ ] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs`
   - [ ] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs`
   - [ ] **#44.6** Test migration with existing .cursorrules files `#test`
@@ -159,7 +159,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 22:35:45 CET 2025
+**Last Updated:** Sat Nov  1 22:40:28 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

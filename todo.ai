@@ -182,6 +182,9 @@ init_cursor_rules() {
     local rules_created=0
     local rules_updated=0
     
+    # Detect installation path for dynamic substitution in rules
+    local todo_ai_path=$(get_todo_ai_path_for_rules)
+    
     # If .cursorrules exists but .cursor/rules/ doesn't, let migration handle it
     if [[ -f "$cursor_rules_file" ]] && [[ ! -d "$rules_dir" ]]; then
         # Migration will handle the conversion, we just need to ensure rules directory exists
@@ -202,14 +205,16 @@ init_cursor_rules() {
 TODO.md and .todo.ai/ must always be committed together
 Always ask for user confirmation before archiving completed tasks using todo.ai"
     
-    # Installation rule content
-    local installation_content="When installing todo.ai from https://github.com/fxstein/todo.ai, use curl to download the single file: \`curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai\`. Do NOT clone the repository with git clone - only the single todo.ai file is needed."
+    # Installation rule content (with detected path)
+    local installation_content="When installing todo.ai from https://github.com/fxstein/todo.ai, use curl to download the single file: \`curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai\`. Do NOT clone the repository with git clone - only the single todo.ai file is needed.
+
+To update an existing installation, run: \`$todo_ai_path update\`"
     
-    # Bug Reporting rule content
+    # Bug Reporting rule content (with detected path)
     local bug_reporting_content="When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:
 
 **CRITICAL REQUIREMENTS:**
-1. **MUST use \`./todo.ai report-bug\` command** - This is the ONLY way to report bugs about todo.ai
+1. **MUST use \`$todo_ai_path report-bug\` command** - This is the ONLY way to report bugs about todo.ai
 2. **NEVER use \`gh issue create\` directly** - This bypasses all safeguards and duplicate detection
 3. **NEVER use GitHub API directly** for bug reports - Always go through the bug reporting feature
 4. Always require explicit user confirmation before any GitHub API calls
@@ -218,12 +223,12 @@ Always ask for user confirmation before archiving completed tasks using todo.ai"
 
 **Usage:**
 \`\`\`bash
-./todo.ai report-bug \"Error description\" \"Error context\" \"command\"
+$todo_ai_path report-bug \"Error description\" \"Error context\" \"command\"
 \`\`\`
 
 **Examples:**
-- ✅ User says \"report a bug about X\": Use \`./todo.ai report-bug \"X\" \"context\" \"command\"\`
-- ✅ \"An error occurred. Would you like me to report this bug?\" → If yes, use \`./todo.ai report-bug\`
+- ✅ User says \"report a bug about X\": Use \`$todo_ai_path report-bug \"X\" \"context\" \"command\"\`
+- ✅ \"An error occurred. Would you like me to report this bug?\" → If yes, use \`$todo_ai_path report-bug\`
 - ❌ \"Error occurred. Automatically reporting to GitHub...\" (NEVER DO THIS)
 - ❌ Using \`gh issue create\` directly for bug reports (NEVER DO THIS)
 - ❌ Creating GitHub issues manually with \`gh CLI\` for todo.ai bugs (NEVER DO THIS)
@@ -2233,6 +2238,76 @@ get_script_path() {
     echo "$script_path"
 }
 
+# Function to get todo.ai path for cursor rules (handles different installation scenarios)
+get_todo_ai_path_for_rules() {
+    # Check if we're in the developer repo (todo.ai repository itself)
+    local is_dev_repo=false
+    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+        local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
+        if [[ -n "$remote_url" ]]; then
+            # Check if this is the todo.ai repository
+            # zsh regex: match array is stored in $match
+            if [[ "$remote_url" =~ github\.com[:/]([^/]+)/([^/]+)(\.git)?$ ]]; then
+                local repo_owner="${match[1]}"
+                local repo_name="${match[2]%.git}"
+                # Check if this is the fxstein/todo.ai repository
+                if [[ "$repo_name" == "todo.ai" ]] && [[ "$repo_owner" == "fxstein" ]]; then
+                    is_dev_repo=true
+                fi
+            fi
+        fi
+    fi
+    
+    # If in developer repo, use relative path (current behavior)
+    if [[ "$is_dev_repo" == true ]]; then
+        echo "./todo.ai"
+        return 0
+    fi
+    
+    # Strategy 1: Check if tool is in PATH (works for global installs)
+    if command -v todo.ai >/dev/null 2>&1; then
+        local path_location=$(which todo.ai 2>/dev/null || command -v todo.ai 2>/dev/null)
+        if [[ -n "$path_location" ]]; then
+            # If in a standard bin directory, just use command name (no path needed)
+            if [[ "$path_location" == *"/bin/todo.ai" ]] || [[ "$path_location" == *"/usr/local/bin/todo.ai" ]] || [[ "$path_location" == *"/usr/bin/todo.ai" ]]; then
+                echo "todo.ai"
+                return 0
+            fi
+        fi
+    fi
+    
+    # Strategy 2: Check if script is in current directory (project-specific install)
+    local current_dir="$(pwd)"
+    if [[ -f "${current_dir}/todo.ai" ]]; then
+        echo "./todo.ai"
+        return 0
+    fi
+    
+    # Strategy 3: Use script's own location (most reliable fallback)
+    local script_path
+    script_path=$(get_script_path) || {
+        # Fallback: try to detect from $0
+        if [[ -f "${0:a}" ]]; then
+            script_path="${0:a}"
+        else
+            echo "./todo.ai"  # Final fallback
+            return 0
+        fi
+    }
+    
+    # Convert absolute path to relative if possible
+    if [[ "$script_path" =~ ^"${current_dir}"/(.+) ]]; then
+        # Script is within current directory - use relative path
+        echo "./${match[1]}"
+    elif [[ "$script_path" =~ ^"${HOME}"/(.+) ]]; then
+        # Script is in home directory - use ~/path
+        echo "~/${match[1]}"
+    else
+        # Use absolute path as last resort
+        echo "$script_path"
+    fi
+}
+
 # Function to list available backups
 list_backups() {
     local backups_dir
@@ -2791,6 +2866,9 @@ generate_bug_report() {
     # Get current date/time
     local current_date=$(date '+%Y-%m-%d %H:%M:%S')
     
+    # Get todo.ai path for bug report (use detected path)
+    local todo_ai_path=$(get_todo_ai_path_for_rules 2>/dev/null || echo "./todo.ai")
+    
     # Build bug report
     local bug_report="## Bug Report
 
@@ -2806,7 +2884,7 @@ $error_message
 
 ### Command
 \`\`\`bash
-./todo.ai $command
+$todo_ai_path $command
 \`\`\`
 
 ### Error Context
@@ -3244,8 +3322,9 @@ report_bug() {
     local command="${3:-}"
     
     if [[ -z "$error_description" ]]; then
+        local todo_ai_path=$(get_todo_ai_path_for_rules 2>/dev/null || echo "./todo.ai")
         echo "Error: Please provide an error description"
-        echo "Usage: ./todo.ai report-bug \"Error description\" [error context] [command]"
+        echo "Usage: $todo_ai_path report-bug \"Error description\" [error context] [command]"
         return 1
     fi
     

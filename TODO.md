@@ -3,6 +3,15 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature`
+  - [ ] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test`
+  - [ ] **#47.7** Update help screen and documentation with feature request command `#docs`
+  - [ ] **#47.6** Integrate feature request rules into cursor rules (similar to bug reporting rules) `#code`
+  - [ ] **#47.5** Add manual confirmation requirement (always ask before creating feature request) `#code`
+  - [ ] **#47.4** Implement 'me too' reply for existing feature requests `#code`
+  - [ ] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code`
+  - [ ] **#47.2** Implement feature request command handler and template generation `#code`
+  - [ ] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs`
 - [ ] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug`
   - [ ] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test`
   - [ ] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code`
@@ -174,7 +183,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 22:51:50 CET 2025
+**Last Updated:** Sat Nov  1 22:54:23 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

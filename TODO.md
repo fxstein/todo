@@ -3,6 +3,10 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#43** Create uninstall feature
+  - [ ] **#43.3** Enhance README.md to show simple uninstall command
+  - [ ] **#43.2** Implement and test uninstall feature
+  - [ ] **#43.1** Write design document for uninstall feature
 - [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
   - [ ] **#42.6** Test duplicate detection and 'me too' reply flow
   - [ ] **#42.5** Test bug reporting with GitHub CLI integration
@@ -145,7 +149,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 12:20:33 CET 2025
+**Last Updated:** Sat Nov  1 12:34:36 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

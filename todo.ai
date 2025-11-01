@@ -3181,7 +3181,27 @@ suggest_bug_report() {
     echo ""
     echo "Preview of bug report:"
     echo "---"
-    echo "$bug_report" | head -30
+    # Show header up to (but not including) Recent Logs section
+    echo "$bug_report" | sed -n '1,/^### Recent Logs$/p' | sed '$d'
+    # Show Recent Logs section header
+    echo "### Recent Logs"
+    echo "<details>"
+    echo "<summary>Click to expand log history (last 50 lines)</summary>"
+    echo ""
+    echo "\`\`\`"
+    # Extract and show first 5 log entries
+    local first_logs=$(echo "$bug_report" | sed -n '/```/,/```/p' | grep "^2025-" | head -5)
+    echo "$first_logs"
+    # Count total log entries
+    local log_count=$(echo "$bug_report" | sed -n '/```/,/```/p' | grep -c "^2025-" || echo "0")
+    if [[ $log_count -gt 5 ]]; then
+        echo "... (showing 5 of $log_count log entries; all $log_count entries will be included in full report) ..."
+    fi
+    echo "\`\`\`"
+    echo ""
+    echo "</details>"
+    # Show footer (System Information onwards)
+    echo "$bug_report" | sed -n '/^### System Information/,/---/p'
     echo "---"
     echo ""
     

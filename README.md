@@ -1,4 +1,4 @@
-# todo.ai - For AI Agents and Humans
+# todo.ai
 
 **Simple, zero-interaction TODO management for AI agents**
 
@@ -6,12 +6,7 @@
 
 Tell your agent to adopt `todo.ai` for task management.
 
-**Installation:**
-```bash
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
-```
-
-**Copy-paste this to your agent:**
+**AI Agent Installation: Copy-paste this to your agent:**
 ```
 Adopt todo.ai for task tracking. Install using:
 curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
@@ -22,6 +17,12 @@ Then create a task "Implement user authentication" with subtasks:
 - Add frontend components
 - Write tests
 ```
+
+**Manual Installation:**
+```bash
+curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
+```
+
 
 **To update:** Re-run the curl command, or use `./todo.ai update`
 

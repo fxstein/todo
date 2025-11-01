@@ -367,8 +367,10 @@ The `release/release.sh` script is an intelligent, fully automated release tool 
 
 **Release Logging:**
 
-All release operations are automatically logged to `release/RELEASE_LOG.log`. The log includes:
-- Timestamp for each step (start, version update, git operations, GitHub release)
+All release operations are automatically logged to `release/RELEASE_LOG.log`. The log uses a pipe-delimited format:
+- Format: `TIMESTAMP | USER | STEP | MESSAGE`
+- Newest entries appear at the top of the file
+- Includes timestamp, GitHub user ID, step name, and message for each operation
 - Success or failure status for each operation
 - Error messages if any step fails
 - Release details (version, tag, URL)

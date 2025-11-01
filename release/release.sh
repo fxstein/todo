@@ -29,25 +29,25 @@ log_release_step() {
     
     # Create header if file doesn't exist
     if [[ ! -f "$RELEASE_LOG" ]]; then
-        cat > "$RELEASE_LOG" << 'EOF'
-# Release Log
-# This file contains a chronological log of all release operations performed by the release script.
-# Format: TIMESTAMP USER_ID STEP - MESSAGE
-# Newest entries appear at the top of the file.
+        local generated_date=$(date)
+        cat > "$RELEASE_LOG" << EOF
+# Release Log File
+# Format: TIMESTAMP | USER | STEP | MESSAGE
+# Generated: ${generated_date}
 #
 EOF
     fi
     
     # Create log entry (flatten multi-line messages to single line)
     local flat_message=$(echo "$message" | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//')
-    local log_entry="${timestamp} ${user_id} ${step} - ${flat_message}"
+    local log_entry="${timestamp} | ${user_id} | ${step} | ${flat_message}"
     
     # Find where header ends (first non-comment line)
     local header_end=$(awk '/^[^#]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
     
     # If no non-comment lines, header is entire file
     if [[ -z "$header_end" ]] || [[ "$header_end" -eq 0 ]]; then
-        header_end=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 5)
+        header_end=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 4)
     fi
     
     # Create new log: header + new entry + old entries

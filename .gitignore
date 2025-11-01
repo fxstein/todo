@@ -1,0 +1,20 @@
+# Backup files with quotes or special characters
+todo.ai ''
+todo.ai ''
+
+# RELEASE_SUMMARY.md should only be in release/ directory
+# (Allow it in release/ but ignore in root)
+RELEASE_SUMMARY.md
+!release/RELEASE_SUMMARY.md
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor backup files
+*~
+*.swp
+*.swo
+*#
+

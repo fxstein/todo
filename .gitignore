@@ -18,3 +18,7 @@ RELEASE_SUMMARY.md
 *.swo
 *#
 
+# Auto-generated end-user cursor rules (created by init_cursor_rules())
+# These are generated on install/update and don't need to be committed
+.cursor/rules/todo.ai-*.mdc
+

@@ -2,6 +2,19 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 00:22:24 | fxstein | ARCHIVE | 19 | Move Deleted Tasks section below Recently Completed section (with 0 subtasks)
+2025-11-02 00:21:57 | fxstein | DELETE | 34.1 | Level 1 subtask
+2025-11-02 00:21:57 | fxstein | DELETE | 34.1.1 | Level 2 sub-subtask
+2025-11-02 00:21:56 | fxstein | DELETE | 34 | Final nested subtask test
+2025-11-02 00:21:56 | fxstein | DELETE | 33.1 | Add subtask to main task
+2025-11-02 00:21:56 | fxstein | DELETE | 33.1.1 | Test sub-subtask creation
+2025-11-02 00:21:56 | fxstein | DELETE | 33 | Test nested subtasks implementation
+2025-11-02 00:21:18 | fxstein | ARCHIVE | 37 | Build release migration and cleanup system for one-time migrations and cleanups (with 12 subtasks)
+2025-11-02 00:21:16 | fxstein | COMPLETE | 37 | Build release migration and cleanup system for one-time migrations and cleanups
+2025-11-02 00:20:44 | fxstein | ARCHIVE | 44 | Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure (with 10 subtasks)
+2025-11-02 00:20:42 | fxstein | COMPLETE | 44 | Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure
+2025-11-02 00:20:14 | fxstein | ARCHIVE | 43 | Create uninstall feature (with 4 subtasks)
+2025-11-02 00:20:12 | fxstein | COMPLETE | 43 | Create uninstall feature
 2025-11-02 00:13:39 | fxstein | COMPLETE | 43.4 | Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope
 2025-11-02 00:11:05 | fxstein | ADD_SUBTASK | 43.4 | Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope (parent: #43)
 2025-11-02 00:09:19 | fxstein | ARCHIVE | 48 | Fix update logic error: new version update logic never executes (with 4 subtasks)

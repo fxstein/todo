@@ -37,22 +37,6 @@
   - [ ] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code`
   - [ ] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs`
   - [ ] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research`
-- [ ] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration`
-  - [x] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code`
-  - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code`
-  - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs`
-  - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs`
-  - [x] **#44.6** Test migration with existing .cursorrules files `#test`
-  - [x] **#44.5** Create migration to convert existing .cursorrules to .cursor/rules/ on update `#migration`
-  - [x] **#44.4** Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file `#code`
-  - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code`
-  - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs`
-  - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research`
-- [ ] **#43** Create uninstall feature
-  - [x] **#43.4** Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope `#code`
-  - [x] **#43.3** Enhance README.md to show simple uninstall command
-  - [x] **#43.2** Implement and test uninstall feature
-  - [x] **#43.1** Write design document for uninstall feature
 - [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
   - [x] **#42.6** Test duplicate detection and 'me too' reply flow
   - [x] **#42.5** Test bug reporting with GitHub CLI integration
@@ -60,28 +44,11 @@
   - [x] **#42.3** Implement duplicate issue detection and 'me too' reply functionality
   - [x] **#42.2** Implement bug detection and reporting logic
   - [x] **#42.1** Create design document for bug reporting feature
-- [ ] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature`
-  - [x] **#37.12** Update release process documentation to include migration workflow
-  - [x] **#37.11** Document migration creation process for developers
-  - [x] **#37.10** Test migration system with real TODO.md files (wrong section order)
-  - [x] **#37.9** Create integration tests for migration execution during update
-  - [x] **#37.8** Create unit tests for migration system (version comparison, idempotency)
-  - [x] **#37.7** Add migration execution to script startup (after version check)
-  - [x] **#37.6** Implement first migration: section order fix (v1.3.5)
-  - [x] **#37.5** Create migration lock mechanism to prevent concurrent execution
-  - [x] **#37.4** Implement migration execution system with run_migrations function
-  - [x] **#37.3** Implement version comparison function for semantic versioning
-  - [x] **#37.2** Create migration registry structure in todo.ai script
-  - [x] **#37.1** Create design document for migration/cleanup system architecture
 - [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
   - [x] **#35.3** Create tests directory and draft detailed test plan document `#tests` `#docs`
   - [x] **#35.2** Define test framework architecture and tooling `#tests` `#planning`
   - [x] **#35.1** Research todo.ai testing requirements and existing docs `#tests` `#docs`
-- [ ] **#34** Final nested subtask test `#test`
-- [ ] **#33** Test nested subtasks implementation `#test`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
-  - [ ] **#.1.1** Add sub-subtask (2-level nesting) `#test`
-- [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#15** Setup githooks `#setup` `#git`
   - [ ] **#15.4** TODO linting (using todo.ai --lint) `#lint`
   - [ ] **#15.3** JSON linting `#lint`
@@ -90,6 +57,36 @@
 ------------------
 
 ## Recently Completed
+- [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup` (2025-11-02)
+- [x] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature` (2025-11-02)
+  - [x] **#37.12** Update release process documentation to include migration workflow (2025-11-02)
+  - [x] **#37.11** Document migration creation process for developers (2025-11-02)
+  - [x] **#37.10** Test migration system with real TODO.md files (wrong section order) (2025-11-02)
+  - [x] **#37.9** Create integration tests for migration execution during update (2025-11-02)
+  - [x] **#37.8** Create unit tests for migration system (version comparison, idempotency) (2025-11-02)
+  - [x] **#37.7** Add migration execution to script startup (after version check) (2025-11-02)
+  - [x] **#37.6** Implement first migration: section order fix (v1.3.5) (2025-11-02)
+  - [x] **#37.5** Create migration lock mechanism to prevent concurrent execution (2025-11-02)
+  - [x] **#37.4** Implement migration execution system with run_migrations function (2025-11-02)
+  - [x] **#37.3** Implement version comparison function for semantic versioning (2025-11-02)
+  - [x] **#37.2** Create migration registry structure in todo.ai script (2025-11-02)
+  - [x] **#37.1** Create design document for migration/cleanup system architecture (2025-11-02)
+- [x] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration` (2025-11-02)
+  - [x] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code` (2025-11-02)
+  - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code` (2025-11-02)
+  - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs` (2025-11-02)
+  - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs` (2025-11-02)
+  - [x] **#44.6** Test migration with existing .cursorrules files `#test` (2025-11-02)
+  - [x] **#44.5** Create migration to convert existing .cursorrules to .cursor/rules/ on update `#migration` (2025-11-02)
+  - [x] **#44.4** Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file `#code` (2025-11-02)
+  - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code` (2025-11-02)
+  - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs` (2025-11-02)
+  - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research` (2025-11-02)
+- [x] **#43** Create uninstall feature (2025-11-02)
+  - [x] **#43.4** Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope `#code` (2025-11-02)
+  - [x] **#43.3** Enhance README.md to show simple uninstall command (2025-11-02)
+  - [x] **#43.2** Implement and test uninstall feature (2025-11-02)
+  - [x] **#43.1** Write design document for uninstall feature (2025-11-02)
 - [x] **#48** Fix update logic error: new version update logic never executes (2025-11-02)
   - [x] **#48.4** Test update workflow: verify migrations execute in new version after update `#test` (2025-11-02)
   - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code` (2025-11-02)
@@ -177,6 +174,12 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#34** Final nested subtask test `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-11-02, expires 2025-12-02)
+    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#33** Test nested subtasks implementation `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#40.1** Subtask A (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#40.2** Subtask B (deleted 2025-11-01, expires 2025-12-01)
 - [D] **#40** Test parent task 2 (deleted 2025-11-01, expires 2025-12-01)
@@ -187,11 +190,7 @@
     - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
 - [D] **#39** Test parent task for deletion bug fix (deleted 2025-11-01, expires 2025-12-01)
-    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
-  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#9** Test new formatting fix `#test` (deleted 2025-10-30, expires 2025-11-29)
-    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-10-30, expires 2025-11-29)
-  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#31** Test task after serial rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
 - [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
@@ -200,7 +199,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 00:13:39 CET 2025
+**Last Updated:** Sun Nov  2 00:22:24 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

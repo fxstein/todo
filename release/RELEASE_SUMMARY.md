@@ -1,39 +1,30 @@
-This release introduces the new bug reporting feature, enabling todo.ai to self-report bugs to GitHub Issues with intelligent duplicate detection and user-controlled reporting.
+# Release Summary
 
-**New Feature: Bug Reporting System**
-- Self-reporting to GitHub Issues: When errors occur, todo.ai can suggest creating a bug report on GitHub Issues
-- Manual confirmation required: Always requires explicit user confirmation before any GitHub API calls - never automatic
-- Duplicate detection: Intelligently searches for similar issues before creating new ones
-- "Me Too" replies: If similar issues exist, users can add "me too" comments with their context
-- Context collection: Automatically gathers error details, system information, and recent logs (50 lines)
-- Privacy protection: For private repositories, hides repository identifiers to protect privacy
-- Log history: Includes collapsed log sections with the 50 most recent entries (newest first)
-- GitHub CLI integration: Uses GitHub CLI for seamless issue creation and commenting
+This release enhances the cursor rules update system to ensure that AI agents always have the latest rules and that users are properly notified when rules are updated.
 
-**Technical Details:**
-- Similarity threshold: 75% for duplicate detection (word-based comparison)
-- Log collection: Automatically collects and sanitizes logs (passwords, tokens filtered)
-- Template-based reports: Structured bug reports with version, OS, shell, error context, and logs
-- Cursor rules integration: Automatically adds rules to .cursorrules for AI agent behavior
+## Key Improvements
 
-**User Experience:**
-- Error suggestion: When errors occur, todo.ai suggests reporting (never forces it)
-- Preview before submit: Shows preview of bug report before asking for confirmation
-- Interactive flow: Guides users through duplicate detection and "me too" reply process
-- Graceful fallbacks: Works even if GitHub CLI is unavailable (just suggests reporting)
+**Enhanced Cursor Rules Update System:**
+- The `init_cursor_rules` function now intelligently detects and updates outdated sections, not just missing ones. This ensures that existing installations automatically get the latest rules (such as the critical bug reporting requirements) when they update `todo.ai`.
+- When cursor rules are updated, comprehensive prompts are now displayed for both humans and AI agents, clearly explaining that rules only take effect in new chat sessions.
+- The update process now includes automatic cursor rules updates, ensuring users always have the latest rules after updating `todo.ai`.
+
+**Better User Experience:**
+- Clear, actionable instructions are provided when cursor rules are updated, explaining the need to start a new chat session.
+- AI agents are explicitly instructed to inform users about rule updates and request a new session.
+- This prevents confusion when agents bypass required workflows (like using `./todo.ai report-bug` instead of directly creating GitHub issues).
 
 **Usage:**
 
 For AI Agents:
 ```
-./todo.ai report-bug "Error description" "Error context" "command"
+When cursor rules are updated, inform the user:
+"Cursor rules have been updated. Please start a new chat session for the updated rules to take effect."
 ```
 
 For Humans:
 ```
-Tell todo.ai to report a bug: Sample bug description
+Start a new chat session in Cursor after updating todo.ai to ensure the latest rules are applied.
 ```
 
-**Note:** Only bugs related to todo.ai itself should be reported. Use this feature when todo.ai encounters errors or unexpected behavior, not for general project bugs.
-
-This feature significantly improves the feedback loop between users and developers while maintaining full user control and privacy protection.
+**Note:** This release ensures that the critical bug reporting requirements (requiring `./todo.ai report-bug` instead of direct `gh issue create`) are automatically updated in all installations, preventing agents from bypassing the bug reporting workflow.

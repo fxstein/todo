@@ -116,6 +116,7 @@ calculate_next_version() {
 generate_release_notes() {
     local last_tag="$1"
     local new_version="$2"
+    local summary_file="${3:-}"
     local commit_range
     
     if [[ -z "$last_tag" ]] || [[ ! "$last_tag" =~ ^v ]]; then
@@ -130,6 +131,14 @@ generate_release_notes() {
     
     echo "## Release ${new_version}" > "$temp_notes"
     echo "" >> "$temp_notes"
+    
+    # Add AI-generated summary if provided
+    if [[ -n "$summary_file" ]] && [[ -f "$summary_file" ]]; then
+        echo "$(cat "$summary_file")" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+        echo "---" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+    fi
     
     # Categorize commits
     local breaking_commits=()
@@ -226,8 +235,36 @@ update_version() {
 
 # Main release process
 main() {
+    local SUMMARY_FILE=""
+    
+    # Parse command-line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --summary|-s)
+                SUMMARY_FILE="$2"
+                shift 2
+                ;;
+            *)
+                echo -e "${RED}Unknown option: $1${NC}"
+                echo "Usage: $0 [--summary <file>]"
+                exit 1
+                ;;
+        esac
+    done
+    
     echo -e "${BLUE}🚀 Starting intelligent release process...${NC}"
     echo ""
+    
+    # Check if summary file exists if provided
+    if [[ -n "$SUMMARY_FILE" ]] && [[ ! -f "$SUMMARY_FILE" ]]; then
+        echo -e "${YELLOW}⚠️  Warning: Summary file not found: $SUMMARY_FILE${NC}"
+        printf "Continue without summary? (y/N) "
+        read -r reply
+        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+            exit 0
+        fi
+        SUMMARY_FILE=""
+    fi
     
     # Verify prerequisites
     if ! command -v gh &> /dev/null; then
@@ -290,7 +327,10 @@ main() {
     
     # Generate release notes
     echo -e "${BLUE}📝 Generating release notes...${NC}"
-    RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION")
+    if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
+        echo -e "${GREEN}📄 Including AI-generated summary from: $SUMMARY_FILE${NC}"
+    fi
+    RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
     
     # Show release notes preview
     echo ""

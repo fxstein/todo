@@ -232,6 +232,10 @@ EOF
         echo "   📝 Added rule: 'TODO.md and .todo.ai/ must always be committed together'"
         echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
         echo "   This ensures AI agents will automatically use todo.ai for task tracking"
+        echo ""
+        echo "   🔄 RESTART REQUIRED: Please start a new chat session in Cursor"
+        echo "      for the rules to take effect. Cursor loads .cursorrules at the"
+        echo "      start of each chat session."
         return 0
     fi
     
@@ -335,6 +339,10 @@ $new_section" "$cursor_rules_file"
         echo ""
         echo "⚠️  IMPORTANT: Updated .cursorrules file"
         echo "   📝 Updated '## Bug Reporting' section with latest rules"
+        echo ""
+        echo "   🔄 RESTART REQUIRED: Please start a new chat session in Cursor"
+        echo "      for the updated rules to take effect. Cursor loads .cursorrules"
+        echo "      at the start of each chat session."
     elif [[ "$bug_report_section_exists" == false ]]; then
         # Section doesn't exist - add it
         echo "" >> "$cursor_rules_file"
@@ -429,6 +437,10 @@ $new_section" "$cursor_rules_file"
             echo "   📝 Added rule: 'Always ask for user confirmation before archiving completed tasks using todo.ai'"
         fi
         echo "   This ensures AI agents will automatically use todo.ai for task tracking"
+        echo ""
+        echo "   🔄 RESTART REQUIRED: Please start a new chat session in Cursor"
+        echo "      for the updated rules to take effect. Cursor loads .cursorrules"
+        echo "      at the start of each chat session."
     fi
 }
 
@@ -2630,8 +2642,15 @@ update_tool() {
                     local current_dir=$(pwd)
                     cd "$(dirname "$script_path")" 2>/dev/null || true
                     source "$temp_script" 2>/dev/null && init_cursor_rules
+                    local rules_updated=$?
                     cd "$current_dir" 2>/dev/null || true
                     rm -f "$temp_script"
+                    
+                    # If rules were updated, remind user to restart
+                    if [[ $rules_updated -eq 0 ]]; then
+                        echo ""
+                        echo "   💡 TIP: Start a new chat session in Cursor to load the updated rules."
+                    fi
                 else
                     echo "   ⚠️  Could not extract cursor rules function. They will be updated on next script run."
                 fi

@@ -319,17 +319,17 @@ main() {
     if [[ "$needs_review" == true ]]; then
         echo ""
         echo "Please review the release notes above."
-        read "?Proceed with release? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        printf "Proceed with release? (y/N) "
+        read -r reply
+        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
             echo -e "${YELLOW}Release cancelled by user${NC}"
             rm -f "$RELEASE_NOTES_FILE"
             exit 0
         fi
     else
-        read "?Proceed with release? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        printf "Proceed with release? (y/N) "
+        read -r reply
+        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
             echo -e "${YELLOW}Release cancelled by user${NC}"
             rm -f "$RELEASE_NOTES_FILE"
             exit 0

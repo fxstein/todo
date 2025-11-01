@@ -43,7 +43,7 @@ Run `./todo.ai --help` to see all available commands and usage examples. Everyth
 
 With `todo.ai`, you simply tell your AI agent what you want in plain English. Your agent handles all the technical details automatically.
 
-**Examples of what you can ask your agent (click copy button on each):**
+**Examples of what you can ask your agent:**
 
 ```
 Create a task for implementing user authentication
@@ -98,6 +98,27 @@ Restore deleted task 1
 ```
 
 Your agent understands natural language requests and translates them to the appropriate `todo.ai` commands. All tasks are tracked in `TODO.md` in your repository.
+
+---
+
+## Why not GitHub Issues?
+
+Agents need a **fast, local, Markdown-native** way to manage tasks. GitHub Issues adds too much complexity and overhead—API calls, authentication, rate limits, and network latency slow down task management.
+
+**Key differences:**
+
+- **Speed**: `todo.ai` is instant and local—no API calls or network delays
+- **Simplicity**: Plain Markdown that agents can parse and modify directly
+- **Zero overhead**: No authentication, rate limits, or API complexity
+- **Native workflow**: Works seamlessly with your Git workflow
+
+**But you can still reference GitHub Issues and PRs:**
+
+GitHub issue and PR numbers can be tagged onto tasks and subtasks for reference. For example:
+- *"Create a task for fixing #123"*
+- *"Add subtask 1.1: Address PR #456 feedback"*
+
+This keeps `todo.ai` fast and simple while still maintaining links to your GitHub workflow.
 
 ---
 

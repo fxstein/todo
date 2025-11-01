@@ -41,7 +41,8 @@ analyze_commits() {
         commit_range="${last_tag}..HEAD"
     fi
     
-    local commits=$(git log "$commit_range" --pretty=format:"%s" --no-merges 2>/dev/null || echo "")
+    local commits
+    commits=$(git log "$commit_range" --pretty=format:"%s" --no-merges 2>/dev/null) || commits=""
     
     if [[ -z "$commits" ]]; then
         echo "patch"
@@ -53,7 +54,7 @@ analyze_commits() {
     local fix_count=0
     local other_count=0
     
-    while IFS= read -r commit; do
+    while IFS= read -r commit || [[ -n "$commit" ]]; do
         local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]')
         
         # Check for breaking changes

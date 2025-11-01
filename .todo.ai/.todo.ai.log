@@ -2,6 +2,12 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-01 22:51:50 | fxstein | ADD_SUBTASK | 46.5 | Test fix: verify cursor rules migration would be classified as MINOR with fix applied (parent: #46)
+2025-11-01 22:51:49 | fxstein | ADD_SUBTASK | 46.4 | Handle ambiguous cases: migrations that affect users vs pure infrastructure changes (parent: #46)
+2025-11-01 22:51:48 | fxstein | ADD_SUBTASK | 46.3 | Implement fix: check for functional changes in todo.ai before file-based classification (parent: #46)
+2025-11-01 22:51:46 | fxstein | ADD_SUBTASK | 46.2 | Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features (parent: #46)
+2025-11-01 22:51:45 | fxstein | ADD_SUBTASK | 46.1 | Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH (parent: #46)
+2025-11-01 22:51:42 | fxstein | ADD | 46 | Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR
 2025-11-01 22:47:33 | fxstein | COMPLETE | 44 | Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure
 2025-11-01 22:46:04 | fxstein | ADD_SUBTASK | 45.8 | Test pre-release creation and promotion workflow (parent: #45)
 2025-11-01 22:46:03 | fxstein | ADD_SUBTASK | 45.7 | Update release process documentation with pre-release workflow (parent: #45)

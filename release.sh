@@ -12,6 +12,29 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
+# Release log file
+RELEASE_LOG="${RELEASE_LOG:-$(pwd)/RELEASE_LOG.md}"
+
+# Log release step with timestamp
+log_release_step() {
+    local step="$1"
+    local message="$2"
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # Ensure release log exists with header
+    if [[ ! -f "$RELEASE_LOG" ]]; then
+        echo "# Release Log" > "$RELEASE_LOG"
+        echo "" >> "$RELEASE_LOG"
+        echo "This log contains detailed timestamps of all release operations performed by the release script." >> "$RELEASE_LOG"
+        echo "" >> "$RELEASE_LOG"
+    fi
+    
+    echo "## ${timestamp} - ${step}" >> "$RELEASE_LOG"
+    echo "" >> "$RELEASE_LOG"
+    echo "$message" >> "$RELEASE_LOG"
+    echo "" >> "$RELEASE_LOG"
+}
+
 # Get current version from todo.ai
 get_current_version() {
     grep '^VERSION=' todo.ai | sed 's/VERSION="\([^"]*\)"/\1/'
@@ -306,10 +329,38 @@ main() {
         fi
     fi
     
-    # Check for uncommitted changes
-    if [[ -n $(git status -s) ]]; then
+    # Check for uncommitted changes (allow release-related files)
+    local status_output=$(git status -s)
+    local uncommitted=""
+    
+    # Filter out allowed files: RELEASE_SUMMARY.md and weird backup files
+    while IFS= read -r line; do
+        # Skip RELEASE_SUMMARY.md
+        if [[ "$line" =~ ^[?]{2}[[:space:]]+RELEASE_SUMMARY\.md$ ]]; then
+            continue
+        fi
+        # Skip weird backup files like "todo.ai ''"
+        if [[ "$line" =~ ^[?]{2}[[:space:]]+\"todo\.ai ]]; then
+            continue
+        fi
+        # All other files are uncommitted
+        if [[ -n "$line" ]]; then
+            if [[ -n "$uncommitted" ]]; then
+                uncommitted="${uncommitted}\n${line}"
+            else
+                uncommitted="$line"
+            fi
+        fi
+    done <<< "$status_output"
+    
+    if [[ -n "$uncommitted" ]]; then
         echo -e "${RED}❌ Error: Uncommitted changes detected${NC}"
+        echo "Uncommitted files:"
+        echo -e "$uncommitted"
+        echo ""
         echo "Please commit or stash changes before releasing"
+        echo "Note: RELEASE_SUMMARY.md is allowed and will be used if present"
+        log_release_step "ERROR - Uncommitted Changes" "Release aborted due to uncommitted changes:\n\n$uncommitted"
         exit 1
     fi
     
@@ -346,6 +397,14 @@ main() {
     NEW_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
     echo -e "${GREEN}📌 Proposed new version: ${NEW_VERSION}${NC}"
     echo ""
+    
+    # Log release start with all details
+    log_release_step "RELEASE START" "Starting release process:
+- Current version: ${CURRENT_VERSION}
+- Proposed version: ${NEW_VERSION}
+- Bump type: ${BUMP_TYPE}
+- Last tag: ${LAST_TAG}
+- Summary file: ${SUMMARY_FILE:-none}"
     
     # Generate release notes
     echo -e "${BLUE}📝 Generating release notes...${NC}"
@@ -387,48 +446,86 @@ main() {
         read -r reply
         if [[ ! "$reply" =~ ^[Yy]$ ]]; then
             echo -e "${YELLOW}Release cancelled by user${NC}"
+            log_release_step "CANCELLED" "Release cancelled by user at review stage"
             rm -f "$RELEASE_NOTES_FILE"
             exit 0
         fi
+        log_release_step "REVIEW" "Human review requested and approved for ${NEW_VERSION}"
     else
         printf "Proceed with release? (y/N) "
         read -r reply
         if [[ ! "$reply" =~ ^[Yy]$ ]]; then
             echo -e "${YELLOW}Release cancelled by user${NC}"
+            log_release_step "CANCELLED" "Release cancelled by user at confirmation stage"
             rm -f "$RELEASE_NOTES_FILE"
             exit 0
         fi
+        log_release_step "CONFIRMED" "Release confirmed by user"
     fi
     
     # Update version
     echo ""
     echo -e "${BLUE}📝 Updating version in todo.ai...${NC}"
+    log_release_step "UPDATE VERSION" "Updating version in todo.ai from ${CURRENT_VERSION} to ${NEW_VERSION}"
     update_version "$NEW_VERSION"
+    log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai"
     
     # Commit version change
     echo -e "${BLUE}💾 Committing version change...${NC}"
+    log_release_step "COMMIT VERSION" "Committing version change to git"
     git add todo.ai
-    git commit -m "Bump version to $NEW_VERSION" > /dev/null 2>&1 || true
+    local version_commit=$(git commit -m "Bump version to $NEW_VERSION" 2>&1 || echo "no commit needed")
+    log_release_step "VERSION COMMITTED" "Version change committed: ${version_commit}"
     
     # Create and push tag
     TAG="v${NEW_VERSION}"
     echo -e "${BLUE}🏷️  Creating tag ${TAG}...${NC}"
+    log_release_step "CREATE TAG" "Creating git tag: ${TAG}"
     git tag -a "$TAG" -m "Release version $NEW_VERSION" > /dev/null 2>&1
-    git push origin main > /dev/null 2>&1
-    git push origin "$TAG" > /dev/null 2>&1
+    log_release_step "TAG CREATED" "Git tag ${TAG} created successfully"
+    
+    echo -e "${BLUE}📤 Pushing to remote...${NC}"
+    log_release_step "PUSH MAIN" "Pushing main branch to origin"
+    git push origin main > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push main branch"
+    
+    log_release_step "PUSH TAG" "Pushing tag ${TAG} to origin"
+    git push origin "$TAG" > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push tag ${TAG}"
     
     # Create GitHub release
     echo -e "${BLUE}📦 Creating GitHub release...${NC}"
-    gh release create "$TAG" \
+    log_release_step "CREATE GITHUB RELEASE" "Creating GitHub release for tag ${TAG}"
+    
+    # Temporarily disable set -e to capture error
+    set +e
+    local release_output=$(gh release create "$TAG" \
         --title "$NEW_VERSION" \
-        --notes-file "$RELEASE_NOTES_FILE" > /dev/null 2>&1
+        --notes-file "$RELEASE_NOTES_FILE" 2>&1)
+    local release_status=$?
+    set -e
+    
+    if [[ $release_status -eq 0 ]]; then
+        log_release_step "GITHUB RELEASE CREATED" "GitHub release created successfully for ${TAG}\nOutput: ${release_output}"
+    else
+        log_release_step "GITHUB RELEASE ERROR" "Failed to create GitHub release for ${TAG}\nError: ${release_output}\nExit code: ${release_status}"
+        echo -e "${RED}⚠️  Warning: GitHub release creation failed${NC}"
+        echo "Error: ${release_output}"
+        echo "Check the release log: ${RELEASE_LOG}"
+        echo "Try manually: gh release view ${TAG} || gh release create ${TAG} --title ${NEW_VERSION} --notes-file <file>"
+    fi
     
     # Cleanup
     rm -f "$RELEASE_NOTES_FILE"
     
+    local repo_url=$(get_repo_url)
+    log_release_step "RELEASE COMPLETE" "Release ${NEW_VERSION} published successfully!
+- Tag: ${TAG}
+- URL: ${repo_url}/releases/tag/${TAG}
+- Release log: ${RELEASE_LOG}"
+    
     echo ""
     echo -e "${GREEN}✅ Release ${NEW_VERSION} published successfully!${NC}"
-    echo -e "${GREEN}🔗 View release: https://github.com/fxstein/todo.ai/releases/tag/${TAG}${NC}"
+    echo -e "${GREEN}🔗 View release: ${repo_url}/releases/tag/${TAG}${NC}"
+    echo -e "${GREEN}📋 Release log: ${RELEASE_LOG}${NC}"
 }
 
 # Run main function

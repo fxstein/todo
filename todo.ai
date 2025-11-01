@@ -2568,82 +2568,36 @@ update_tool() {
                 echo "Warning: Failed to create backup, continuing with update..."
             }
             
-            # Replace with new version
-            mv "$temp_file" "$script_path"
-            chmod +x "$script_path"
+            # Get new version before replacing
+            local new_version=$(grep -i "VERSION=" "$temp_file" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
             
-            # Get new version
-            local new_version=$(grep -i "VERSION=" "$script_path" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
+            # Make new version executable
+            chmod +x "$temp_file"
+            
+            # CRITICAL FIX: Execute new version's code BEFORE replacing old version
+            # This ensures new version's update logic, migrations, and cursor rules updates run
+            echo ""
+            echo "🔄 Executing new version's update logic (v$new_version)..."
+            local current_dir=$(pwd)
+            cd "$(dirname "$script_path")" 2>/dev/null || true
+            
+            # Execute new version with a special internal command that runs:
+            # 1. Migrations (runs automatically at startup via run_migrations)
+            # 2. Cursor rules update (runs automatically at startup via init_cursor_rules)
+            # The new version's code will execute with its own logic, not the old version's
+            # Suppress stdout (version info) but allow stderr (migration/cursor rules messages) through
+            "$temp_file" version >/dev/null 2>&1 || true
+            
+            # Now replace the old version with the new version
+            mv "$temp_file" "$script_path"
+            
+            cd "$current_dir" 2>/dev/null || true
             
             echo "✅ Updated todo.ai to version $new_version"
             if [[ -f "$backup_file" ]]; then
                 echo "   Backup saved as: $(basename "$backup_file") (v$current_version)"
                 echo "   Use './todo.ai rollback' to restore previous version"
             fi
-            
-            # Update cursor rules after successful update to ensure latest rules are applied
-            if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-                echo ""
-                echo "🔄 Updating cursor rules..."
-                # Extract and source the init_cursor_rules function from the updated script
-                local function_start=$(grep -n "^init_cursor_rules()" "$script_path" | head -1 | cut -d: -f1)
-                local function_end=$(awk "NR>$function_start && /^[a-zA-Z_]/ && /\(\) \{/ {print NR-1; exit}" "$script_path" | head -1)
-                
-                if [[ -n "$function_start" ]] && [[ -n "$function_end" ]]; then
-                    local temp_script=$(mktemp)
-                    # Also need sed_inplace function
-                    local sed_inplace_start=$(grep -n "^sed_inplace()" "$script_path" | head -1 | cut -d: -f1)
-                    local sed_inplace_end
-                    
-                    if [[ -n "$sed_inplace_start" ]] && [[ "$sed_inplace_start" -lt "$function_start" ]]; then
-                        sed_inplace_end=$(awk "NR>$sed_inplace_start && /^[a-zA-Z_]/ && /\(\) \{/ {print NR-1; exit}" "$script_path" | head -1)
-                        if [[ -n "$sed_inplace_end" ]]; then
-                            sed -n "${sed_inplace_start},${sed_inplace_end}p" "$script_path" >> "$temp_script"
-                            echo "" >> "$temp_script"
-                        fi
-                    fi
-                    
-                    # Extract init_cursor_rules function
-                    sed -n "${function_start},${function_end}p" "$script_path" >> "$temp_script"
-                    
-                    # Source and execute - ensure we're in the right directory
-                    local current_dir=$(pwd)
-                    cd "$(dirname "$script_path")" 2>/dev/null || true
-                    source "$temp_script" 2>/dev/null && init_cursor_rules
-                    local rules_updated=$?
-                    cd "$current_dir" 2>/dev/null || true
-                    rm -f "$temp_script"
-                    
-                    # If rules were updated, remind user to restart
-                    if [[ $rules_updated -eq 0 ]]; then
-                        echo ""
-                        echo "   🔄 ACTION REQUIRED: Cursor rules have been updated!"
-                        echo ""
-                        echo "   For Humans:"
-                        echo "   → Please start a new chat session in Cursor"
-                        echo "   → The updated rules will not apply to your current session"
-                        echo ""
-                        echo "   For AI Agents:"
-                        echo "   → Inform the user that cursor rules have been updated"
-                        echo "   → Request that the user start a new chat session"
-                    fi
-                else
-                    echo "   ⚠️  Could not extract cursor rules function. They will be updated on next script run."
-                fi
-            fi
-            
-            # Run migrations automatically after update
-            echo ""
-            echo "🔄 Running migrations..."
-            # Execute the updated script with a simple command to trigger migrations
-            # Migrations run automatically at script startup, so any command will trigger them
-            local current_dir=$(pwd)
-            cd "$(dirname "$script_path")" 2>/dev/null || true
-            # Use version command to trigger script initialization and migrations
-            # Suppress stdout (version info) but allow stderr (migration messages) through
-            "$script_path" version >/dev/null || true
-            cd "$current_dir" 2>/dev/null || true
-            echo "✅ Migrations completed"
             
             return 0
         else

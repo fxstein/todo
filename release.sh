@@ -51,6 +51,87 @@ get_last_tag() {
     fi
 }
 
+# Check if release is backend-only (infrastructure only, no user-facing changes)
+is_backend_only_release() {
+    local commit_range="$1"
+    
+    # Get list of changed files
+    local changed_files
+    if [[ "$commit_range" == "HEAD" ]]; then
+        # HEAD only - compare to initial commit or all files
+        changed_files=$(git diff --name-only "$commit_range" 2>/dev/null || echo "")
+    elif [[ ! "$commit_range" =~ \.\. ]]; then
+        # Single commit - use diff-tree
+        changed_files=$(git diff-tree --no-commit-id --name-only -r "$commit_range" 2>/dev/null || echo "")
+    else
+        # Range of commits (e.g., v1.1.0..HEAD) - use diff
+        changed_files=$(git diff --name-only "$commit_range" 2>/dev/null || echo "")
+    fi
+    
+    if [[ -z "$changed_files" ]]; then
+        return 1  # Can't determine, use normal logic
+    fi
+    
+    # Backend file patterns (infrastructure only)
+    local backend_patterns=(
+        "^release\.sh$"
+        "^\.cursorrules$"
+        "^\.todo\.ai/"
+        "^tests/"
+        "^RELEASE_SUMMARY\.md$"
+        "^RELEASE_LOG\.md$"
+        "^docs/RELEASE_PROCESS\.md$"
+        "^docs/TEST_PLAN\.md$"
+        "^docs/RELEASE_NUMBERING_ANALYSIS\.md$"
+    )
+    
+    # Frontend file patterns (user-facing)
+    local frontend_patterns=(
+        "^README\.md$"
+        "^docs/[^/]+\.md$"  # General docs (excluding RELEASE_PROCESS, TEST_PLAN)
+        "^todo\.ai$"  # Only count if functional changes (handled separately)
+    )
+    
+    local has_frontend=false
+    local has_backend=false
+    
+    while IFS= read -r file; do
+        [[ -z "$file" ]] && continue
+        
+        # Skip version bump commits
+        if [[ "$file" == "todo.ai" ]]; then
+            # Check if todo.ai changes are functional or just version bumps
+            # This is handled by commit message analysis below
+            continue
+        fi
+        
+        # Check if frontend (user-facing docs)
+        if [[ "$file" == "README.md" ]] || [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
+            # Exclude backend docs
+            if [[ "$file" != "docs/RELEASE_PROCESS.md" ]] && \
+               [[ "$file" != "docs/TEST_PLAN.md" ]] && \
+               [[ "$file" != "docs/RELEASE_NUMBERING_ANALYSIS.md" ]]; then
+                has_frontend=true
+            fi
+        fi
+        
+        # Check if backend
+        for pattern in "${backend_patterns[@]}"; do
+            if [[ "$file" =~ $pattern ]]; then
+                has_backend=true
+                break
+            fi
+        done
+    done <<< "$changed_files"
+    
+    # If only backend files changed (no frontend), it's a backend-only release
+    if [[ "$has_backend" == true ]] && [[ "$has_frontend" == false ]]; then
+        return 0  # Backend only
+    fi
+    
+    return 1  # Has frontend or mixed
+}
+
 # Analyze commits to determine version bump type
 analyze_commits() {
     local last_tag="$1"
@@ -72,6 +153,19 @@ analyze_commits() {
         return
     fi
     
+    # Priority 1: Check for explicit backend prefixes (fastest, explicit)
+    if echo "$commits" | grep -qiE "^(backend|infra|release|internal):"; then
+        echo "patch"
+        return
+    fi
+    
+    # Priority 2: Check for backend-only file changes (catches forgotten prefixes)
+    if is_backend_only_release "$commit_range"; then
+        echo "patch"
+        return
+    fi
+    
+    # Priority 3: Continue with existing keyword analysis (frontend/mixed releases)
     local breaking_count=0
     local feature_count=0
     local fix_count=0

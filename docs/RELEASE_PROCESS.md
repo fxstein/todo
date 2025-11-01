@@ -93,8 +93,20 @@ The intelligent release script will:
 
 ### How It Works
 
-The script analyzes commit messages using patterns:
+The script uses a **hybrid approach** with three priority levels:
 
+**Priority 1: Explicit Prefixes** (fastest, explicit)
+- `backend:`, `infra:`, `release:`, `internal:` → **PATCH** (backend-only work)
+- `feat:`, `feature:` → **MINOR** (new user-facing features)
+- `fix:`, `bugfix:` → **PATCH** (bug fixes)
+- `breaking:`, `!:` → **MAJOR** (breaking changes)
+
+**Priority 2: File Analysis** (catches forgotten prefixes)
+- If **only backend files** changed → **PATCH** (infrastructure only)
+- Backend files: `release.sh`, `.cursorrules`, `.todo.ai/`, `tests/`, `RELEASE_*.md`, `docs/RELEASE_*.md`
+- Frontend files: `README.md`, `todo.ai` (functional changes), user-facing docs
+
+**Priority 3: Keyword Analysis** (fallback for mixed/frontend)
 - **Major release** (X.0.0): Breaking changes detected
   - Keywords: `breaking`, `break`, `major`, `!:` in commit messages
   - Commits with `!` suffix (e.g., `feat!:`, `fix!:`)
@@ -105,6 +117,12 @@ The script analyzes commit messages using patterns:
 - **Patch release** (0.0.X): Bug fixes and other changes
   - Keywords: `fix:`, `bugfix:`, `patch:`, `bug`, `hotfix`, `correct`
   - All other commits default to patch
+
+**Why This Approach?**
+- Backend-only releases (infrastructure improvements) should be **PATCH**, not **MINOR**
+- Version numbers reflect actual user impact
+- Automatic detection catches forgotten prefixes
+- Aligns with semantic versioning principles
 
 ### Release Notes Generation
 

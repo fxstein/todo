@@ -26,3 +26,23 @@ When the user says "Release todo.ai" or similar:
    - Execute the release automatically after approval
 
 If the user requests a release review, show them the generated release notes and summary, then wait for approval before proceeding. For major releases or releases with >10 commits, always request human review before executing.
+
+## Commit Message Prefixes for Release Numbering
+
+When making commits, use explicit prefixes to help the release script correctly determine version bumps:
+
+**Backend/Infrastructure Commits (will be PATCH releases):**
+- `backend:` - Backend infrastructure changes (e.g., `backend: Fix release script error handling`)
+- `infra:` - Infrastructure improvements (e.g., `infra: Add release logging`)
+- `release:` - Release process improvements (e.g., `release: Add commit link support`)
+- `internal:` - Internal refactoring (e.g., `internal: Refactor version update function`)
+
+**Frontend/User-Facing Commits (can be MINOR/MAJOR):**
+- `feat:` - New features for users (e.g., `feat: Add task filtering command`)
+- `fix:` - Bug fixes that affect users (e.g., `fix: Correct task modification logic`)
+- `docs:` - User-facing documentation (e.g., `docs: Update README with examples`)
+
+**Special Cases:**
+- Backend-only releases (only infrastructure changes) are automatically detected as PATCH
+- If you forget a prefix, file analysis will catch backend-only changes
+- Mixed releases (both frontend and backend) use keyword analysis

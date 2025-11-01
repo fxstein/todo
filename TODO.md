@@ -8,11 +8,11 @@
   - [ ] **#43.2** Implement and test uninstall feature
   - [ ] **#43.1** Write design document for uninstall feature
 - [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
-  - [ ] **#42.6** Test duplicate detection and 'me too' reply flow
-  - [ ] **#42.5** Test bug reporting with GitHub CLI integration
-  - [ ] **#42.4** Create bug report template with logs and data attachment
-  - [ ] **#42.3** Implement duplicate issue detection and 'me too' reply functionality
-  - [ ] **#42.2** Implement bug detection and reporting logic
+  - [x] **#42.6** Test duplicate detection and 'me too' reply flow
+  - [x] **#42.5** Test bug reporting with GitHub CLI integration
+  - [x] **#42.4** Create bug report template with logs and data attachment
+  - [x] **#42.3** Implement duplicate issue detection and 'me too' reply functionality
+  - [x] **#42.2** Implement bug detection and reporting logic
   - [x] **#42.1** Create design document for bug reporting feature
 - [ ] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature`
   - [x] **#37.12** Update release process documentation to include migration workflow
@@ -149,7 +149,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 12:34:36 CET 2025
+**Last Updated:** Sat Nov  1 12:41:05 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

@@ -181,6 +181,11 @@ init_cursor_rules() {
     local todo_rule="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools"
     local commit_rule="TODO.md and .todo.ai/ must always be committed together"
     local archive_rule="Always ask for user confirmation before archiving completed tasks using todo.ai"
+    local bug_report_rule_suggest="When todo.ai encounters errors: Always suggest bug reporting to the user"
+    local bug_report_rule_never="When todo.ai encounters errors: Never automatically send bug reports to GitHub"
+    local bug_report_rule_confirm="When todo.ai encounters errors: Always require explicit user confirmation before any GitHub API calls"
+    local bug_report_rule_preview="When todo.ai encounters errors: Show preview of bug report before asking for confirmation"
+    local bug_report_rule_privacy="When todo.ai encounters errors: For private repositories, remove all repo identifiers"
     local rules_added=0
     
     # Check if .cursorrules exists
@@ -191,6 +196,18 @@ init_cursor_rules() {
 It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo.ai/ must always be committed together
 Always ask for user confirmation before archiving completed tasks using todo.ai
+
+## Bug Reporting
+When todo.ai encounters errors or unexpected behavior:
+1. Always suggest bug reporting to the user
+2. Never automatically send bug reports to GitHub
+3. Always require explicit user confirmation before any GitHub API calls
+4. Show preview of bug report before asking for confirmation
+5. Respect privacy: For private repositories, remove all repo identifiers
+
+Example:
+- ✅ "An error occurred. Would you like me to prepare a bug report for GitHub?"
+- ❌ "Error occurred. Automatically reporting to GitHub..." (NEVER DO THIS)
 EOF
         echo ""
         echo "⚠️  IMPORTANT: Created .cursorrules file"
@@ -205,6 +222,7 @@ EOF
     local todo_rule_exists=false
     local commit_rule_exists=false
     local archive_rule_exists=false
+    local bug_report_section_exists=false
     
     if grep -q "todo.ai" "$cursor_rules_file" || grep -q "track tasks" "$cursor_rules_file" || grep -q "built in TODO tools" "$cursor_rules_file"; then
         todo_rule_exists=true
@@ -218,8 +236,12 @@ EOF
         archive_rule_exists=true
     fi
     
+    if grep -q "^## Bug Reporting" "$cursor_rules_file"; then
+        bug_report_section_exists=true
+    fi
+    
     # If all rules exist, nothing to do
-    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]]; then
+    if [[ "$todo_rule_exists" == true ]] && [[ "$commit_rule_exists" == true ]] && [[ "$archive_rule_exists" == true ]] && [[ "$bug_report_section_exists" == true ]]; then
         return 0
     fi
     
@@ -230,6 +252,23 @@ EOF
         echo "" >> "$cursor_rules_file"
         echo "## Task Management" >> "$cursor_rules_file"
         section_added=true
+    fi
+    
+    # Add Bug Reporting section if it doesn't exist
+    if ! grep -q "^## Bug Reporting" "$cursor_rules_file"; then
+        echo "" >> "$cursor_rules_file"
+        echo "## Bug Reporting" >> "$cursor_rules_file"
+        echo "When todo.ai encounters errors or unexpected behavior:" >> "$cursor_rules_file"
+        echo "1. Always suggest bug reporting to the user" >> "$cursor_rules_file"
+        echo "2. Never automatically send bug reports to GitHub" >> "$cursor_rules_file"
+        echo "3. Always require explicit user confirmation before any GitHub API calls" >> "$cursor_rules_file"
+        echo "4. Show preview of bug report before asking for confirmation" >> "$cursor_rules_file"
+        echo "5. Respect privacy: For private repositories, remove all repo identifiers" >> "$cursor_rules_file"
+        echo "" >> "$cursor_rules_file"
+        echo "Example:" >> "$cursor_rules_file"
+        echo "- ✅ \"An error occurred. Would you like me to prepare a bug report for GitHub?\"" >> "$cursor_rules_file"
+        echo "- ❌ \"Error occurred. Automatically reporting to GitHub...\" (NEVER DO THIS)" >> "$cursor_rules_file"
+        bug_report_section_exists=true
     fi
     
     # Add the rules (check if we need to add them to existing section)
@@ -352,6 +391,7 @@ show_usage() {
     echo "  update                        Update todo.ai to latest version"
     echo "  backups, list-backups         List available backup versions"
     echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
+    echo "  report-bug \"description\"      Report a bug to GitHub Issues (requires GitHub CLI)"
     echo "  version, -v, --version        Show version information"
     echo ""
     echo ""
@@ -393,6 +433,7 @@ show_usage() {
     echo "  ./todo.ai rollback                   # Rollback to latest backup"
     echo "  ./todo.ai rollback 2                 # Rollback to backup #2"
     echo "  ./todo.ai rollback 20251030231500     # Rollback by timestamp"
+    echo "  ./todo.ai report-bug \"Error message\" # Report bug to GitHub Issues"
     echo "  ./todo.ai version                    # Show version"
 }
 
@@ -2601,6 +2642,577 @@ run_migrations() {
     rm -f "$lock_file" 2>/dev/null || true
 }
 
+# ============================================================================
+# Bug Reporting System
+# ============================================================================
+
+# Bug reporting configuration
+BUG_REPORT_ENABLED="${BUG_REPORT_ENABLED:-true}"
+BUG_REPORT_THRESHOLD="${BUG_REPORT_THRESHOLD:-75}"  # Similarity threshold (%)
+
+# Get GitHub repository URL (sanitized for private repos)
+get_bug_report_repo() {
+    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+        local repo_url=$(git remote get-url origin 2>/dev/null | sed 's/\.git$//' | sed 's/git@github\.com:/https:\/\/github.com\//' || echo '')
+        echo "$repo_url"
+    else
+        echo ""
+    fi
+}
+
+# Check if repository is private
+is_private_repo() {
+    local repo_url="$1"
+    if [[ -z "$repo_url" ]]; then
+        return 1
+    fi
+    
+    # Check if we can access repository metadata (basic check)
+    if command -v gh >/dev/null 2>&1; then
+        local repo_info=$(gh repo view "$repo_url" --json isPrivate 2>/dev/null)
+        if [[ -n "$repo_info" ]]; then
+            local is_private=$(echo "$repo_info" | grep -o '"isPrivate":[^,}]*' | cut -d: -f2)
+            if [[ "$is_private" == "true" ]]; then
+                return 0
+            fi
+        fi
+    fi
+    
+    # Default: assume public if we can't determine
+    return 1
+}
+
+# Collect error context
+collect_error_context() {
+    local error_message="$1"
+    local error_context="$2"
+    local command="$3"
+    
+    # Collect system information
+    local os_info=$(uname -srm 2>/dev/null || echo "Unknown")
+    local shell_info="$SHELL $(echo $SHELL | xargs -I{} {} --version 2>/dev/null | head -1 || echo '')"
+    local version_info="$VERSION"
+    
+    # Collect recent logs (first 50 log entries from top of file, skipping header lines)
+    # NOTE: Log file is sorted in descending order (newest entries at the top)
+    # So we use head with grep to skip header lines (# comments) and get the most recent entries
+    local recent_logs=""
+    if [[ -f "$LOG_FILE" ]]; then
+        recent_logs=$(grep -v "^#" "$LOG_FILE" 2>/dev/null | head -n 50 || echo "")
+    fi
+    
+    # Sanitize logs (remove sensitive info)
+    recent_logs=$(echo "$recent_logs" | sed 's/password[=:][^[:space:]]*/password=***/gi' || echo "$recent_logs")
+    recent_logs=$(echo "$recent_logs" | sed 's/token[=:][^[:space:]]*/token=***/gi' || echo "$recent_logs")
+    recent_logs=$(echo "$recent_logs" | sed 's/api[_-]key[=:][^[:space:]]*/api-key=***/gi' || echo "$recent_logs")
+    
+    # Collect repository info (sanitized for private repos)
+    local repo_url=$(get_bug_report_repo)
+    local repo_info=""
+    if [[ -n "$repo_url" ]] && ! is_private_repo "$repo_url"; then
+        repo_info="Git Repository: $repo_url"
+    elif [[ -n "$repo_url" ]]; then
+        # Private repo - don't include repo identifier
+        repo_info="Git Repository: [private repository]"
+    fi
+    
+    # Build context object (we'll use this in generate_bug_report)
+    # Use ###FIELD_SEP### as field separator to avoid conflicts with log content which contains pipes
+    echo "ERROR_MESSAGE:$error_message###FIELD_SEP###ERROR_CONTEXT:$error_context###FIELD_SEP###COMMAND:$command###FIELD_SEP###OS:$os_info###FIELD_SEP###SHELL:$shell_info###FIELD_SEP###VERSION:$version_info###FIELD_SEP###LOGS:$recent_logs###FIELD_SEP###REPO:$repo_info"
+}
+
+# Collect logs for bug report
+collect_logs() {
+    local max_lines="${1:-50}"
+    local log_content=""
+    
+    # Collect from .todo.ai/.todo.ai.log
+    # NOTE: Log file is sorted in descending order (newest entries at the top)
+    # So we use head with grep to skip header lines (# comments) and get the most recent entries
+    if [[ -f "$LOG_FILE" ]]; then
+        log_content=$(grep -v "^#" "$LOG_FILE" 2>/dev/null | head -n "$max_lines" || echo "")
+    fi
+    
+    # Sanitize sensitive information
+    log_content=$(echo "$log_content" | sed 's/password[=:][^[:space:]]*/password=***/gi' || echo "$log_content")
+    log_content=$(echo "$log_content" | sed 's/token[=:][^[:space:]]*/token=***/gi' || echo "$log_content")
+    log_content=$(echo "$log_content" | sed 's/api[_-]key[=:][^[:space:]]*/api-key=***/gi' || echo "$log_content")
+    
+    echo "$log_content"
+}
+
+# Generate bug report template
+generate_bug_report() {
+    local error_message="$1"
+    local error_context="$2"
+    local command="${3:-unknown}"
+    
+    # Collect context
+    local context=$(collect_error_context "$error_message" "$error_context" "$command")
+    
+    # Parse context (using ###FIELD_SEP### as field separator to avoid conflicts with log pipes)
+    local os_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^OS:/) {print substr($i, 4); exit}}')
+    local shell_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^SHELL:/) {print substr($i, 7); exit}}')
+    local version_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^VERSION:/) {print substr($i, 9); exit}}')
+    local repo_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^REPO:/) {print substr($i, 6); exit}}')
+    
+    # Collect logs directly to preserve newlines (don't parse from context string)
+    # Use a temporary file to preserve all newlines correctly
+    local temp_logs=$(mktemp)
+    collect_logs 50 > "$temp_logs"
+    local logs=$(cat "$temp_logs")
+    rm -f "$temp_logs"
+    
+    # Format shell version (clean up)
+    local shell_version=$(echo "$shell_info" | awk '{print $NF}' | head -1)
+    if [[ -z "$shell_version" ]]; then
+        shell_version="unknown"
+    fi
+    
+    # Get current date/time
+    local current_date=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # Build bug report
+    local bug_report="## Bug Report
+
+**Version**: $version_info
+**Date**: $current_date
+**OS**: $os_info
+**Shell**: $shell_version
+
+### Error
+\`\`\`
+$error_message
+\`\`\`
+
+### Command
+\`\`\`bash
+./todo.ai $command
+\`\`\`
+
+### Error Context
+\`\`\`
+$error_context
+\`\`\`
+
+### Recent Logs
+<details>
+<summary>Click to expand log history (last 50 lines)</summary>
+
+\`\`\`
+$logs
+\`\`\`
+
+</details>
+
+### System Information
+- OS: $os_info
+- Shell: $shell_version
+- Script Version: $version_info"
+    
+    # Only include repo info if not private (or if explicitly requested)
+    if [[ -n "$repo_info" ]]; then
+        bug_report="$bug_report
+- $repo_info"
+    fi
+    
+    bug_report="$bug_report
+
+### Additional Context
+[Any additional relevant information]
+
+---
+*Reported automatically by todo.ai*"
+    
+    echo "$bug_report"
+}
+
+# Calculate similarity between two strings (simple word-based)
+calculate_similarity() {
+    local text1="$1"
+    local text2="$2"
+    
+    # Convert to lowercase and extract words
+    local words1=$(echo "$text1" | tr '[:upper:]' '[:lower:]' | tr -s '[:space:]' '\n' | sort -u)
+    local words2=$(echo "$text2" | tr '[:upper:]' '[:lower:]' | tr -s '[:space:]' '\n' | sort -u)
+    
+    # Count common words and total unique words
+    local common_words=$(comm -12 <(echo "$words1") <(echo "$words2") | wc -l | tr -d ' ')
+    local total_unique=$(comm -3 <(echo "$words1") <(echo "$words2") | wc -l | tr -d ' ')
+    local total_words=$(comm <(echo "$words1") <(echo "$words2") | wc -l | tr -d ' ')
+    
+    # Calculate similarity percentage (simple Jaccard-like)
+    if [[ $total_unique -eq 0 ]] && [[ $common_words -gt 0 ]]; then
+        echo "100"
+        return
+    fi
+    
+    # Calculate similarity without bc (fallback for systems without bc)
+    if command -v bc >/dev/null 2>&1; then
+        local similarity=$(echo "scale=0; $common_words * 100 / ($total_unique + $common_words)" | bc 2>/dev/null || echo "0")
+    else
+        # Simple integer calculation fallback
+        local total=$((total_unique + common_words))
+        if [[ $total -gt 0 ]]; then
+            local similarity=$((common_words * 100 / total))
+        else
+            local similarity=0
+        fi
+    fi
+    echo "$similarity"
+}
+
+# Check for duplicate issues
+check_for_duplicate_issues() {
+    local title="$1"
+    local body="$2"
+    local repo_url="$3"
+    
+    if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
+        echo ""
+        return 1
+    fi
+    
+    # Check GitHub CLI authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        echo ""
+        return 1
+    fi
+    
+    # Search for issues with similar titles (extract keywords from title)
+    local keywords=$(echo "$title" | tr '[:upper:]' '[:lower:]' | grep -oE '[a-z]+' | head -5 | tr '\n' ' ' | sed 's/ $//')
+    
+    if [[ -z "$keywords" ]]; then
+        echo ""
+        return 1
+    fi
+    
+    # Search for issues (limit to last 30 days)
+    # Note: Don't include body in initial search as it may contain control characters that break JSON parsing
+    local issues_json=$(gh issue list --repo "$repo_url" --search "in:title $keywords" --limit 10 --json number,title,state,createdAt 2>/dev/null || echo "[]")
+    
+    if [[ -z "$issues_json" ]] || [[ "$issues_json" == "[]" ]]; then
+        echo ""
+        return 1
+    fi
+    
+    # Parse issues and check similarity
+    local duplicates=""
+    
+    # Use jq if available, otherwise fall back to basic parsing
+    if command -v jq >/dev/null 2>&1; then
+        # Use jq for proper JSON parsing
+        local issues_count=$(echo "$issues_json" | jq '. | length' 2>/dev/null || echo "0")
+        
+        for ((i=0; i<issues_count; i++)); do
+            local issue_number=$(echo "$issues_json" | jq -r ".[$i].number" 2>/dev/null || echo "")
+            local issue_title=$(echo "$issues_json" | jq -r ".[$i].title" 2>/dev/null || echo "")
+            
+            if [[ -z "$issue_number" ]] || [[ -z "$issue_title" ]] || [[ "$issue_number" == "null" ]] || [[ "$issue_title" == "null" ]]; then
+                continue
+            fi
+            
+            # Normalize titles for comparison (strip "Bug: " prefix from issue title)
+            local normalized_issue_title=$(echo "$issue_title" | sed 's/^Bug: *//')
+            local normalized_title="$title"
+            
+            # Calculate similarity for title
+            local title_similarity=$(calculate_similarity "$normalized_title" "$normalized_issue_title")
+            
+            # Use title similarity (body comparison skipped to avoid JSON parsing issues)
+            local max_similarity=$title_similarity
+            
+            # If similarity >= threshold, consider it a duplicate
+            if [[ $max_similarity -ge $BUG_REPORT_THRESHOLD ]]; then
+                if [[ -z "$duplicates" ]]; then
+                    duplicates="$issue_number|$issue_title|$max_similarity"
+                else
+                    duplicates="$duplicates\n$issue_number|$issue_title|$max_similarity"
+                fi
+            fi
+        done
+    else
+        # Fallback to basic parsing (less reliable)
+        local issues_count=$(echo "$issues_json" | grep -o '"number"' | wc -l | tr -d ' ')
+        
+        for ((i=0; i<issues_count; i++)); do
+            # Try to extract using awk (more reliable than grep+cut)
+            local issue_data=$(echo "$issues_json" | awk -v i="$i" 'BEGIN{RS="},? ?{";FS=","} NR==i+1 {
+                for(j=1;j<=NF;j++) {
+                    if($j ~ /"number":/) {
+                        gsub(/.*"number": ?/, "", $j)
+                        gsub(/[^0-9].*/, "", $j)
+                        print $j
+                        break
+                    }
+                }
+            }' | head -1)
+            
+            # Simple extraction - this is less reliable but better than before
+            local issue_number=$(echo "$issues_json" | awk -v i="$i" '{
+                gsub(/.*"number": ?/, "", $0)
+                match($0, /[0-9]+/)
+                if(RSTART>0) print substr($0, RSTART, RLENGTH)
+            }' | sed -n "$((i+1))p")
+            
+            if [[ -z "$issue_number" ]] || ! [[ "$issue_number" =~ ^[0-9]+$ ]]; then
+                continue
+            fi
+            
+            # Extract title (basic approach - get text between "title":" and next "
+            local issue_title=$(echo "$issues_json" | grep -o "\"title\":\"[^\"]*\"" | sed -n "$((i+1))p" | sed 's/"title":"//' | sed 's/"$//')
+            
+            if [[ -z "$issue_title" ]]; then
+                continue
+            fi
+            
+            # Normalize titles for comparison (strip "Bug: " prefix from issue title)
+            local normalized_issue_title=$(echo "$issue_title" | sed 's/^Bug: *//')
+            local normalized_title="$title"
+            
+            # Calculate similarity for title
+            local title_similarity=$(calculate_similarity "$normalized_title" "$normalized_issue_title")
+            
+            # Use title similarity only (body parsing is too complex without jq)
+            local max_similarity=$title_similarity
+            
+            # If similarity >= threshold, consider it a duplicate
+            if [[ $max_similarity -ge $BUG_REPORT_THRESHOLD ]]; then
+                if [[ -z "$duplicates" ]]; then
+                    duplicates="$issue_number|$issue_title|$max_similarity"
+                else
+                    duplicates="$duplicates\n$issue_number|$issue_title|$max_similarity"
+                fi
+            fi
+        done
+    fi
+    
+    if [[ -n "$duplicates" ]]; then
+        echo -e "$duplicates"
+        return 0
+    else
+        echo ""
+        return 1
+    fi
+}
+
+# Create new GitHub issue
+create_new_issue() {
+    local title="$1"
+    local body="$2"
+    local repo_url="$3"
+    
+    if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
+        echo "Error: GitHub CLI not available or repository not configured"
+        return 1
+    fi
+    
+    # Check GitHub CLI authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        echo "Error: GitHub CLI not authenticated. Run 'gh auth login' first"
+        return 1
+    fi
+    
+    # Create temporary file for body
+    local temp_body=$(mktemp)
+    echo "$body" > "$temp_body"
+    
+    # Create issue (try with auto-reported label, fallback to bug only if label doesn't exist)
+    if gh issue create --repo "$repo_url" --title "Bug: $title" --body-file "$temp_body" --label "bug,auto-reported" >/dev/null 2>&1; then
+        echo "✅ Bug report created successfully"
+        rm -f "$temp_body"
+        return 0
+    elif gh issue create --repo "$repo_url" --title "Bug: $title" --body-file "$temp_body" --label "bug" >/dev/null 2>&1; then
+        echo "✅ Bug report created successfully (without auto-reported label)"
+        rm -f "$temp_body"
+        return 0
+    else
+        echo "Error: Failed to create issue"
+        rm -f "$temp_body"
+        return 1
+    fi
+}
+
+# Reply to existing issue
+reply_to_existing_issue() {
+    local issue_number="$1"
+    local body="$2"
+    local repo_url="$3"
+    
+    if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
+        echo "Error: GitHub CLI not available or repository not configured"
+        return 1
+    fi
+    
+    # Check GitHub CLI authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        echo "Error: GitHub CLI not authenticated. Run 'gh auth login' first"
+        return 1
+    fi
+    
+    # Create "me too" message
+    local me_too_message="## Me Too - Same Issue Encountered
+
+**Version**: $VERSION
+**Date**: $(date '+%Y-%m-%d %H:%M:%S')
+**OS**: $(uname -srm 2>/dev/null || echo 'Unknown')
+
+I'm experiencing the same error. Here's my context:
+
+$body
+
+---
+*Reported automatically by todo.ai*"
+    
+    # Create temporary file for comment
+    local temp_comment=$(mktemp)
+    echo "$me_too_message" > "$temp_comment"
+    
+    # Add comment to issue
+    if gh issue comment "$issue_number" --repo "$repo_url" --body-file "$temp_comment" >/dev/null 2>&1; then
+        echo "✅ Added 'me too' comment to issue #$issue_number"
+        rm -f "$temp_comment"
+        return 0
+    else
+        echo "Error: Failed to add comment to issue"
+        rm -f "$temp_comment"
+        return 1
+    fi
+}
+
+# Handle duplicate detection with user confirmation
+handle_duplicate_detection() {
+    local title="$1"
+    local body="$2"
+    local repo_url="$3"
+    
+    # Check for duplicates
+    local duplicates=$(check_for_duplicate_issues "$title" "$body" "$repo_url")
+    
+    if [[ -n "$duplicates" ]]; then
+        echo ""
+        echo "Similar issues found:"
+        echo ""
+        
+        # Display duplicates and collect issue numbers
+        local count=1
+        local issue_numbers=()
+        while IFS='|' read -r issue_num issue_title similarity; do
+            if [[ -n "$issue_num" ]]; then
+                echo "$count) Issue #$issue_num: $issue_title (similarity: ${similarity}%)"
+                issue_numbers+=("$issue_num")
+                count=$((count + 1))
+            fi
+        done <<< "$duplicates"
+        
+        echo ""
+        printf "Would you like to add a 'me too' comment to an existing issue? (y/N) "
+        read -r reply
+        
+        if [[ "$reply" =~ ^[Yy]$ ]]; then
+            # Ask which issue
+            echo ""
+            printf "Enter issue number to reply to: "
+            read -r selected_num
+            
+            if [[ -n "$selected_num" ]] && [[ "$selected_num" =~ ^[0-9]+$ ]]; then
+                if reply_to_existing_issue "$selected_num" "$body" "$repo_url"; then
+                    return 0
+                else
+                    echo "Error: Failed to add comment. Bug report cancelled."
+                    return 1
+                fi
+            else
+                echo "Invalid issue number"
+                return 1
+            fi
+        else
+            printf "Create a new issue instead? (y/N) "
+            read -r reply
+            if [[ "$reply" =~ ^[Yy]$ ]]; then
+                create_new_issue "$title" "$body" "$repo_url"
+            else
+                echo "Bug report cancelled"
+                return 0
+            fi
+        fi
+    else
+        # No duplicates, ask to create new issue
+        printf "Would you like to create a new issue? (y/N) "
+        read -r reply
+        if [[ "$reply" =~ ^[Yy]$ ]]; then
+            create_new_issue "$title" "$body" "$repo_url"
+        else
+            echo "Bug report cancelled"
+            return 0
+        fi
+    fi
+}
+
+# Main bug reporting entry point - ALWAYS requires user confirmation
+suggest_bug_report() {
+    local error_message="$1"
+    local error_context="$2"
+    local command="${3:-unknown}"
+    
+    # Check if bug reporting is enabled
+    if [[ "$BUG_REPORT_ENABLED" != "true" ]]; then
+        return 0
+    fi
+    
+    # Get repository URL
+    local repo_url=$(get_bug_report_repo)
+    if [[ -z "$repo_url" ]]; then
+        echo "⚠️  Cannot report bug: No GitHub repository configured"
+        return 1
+    fi
+    
+    # Generate bug report
+    local bug_report=$(generate_bug_report "$error_message" "$error_context" "$command")
+    
+    # Extract title from error message (first line, max 100 chars)
+    local title=$(echo "$error_message" | head -1 | cut -c1-100)
+    
+    # Show error and suggestion
+    echo ""
+    echo "⚠️  An error occurred: $error_message"
+    echo ""
+    echo "Would you like to report this bug to GitHub Issues?"
+    echo ""
+    echo "Preview of bug report:"
+    echo "---"
+    echo "$bug_report" | head -30
+    echo "---"
+    echo ""
+    
+    # Always require confirmation
+    printf "Report this bug? (y/N) "
+    read -r reply
+    
+    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+        echo "Bug report cancelled by user"
+        return 0
+    fi
+    
+    # User confirmed - proceed with duplicate check and reporting
+    handle_duplicate_detection "$title" "$bug_report" "$repo_url"
+}
+
+# Command handler for manual bug reporting
+report_bug() {
+    local error_description="$1"
+    local error_context="${2:-}"
+    local command="${3:-}"
+    
+    if [[ -z "$error_description" ]]; then
+        echo "Error: Please provide an error description"
+        echo "Usage: ./todo.ai report-bug \"Error description\" [error context] [command]"
+        return 1
+    fi
+    
+    suggest_bug_report "$error_description" "$error_context" "$command"
+}
+
 # Migration: Fix section order in TODO.md
 migrate_section_order() {
     local migration_id="section_order_fix"
@@ -2866,6 +3478,10 @@ case "${1:-}" in
     "rollback")
         shift
         rollback "$@"
+        ;;
+    "report-bug")
+        shift
+        report_bug "$1" "$2" "$3"
         ;;
     "version"|"--version"|"-v")
         echo "todo.ai version $VERSION"

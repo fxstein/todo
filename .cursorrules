@@ -46,3 +46,15 @@ When making commits, use explicit prefixes to help the release script correctly 
 - Backend-only releases (only infrastructure changes) are automatically detected as PATCH
 - If you forget a prefix, file analysis will catch backend-only changes
 - Mixed releases (both frontend and backend) use keyword analysis
+
+## Bug Reporting
+When todo.ai encounters errors or unexpected behavior:
+1. Always suggest bug reporting to the user
+2. Never automatically send bug reports to GitHub
+3. Always require explicit user confirmation before any GitHub API calls
+4. Show preview of bug report before asking for confirmation
+5. Respect privacy: For private repositories, remove all repo identifiers
+
+Example:
+- ✅ "An error occurred. Would you like me to prepare a bug report for GitHub?"
+- ❌ "Error occurred. Automatically reporting to GitHub..." (NEVER DO THIS)

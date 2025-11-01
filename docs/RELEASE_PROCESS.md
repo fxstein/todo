@@ -360,10 +360,10 @@ This helps debug issues when releases get stuck or fail. Check `RELEASE_LOG.md` 
 **Uncommitted Files Handling:**
 
 The script now properly handles:
-- `RELEASE_SUMMARY.md` - allowed as uncommitted (will be used if present)
-- Other uncommitted files - will block the release (must commit or stash)
+- `RELEASE_SUMMARY.md` - **MUST BE COMMITTED** as part of the release process (automatically committed along with version bump)
+- Other uncommitted files - will block the release (must commit or stash before releasing)
 
-The script handles everything automatically - just provide the summary file if you want it included!
+**IMPORTANT:** Release notes and summaries are never allowed as uncommitted changes. The script automatically commits `RELEASE_SUMMARY.md` along with the version bump, ensuring all release materials are properly tracked in git.
 
 ## Pre-Release Checklist
 
@@ -379,8 +379,8 @@ Before creating a release, ensure:
 **Notes:**
 - Release notes are automatically generated from commits - no manual preparation needed!
 - AI-generated summaries (recommended) should be created by the agent and saved to `RELEASE_SUMMARY.md`
-- The summary file (`RELEASE_SUMMARY.md`) can be committed or kept as a temporary file - it's included in the release notes but not required in the repository
-- The script allows `RELEASE_SUMMARY.md` as an uncommitted file - you don't need to commit it before releasing
+- The summary file (`RELEASE_SUMMARY.md`) **will be automatically committed** as part of the release process
+- **NEVER** allow release notes or summaries to remain uncommitted - they must be committed as part of the release
 - All release operations are automatically logged to `RELEASE_LOG.md` with detailed timestamps for debugging and auditing
 
 ## Post-Release Tasks

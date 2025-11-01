@@ -329,16 +329,12 @@ main() {
         fi
     fi
     
-    # Check for uncommitted changes (allow release-related files)
+    # Check for uncommitted changes (filter out weird backup files)
     local status_output=$(git status -s)
     local uncommitted=""
     
-    # Filter out allowed files: RELEASE_SUMMARY.md and weird backup files
+    # Filter out only weird backup files like "todo.ai ''"
     while IFS= read -r line; do
-        # Skip RELEASE_SUMMARY.md
-        if [[ "$line" =~ ^[?]{2}[[:space:]]+RELEASE_SUMMARY\.md$ ]]; then
-            continue
-        fi
         # Skip weird backup files like "todo.ai ''"
         if [[ "$line" =~ ^[?]{2}[[:space:]]+\"todo\.ai ]]; then
             continue
@@ -353,13 +349,30 @@ main() {
         fi
     done <<< "$status_output"
     
+    # If RELEASE_SUMMARY.md exists and is uncommitted, we'll commit it as part of the release
+    local summary_needs_commit=false
+    if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
+        # Check if file is untracked (starts with ??)
+        if echo "$status_output" | grep -qE "^[?]{2}[[:space:]]+.*${SUMMARY_FILE}$"; then
+            summary_needs_commit=true
+            log_release_step "SUMMARY DETECTED" "Found uncommitted summary file: ${SUMMARY_FILE} - will commit as part of release"
+            # Remove it from uncommitted list so it doesn't block the release
+            uncommitted=$(echo -e "$uncommitted" | grep -vE ".*${SUMMARY_FILE}$" || true)
+        # Check if file is modified (starts with M or A)
+        elif echo "$status_output" | grep -qE "^[MA ][[:space:]]+.*${SUMMARY_FILE}$"; then
+            summary_needs_commit=true
+            log_release_step "SUMMARY DETECTED" "Found modified summary file: ${SUMMARY_FILE} - will commit as part of release"
+            # Remove it from uncommitted list so it doesn't block the release
+            uncommitted=$(echo -e "$uncommitted" | grep -vE ".*${SUMMARY_FILE}$" || true)
+        fi
+    fi
+    
     if [[ -n "$uncommitted" ]]; then
         echo -e "${RED}❌ Error: Uncommitted changes detected${NC}"
         echo "Uncommitted files:"
         echo -e "$uncommitted"
         echo ""
         echo "Please commit or stash changes before releasing"
-        echo "Note: RELEASE_SUMMARY.md is allowed and will be used if present"
         log_release_step "ERROR - Uncommitted Changes" "Release aborted due to uncommitted changes:\n\n$uncommitted"
         exit 1
     fi
@@ -470,11 +483,25 @@ main() {
     update_version "$NEW_VERSION"
     log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai"
     
-    # Commit version change
-    echo -e "${BLUE}💾 Committing version change...${NC}"
+    # Commit version change and summary file
+    echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
     git add todo.ai
-    local version_commit=$(git commit -m "Bump version to $NEW_VERSION" 2>&1 || echo "no commit needed")
+    
+    # Commit summary file if it exists and is uncommitted
+    if [[ "$summary_needs_commit" == true ]] && [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
+        log_release_step "COMMIT SUMMARY" "Adding release summary file to commit: ${SUMMARY_FILE}"
+        git add "$SUMMARY_FILE"
+    fi
+    
+    local commit_msg="Bump version to $NEW_VERSION"
+    if [[ "$summary_needs_commit" == true ]]; then
+        commit_msg="${commit_msg}
+
+Includes release summary from ${SUMMARY_FILE}"
+    fi
+    
+    local version_commit=$(git commit -m "$commit_msg" 2>&1 || echo "no commit needed")
     log_release_step "VERSION COMMITTED" "Version change committed: ${version_commit}"
     
     # Create and push tag

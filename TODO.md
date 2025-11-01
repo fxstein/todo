@@ -3,12 +3,8 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#36** Create release process for todo.ai on GitHub
-  - [ ] **#36.5** Review and finetune release numbering logic
-  - [ ] **#36.4** Create permanent release log file with detailed timestamps
-  - [ ] **#36.3** Create release management process
-  - [ ] **#36.2** Review release process document
-  - [x] **#36.1** Create release process document
+- [ ] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature`
+  - [x] **#37.1** Create design document for migration/cleanup system architecture
 - [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
   - [x] **#35.3** Create tests directory and draft detailed test plan document `#tests` `#docs`
   - [x] **#35.2** Define test framework architecture and tooling `#tests` `#planning`
@@ -17,31 +13,25 @@
 - [ ] **#33** Test nested subtasks implementation `#test`
 - [ ] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup`
   - [ ] **#.1.1** Add sub-subtask (2-level nesting) `#test`
-- [ ] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
+- [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup`
 - [ ] **#15** Setup githooks `#setup` `#git`
   - [ ] **#15.4** TODO linting (using todo.ai --lint) `#lint`
   - [ ] **#15.3** JSON linting `#lint`
   - [ ] **#15.2** YAML linting `#lint`
   - [ ] **#15.1** Markdown linting `#lint`
-- [ ] **#14** Formatting fixes complete `#setup`
-- [ ] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#setup` `#git`
-  - [ ] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs`
-- [ ] **#5** Initialize repository structure and configuration `#setup` `#repo`
 ------------------
 
-## Deleted Tasks
-    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
-  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#9** Test new formatting fix `#test` (deleted 2025-10-30, expires 2025-11-29)
-    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-10-30, expires 2025-11-29)
-  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#31** Test task after serial rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#24** Test task after rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
-
 ## Recently Completed
+- [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
+- [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#setup` `#git` (2025-11-01)
+  - [ ] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (2025-11-01)
+- [x] **#5** Initialize repository structure and configuration `#setup` `#repo` (2025-11-01)
+- [x] **#36** Create release process for todo.ai on GitHub (2025-11-01)
+  - [x] **#36.5** Review and finetune release numbering logic (2025-11-01)
+  - [x] **#36.4** Create permanent release log file with detailed timestamps (2025-11-01)
+  - [x] **#36.3** Create release management process (2025-11-01)
+  - [x] **#36.2** Review release process document (2025-11-01)
+  - [x] **#36.1** Create release process document (2025-11-01)
 - [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
 - [x] **#30** Implement versioned backups and rollback capability `#feature` (2025-10-30)
   - [x] **#30.11** Test backup and rollback functionality `#test` (2025-10-30)
@@ -106,9 +96,21 @@
 - [x] **#10** Verify formatting works correctly `#test` (2025-10-30)
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
+## Deleted Tasks
+    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
+  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#9** Test new formatting fix `#test` (deleted 2025-10-30, expires 2025-11-29)
+    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-10-30, expires 2025-11-29)
+  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#31** Test task after serial rename `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#24** Test task after rename `#test` (deleted 2025-10-30, expires 2025-11-29)
+- [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
+
 ---
 
-**Last Updated:** Sat Nov  1 10:46:46 CET 2025
+**Last Updated:** Sat Nov  1 11:31:30 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

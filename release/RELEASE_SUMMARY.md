@@ -1,11 +1,25 @@
-This release fixes a critical bug in the bug reporting feature where log collection was retrieving the oldest entries instead of the newest ones.
+This release introduces the new bug reporting feature, enabling todo.ai to self-report bugs to GitHub Issues with intelligent duplicate detection and user-controlled reporting.
 
-**Key Fixes:**
-- Fixed log collection order: Changed from `tail -n 50` to `head -n 50` since the log file is sorted in descending order (newest entries at the top)
-- Added header line filtering: Skip comment lines (starting with `#`) when collecting logs
-- Updated documentation: Added comments explaining the log file format (descending order, newest first)
+**New Feature: Bug Reporting System**
+- Self-reporting to GitHub Issues: When errors occur, todo.ai can suggest creating a bug report on GitHub Issues
+- Manual confirmation required: Always requires explicit user confirmation before any GitHub API calls - never automatic
+- Duplicate detection: Intelligently searches for similar issues before creating new ones
+- "Me Too" replies: If similar issues exist, users can add "me too" comments with their context
+- Context collection: Automatically gathers error details, system information, and recent logs (50 lines)
+- Privacy protection: For private repositories, hides repository identifiers to protect privacy
+- Log history: Includes collapsed log sections with the 50 most recent entries (newest first)
+- GitHub CLI integration: Uses GitHub CLI for seamless issue creation and commenting
 
-**Impact:**
-- Bug reports now correctly include the 50 most recent log entries instead of the 50 oldest entries
-- This ensures developers receive relevant, recent context when debugging issues
-- The fix improves the quality and usefulness of automated bug reports
+**Technical Details:**
+- Similarity threshold: 75% for duplicate detection (word-based comparison)
+- Log collection: Automatically collects and sanitizes logs (passwords, tokens filtered)
+- Template-based reports: Structured bug reports with version, OS, shell, error context, and logs
+- Cursor rules integration: Automatically adds rules to .cursorrules for AI agent behavior
+
+**User Experience:**
+- Error suggestion: When errors occur, todo.ai suggests reporting (never forces it)
+- Preview before submit: Shows preview of bug report before asking for confirmation
+- Interactive flow: Guides users through duplicate detection and "me too" reply process
+- Graceful fallbacks: Works even if GitHub CLI is unavailable (just suggests reporting)
+
+This feature significantly improves the feedback loop between users and developers while maintaining full user control and privacy protection.

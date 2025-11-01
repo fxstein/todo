@@ -73,18 +73,23 @@ The agent will automatically:
 
 ### Quick Release (Manual)
 
-Simply run:
-
+**Without AI-generated summary:**
 ```bash
 ./release.sh
 ```
 
+**With AI-generated summary:**
+```bash
+./release.sh --summary RELEASE_SUMMARY.md
+```
+
 The intelligent release script will:
-1. **Analyze commits** since the last release
-2. **Determine version bump** (major/minor/patch) based on commit messages
-3. **Generate release notes** automatically from commits
-4. **Request human review** for major releases or releases with >10 commits
-5. **Execute the release** automatically after approval
+1. **Include AI-generated summary** (if provided via `--summary` flag)
+2. **Analyze commits** since the last release
+3. **Determine version bump** (major/minor/patch) based on commit messages
+4. **Generate release notes** automatically from commits
+5. **Request human review** for major releases or releases with >10 commits
+6. **Execute the release** automatically after approval
 
 ### How It Works
 
@@ -123,6 +128,72 @@ The script generates release notes in two parts:
 ```bash
 ./release.sh --summary RELEASE_SUMMARY.md
 ```
+
+**Example release notes format:**
+
+When using the `--summary` flag, the release notes will have this structure:
+
+```markdown
+## Release 1.2.0
+
+This release enhances the automated release process with AI-generated 
+human-readable summaries and fixes a critical bug in the version update 
+mechanism.
+
+The most significant improvement is the introduction of AI-generated 
+release summaries. When using AI agents like Cursor, agents can now 
+automatically generate a 2-3 paragraph human-readable summary that 
+highlights key improvements and user-facing benefits...
+
+Additionally, a critical bug fix ensures that version updates only 
+replace actual `VERSION=` variable assignments...
+
+---
+
+### Added
+- Add support for AI-generated human-readable release summaries
+- Add release summary for testing AI-generated summary feature
+
+### Changed
+- Update version to 1.1.0 to match release
+
+### Fixed
+- Fix version update to only replace VERSION assignments
+
+### Other
+- Document AI-generated release summary feature
+
+*Total commits: 5*
+```
+
+**Creating an AI-generated summary:**
+
+When generating a summary, save it to `RELEASE_SUMMARY.md` with this format:
+
+```markdown
+This release enhances the automated release process with AI-generated 
+human-readable summaries and fixes a critical bug in the version update 
+mechanism.
+
+The most significant improvement is the introduction of AI-generated 
+release summaries. When using AI agents like Cursor, agents can now 
+automatically generate a 2-3 paragraph human-readable summary that 
+highlights key improvements and user-facing benefits. This summary 
+appears at the top of release notes, making them much more accessible 
+and informative than raw commit lists alone.
+
+Additionally, a critical bug fix ensures that version updates only 
+replace actual `VERSION=` variable assignments, not all occurrences 
+throughout the codebase. This prevents accidental corruption of grep 
+patterns and other code that might contain version-like strings.
+```
+
+**Guidelines for summary writing:**
+- Focus on user-facing benefits and improvements
+- Explain what's new and why it matters
+- Use 2-3 paragraphs (not too short, not too long)
+- Write in plain language (avoid overly technical jargon)
+- Highlight the most important changes first
 
 ### Human Review Safeguards
 
@@ -246,11 +317,24 @@ Use this template for consistent formatting:
 The `release.sh` script is an intelligent, fully automated release tool that:
 
 1. **Automatically determines version** by analyzing commit history
-2. **Generates release notes** from commit messages
-3. **Requests human review** when needed (major releases, >10 commits)
-4. **Executes the release** after approval
+2. **Includes AI-generated summary** (if provided via `--summary` flag)
+3. **Generates release notes** from commit messages
+4. **Requests human review** when needed (major releases, >10 commits)
+5. **Executes the release** after approval
 
-**No parameters needed** - just run `./release.sh` and it handles everything!
+**Usage:**
+```bash
+# Without AI summary
+./release.sh
+
+# With AI-generated summary
+./release.sh --summary RELEASE_SUMMARY.md
+```
+
+**Options:**
+- `--summary <file>` or `-s <file>`: Include AI-generated human-readable summary from the specified file
+
+The script handles everything automatically - just provide the summary file if you want it included!
 
 ## Pre-Release Checklist
 
@@ -263,7 +347,10 @@ Before creating a release, ensure:
 - [ ] TODO.md is updated with completed tasks
 - [ ] GitHub CLI authenticated (`gh auth status`)
 
-**Note:** Release notes are automatically generated from commits - no manual preparation needed!
+**Notes:**
+- Release notes are automatically generated from commits - no manual preparation needed!
+- AI-generated summaries (recommended) should be created by the agent and saved to `RELEASE_SUMMARY.md`
+- The summary file (`RELEASE_SUMMARY.md`) can be committed or kept as a temporary file - it's included in the release notes but not required in the repository
 
 ## Post-Release Tasks
 

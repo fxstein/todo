@@ -395,6 +395,7 @@ Before creating a release, ensure:
 - [ ] All planned features for this release are complete
 - [ ] TODO.md is updated with completed tasks
 - [ ] GitHub CLI authenticated (`gh auth status`)
+- [ ] **Migrations reviewed** (if any migrations are included in this release)
 
 **Notes:**
 - Release notes are automatically generated from commits - no manual preparation needed!
@@ -402,6 +403,106 @@ Before creating a release, ensure:
 - The summary file (`release/RELEASE_SUMMARY.md`) **will be automatically committed** as part of the release process
 - **NEVER** allow release notes or summaries to remain uncommitted - they must be committed as part of the release
 - All release operations are automatically logged to `release/RELEASE_LOG.log` with detailed timestamps for debugging and auditing
+
+## Migrations in Releases
+
+### Overview
+
+`todo.ai` includes an automatic migration system that runs one-time fixes and cleanups on existing installations when they update. Migrations are registered in the script and execute automatically based on version.
+
+### Adding Migrations to a Release
+
+1. **During Development:**
+   - Identify migration needs (e.g., structural fixes, format changes)
+   - Write migration function following the pattern in `docs/MIGRATION_GUIDE.md`
+   - Add migration to the `MIGRATIONS` registry with target version
+   - Test migration locally
+
+2. **Before Release:**
+   - Review migrations for this release
+   - Ensure migrations are idempotent (safe to run multiple times)
+   - Verify migration version matches release version
+   - Test migration with wrong state (problem exists)
+   - Test migration with correct state (problem doesn't exist)
+   - Test idempotency (runs twice without issues)
+
+3. **During Release:**
+   - Migrations are included automatically in the new version
+   - No additional release steps needed
+   - Migration will run automatically on user update
+
+4. **Release Notes:**
+   - Document migrations in release notes if user-visible
+   - Include in "Migration Notes" section
+   - Example:
+     ```markdown
+     ### Migration Notes
+     
+     This release includes automatic migrations that will run once on update:
+     
+     - **Section Order Fix (v1.3.5):** Automatically reorders TODO.md sections to correct order
+     - **Backup Cleanup (v1.4.0):** Removes obsolete .bak files from previous versions
+     ```
+
+### Migration Registry
+
+Migrations are registered in `todo.ai` in the `MIGRATIONS` array:
+
+```zsh
+declare -a MIGRATIONS=(
+    "1.3.5|section_order_fix|Fix TODO.md section order|migrate_section_order"
+    "1.4.0|cleanup_old_backups|Remove old .bak files|cleanup_old_backup_files"
+)
+```
+
+**Format:** `"VERSION|MIGRATION_ID|DESCRIPTION|FUNCTION_NAME"`
+
+### Migration Execution
+
+Migrations run automatically:
+- On every script execution (fast check via `.migrated` file)
+- After initialization, before main logic
+- Only if version >= target version
+- Only if not already executed (checked via `.migrated` file)
+- Locked to prevent concurrent execution
+
+### Migration Testing
+
+Before including migrations in a release:
+
+1. **Test with wrong state:**
+   - Create TODO.md with problem state
+   - Run migration
+   - Verify it fixes the issue
+
+2. **Test with correct state:**
+   - Create TODO.md without problem
+   - Run migration
+   - Verify it doesn't break anything
+
+3. **Test idempotency:**
+   - Run migration
+   - Run again
+   - Verify second run is skipped (already migrated)
+
+4. **Test version check:**
+   - Verify migration runs when version >= target
+   - Verify migration doesn't run when version < target
+
+### Documentation
+
+For detailed migration creation instructions, see:
+- **Migration Guide:** `docs/MIGRATION_GUIDE.md`
+- **Design Document:** `docs/MIGRATION_SYSTEM_DESIGN.md`
+
+### Example Migration Workflow
+
+1. **Identify need:** Existing installations have wrong section order
+2. **Write migration:** Create `migrate_section_order()` function
+3. **Test migration:** Verify it fixes the problem
+4. **Add to registry:** `"1.3.5|section_order_fix|Fix TODO.md section order|migrate_section_order"`
+5. **Test idempotency:** Run twice, verify second run is skipped
+6. **Release:** Migration runs automatically when users update to 1.3.5+
 
 ## Post-Release Tasks
 

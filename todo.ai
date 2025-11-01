@@ -1509,19 +1509,32 @@ delete_task() {
 # Function to ensure Deleted Tasks section exists
 ensure_deleted_section() {
     if ! grep -q "^## Deleted Tasks" "$TODO_FILE"; then
-        # Add Deleted section before Recently Completed
+        # Add Deleted section after Recently Completed
         local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
         if [[ -n "$recently_completed_line" ]]; then
+            # Find the end of the Recently Completed section (next section header or end of file)
+            local next_section_line=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
+            local insert_line
+            if [[ -z "$next_section_line" ]]; then
+                # No next section, insert at end of file
+                insert_line=$(wc -l < "$TODO_FILE" | tr -d ' ')
+            else
+                # Insert before the next section
+                insert_line=$((next_section_line - 1))
+            fi
+            
             if [[ "$(uname)" == "Darwin" ]]; then
                 # Use temporary file approach for macOS compatibility
                 local temp_file=$(mktemp)
-                head -n $((recently_completed_line - 1)) "$TODO_FILE" > "$temp_file"
+                head -n "$insert_line" "$TODO_FILE" > "$temp_file"
+                echo "" >> "$temp_file"
                 echo "## Deleted Tasks" >> "$temp_file"
                 echo "" >> "$temp_file"
-                tail -n +$recently_completed_line "$TODO_FILE" >> "$temp_file"
+                tail -n +$((insert_line + 1)) "$TODO_FILE" >> "$temp_file" 2>/dev/null || true
                 mv "$temp_file" "$TODO_FILE"
             else
-                sed_inplace "${recently_completed_line}i## Deleted Tasks\n" "$TODO_FILE"
+                # Insert after the last line before next section
+                sed_inplace "${insert_line}a\\\n## Deleted Tasks\n" "$TODO_FILE"
             fi
         fi
     fi
@@ -2499,11 +2512,183 @@ update_tool() {
 
 
 
+# ============================================================================
+# Migration System
+# ============================================================================
+
+# Migration registry
+# Format: "VERSION|MIGRATION_ID|DESCRIPTION|FUNCTION_NAME"
+declare -a MIGRATIONS=(
+    "1.3.5|section_order_fix|Fix TODO.md section order|migrate_section_order"
+)
+
+# Function to compare semantic versions
+version_compare() {
+    local version1="$1"
+    local version2="$2"
+    local operator="$3"
+    
+    # Convert versions to comparable format (1.3.5 -> 1003005)
+    local v1_num=$(echo "$version1" | awk -F. '{printf "%d%03d%03d", $1, $2, $3}')
+    local v2_num=$(echo "$version2" | awk -F. '{printf "%d%03d%03d", $1, $2, $3}')
+    
+    case "$operator" in
+        ">=") [[ $v1_num -ge $v2_num ]] ;;
+        ">")  [[ $v1_num -gt $v2_num ]] ;;
+        "<=") [[ $v1_num -le $v2_num ]] ;;
+        "<")  [[ $v1_num -lt $v2_num ]] ;;
+        "==") [[ $v1_num -eq $v2_num ]] ;;
+        *) return 1 ;;
+    esac
+}
+
+# Function to run migrations
+run_migrations() {
+    local current_version="$VERSION"
+    local migrations_dir="$(pwd)/.todo.ai/migrations"
+    local lock_file="${migrations_dir}/.migrations_lock"
+    
+    # Lock to prevent concurrent execution
+    if [[ -f "$lock_file" ]]; then
+        # Another instance is running migrations, skip
+        return 0
+    fi
+    
+    # Create migrations directory if it doesn't exist
+    mkdir -p "$migrations_dir" 2>/dev/null || return 1
+    
+    # Create lock file
+    touch "$lock_file" 2>/dev/null || return 1
+    
+    # Process each migration
+    for migration in "${MIGRATIONS[@]}"; do
+        IFS='|' read -r target_version migration_id description function_name <<< "$migration"
+        
+        # Check if this migration applies to current or earlier version
+        if version_compare "$current_version" "$target_version" ">="; then
+            # Check if already executed
+            local migration_file="${migrations_dir}/v${target_version}_${migration_id}.migrated"
+            if [[ ! -f "$migration_file" ]]; then
+                # Run migration
+                if "$function_name"; then
+                    # Migration succeeded - output is handled by migration function
+                    true
+                else
+                    # Migration failed - log but don't block
+                    echo "⚠️  Migration failed: $description" >&2
+                fi
+            fi
+        fi
+    done
+    
+    # Remove lock file
+    rm -f "$lock_file" 2>/dev/null || true
+}
+
+# Migration: Fix section order in TODO.md
+migrate_section_order() {
+    local migration_id="section_order_fix"
+    local migrations_dir="$(pwd)/.todo.ai/migrations"
+    local migration_file="${migrations_dir}/v1.3.5_${migration_id}.migrated"
+    
+    # Check if already migrated
+    if [[ -f "$migration_file" ]]; then
+        return 0
+    fi
+    
+    # Check prerequisites
+    if [[ ! -f "$TODO_FILE" ]]; then
+        return 1
+    fi
+    
+    # Check if sections are in wrong order (Deleted Tasks before Recently Completed)
+    local deleted_line=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1 | head -1)
+    local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
+    
+    # If both exist and Deleted is before Recently Completed, fix it
+    if [[ -n "$deleted_line" ]] && [[ -n "$recently_completed_line" ]] && [[ $deleted_line -lt $recently_completed_line ]]; then
+        # Extract sections
+        local temp_file=$(mktemp)
+        
+        # Find where Recently Completed section ends (next section header or end of file)
+        local next_section_line=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
+        local recently_completed_end
+        if [[ -z "$next_section_line" ]]; then
+            # No next section, Recently Completed is at end of file
+            recently_completed_end=$(wc -l < "$TODO_FILE" | tr -d ' ')
+        else
+            recently_completed_end=$((next_section_line - 1))
+        fi
+        
+        # Find where Deleted Tasks section ends
+        local deleted_end
+        if [[ -z "$next_section_line" ]]; then
+            # If Deleted was the last section before Recently Completed
+            deleted_end=$((recently_completed_line - 1))
+        else
+            # Find next section after Deleted
+            local deleted_next_section=$(awk "NR > $deleted_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
+            if [[ -n "$deleted_next_section" ]]; then
+                deleted_end=$((deleted_next_section - 1))
+            else
+                deleted_end=$(wc -l < "$TODO_FILE" | tr -d ' ')
+            fi
+        fi
+        
+        # Extract Deleted Tasks section (including header)
+        local deleted_section=$(sed -n "${deleted_line},${deleted_end}p" "$TODO_FILE")
+        
+        # Remove Deleted Tasks section from original file
+        sed_inplace "${deleted_line},${deleted_end}d" "$TODO_FILE"
+        
+        # Recalculate line numbers after deletion
+        recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
+        if [[ -n "$recently_completed_line" ]]; then
+            # Find where Recently Completed section ends now
+            local new_next_section=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
+            local insert_line
+            if [[ -z "$new_next_section" ]]; then
+                # No next section, insert at end
+                insert_line=$(wc -l < "$TODO_FILE" | tr -d ' ')
+            else
+                # Insert before next section
+                insert_line=$((new_next_section - 1))
+            fi
+            
+            # Insert Deleted Tasks section after Recently Completed
+            if [[ "$(uname)" == "Darwin" ]]; then
+                # macOS approach: use temporary file
+                head -n "$insert_line" "$TODO_FILE" > "$temp_file"
+                echo "" >> "$temp_file"
+                echo "$deleted_section" >> "$temp_file"
+                tail -n +$((insert_line + 1)) "$TODO_FILE" >> "$temp_file" 2>/dev/null || true
+                mv "$temp_file" "$TODO_FILE"
+            else
+                # Linux approach: use sed
+                echo "$deleted_section" > "$temp_file"
+                sed_inplace "${insert_line}r $temp_file" "$TODO_FILE"
+                rm -f "$temp_file"
+            fi
+            
+            echo "✓ Migration: Fixed TODO.md section order" >&2
+        fi
+    fi
+    
+    # Mark as complete
+    mkdir -p "$migrations_dir" 2>/dev/null || return 1
+    touch "$migration_file" 2>/dev/null || return 1
+    
+    return 0
+}
+
 # Initialize log file
 init_log_file
 
 # Initialize TODO file
 init_todo_file
+
+# Run migrations (after initialization, before main logic)
+run_migrations
 
 # Initialize Cursor rules if needed (check on every run, add if missing)
 init_cursor_rules

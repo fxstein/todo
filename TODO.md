@@ -4,6 +4,17 @@
 
 ## Tasks
 - [ ] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature`
+  - [x] **#37.12** Update release process documentation to include migration workflow
+  - [x] **#37.11** Document migration creation process for developers
+  - [ ] **#37.10** Test migration system with real TODO.md files (wrong section order)
+  - [ ] **#37.9** Create integration tests for migration execution during update
+  - [x] **#37.8** Create unit tests for migration system (version comparison, idempotency)
+  - [x] **#37.7** Add migration execution to script startup (after version check)
+  - [x] **#37.6** Implement first migration: section order fix (v1.3.5)
+  - [x] **#37.5** Create migration lock mechanism to prevent concurrent execution
+  - [x] **#37.4** Implement migration execution system with run_migrations function
+  - [x] **#37.3** Implement version comparison function for semantic versioning
+  - [x] **#37.2** Create migration registry structure in todo.ai script
   - [x] **#37.1** Create design document for migration/cleanup system architecture
 - [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
   - [x] **#35.3** Create tests directory and draft detailed test plan document `#tests` `#docs`
@@ -110,7 +121,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 11:31:30 CET 2025
+**Last Updated:** Sat Nov  1 11:41:07 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

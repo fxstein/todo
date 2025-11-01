@@ -22,4 +22,16 @@ This release introduces the new bug reporting feature, enabling todo.ai to self-
 - Interactive flow: Guides users through duplicate detection and "me too" reply process
 - Graceful fallbacks: Works even if GitHub CLI is unavailable (just suggests reporting)
 
+**Usage:**
+
+For AI Agents:
+```
+./todo.ai report-bug "Error description" "Error context" "command"
+```
+
+For Humans:
+```
+Report this bug to GitHub Issues
+```
+
 This feature significantly improves the feedback loop between users and developers while maintaining full user control and privacy protection.

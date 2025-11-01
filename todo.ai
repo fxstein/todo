@@ -400,6 +400,7 @@ show_usage() {
     echo "  backups, list-backups         List available backup versions"
     echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
     echo "  report-bug \"description\"      Report a bug to GitHub Issues (requires GitHub CLI)"
+    echo "  uninstall [--remove-data] [--remove-rules] [--all]  Uninstall todo.ai"
     echo "  version, -v, --version        Show version information"
     echo ""
     echo ""
@@ -442,6 +443,8 @@ show_usage() {
     echo "  ./todo.ai rollback 2                 # Rollback to backup #2"
     echo "  ./todo.ai rollback 20251030231500     # Rollback by timestamp"
     echo "  ./todo.ai report-bug \"Error message\" # Report bug to GitHub Issues"
+    echo "  ./todo.ai uninstall                  # Uninstall script only"
+    echo "  ./todo.ai uninstall --all             # Uninstall script, data, and rules"
     echo "  ./todo.ai version                    # Show version"
 }
 
@@ -3362,6 +3365,164 @@ report_bug() {
     suggest_bug_report "$error_description" "$error_context" "$command"
 }
 
+# Function to uninstall todo.ai
+uninstall_tool() {
+    local remove_data=false
+    local remove_rules=false
+    local force=false
+    
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --remove-data|--data)
+                remove_data=true
+                shift
+                ;;
+            --remove-rules|--rules)
+                remove_rules=true
+                shift
+                ;;
+            --all)
+                remove_data=true
+                remove_rules=true
+                shift
+                ;;
+            --force|-f)
+                force=true
+                shift
+                ;;
+            *)
+                echo "Error: Unknown option '$1'"
+                echo "Usage: ./todo.ai uninstall [--remove-data] [--remove-rules] [--all] [--force]"
+                return 1
+                ;;
+        esac
+    done
+    
+    # Get script path
+    local script_path
+    script_path=$(get_script_path) || {
+        echo "⚠️  Cannot locate todo.ai script"
+        echo "   It may already be uninstalled."
+        return 1
+    }
+    
+    # Detect .todo.ai/ directory (in current working directory)
+    local todo_ai_dir="$(pwd)/.todo.ai"
+    local has_data_dir=false
+    if [[ -d "$todo_ai_dir" ]]; then
+        has_data_dir=true
+    fi
+    
+    # Detect Cursor rules created by todo.ai
+    local rules_dir="$(pwd)/.cursor/rules"
+    local todo_ai_rules=()
+    if [[ -d "$rules_dir" ]]; then
+        # Find all todo.ai-*.mdc files
+        for rule_file in "$rules_dir"/todo.ai-*.mdc; do
+            if [[ -f "$rule_file" ]]; then
+                todo_ai_rules+=("$rule_file")
+            fi
+        done
+    fi
+    
+    # Build what will be removed list
+    echo ""
+    echo "🗑️  Uninstalling todo.ai"
+    echo ""
+    echo "The following will be removed:"
+    
+    local will_remove_script=true
+    local will_remove_data=false
+    local will_remove_rules=false
+    
+    if [[ -f "$script_path" ]]; then
+        echo "  ✗ Script: $script_path"
+    else
+        will_remove_script=false
+    fi
+    
+    if [[ "$remove_data" == true ]] && [[ "$has_data_dir" == true ]]; then
+        echo "  ✗ Data directory: $todo_ai_dir"
+        will_remove_data=true
+        echo "     ⚠️  Warning: This will remove your TODO data (.todo.ai/ directory)"
+        echo "     ⚠️  Your TODO.md file will remain untouched"
+    elif [[ "$has_data_dir" == true ]]; then
+        echo "  ✓ Data directory: $todo_ai_dir (preserved - use --remove-data to remove)"
+    fi
+    
+    if [[ "$remove_rules" == true ]] && [[ ${#todo_ai_rules[@]} -gt 0 ]]; then
+        echo "  ✗ Cursor rules:"
+        for rule_file in "${todo_ai_rules[@]}"; do
+            echo "      - $(basename "$rule_file")"
+        done
+        will_remove_rules=true
+    elif [[ ${#todo_ai_rules[@]} -gt 0 ]]; then
+        echo "  ✓ Cursor rules: ${#todo_ai_rules[@]} file(s) (preserved - use --remove-rules to remove)"
+    fi
+    
+    # Safety check: ensure we have something to remove
+    if [[ "$will_remove_script" == false ]] && [[ "$will_remove_data" == false ]] && [[ "$will_remove_rules" == false ]]; then
+        echo ""
+        echo "✅ Nothing to remove. Script not found or already uninstalled."
+        return 0
+    fi
+    
+    echo ""
+    
+    # Confirmation (unless --force)
+    if [[ "$force" != true ]]; then
+        printf "Proceed with uninstall? (y/N) "
+        read -r reply
+        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+            echo "Uninstall cancelled"
+            return 0
+        fi
+    fi
+    
+    # Remove script
+    if [[ "$will_remove_script" == true ]]; then
+        if rm -f "$script_path" 2>/dev/null; then
+            echo "✅ Removed script: $script_path"
+        else
+            echo "⚠️  Error: Could not remove script: $script_path"
+            echo "   You may need to remove it manually"
+            return 1
+        fi
+    fi
+    
+    # Remove data directory
+    if [[ "$will_remove_data" == true ]]; then
+        if rm -rf "$todo_ai_dir" 2>/dev/null; then
+            echo "✅ Removed data directory: $todo_ai_dir"
+        else
+            echo "⚠️  Error: Could not remove data directory: $todo_ai_dir"
+            echo "   You may need to remove it manually"
+        fi
+    fi
+    
+    # Remove Cursor rules
+    if [[ "$will_remove_rules" == true ]]; then
+        local rules_removed=0
+        for rule_file in "${todo_ai_rules[@]}"; do
+            if rm -f "$rule_file" 2>/dev/null; then
+                rules_removed=$((rules_removed + 1))
+            fi
+        done
+        if [[ $rules_removed -gt 0 ]]; then
+            echo "✅ Removed $rules_removed Cursor rule(s)"
+        else
+            echo "⚠️  Error: Could not remove Cursor rules"
+            echo "   You may need to remove them manually from $rules_dir"
+        fi
+    fi
+    
+    echo ""
+    echo "✅ Uninstall complete!"
+    
+    return 0
+}
+
 # Migration: Fix section order in TODO.md
 migrate_section_order() {
     local migration_id="section_order_fix"
@@ -3901,6 +4062,10 @@ case "${1:-}" in
     "report-bug")
         shift
         report_bug "$1" "$2" "$3"
+        ;;
+    "uninstall")
+        shift
+        uninstall_tool "$@"
         ;;
     "version"|"--version"|"-v")
         echo "todo.ai version $VERSION"

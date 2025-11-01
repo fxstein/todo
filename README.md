@@ -148,6 +148,8 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai &
 
 **To update:** Re-run the curl command, or use `./todo.ai update`
 
+**To uninstall:** Run `./todo.ai uninstall` (removes script only) or `./todo.ai uninstall --all` (removes script, data, and rules)
+
 ---
 
 ## License

@@ -2,6 +2,34 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-01 22:46:04 | fxstein | ADD_SUBTASK | 45.8 | Test pre-release creation and promotion workflow (parent: #45)
+2025-11-01 22:46:03 | fxstein | ADD_SUBTASK | 45.7 | Update release process documentation with pre-release workflow (parent: #45)
+2025-11-01 22:46:02 | fxstein | ADD_SUBTASK | 45.6 | Add command to promote pre-release to official release (remove --prerelease flag) (parent: #45)
+2025-11-01 22:46:00 | fxstein | ADD_SUBTASK | 45.5 | Implement workflow: create pre-release → test → fix if needed → promote to official release (parent: #45)
+2025-11-01 22:45:59 | fxstein | ADD_SUBTASK | 45.4 | Add GitHub pre-release flag support (gh release create --prerelease) (parent: #45)
+2025-11-01 22:45:58 | fxstein | ADD_SUBTASK | 45.3 | Implement pre-release support in release.sh script (--prerelease flag, version parsing) (parent: #45)
+2025-11-01 22:45:56 | fxstein | ADD_SUBTASK | 45.2 | Create design document for pre-release workflow and integration with existing release process (parent: #45)
+2025-11-01 22:45:55 | fxstein | ADD_SUBTASK | 45.1 | Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration (parent: #45)
+2025-11-01 22:45:50 | fxstein | ADD | 45 | Enhance release process with pre-release support for beta/testing versions
+2025-11-01 22:42:24 | fxstein | COMPLETE | 44.6 | Test migration with existing .cursorrules files
+2025-11-01 22:41:58 | fxstein | COMPLETE | 44.7 | Update documentation to reflect .cursor/rules/ structure
+2025-11-01 22:41:56 | fxstein | COMPLETE | 44.8 | Update release process docs to reference .cursor/rules/ instead of .cursorrules
+2025-11-01 22:40:28 | fxstein | COMPLETE | 44.9 | Manage installation path of tool relative to cursor rules
+2025-11-01 22:35:45 | fxstein | ADD_SUBTASK | 44.9 | Manage installation path of tool relative to cursor rules (parent: #44)
+2025-11-01 22:32:31 | fxstein | COMPLETE | 44.5 | Create migration to convert existing .cursorrules to .cursor/rules/ on update
+2025-11-01 22:31:30 | fxstein | COMPLETE | 44.4 | Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file
+2025-11-01 22:29:17 | fxstein | COMPLETE | 44.3 | Implement migration logic to convert .cursorrules sections to .mdc files
+2025-11-01 22:27:00 | fxstein | COMPLETE | 44.2 | Create design document for .cursorrules to .cursor/rules/ migration
+2025-11-01 22:13:15 | fxstein | COMPLETE | 44.1 | Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com
+2025-11-01 22:12:35 | fxstein | ADD_SUBTASK | 44.8 | Update release process docs to reference .cursor/rules/ instead of .cursorrules (parent: #44)
+2025-11-01 22:12:34 | fxstein | ADD_SUBTASK | 44.7 | Update documentation to reflect .cursor/rules/ structure (parent: #44)
+2025-11-01 22:12:33 | fxstein | ADD_SUBTASK | 44.6 | Test migration with existing .cursorrules files (parent: #44)
+2025-11-01 22:12:32 | fxstein | ADD_SUBTASK | 44.5 | Create migration to convert existing .cursorrules to .cursor/rules/ on update (parent: #44)
+2025-11-01 22:12:31 | fxstein | ADD_SUBTASK | 44.4 | Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file (parent: #44)
+2025-11-01 22:12:30 | fxstein | ADD_SUBTASK | 44.3 | Implement migration logic to convert .cursorrules sections to .mdc files (parent: #44)
+2025-11-01 22:12:30 | fxstein | ADD_SUBTASK | 44.2 | Create design document for .cursorrules to .cursor/rules/ migration (parent: #44)
+2025-11-01 22:12:29 | fxstein | ADD_SUBTASK | 44.1 | Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com (parent: #44)
+2025-11-01 22:12:28 | fxstein | ADD | 44 | Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure
 2025-11-01 12:41:05 | fxstein | COMPLETE | 42.6 | Test duplicate detection and 'me too' reply flow
 2025-11-01 12:41:05 | fxstein | COMPLETE | 42.5 | Test bug reporting with GitHub CLI integration
 2025-11-01 12:37:28 | fxstein | COMPLETE | 42.4 | Create bug report template with logs and data attachment

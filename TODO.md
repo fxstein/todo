@@ -3,11 +3,20 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#45** Enhance release process with pre-release support for beta/testing versions `#release`
+  - [ ] **#45.8** Test pre-release creation and promotion workflow `#test`
+  - [ ] **#45.7** Update release process documentation with pre-release workflow `#docs`
+  - [ ] **#45.6** Add command to promote pre-release to official release (remove --prerelease flag) `#code`
+  - [ ] **#45.5** Implement workflow: create pre-release → test → fix if needed → promote to official release `#code`
+  - [ ] **#45.4** Add GitHub pre-release flag support (gh release create --prerelease) `#code`
+  - [ ] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code`
+  - [ ] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs`
+  - [ ] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research`
 - [ ] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration`
   - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code`
-  - [ ] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs`
-  - [ ] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs`
-  - [ ] **#44.6** Test migration with existing .cursorrules files `#test`
+  - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs`
+  - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs`
+  - [x] **#44.6** Test migration with existing .cursorrules files `#test`
   - [x] **#44.5** Create migration to convert existing .cursorrules to .cursor/rules/ on update `#migration`
   - [x] **#44.4** Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file `#code`
   - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code`
@@ -159,7 +168,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 22:40:28 CET 2025
+**Last Updated:** Sat Nov  1 22:46:04 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

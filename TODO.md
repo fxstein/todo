@@ -1,4 +1,4 @@
-# todo ToDo List
+# todo.ai ToDo List
 
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 

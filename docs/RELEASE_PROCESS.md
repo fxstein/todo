@@ -46,17 +46,77 @@ Current version format in `todo.ai`:
 VERSION="1.0.0"
 ```
 
-## Automated Release Process
+## Intelligent Automated Release Process
 
-### Quick Release (All-in-One)
+### Using AI Agents (Cursor)
 
-Run the automated release script:
+Simply tell your AI agent:
 
-```bash
-./release.sh <version> <release-notes-file>
+```
+Release todo.ai
 ```
 
-Or use the manual steps below for more control.
+The agent will automatically:
+1. Run `./release.sh` for you
+2. Show you the generated release notes
+3. Ask for approval before proceeding
+4. Execute the release automatically after approval
+
+**Cursor rules** are configured so agents know to use the intelligent release script when you request a release.
+
+### Quick Release (Manual)
+
+Simply run:
+
+```bash
+./release.sh
+```
+
+The intelligent release script will:
+1. **Analyze commits** since the last release
+2. **Determine version bump** (major/minor/patch) based on commit messages
+3. **Generate release notes** automatically from commits
+4. **Request human review** for major releases or releases with >10 commits
+5. **Execute the release** automatically after approval
+
+### How It Works
+
+The script analyzes commit messages using patterns:
+
+- **Major release** (X.0.0): Breaking changes detected
+  - Keywords: `breaking`, `break`, `major`, `!:` in commit messages
+  - Commits with `!` suffix (e.g., `feat!:`, `fix!:`)
+  
+- **Minor release** (0.X.0): New features added
+  - Keywords: `feat:`, `feature:`, `add`, `new`, `implement`, `create`, `support`
+  
+- **Patch release** (0.0.X): Bug fixes and other changes
+  - Keywords: `fix:`, `bugfix:`, `patch:`, `bug`, `hotfix`, `correct`
+  - All other commits default to patch
+
+### Release Notes Generation
+
+The script automatically categorizes commits into:
+- **Breaking Changes**: Commits indicating breaking changes
+- **Added**: New features and additions
+- **Changed**: Updates, refactors, improvements
+- **Fixed**: Bug fixes and corrections
+- **Other**: Unclassified commits
+
+### Human Review Safeguards
+
+The script automatically requests human review if:
+- **Major release**: Breaking changes detected
+- **Large release**: More than 10 commits since last release
+
+When review is needed, the script will:
+1. Display generated release notes
+2. Ask for confirmation before proceeding
+3. Allow you to cancel if needed
+
+### Manual Release Steps (Optional)
+
+For manual control, you can still use the process below.
 
 ### Manual Release Steps
 
@@ -160,106 +220,16 @@ Use this template for consistent formatting:
 - 
 ```
 
-## Automated Release Script
+## Release Script Details
 
-Create a `release.sh` script for one-command releases:
+The `release.sh` script is an intelligent, fully automated release tool that:
 
-```bash
-#!/bin/zsh
+1. **Automatically determines version** by analyzing commit history
+2. **Generates release notes** from commit messages
+3. **Requests human review** when needed (major releases, >10 commits)
+4. **Executes the release** after approval
 
-set -e
-
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $0 <version> [release-notes-file]"
-    echo "Example: $0 1.0.1 RELEASE_NOTES.md"
-    exit 1
-fi
-
-VERSION="$1"
-NOTES_FILE="${2:-RELEASE_NOTES.md}"
-TAG="v$VERSION"
-
-echo "🚀 Starting release process for version $VERSION..."
-
-# Verify we're on main branch
-CURRENT_BRANCH=$(git branch --show-current)
-if [[ "$CURRENT_BRANCH" != "main" ]]; then
-    echo "⚠️  Warning: Not on main branch (current: $CURRENT_BRANCH)"
-    read "?Continue anyway? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
-fi
-
-# Check for uncommitted changes
-if [[ -n $(git status -s) ]]; then
-    echo "❌ Error: Uncommitted changes detected"
-    echo "Please commit or stash changes before releasing"
-    exit 1
-fi
-
-# Update version in todo.ai
-echo "📝 Updating version to $VERSION..."
-if [[ "$(uname)" == "Darwin" ]]; then
-    sed -i '' "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/" todo.ai
-    sed -i '' "s/# Version: [0-9.]*/# Version: $VERSION/" todo.ai
-else
-    sed -i "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/" todo.ai
-    sed -i "s/# Version: [0-9.]*/# Version: $VERSION/" todo.ai
-fi
-
-# Verify version update
-if ! grep -q "VERSION=\"$VERSION\"" todo.ai; then
-    echo "❌ Error: Version update failed"
-    exit 1
-fi
-
-# Commit version change
-echo "💾 Committing version change..."
-git add todo.ai
-git commit -m "Bump version to $VERSION"
-
-# Create and push tag
-echo "🏷️  Creating tag $TAG..."
-git tag -a "$TAG" -m "Release version $VERSION"
-git push origin main
-git push origin "$TAG"
-
-# Create GitHub release
-echo "📦 Creating GitHub release..."
-if [[ -f "$NOTES_FILE" ]]; then
-    gh release create "$TAG" \
-        --title "$VERSION" \
-        --notes-file "$NOTES_FILE"
-    echo "✅ Release created with notes from $NOTES_FILE"
-else
-    echo "⚠️  Release notes file not found: $NOTES_FILE"
-    read "?Create release without notes? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        gh release create "$TAG" \
-            --title "$VERSION" \
-            --notes "Release version $VERSION"
-    else
-        echo "❌ Release cancelled. Create $NOTES_FILE and try again."
-        exit 1
-    fi
-fi
-
-echo "✅ Release $VERSION published successfully!"
-echo "🔗 View release: https://github.com/fxstein/todo.ai/releases/tag/$TAG"
-```
-
-**Make it executable:**
-```bash
-chmod +x release.sh
-```
-
-**Usage:**
-```bash
-./release.sh 1.0.1 RELEASE_NOTES.md
-```
+**No parameters needed** - just run `./release.sh` and it handles everything!
 
 ## Pre-Release Checklist
 
@@ -270,9 +240,9 @@ Before creating a release, ensure:
 - [ ] Documentation is current
 - [ ] All planned features for this release are complete
 - [ ] TODO.md is updated with completed tasks
-- [ ] No breaking changes unless it's a major version
-- [ ] Release notes prepared in `RELEASE_NOTES.md`
 - [ ] GitHub CLI authenticated (`gh auth status`)
+
+**Note:** Release notes are automatically generated from commits - no manual preparation needed!
 
 ## Post-Release Tasks
 

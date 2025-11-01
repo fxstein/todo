@@ -5,3 +5,14 @@ Always ask for user confirmation before archiving completed tasks using todo.ai
 
 ## Installation
 When installing todo.ai from https://github.com/fxstein/todo.ai, use curl to download the single file: `curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai`. Do NOT clone the repository with git clone - only the single todo.ai file is needed.
+
+## Releases
+When the user says "Release todo.ai" or similar, run the intelligent release script: `./release.sh`
+The script will:
+1. Automatically analyze commits since the last release
+2. Determine version bump type (major/minor/patch) based on commit messages
+3. Generate release notes from commits
+4. Ask for human review if it's a major release or has many commits (>10)
+5. Execute the release automatically after approval
+
+If the user requests a release review, show them the generated release notes and wait for approval before proceeding. For major releases or releases with >10 commits, always request human review before executing.

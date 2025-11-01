@@ -1,85 +1,358 @@
 #!/bin/zsh
 
+# Intelligent release script for todo.ai
+# Automatically determines version bump, generates release notes, and creates release
+
 set -e
 
-if [[ $# -lt 1 ]]; then
-    echo "Usage: $0 <version> [release-notes-file]"
-    echo "Example: $0 1.0.1 RELEASE_NOTES.md"
-    exit 1
-fi
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
-VERSION="$1"
-NOTES_FILE="${2:-RELEASE_NOTES.md}"
-TAG="v$VERSION"
+# Get current version from todo.ai
+get_current_version() {
+    grep '^VERSION=' todo.ai | sed 's/VERSION="\([^"]*\)"/\1/'
+}
 
-echo "🚀 Starting release process for version $VERSION..."
-
-# Verify we're on main branch
-CURRENT_BRANCH=$(git branch --show-current)
-if [[ "$CURRENT_BRANCH" != "main" ]]; then
-    echo "⚠️  Warning: Not on main branch (current: $CURRENT_BRANCH)"
-    read "?Continue anyway? (y/N) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
+# Get last tag or initial commit
+get_last_tag() {
+    local last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    if [[ -z "$last_tag" ]]; then
+        # No tags exist, use initial commit
+        git rev-list --max-parents=0 HEAD 2>/dev/null || git log --reverse --pretty=format:%H | head -1
+    else
+        echo "$last_tag"
     fi
-fi
+}
 
-# Check for uncommitted changes
-if [[ -n $(git status -s) ]]; then
-    echo "❌ Error: Uncommitted changes detected"
-    echo "Please commit or stash changes before releasing"
-    exit 1
-fi
+# Analyze commits to determine version bump type
+analyze_commits() {
+    local last_tag="$1"
+    local commit_range
+    if [[ "$last_tag" =~ ^[0-9a-f]{40}$ ]] || [[ ! "$last_tag" =~ ^v ]]; then
+        # Last tag is a commit hash or empty
+        commit_range="$(get_last_tag)..HEAD"
+    else
+        commit_range="${last_tag}..HEAD"
+    fi
+    
+    local commits=$(git log "$commit_range" --pretty=format:"%s" --no-merges 2>/dev/null || echo "")
+    
+    if [[ -z "$commits" ]]; then
+        echo "patch"
+        return
+    fi
+    
+    local breaking_count=0
+    local feature_count=0
+    local fix_count=0
+    local other_count=0
+    
+    while IFS= read -r commit; do
+        local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]')
+        
+        # Check for breaking changes
+        if [[ "$lower_commit" =~ (breaking|break|major|!:) ]] || 
+           [[ "$lower_commit" =~ ^(feat|fix|refactor|perf)!: ]]; then
+            ((breaking_count++))
+        # Check for features
+        elif [[ "$lower_commit" =~ ^(feat|feature): ]] || 
+             [[ "$lower_commit" =~ (add|new|implement|create|support) ]]; then
+            ((feature_count++))
+        # Check for fixes
+        elif [[ "$lower_commit" =~ ^(fix|bugfix|patch): ]] || 
+             [[ "$lower_commit" =~ (fix|bug|patch|hotfix|correct) ]]; then
+            ((fix_count++))
+        else
+            ((other_count++))
+        fi
+    done <<< "$commits"
+    
+    # Determine bump type
+    if [[ $breaking_count -gt 0 ]]; then
+        echo "major"
+    elif [[ $feature_count -gt 0 ]]; then
+        echo "minor"
+    elif [[ $fix_count -gt 0 ]] || [[ $other_count -gt 0 ]]; then
+        echo "patch"
+    else
+        echo "patch"
+    fi
+}
+
+# Calculate next version
+calculate_next_version() {
+    local current_version="$1"
+    local bump_type="$2"
+    
+    IFS='.' read -r major minor patch <<< "$current_version"
+    
+    case "$bump_type" in
+        major)
+            major=$((major + 1))
+            minor=0
+            patch=0
+            ;;
+        minor)
+            minor=$((minor + 1))
+            patch=0
+            ;;
+        patch)
+            patch=$((patch + 1))
+            ;;
+    esac
+    
+    echo "${major}.${minor}.${patch}"
+}
+
+# Generate release notes from commits
+generate_release_notes() {
+    local last_tag="$1"
+    local new_version="$2"
+    local commit_range
+    
+    if [[ "$last_tag" =~ ^[0-9a-f]{40}$ ]] || [[ ! "$last_tag" =~ ^v ]]; then
+        commit_range="$(get_last_tag)..HEAD"
+    else
+        commit_range="${last_tag}..HEAD"
+    fi
+    
+    local temp_notes=$(mktemp)
+    
+    echo "## Release ${new_version}" > "$temp_notes"
+    echo "" >> "$temp_notes"
+    
+    # Categorize commits
+    local breaking_commits=()
+    local added_commits=()
+    local changed_commits=()
+    local fixed_commits=()
+    local other_commits=()
+    
+    while IFS= read -r commit; do
+        local commit_hash=$(echo "$commit" | cut -d'|' -f1)
+        local commit_msg=$(echo "$commit" | cut -d'|' -f2- | sed 's/^ *//')
+        local lower_msg=$(echo "$commit_msg" | tr '[:upper:]' '[:lower:]')
+        
+        # Skip version bumps
+        if [[ "$lower_msg" =~ ^bump.*version ]]; then
+            continue
+        fi
+        
+        if [[ "$lower_msg" =~ (breaking|break|major|!:) ]] || 
+           [[ "$lower_msg" =~ ^(feat|fix|refactor|perf)!: ]]; then
+            breaking_commits+=("- ${commit_msg}")
+        elif [[ "$lower_msg" =~ ^(feat|feature): ]] || 
+             [[ "$lower_msg" =~ (add|new|implement|create|support) ]]; then
+            added_commits+=("- ${commit_msg}")
+        elif [[ "$lower_msg" =~ (change|update|refactor|improve|enhance|modify) ]]; then
+            changed_commits+=("- ${commit_msg}")
+        elif [[ "$lower_msg" =~ ^(fix|bugfix|patch): ]] || 
+             [[ "$lower_msg" =~ (fix|bug|patch|hotfix|correct) ]]; then
+            fixed_commits+=("- ${commit_msg}")
+        else
+            other_commits+=("- ${commit_msg}")
+        fi
+    done < <(git log "$commit_range" --pretty=format:"%h|%s" --no-merges 2>/dev/null || echo "")
+    
+    # Write sections
+    if [[ ${#breaking_commits[@]} -gt 0 ]]; then
+        echo "### Breaking Changes" >> "$temp_notes"
+        printf '%s\n' "${breaking_commits[@]}" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+    fi
+    
+    if [[ ${#added_commits[@]} -gt 0 ]]; then
+        echo "### Added" >> "$temp_notes"
+        printf '%s\n' "${added_commits[@]}" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+    fi
+    
+    if [[ ${#changed_commits[@]} -gt 0 ]]; then
+        echo "### Changed" >> "$temp_notes"
+        printf '%s\n' "${changed_commits[@]}" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+    fi
+    
+    if [[ ${#fixed_commits[@]} -gt 0 ]]; then
+        echo "### Fixed" >> "$temp_notes"
+        printf '%s\n' "${fixed_commits[@]}" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+    fi
+    
+    if [[ ${#other_commits[@]} -gt 0 ]]; then
+        echo "### Other" >> "$temp_notes"
+        printf '%s\n' "${other_commits[@]}" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+    fi
+    
+    # Count commits
+    local total_commits=$(git log "$commit_range" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
+    echo "*Total commits: ${total_commits}*" >> "$temp_notes"
+    
+    echo "$temp_notes"
+}
 
 # Update version in todo.ai
-echo "📝 Updating version to $VERSION..."
-if [[ "$(uname)" == "Darwin" ]]; then
-    sed -i '' "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/" todo.ai
-    sed -i '' "s/# Version: [0-9.]*/# Version: $VERSION/" todo.ai
-else
-    sed -i "s/VERSION=\"[^\"]*\"/VERSION=\"$VERSION\"/" todo.ai
-    sed -i "s/# Version: [0-9.]*/# Version: $VERSION/" todo.ai
-fi
-
-# Verify version update
-if ! grep -q "VERSION=\"$VERSION\"" todo.ai; then
-    echo "❌ Error: Version update failed"
-    exit 1
-fi
-
-# Commit version change
-echo "💾 Committing version change..."
-git add todo.ai
-git commit -m "Bump version to $VERSION"
-
-# Create and push tag
-echo "🏷️  Creating tag $TAG..."
-git tag -a "$TAG" -m "Release version $VERSION"
-git push origin main
-git push origin "$TAG"
-
-# Create GitHub release
-echo "📦 Creating GitHub release..."
-if [[ -f "$NOTES_FILE" ]]; then
-    gh release create "$TAG" \
-        --title "$VERSION" \
-        --notes-file "$NOTES_FILE"
-    echo "✅ Release created with notes from $NOTES_FILE"
-else
-    echo "⚠️  Release notes file not found: $NOTES_FILE"
-    read "?Create release without notes? (y/N) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        gh release create "$TAG" \
-            --title "$VERSION" \
-            --notes "Release version $VERSION"
+update_version() {
+    local new_version="$1"
+    local sed_flag
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed_flag="-i ''"
     else
-        echo "❌ Release cancelled. Create $NOTES_FILE and try again."
+        sed_flag="-i"
+    fi
+    
+    sed $sed_flag "s/VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
+    sed $sed_flag "s/# Version: [0-9.]*/# Version: $new_version/" todo.ai
+    
+    # Verify
+    if ! grep -q "VERSION=\"$new_version\"" todo.ai; then
+        echo -e "${RED}❌ Error: Version update failed${NC}"
         exit 1
     fi
-fi
+}
 
-echo "✅ Release $VERSION published successfully!"
-echo "🔗 View release: https://github.com/fxstein/todo.ai/releases/tag/$TAG"
+# Main release process
+main() {
+    echo -e "${BLUE}🚀 Starting intelligent release process...${NC}"
+    echo ""
+    
+    # Verify prerequisites
+    if ! command -v gh &> /dev/null; then
+        echo -e "${RED}❌ Error: GitHub CLI (gh) is not installed${NC}"
+        echo "Install it with: brew install gh"
+        exit 1
+    fi
+    
+    # Verify we're on main branch
+    CURRENT_BRANCH=$(git branch --show-current)
+    if [[ "$CURRENT_BRANCH" != "main" ]]; then
+        echo -e "${YELLOW}⚠️  Warning: Not on main branch (current: $CURRENT_BRANCH)${NC}"
+        read "?Continue anyway? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
+    fi
+    
+    # Check for uncommitted changes
+    if [[ -n $(git status -s) ]]; then
+        echo -e "${RED}❌ Error: Uncommitted changes detected${NC}"
+        echo "Please commit or stash changes before releasing"
+        exit 1
+    fi
+    
+    # Get current version
+    CURRENT_VERSION=$(get_current_version)
+    echo -e "${GREEN}📌 Current version: ${CURRENT_VERSION}${NC}"
+    
+    # Get last tag
+    LAST_TAG=$(get_last_tag)
+    if [[ "$LAST_TAG" =~ ^v ]]; then
+        echo -e "${GREEN}📌 Last release: ${LAST_TAG}${NC}"
+    else
+        echo -e "${YELLOW}📌 No previous release found (using initial commit)${NC}"
+    fi
+    
+    # Analyze commits to determine bump type
+    echo ""
+    echo -e "${BLUE}📊 Analyzing commits since last release...${NC}"
+    BUMP_TYPE=$(analyze_commits "$LAST_TAG")
+    
+    case "$BUMP_TYPE" in
+        major)
+            echo -e "${RED}🔴 Major release detected (breaking changes)${NC}"
+            ;;
+        minor)
+            echo -e "${YELLOW}🟡 Minor release detected (new features)${NC}"
+            ;;
+        patch)
+            echo -e "${GREEN}🟢 Patch release detected (bug fixes)${NC}"
+            ;;
+    esac
+    
+    # Calculate next version
+    NEW_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
+    echo -e "${GREEN}📌 Proposed new version: ${NEW_VERSION}${NC}"
+    echo ""
+    
+    # Generate release notes
+    echo -e "${BLUE}📝 Generating release notes...${NC}"
+    RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION")
+    
+    # Show release notes preview
+    echo ""
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    cat "$RELEASE_NOTES_FILE"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
+    # Ask for human review if major release or many commits
+    local commit_count=$(git log "$(get_last_tag)..HEAD" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
+    local needs_review=false
+    
+    if [[ "$BUMP_TYPE" == "major" ]]; then
+        echo -e "${YELLOW}⚠️  Major release detected - human review recommended${NC}"
+        needs_review=true
+    elif [[ $commit_count -gt 10 ]]; then
+        echo -e "${YELLOW}⚠️  Large release ($commit_count commits) - human review recommended${NC}"
+        needs_review=true
+    fi
+    
+    if [[ "$needs_review" == true ]]; then
+        echo ""
+        echo "Please review the release notes above."
+        read "?Proceed with release? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${YELLOW}Release cancelled by user${NC}"
+            rm -f "$RELEASE_NOTES_FILE"
+            exit 0
+        fi
+    else
+        read "?Proceed with release? (y/N) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${YELLOW}Release cancelled by user${NC}"
+            rm -f "$RELEASE_NOTES_FILE"
+            exit 0
+        fi
+    fi
+    
+    # Update version
+    echo ""
+    echo -e "${BLUE}📝 Updating version in todo.ai...${NC}"
+    update_version "$NEW_VERSION"
+    
+    # Commit version change
+    echo -e "${BLUE}💾 Committing version change...${NC}"
+    git add todo.ai
+    git commit -m "Bump version to $NEW_VERSION" > /dev/null 2>&1 || true
+    
+    # Create and push tag
+    TAG="v${NEW_VERSION}"
+    echo -e "${BLUE}🏷️  Creating tag ${TAG}...${NC}"
+    git tag -a "$TAG" -m "Release version $NEW_VERSION" > /dev/null 2>&1
+    git push origin main > /dev/null 2>&1
+    git push origin "$TAG" > /dev/null 2>&1
+    
+    # Create GitHub release
+    echo -e "${BLUE}📦 Creating GitHub release...${NC}"
+    gh release create "$TAG" \
+        --title "$NEW_VERSION" \
+        --notes-file "$RELEASE_NOTES_FILE" > /dev/null 2>&1
+    
+    # Cleanup
+    rm -f "$RELEASE_NOTES_FILE"
+    
+    echo ""
+    echo -e "${GREEN}✅ Release ${NEW_VERSION} published successfully!${NC}"
+    echo -e "${GREEN}🔗 View release: https://github.com/fxstein/todo.ai/releases/tag/${TAG}${NC}"
+}
 
+# Run main function
+main "$@"

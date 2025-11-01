@@ -44,9 +44,9 @@
   - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs`
   - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research`
 - [ ] **#43** Create uninstall feature
-  - [ ] **#43.3** Enhance README.md to show simple uninstall command
-  - [ ] **#43.2** Implement and test uninstall feature
-  - [ ] **#43.1** Write design document for uninstall feature
+  - [x] **#43.3** Enhance README.md to show simple uninstall command
+  - [x] **#43.2** Implement and test uninstall feature
+  - [x] **#43.1** Write design document for uninstall feature
 - [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
   - [x] **#42.6** Test duplicate detection and 'me too' reply flow
   - [x] **#42.5** Test bug reporting with GitHub CLI integration
@@ -189,7 +189,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 23:15:11 CET 2025
+**Last Updated:** Sat Nov  1 23:40:49 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

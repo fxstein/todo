@@ -2,6 +2,9 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-01 23:40:48 | fxstein | COMPLETE | 43.3 | Enhance README.md to show simple uninstall command
+2025-11-01 23:40:48 | fxstein | COMPLETE | 43.2 | Implement and test uninstall feature
+2025-11-01 23:40:48 | fxstein | COMPLETE | 43.1 | Write design document for uninstall feature
 2025-11-01 23:15:11 | fxstein | COMPLETE | 48.3 | Implement update fix: execute new version's migrations and update logic before replacement
 2025-11-01 23:15:11 | fxstein | COMPLETE | 48.2 | Design solution: download → execute new version → replace old version
 2025-11-01 23:15:11 | fxstein | COMPLETE | 48.1 | Research update execution pattern: how to execute new version's code after download

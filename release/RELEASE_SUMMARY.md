@@ -1,5 +1,9 @@
-This release completes the Cursor rules migration system with an important cleanup enhancement. When users update todo.ai, the migration process now automatically cleans up the old `.cursorrules` file by removing all todo.ai-specific sections and paragraphs, ensuring a clean transition to the new `.cursor/rules/` directory structure.
+This release fixes a critical update logic error that prevented new versions from properly executing their own update logic, migrations, and cursor rules updates.
 
-The cleanup process is safe and reversible: before making any changes, a timestamped backup is created (`.cursorrules.backup.YYYYMMDDHHMMSS`), allowing users to restore their original file if needed. The cleanup intelligently preserves any user-specific custom content that doesn't reference todo.ai, while removing all migrated sections. If the file becomes empty after cleanup, it's removed entirely to keep repositories clean.
+**The Problem:**
+When users ran the update command, the update process was executed from the old version's code. This meant that any new logic in the updated version (like new migrations, cursor rules updates, or other update-related code) never executed because the old version didn't have knowledge of those features.
 
-This enhancement ensures that users don't have duplicate todo.ai rules in both the old `.cursorrules` file and the new `.cursor/rules/` directory, preventing confusion and ensuring consistent behavior. The migration is now a complete, hands-off experience that handles both the migration to the new format and the cleanup of the old format automatically.
+**The Solution:**
+The update process now follows a more reliable pattern: download the new version → execute the new version's code directly → then replace the old version. This ensures that migrations, cursor rules updates, and any other update logic in the new version execute with the new version's code, not the old version's code.
+
+This fix ensures that users upgrading from any version to any newer version will reliably have all migrations run and all updates applied, regardless of what version they're upgrading from. The update process is now truly self-contained and future-proof.

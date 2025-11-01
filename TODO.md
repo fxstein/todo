@@ -4,6 +4,8 @@
 
 ## Tasks
 - [ ] **#36** Create release process for todo.ai on GitHub
+  - [ ] **#36.5** Review and finetune release numbering logic
+  - [ ] **#36.4** Create permanent release log file with detailed timestamps
   - [ ] **#36.3** Create release management process
   - [ ] **#36.2** Review release process document
   - [x] **#36.1** Create release process document
@@ -106,7 +108,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 10:14:27 CET 2025
+**Last Updated:** Sat Nov  1 10:46:46 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

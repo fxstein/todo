@@ -28,7 +28,7 @@
   - [ ] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs`
   - [ ] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research`
 - [ ] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration`
-  - [ ] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code`
+  - [x] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code`
   - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code`
   - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs`
   - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs`
@@ -184,7 +184,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 23:04:16 CET 2025
+**Last Updated:** Sat Nov  1 23:07:19 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

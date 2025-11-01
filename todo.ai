@@ -3556,6 +3556,138 @@ EOF
         echo "   For AI Agents:" >&2
         echo "   → Inform the user that cursor rules have been migrated" >&2
         echo "   → Request that the user start a new chat session" >&2
+        
+        # Cleanup: Remove todo.ai references from .cursorrules after successful migration
+        # Create timestamped backup before making any edits
+        local timestamp=$(date +"%Y%m%d%H%M%S")
+        local backup_file="${cursorrules_file}.backup.${timestamp}"
+        
+        if cp "$cursorrules_file" "$backup_file" 2>/dev/null; then
+            echo "   💾 Created backup: $(basename "$backup_file")" >&2
+            
+            # Create temporary file for cleaned content
+            local cleaned_file=$(mktemp)
+            local in_todo_ai_section=false
+            local current_section_name=""
+            
+            # Parse .cursorrules and remove todo.ai-specific sections and paragraphs
+            local paragraph_buffer=""
+            local in_paragraph=false
+            
+            while IFS= read -r line || [[ -n "$line" ]]; do
+                # Check if this is a section header
+                if [[ "$line" =~ ^##[[:space:]] ]]; then
+                    # Save previous section if we were in one
+                    if [[ "$in_todo_ai_section" == true ]]; then
+                        # Skip this section - don't write it
+                        in_todo_ai_section=false
+                    fi
+                    
+                    # Write accumulated paragraph buffer if it's not todo.ai-specific
+                    if [[ -n "$paragraph_buffer" ]] && [[ "$in_paragraph" == true ]]; then
+                        # Check if paragraph references todo.ai
+                        local paragraph_lower=$(echo "$paragraph_buffer" | tr '[:upper:]' '[:lower:]')
+                        if [[ ! "$paragraph_lower" =~ (todo\.ai|todo-ai) ]]; then
+                            echo "$paragraph_buffer" >> "$cleaned_file"
+                        fi
+                        paragraph_buffer=""
+                        in_paragraph=false
+                    fi
+                    
+                    # Extract section name
+                    current_section_name=$(echo "$line" | sed 's/^##[[:space:]]*//')
+                    
+                    # Check if this section is in our mapping (todo.ai-specific)
+                    in_todo_ai_section=false
+                    for mapping in "${section_mappings[@]}"; do
+                        IFS='|' read -r section_name filename description is_end_user <<< "$mapping"
+                        if [[ "$current_section_name" == "$section_name" ]]; then
+                            in_todo_ai_section=true
+                            break
+                        fi
+                    done
+                    
+                    # Write section header only if not todo.ai-specific
+                    if [[ "$in_todo_ai_section" == false ]]; then
+                        echo "$line" >> "$cleaned_file"
+                    fi
+                elif [[ -z "$line" ]] || [[ "$line" =~ ^[[:space:]]*$ ]]; then
+                    # Empty line - end of paragraph
+                    if [[ -n "$paragraph_buffer" ]] && [[ "$in_paragraph" == true ]]; then
+                        # Check if paragraph references todo.ai
+                        local paragraph_lower=$(echo "$paragraph_buffer" | tr '[:upper:]' '[:lower:]')
+                        if [[ ! "$paragraph_lower" =~ (todo\.ai|todo-ai) ]]; then
+                            echo "$paragraph_buffer" >> "$cleaned_file"
+                        fi
+                        paragraph_buffer=""
+                        in_paragraph=false
+                    fi
+                    # Write empty line only if not in todo.ai section
+                    if [[ "$in_todo_ai_section" == false ]]; then
+                        echo "$line" >> "$cleaned_file"
+                    fi
+                else
+                    # Regular line - check if it's part of a paragraph
+                    if [[ "$in_todo_ai_section" == false ]]; then
+                        # Check if line references todo.ai directly
+                        local line_lower=$(echo "$line" | tr '[:upper:]' '[:lower:]')
+                        if [[ "$line_lower" =~ (todo\.ai|todo-ai) ]]; then
+                            # Skip this line - it references todo.ai
+                            continue
+                        fi
+                        
+                        # Add to paragraph buffer or write directly
+                        if [[ "$line" =~ ^[[:space:]]*- ]] || [[ "$line" =~ ^[[:space:]]*\* ]] || [[ "$line" =~ ^[[:space:]]*[0-9]+\. ]]; then
+                            # List item - write directly (not part of a paragraph)
+                            echo "$line" >> "$cleaned_file"
+                        else
+                            # Regular text - accumulate in paragraph buffer
+                            if [[ -z "$paragraph_buffer" ]]; then
+                                paragraph_buffer="$line"
+                            else
+                                paragraph_buffer="${paragraph_buffer}
+${line}"
+                            fi
+                            in_paragraph=true
+                        fi
+                    fi
+                fi
+            done < "$cursorrules_file"
+            
+            # Write any remaining paragraph buffer
+            if [[ -n "$paragraph_buffer" ]] && [[ "$in_paragraph" == true ]]; then
+                local paragraph_lower=$(echo "$paragraph_buffer" | tr '[:upper:]' '[:lower:]')
+                if [[ ! "$paragraph_lower" =~ (todo\.ai|todo-ai) ]]; then
+                    echo "$paragraph_buffer" >> "$cleaned_file"
+                fi
+            fi
+            
+            # Check if cleaned file has any content (not just whitespace)
+            local has_content=false
+            if [[ -s "$cleaned_file" ]] && grep -q "[^[:space:]]" "$cleaned_file" 2>/dev/null; then
+                has_content=true
+            fi
+            
+            if [[ "$has_content" == true ]]; then
+                # Replace original file with cleaned content
+                mv "$cleaned_file" "$cursorrules_file" 2>/dev/null || {
+                    echo "⚠️  Warning: Could not update .cursorrules file" >&2
+                    rm -f "$cleaned_file"
+                    return 1
+                }
+                echo "   🧹 Cleaned .cursorrules: Removed todo.ai-specific sections" >&2
+                echo "   💾 Backup saved as: $(basename "$backup_file")" >&2
+            else
+                # File is empty after cleanup - remove it entirely
+                rm -f "$cleaned_file"
+                rm -f "$cursorrules_file"
+                echo "   🗑️  Removed .cursorrules: No remaining content after removing todo.ai sections" >&2
+                echo "   💾 Backup saved as: $(basename "$backup_file")" >&2
+            fi
+        else
+            echo "⚠️  Warning: Could not create backup of .cursorrules" >&2
+            # Still proceed with migration, but skip cleanup
+        fi
     fi
     
     # Mark as complete

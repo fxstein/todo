@@ -1,0 +1,26 @@
+---
+description: "Guidelines for creating cursor rules"
+alwaysApply: true
+---
+
+When creating Cursor rules for todo.ai, keep them **short, precise, and highly specific**.
+
+**Requirements:**
+- Rules must be concise and actionable
+- Include only essential information
+- Avoid verbose explanations or lengthy examples
+- Focus on what agents MUST do or MUST NOT do
+- Remove unnecessary detail that can be found in documentation
+
+**Pattern:**
+- Start with critical requirements if applicable
+- Use clear ✅/❌ examples for correct vs incorrect behavior
+- Reference documentation instead of duplicating content
+- Keep rule files under ~30 lines when possible
+
+**Review before committing:**
+- Can this rule be shorter?
+- Is every line essential?
+- Can examples/references be condensed or moved to docs?
+
+**NEVER** create verbose, extensive rules with lengthy checklists or detailed explanations - keep them focused and scannable.

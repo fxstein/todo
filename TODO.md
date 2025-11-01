@@ -13,11 +13,6 @@
   - [ ] **#49.3** Assess code execution risks: migration system, script execution, and dynamic code loading `#security`
   - [ ] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security`
   - [ ] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security`
-- [ ] **#48** Fix update logic error: new version update logic never executes
-  - [ ] **#48.4** Test update workflow: verify migrations execute in new version after update `#test`
-  - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code`
-  - [x] **#48.2** Design solution: download → execute new version → replace old version `#docs`
-  - [x] **#48.1** Research update execution pattern: how to execute new version's code after download `#research`
 - [ ] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature`
   - [ ] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test`
   - [ ] **#47.7** Update help screen and documentation with feature request command `#docs`
@@ -54,6 +49,7 @@
   - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs`
   - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research`
 - [ ] **#43** Create uninstall feature
+  - [x] **#43.4** Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope `#code`
   - [x] **#43.3** Enhance README.md to show simple uninstall command
   - [x] **#43.2** Implement and test uninstall feature
   - [x] **#43.1** Write design document for uninstall feature
@@ -94,6 +90,11 @@
 ------------------
 
 ## Recently Completed
+- [x] **#48** Fix update logic error: new version update logic never executes (2025-11-02)
+  - [x] **#48.4** Test update workflow: verify migrations execute in new version after update `#test` (2025-11-02)
+  - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code` (2025-11-02)
+  - [x] **#48.2** Design solution: download → execute new version → replace old version `#docs` (2025-11-02)
+  - [x] **#48.1** Research update execution pattern: how to execute new version's code after download `#research` (2025-11-02)
 - [x] **#38** Fix orphaned subtasks bug: delete subtasks when deleting parent task `#bug` (2025-11-01)
   - [x] **#38.6** Verify orphaned subtask detection still works correctly (2025-11-01)
   - [x] **#38.5** Test deletion of subtask only (should not delete parent or siblings) (2025-11-01)
@@ -199,7 +200,7 @@
 
 ---
 
-**Last Updated:** Sat Nov  1 23:53:49 CET 2025
+**Last Updated:** Sun Nov  2 00:13:39 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

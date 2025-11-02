@@ -25,3 +25,7 @@ RELEASE_SUMMARY.md
 # Backup files created by mode switching and rollback operations
 .todo.ai/backups/
 
+
+# Backup files created by various tools (sed, etc.)
+*.bak
+*.bak*

@@ -1,12 +1,12 @@
 # Release Summary
 
-This release includes several improvements focused on usability and developer workflow enhancements.
+This release fixes a critical bug in the coordination setup process that was automatically switching users to enhanced mode without consent.
 
-The main feature addition is the enhancement of the `--info` command output, which now displays the configuration file location. This makes it easier for users to locate and understand where todo.ai stores its configuration, especially helpful when working with multiple projects or troubleshooting setup issues. The config file location is shown at the end of the `--info` output for quick reference.
+The main fix resolves issue #27 where running `setup-coordination github-issues` or `setup-coordination counterapi` would automatically switch from single-user mode to enhanced mode when creating a new configuration file. This violated the principle that coordination should be configurable independently of the numbering mode. The fix ensures that when a new config file is created during coordination setup, it preserves the current numbering mode (which defaults to single-user) instead of forcing enhanced mode.
 
-Additionally, this release includes documentation improvements that streamline the user experience. The README has been refined with a more concise examples section, reducing from 13 examples to just 5 carefully selected ones that cover the most common use cases while adding a touch of humor. The bug review workflow Cursor rule has also been updated to use zsh syntax (matching the tool's actual implementation) and includes comprehensive guidance on closing bug issues with proper release references.
+This improvement means users can now configure coordination services (GitHub Issues or CounterAPI) in any numbering mode without being forced into enhanced mode. Coordination and numbering mode are now truly independent features, giving users more flexibility in how they configure todo.ai for their workflow.
 
 **Key improvements:**
-- Added config file location to `--info` output for better visibility
-- Streamlined README examples (5 essential examples instead of 13)
-- Updated bug-review-workflow Cursor rule with zsh syntax and issue closing guidance
+- Fixed coordination setup to preserve current numbering mode
+- Coordination can now be configured independently of numbering mode
+- Users can set up coordination in single-user mode without mode switch

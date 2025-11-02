@@ -335,6 +335,8 @@ Store task number in a discussion post (not practical).
 
 ## Implementation Recommendation
 
+### Option A: Repository Contents API (For Collaborators Only)
+
 **Use Repository Contents API with SHA-based optimistic locking:**
 
 1. **Store counter file:** `.todo.ai/task_counter.txt` in repository
@@ -347,9 +349,33 @@ Store task number in a discussion post (not practical).
    - True atomic assignment
    - Optimistic locking prevents race conditions
    - Repository-integrated
-   - Works across branches/forks (single source of truth)
+4. **Limitations:**
+   - ❌ **Does NOT work with forks** - Fork contributors cannot update upstream file
+   - ✅ **Only for collaborators** - Users must have write access
 
-**This provides a viable solution for multi-user task numbering!**
+### Option B: Issues API with Comments (For Forks!) ⭐ RECOMMENDED FOR OPEN SOURCE
+
+**Use GitHub Issues API with comment-based coordination:**
+
+1. **Create dedicated coordination issue:** e.g., "Task Number Coordination" in repository
+2. **Atomic assignment pattern:**
+   - GET latest comment from coordination issue
+   - Extract current task number from comment
+   - Increment number
+   - POST new comment with incremented number
+   - Retry if latest comment changed (concurrent update detected)
+3. **Benefits:**
+   - ✅ **Works with forks!** - Fork contributors can comment on upstream issues
+   - ✅ **Lower permissions** - Only needs `public_repo` scope (not write access)
+   - ✅ **Open source friendly** - Fork contributors can participate
+   - ✅ **Repository-integrated** - Visible in repository issues
+   - ✅ **Simple coordination** - Last comment with highest number wins
+4. **Limitations:**
+   - ⚠️ **Not truly atomic** - Race conditions possible (can retry)
+   - ⚠️ **Comment-based** - Requires parsing comments for numbers
+   - ⚠️ **Rate limits** - 5,000 requests/hour
+
+**For fork-based workflows, Issues API with comments is the BEST option!**
 
 ---
 

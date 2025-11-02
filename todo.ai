@@ -383,11 +383,14 @@ assign_task_number_multi_user() {
     
     # Find highest task number for this user prefix
     local highest=0
-    local pattern="${user_prefix}-([0-9]+)"
+    
+    # Construct pattern variable for zsh regex compatibility
+    local pattern="\\*\\*#${user_prefix}-([0-9]+)\\*\\*"
     
     while IFS= read -r line; do
         # Match task IDs like fxstein-50 in TODO.md
-        if [[ "$line" =~ \*\*#${user_prefix}-([0-9]+)\*\* ]]; then
+        # Use pattern variable for zsh compatibility
+        if [[ "$line" =~ $pattern ]]; then
             local num="${match[1]}"
             if [[ $num -gt $highest ]]; then
                 highest=$num
@@ -406,11 +409,14 @@ assign_task_number_branch() {
     
     # Find highest task number for this branch prefix
     local highest=0
-    local pattern="${branch_prefix}-([0-9]+)"
+    
+    # Construct pattern variable for zsh regex compatibility
+    local pattern="\\*\\*#${branch_prefix}-([0-9]+)\\*\\*"
     
     while IFS= read -r line; do
         # Match task IDs like feature-50 in TODO.md
-        if [[ "$line" =~ \*\*#${branch_prefix}-([0-9]+)\*\* ]]; then
+        # Use pattern variable for zsh compatibility
+        if [[ "$line" =~ $pattern ]]; then
             local num="${match[1]}"
             if [[ $num -gt $highest ]]; then
                 highest=$num

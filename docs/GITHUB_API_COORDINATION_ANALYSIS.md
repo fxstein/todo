@@ -232,11 +232,34 @@ Store task number in a discussion post (not practical).
    - Retry logic handles concurrent requests
    - Eventually succeeds when no other updates occur
 
+**Authentication & Permissions Required:**
+
+**Personal Access Tokens (Classic):**
+- **Public repositories:** `public_repo` scope (grants read/write access to public repos)
+- **Private repositories:** `repo` scope (grants full control over private repos)
+- **Note:** `repo` scope is quite broad - grants full access to all repository contents, settings, and metadata
+
+**Fine-Grained Personal Access Tokens:**
+- **Contents** repository permission set to **"Read and write"**
+- More granular control - can restrict to specific repositories
+- Recommended for better security
+
+**GitHub Apps:**
+- **Contents** repository permission with **"Read and write"** access
+- Required if using GitHub App authentication
+
+**Security Considerations:**
+- ⚠️ **Broad permissions:** `repo` scope grants full repository access (not just contents)
+- ⚠️ **Token security:** Tokens must be stored securely (not in code, use environment variables)
+- ⚠️ **Least privilege:** Fine-grained tokens are recommended for better security
+- ⚠️ **Repository access:** User must have write access to the repository
+
 **Limitations:**
 - ⚠️ **Requires repository context** - Must know repository owner/name
 - ⚠️ **File must be committed** - Changes go through Git (can be automated)
 - ⚠️ **Rate limits:** 5,000 requests/hour (authenticated)
 - ⚠️ **Network required** - Cannot work offline
+- ⚠️ **Authentication required** - GitHub tokens needed for all users
 
 **Trade-offs:**
 - ✅ **Provides true atomic assignment** - Much better than Git-based coordination
@@ -278,11 +301,39 @@ Store task number in a discussion post (not practical).
 
 ---
 
+## Security & Permissions Summary
+
+**Required Permissions for Repository Contents API:**
+
+| Authentication Method | Required Permission | Scope |
+|----------------------|---------------------|-------|
+| **Classic PAT (Public Repo)** | `public_repo` scope | Read/write to public repos |
+| **Classic PAT (Private Repo)** | `repo` scope | Full access to private repos |
+| **Fine-Grained PAT** | Contents: Read and write | Repository-specific |
+| **GitHub App** | Contents: Read and write | App-specific |
+
+**Security Best Practices:**
+1. **Use fine-grained tokens** - More granular, repository-specific permissions
+2. **Store tokens securely** - Environment variables, not in code
+3. **Rotate tokens regularly** - Periodic token rotation for security
+4. **Minimal permissions** - Only grant necessary permissions (Contents: Read/write)
+5. **Repository access control** - Users must have write access to repository
+
+**User Requirements:**
+- ✅ Users need GitHub account
+- ✅ Users need GitHub CLI (`gh`) installed and authenticated
+- ✅ Users need write access to repository
+- ✅ Users need appropriate token with Contents permissions
+
+---
+
 ## Next Steps
 
 1. **Verify SHA-based locking** - Test with concurrent requests to confirm optimistic locking works
 2. **Design counter file structure** - Format and location of task counter file
 3. **Implement retry logic** - Handle SHA mismatches gracefully
 4. **Design error handling** - Network failures, rate limits, authentication errors
-5. **Consider fallback** - What happens if API unavailable (offline mode)
+5. **Design authentication flow** - Token validation, error messages for missing permissions
+6. **Consider fallback** - What happens if API unavailable (offline mode)
+7. **Security documentation** - Guide for users on setting up tokens and permissions
 

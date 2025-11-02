@@ -1,0 +1,40 @@
+---
+description: "Bug review and task setup workflow for todo.ai development"
+alwaysApply: true
+---
+When reviewing new bugs and setting up tasks:
+
+1. **Check GitHub for new bug issues:**
+   ```bash
+   gh issue list --label "bug" --state open --json number,title,body,url
+   ```
+   - Review all open bugs
+   - Check for unlabeled bugs that mention "bug", "fix", or "error" in title
+   - Examine issue details for context
+
+2. **Create task in TODO.md with issue number:**
+   ```bash
+   ./todo.ai add "Fix issue#XX: [bug description]" "#bug"
+   ```
+   - Always include `issue#XX` in task description (e.g., "Fix issue#25: ...")
+   - Use `#bug` tag
+   - Include issue number so commits can reference both task and issue
+
+3. **Add subtasks for investigation and fix:**
+   ```bash
+   ./todo.ai add-subtask <task-id> "Investigate [component/cause]" "#bug"
+   ./todo.ai add-subtask <task-id> "Fix [specific issue]" "#bug"
+   ./todo.ai add-subtask <task-id> "Add tests for [fix verification]" "#bug"
+   ```
+
+4. **Format commits with both task and issue numbers:**
+   - Use `task#nn` format for todo.ai task numbers (prevents GitHub auto-linking)
+   - Use `#nn` format for GitHub issue numbers (enables linking)
+   - Example: `fix: Fix delete command section placement (task#123, #25)`
+   - Never use `#nn` alone for task numbers - always use `task#nn`
+
+**Format Examples:**
+- ✅ `fix: Fix delete command section placement (task#123, #25)`
+- ✅ `fix: Resolve footer ordering issue (task#123, #25)`
+- ❌ `fix: Fix bug (#25)` - Missing task number
+- ❌ `fix: Fix bug (123, #25)` - Task number format wrong (should be task#123)

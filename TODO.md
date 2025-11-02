@@ -163,6 +163,12 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] **#124** Convince the coffee machine to understand sarcasm `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [  D] **#123.1** Investigate delete command placement logic for Deleted Tasks section (completed - found footer boundary check missing) `#bug`
+  - [  D] **#123.2** Verify expected section order: Tasks -> Recently Completed -> Deleted Tasks -> Footer (verified - order is now correct) `#bug`
+  - [  D] **#123.3** Fix delete command to place Deleted Tasks section before footer (completed - updated ensure_deleted_section function) `#bug`
+  - [D] **#123.4** Add tests to verify correct section ordering `#bug` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#123** Fix issue#25: Deleted tasks section placement - footer appears before Deleted Tasks section instead of after `#bug` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#fxstein-106** clean the car (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#64** Test after fix (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#63** Test coordination after mode switch (deleted 2025-11-02, expires 2025-12-02)
@@ -296,9 +302,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 18:14:39 CET 2025
+**Last Updated:** Sun Nov  2 19:56:49 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
-
-- [ ] **#100** Duplicate test task 1
-- [ ] **#102** Duplicate test task 2

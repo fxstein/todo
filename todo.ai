@@ -2962,21 +2962,80 @@ delete_task() {
     echo "Moved $deleted_count task(s) to Deleted section"
 }
 
-# Function to ensure Deleted Tasks section exists
+# Function to ensure Deleted Tasks section exists and is correctly positioned
 ensure_deleted_section() {
-    if ! grep -q "^## Deleted Tasks" "$TODO_FILE"; then
-        # Add Deleted section after Recently Completed
+    local deleted_section_line=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1 | head -1)
+    local footer_line=$(grep -n "^---$" "$TODO_FILE" | cut -d: -f1 | head -1)
+    
+    # Check if Deleted Tasks section exists but is after footer (wrong position)
+    if [[ -n "$deleted_section_line" ]] && [[ -n "$footer_line" ]] && [[ $deleted_section_line -gt $footer_line ]]; then
+        # Deleted Tasks section is after footer - need to move it before footer
+        # This is a fix for existing incorrectly-positioned sections
+        
+        # Find Recently Completed section
+        local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
+        
+        if [[ -n "$recently_completed_line" ]]; then
+            # Find where Deleted Tasks section ends (next section header or end of file)
+            local deleted_next_section=$(awk "NR > $deleted_section_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
+            local deleted_end
+            if [[ -n "$deleted_next_section" ]]; then
+                deleted_end=$((deleted_next_section - 1))
+            else
+                deleted_end=$(wc -l < "$TODO_FILE" | tr -d ' ')
+            fi
+            
+            # Extract Deleted Tasks section (including header and all tasks)
+            local deleted_section=$(sed -n "${deleted_section_line},${deleted_end}p" "$TODO_FILE")
+            
+            # Remove Deleted Tasks section from original position
+            if [[ "$(uname)" == "Darwin" ]]; then
+                local temp_file=$(mktemp)
+                head -n $((deleted_section_line - 1)) "$TODO_FILE" > "$temp_file"
+                tail -n +$((deleted_end + 1)) "$TODO_FILE" >> "$temp_file" 2>/dev/null || true
+                mv "$temp_file" "$TODO_FILE"
+            else
+                sed_inplace "${deleted_section_line},${deleted_end}d" "$TODO_FILE"
+            fi
+            
+            # Recalculate footer line after deletion
+            footer_line=$(grep -n "^---$" "$TODO_FILE" | cut -d: -f1 | head -1)
+            
+            # Insert Deleted Tasks section before footer
+            if [[ -n "$footer_line" ]]; then
+                local insert_line=$((footer_line - 1))
+                
+                if [[ "$(uname)" == "Darwin" ]]; then
+                    local temp_file=$(mktemp)
+                    head -n "$insert_line" "$TODO_FILE" > "$temp_file"
+                    echo "" >> "$temp_file"
+                    echo "$deleted_section" >> "$temp_file"
+                    tail -n +$((insert_line + 1)) "$TODO_FILE" >> "$temp_file" 2>/dev/null || true
+                    mv "$temp_file" "$TODO_FILE"
+                else
+                    sed_inplace "${insert_line}a\\\n$deleted_section" "$TODO_FILE"
+                fi
+            fi
+        fi
+    elif [[ -z "$deleted_section_line" ]]; then
+        # Deleted Tasks section doesn't exist - create it after Recently Completed, but before footer
         local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
         if [[ -n "$recently_completed_line" ]]; then
-            # Find the end of the Recently Completed section (next section header or end of file)
+            # Find the footer boundary (---) or next section header (## )
+            # Priority: check for footer first, then section headers
+            local footer_after_recently=$(awk "NR > $recently_completed_line && /^---$/ {print NR; exit}" "$TODO_FILE" || echo "")
             local next_section_line=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
+            
             local insert_line
-            if [[ -z "$next_section_line" ]]; then
-                # No next section, insert at end of file
-                insert_line=$(wc -l < "$TODO_FILE" | tr -d ' ')
-            else
-                # Insert before the next section
+            if [[ -n "$footer_after_recently" ]]; then
+                # Footer exists - insert Deleted Tasks section before footer
+                insert_line=$((footer_after_recently - 1))
+            elif [[ -n "$next_section_line" ]]; then
+                # Next section exists - insert before it
                 insert_line=$((next_section_line - 1))
+            else
+                # No footer or section, insert at end of file
+                insert_line=$(wc -l < "$TODO_FILE" | tr -d ' ')
             fi
             
             if [[ "$(uname)" == "Darwin" ]]; then

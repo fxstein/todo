@@ -7,8 +7,8 @@ mode: enhanced
 
 # Coordination settings (for enhanced mode)
 coordination:
-  type: none
-  fallback: multi-user
+  type: counterapi
+  namespace: todo-ai-fxstein
 
 # Conflict resolution settings
 conflict_resolution:

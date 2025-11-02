@@ -107,10 +107,44 @@ EOF
         fi
     fi
     
-    # Fallback to simple grep/sed for mode (top-level only)
-    if [[ "$key" == "mode" ]]; then
-        local value=$(grep "^mode:" "$config_file" 2>/dev/null | sed 's/^mode:[[:space:]]*//' | sed 's/[[:space:]]*$//' || echo "")
-        if [[ -n "$value" ]]; then
+    # Fallback to sed for nested keys (e.g., coordination.type, coordination.issue_number)
+    if [[ "$key" =~ ^([^.]+)\.(.+)$ ]]; then
+        local parent_key="${match[1]}"
+        local child_key="${match[2]}"
+        
+        # Find the parent section (e.g., "coordination:")
+        local in_section=false
+        while IFS= read -r line; do
+            # Check if we're entering the parent section
+            if [[ "$line" =~ ^${parent_key}: ]]; then
+                in_section=true
+                continue
+            fi
+            
+            # If we hit another top-level key, we've left the section
+            if [[ "$in_section" == true ]] && [[ "$line" =~ ^[a-z_]+: ]]; then
+                break
+            fi
+            
+            # If we're in the section, look for the child key
+            if [[ "$in_section" == true ]] && [[ "$line" =~ ^[[:space:]]+${child_key}:[[:space:]]*(.+)$ ]]; then
+                local value="${match[1]}"
+                # Remove quotes if present
+                value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/" | sed 's/[[:space:]]*$//')
+                if [[ -n "$value" ]] && [[ "$value" != "null" ]]; then
+                    echo "$value"
+                    return 0
+                fi
+            fi
+        done < "$config_file"
+    fi
+    
+    # Handle simple keys (not nested) - check after nested key handling
+    # Use string contains check instead of regex for better compatibility
+    if [[ "$key" != *.* ]]; then
+        # Simple key (not nested) - use grep and sed
+        local value=$(grep "^${key}:" "$config_file" 2>/dev/null | sed "s/^${key}:[[:space:]]*//" | sed 's/[[:space:]]*$//' | head -1)
+        if [[ -n "$value" ]] && [[ "$value" != "null" ]]; then
             echo "$value"
             return 0
         fi
@@ -461,8 +495,9 @@ assign_task_number_enhanced_github_issues() {
         return 1  # Trigger fallback
     fi
     
-    # Get latest comment from issue
-    local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq '.[0].body' 2>/dev/null || echo "")
+    # Get latest comment from issue (comments are returned in chronological order, so get last one)
+    # Sort by created_at to ensure we get the newest comment, or use last element if already sorted
+    local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
     
     if [[ -z "$latest_comment" ]]; then
         # No comments yet, start with 1
@@ -488,8 +523,8 @@ assign_task_number_enhanced_github_issues() {
             return 0
         fi
         
-        # Check if number changed (concurrent update)
-        local updated_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq '.[0].body' 2>/dev/null || echo "")
+        # Check if number changed (concurrent update) - get latest comment by sorting
+        local updated_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
         local updated_num=$(echo "$updated_comment" | grep -oE '[0-9]+' | tail -1)
         if [[ -n "$updated_num" ]] && [[ "$updated_num" != "$current_num" ]]; then
             # Number changed, retry with new number
@@ -1462,6 +1497,10 @@ show_usage() {
     echo "  switch-mode <mode> [--force] [--renumber]  Switch numbering mode (single-user, multi-user, branch, enhanced)"
     echo "  list-mode-backups             List mode switch backups"
     echo "  rollback-mode <backup-name>   Rollback from mode switch backup"
+    echo "  config, show-config           Show current configuration"
+    echo "  detect-coordination           Detect available coordination options based on system"
+    echo "  setup-coordination <type>     Set up coordination service (github-issues, counterapi)"
+    echo "  setup, setup-wizard           Interactive setup wizard for mode and coordination"
     echo "  version, -v, --version        Show version information"
     echo ""
     echo ""
@@ -1513,6 +1552,11 @@ show_usage() {
     echo "  ./todo.ai switch-mode branch          # Switch to branch-based numbering"
     echo "  ./todo.ai list-mode-backups           # List mode switch backups"
     echo "  ./todo.ai rollback-mode <backup-name> # Rollback from mode switch"
+    echo "  ./todo.ai config                      # Show current configuration"
+    echo "  ./todo.ai detect-coordination         # Check available coordination options"
+    echo "  ./todo.ai setup-coordination github-issues  # Set up GitHub Issues coordination"
+    echo "  ./todo.ai setup-coordination counterapi     # Set up CounterAPI coordination"
+    echo "  ./todo.ai setup                       # Run interactive setup wizard"
     echo "  ./todo.ai version                    # Show version"
     echo ""
     echo "Copyright 2025 Oliver Ratzesberger"
@@ -1782,14 +1826,14 @@ add_subtask() {
     fi
     
     # Resolve task reference (auto-add prefix for number-only references)
+    local original_parent_id="$parent_id"
     local resolved_parent_id=$(resolve_task_reference "$parent_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_parent_id" ]]; then
         resolved_parent_id="$parent_id"
     fi
-    parent_id="$resolved_parent_id"
     
-    # Check nesting depth of parent
-    local parent_depth=$(get_nesting_depth "$parent_id")
+    # Check nesting depth of parent (use resolved ID for depth calculation)
+    local parent_depth=$(get_nesting_depth "$resolved_parent_id")
     
     # Validate max nesting (2 levels: main task → subtask → sub-subtask)
     if [[ $parent_depth -ge 2 ]]; then
@@ -1803,17 +1847,43 @@ add_subtask() {
     local parent_found=false
     local parent_line_num=""
     local parent_indent=""
+    local final_parent_id=""  # Will be set to the actual ID found in TODO.md
     
-    # Check for main task pattern: `^- \[.*\] \*\*#$parent_id\*\* `
-    if grep -q "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+    # Check for main task pattern: `^- \[.*\] \*\*#$resolved_parent_id\*\* `
+    if grep -q "^- \[.*\] \*\*#$resolved_parent_id\*\* " "$TODO_FILE"; then
         parent_found=true
-        parent_line_num=$(grep -n "^- \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        parent_line_num=$(grep -n "^- \[.*\] \*\*#$resolved_parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
         parent_indent="  "  # Main tasks have subtasks indented with 2 spaces
-    # Check for subtask pattern: `^  - \[.*\] \*\*#$parent_id\*\* `
-    elif grep -q "^  - \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE"; then
+        final_parent_id="$resolved_parent_id"
+    # Check for subtask pattern: `^  - \[.*\] \*\*#$resolved_parent_id\*\* `
+    elif grep -q "^  - \[.*\] \*\*#$resolved_parent_id\*\* " "$TODO_FILE"; then
         parent_found=true
-        parent_line_num=$(grep -n "^  - \[.*\] \*\*#$parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        parent_line_num=$(grep -n "^  - \[.*\] \*\*#$resolved_parent_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
         parent_indent="    "  # Subtasks have sub-subtasks indented with 4 spaces
+        final_parent_id="$resolved_parent_id"
+    # Fallback: if resolved ID has a prefix but not found, try original plain number
+    elif [[ "$resolved_parent_id" != "$original_parent_id" ]] && [[ "$resolved_parent_id" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
+        local plain_parent_id="${match[1]}"
+        # Check for main task pattern with plain ID
+        if grep -q "^- \[.*\] \*\*#${plain_parent_id}\*\* " "$TODO_FILE"; then
+            parent_found=true
+            parent_line_num=$(grep -n "^- \[.*\] \*\*#${plain_parent_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+            parent_indent="  "
+            final_parent_id="$plain_parent_id"  # Use plain ID for creating subtask ID
+        # Check for subtask pattern with plain ID
+        elif grep -q "^  - \[.*\] \*\*#${plain_parent_id}\*\* " "$TODO_FILE"; then
+            parent_found=true
+            parent_line_num=$(grep -n "^  - \[.*\] \*\*#${plain_parent_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+            parent_indent="    "
+            final_parent_id="$plain_parent_id"  # Use plain ID for creating subtask ID
+        fi
+    fi
+    
+    # Set parent_id to the final ID found (or resolved ID if not found with fallback)
+    if [[ -z "$final_parent_id" ]]; then
+        parent_id="$resolved_parent_id"
+    else
+        parent_id="$final_parent_id"
     fi
     
     if [[ "$parent_found" == false ]]; then
@@ -2905,6 +2975,662 @@ get_relationships() {
         while IFS=: read -r id rel_type targets; do
             echo "$rel_type:$targets"
         done
+}
+
+# Function to detect available coordination options (#52.20)
+detect_coordination_options() {
+    local available_options=()
+    local missing_requirements=()
+    
+    echo "🔍 Detecting available coordination options..."
+    echo ""
+    
+    # Check for GitHub Issues coordination
+    echo "Checking GitHub Issues coordination..."
+    local gh_available=false
+    local gh_auth=false
+    local git_repo=false
+    
+    if command -v gh >/dev/null 2>&1; then
+        gh_available=true
+        echo "  ✅ GitHub CLI (gh) installed"
+        
+        # Check authentication
+        if gh auth status >/dev/null 2>&1; then
+            gh_auth=true
+            echo "  ✅ GitHub CLI authenticated"
+        else
+            echo "  ⚠️  GitHub CLI not authenticated (run: gh auth login)"
+            missing_requirements+=("GitHub CLI authentication")
+        fi
+    else
+        echo "  ❌ GitHub CLI (gh) not installed"
+        missing_requirements+=("GitHub CLI (gh)")
+    fi
+    
+    # Check if we're in a git repository
+    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+        local repo_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
+        if [[ -n "$repo_url" ]] && [[ "$repo_url" =~ github\.com ]]; then
+            git_repo=true
+            echo "  ✅ Git repository with GitHub remote detected"
+        else
+            echo "  ⚠️  Git repository not connected to GitHub"
+            missing_requirements+=("GitHub repository connection")
+        fi
+    else
+        echo "  ⚠️  Not in a Git repository"
+        missing_requirements+=("Git repository")
+    fi
+    
+    if [[ "$gh_available" == true ]] && [[ "$gh_auth" == true ]] && [[ "$git_repo" == true ]]; then
+        available_options+=("github-issues")
+        echo "  ✅ GitHub Issues coordination: AVAILABLE"
+    else
+        echo "  ❌ GitHub Issues coordination: NOT AVAILABLE"
+    fi
+    echo ""
+    
+    # Check for CounterAPI coordination
+    echo "Checking CounterAPI coordination..."
+    local curl_available=false
+    local jq_available=false
+    local python_available=false
+    
+    if command -v curl >/dev/null 2>&1; then
+        curl_available=true
+        echo "  ✅ curl installed"
+    else
+        echo "  ❌ curl not installed"
+        missing_requirements+=("curl")
+    fi
+    
+    if command -v jq >/dev/null 2>&1; then
+        jq_available=true
+        echo "  ✅ jq installed"
+    elif command -v python3 >/dev/null 2>&1; then
+        python_available=true
+        echo "  ✅ python3 installed (can parse JSON)"
+    else
+        echo "  ⚠️  Neither jq nor python3 available (JSON parsing will be limited)"
+        missing_requirements+=("jq or python3")
+    fi
+    
+    if [[ "$curl_available" == true ]] && ([[ "$jq_available" == true ]] || [[ "$python_available" == true ]]); then
+        available_options+=("counterapi")
+        echo "  ✅ CounterAPI coordination: AVAILABLE"
+    else
+        echo "  ❌ CounterAPI coordination: NOT AVAILABLE"
+    fi
+    echo ""
+    
+    # Summary
+    echo "📊 Summary:"
+    echo "============"
+    if [[ ${#available_options[@]} -eq 0 ]]; then
+        echo "  ❌ No coordination options available"
+        echo ""
+        echo "Missing requirements:"
+        for req in "${missing_requirements[@]}"; do
+            echo "  - $req"
+        done
+        echo ""
+        echo "💡 Recommendation: Use 'multi-user' or 'branch' mode (no coordination required)"
+        return 1
+    else
+        echo "  ✅ Available coordination options:"
+        for option in "${available_options[@]}"; do
+            case "$option" in
+                "github-issues")
+                    echo "    - GitHub Issues (github-issues)"
+                    ;;
+                "counterapi")
+                    echo "    - CounterAPI (counterapi)"
+                    ;;
+            esac
+        done
+        echo ""
+        if [[ ${#missing_requirements[@]} -gt 0 ]]; then
+            echo "⚠️  Note: Some options may require additional setup"
+        fi
+        return 0
+    fi
+}
+
+# Function to set up coordination service (#52.21)
+setup_coordination() {
+    local coord_type="$1"
+    local interactive=true
+    
+    # Parse arguments
+    if [[ "$1" == "--non-interactive" ]]; then
+        interactive=false
+        coord_type="$2"
+    fi
+    
+    if [[ -z "$coord_type" ]]; then
+        echo "Error: Please specify coordination type"
+        echo "Usage: ./todo.ai setup-coordination <type>"
+        echo "Types: github-issues, counterapi"
+        return 1
+    fi
+    
+    local config_file=$(get_config_file)
+    local config_dir=$(dirname "$config_file")
+    
+    # Ensure config directory exists
+    mkdir -p "$config_dir" 2>/dev/null || return 1
+    
+    # Ensure config file exists
+    if [[ ! -f "$config_file" ]]; then
+        cat > "$config_file" <<EOF
+# todo.ai Configuration File
+mode: enhanced
+coordination:
+  type: none
+  fallback: multi-user
+EOF
+    fi
+    
+    case "$coord_type" in
+        "github-issues")
+            setup_github_issues_coordination "$interactive"
+            ;;
+        "counterapi")
+            setup_counterapi_coordination "$interactive"
+            ;;
+        *)
+            echo "Error: Unknown coordination type '$coord_type'"
+            echo "Valid types: github-issues, counterapi"
+            return 1
+            ;;
+    esac
+}
+
+# Function to get highest task number from TODO.md
+get_highest_task_number() {
+    local highest=0
+    
+    if [[ ! -f "$TODO_FILE" ]]; then
+        echo "0"
+        return 0
+    fi
+    
+    # Scan all task IDs in TODO.md (handle both prefixed and non-prefixed formats)
+    while IFS= read -r line; do
+        # Match task IDs in format: **#task_id** or **#prefix-task_id**
+        # Use unquoted pattern variable for zsh regex compatibility
+        local task_pattern='\*\*#([0-9a-z.\-]+)\*\*'
+        if [[ "$line" =~ $task_pattern ]]; then
+            local full_task_id="${match[1]}"
+            
+            # Extract numeric part (removes prefix if present, ignores subtasks)
+            local numeric_part=$(extract_task_number "$full_task_id" 2>/dev/null)
+            if [[ -z "$numeric_part" ]]; then
+                # Try extracting just the main number (not subtask)
+                if [[ "$full_task_id" =~ ^([0-9]+)(\.[0-9]+)?$ ]]; then
+                    numeric_part="${match[1]}"
+                elif [[ "$full_task_id" =~ ^[a-z0-9]{1,7}-([0-9]+)(\.[0-9]+)?$ ]]; then
+                    numeric_part="${match[1]}"
+                fi
+            fi
+            
+            if [[ -n "$numeric_part" ]] && [[ "$numeric_part" =~ ^[0-9]+$ ]]; then
+                # Extract main number (ignore subtask part)
+                local main_num="${numeric_part%%.*}"
+                if [[ $main_num -gt $highest ]]; then
+                    highest=$main_num
+                fi
+            fi
+        fi
+    done < "$TODO_FILE"
+    
+    echo "$highest"
+}
+
+# Function to set up GitHub Issues coordination
+setup_github_issues_coordination() {
+    local interactive="$1"
+    local config_file=$(get_config_file)
+    
+    echo "🔧 Setting up GitHub Issues coordination..."
+    echo ""
+    
+    # Verify prerequisites
+    if ! command -v gh >/dev/null 2>&1; then
+        echo "❌ Error: GitHub CLI (gh) is not installed"
+        echo "   Install: https://cli.github.com/manual/installation"
+        return 1
+    fi
+    
+    if ! gh auth status >/dev/null 2>&1; then
+        echo "❌ Error: GitHub CLI is not authenticated"
+        echo "   Run: gh auth login"
+        return 1
+    fi
+    
+    # Get repository URL
+    local repo_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
+    if [[ -z "$repo_url" ]] || [[ ! "$repo_url" =~ github\.com ]]; then
+        echo "❌ Error: Not in a GitHub repository"
+        return 1
+    fi
+    
+    # Extract repo owner/name
+    local repo_identifier=$(echo "$repo_url" | sed 's/\.git$//' | sed 's/.*github\.com[:/]//')
+    
+    echo "Repository: $repo_identifier"
+    echo ""
+    
+    # Get or create issue
+    local issue_number=""
+    if [[ "$interactive" == true ]]; then
+        echo "Choose an option:"
+        echo "  1) Use an existing issue"
+        echo "  2) Create a new issue"
+        printf "Enter choice [1]: "
+        read -r choice
+        choice=${choice:-1}
+        
+        if [[ "$choice" == "2" ]]; then
+            # Create new issue
+            echo ""
+            echo "Creating new GitHub issue for task coordination..."
+            local issue_title="todo.ai Task Number Coordination"
+            local issue_body="This issue is used by todo.ai for atomic task number coordination.
+            
+Do not manually comment on this issue - it is managed automatically by todo.ai."
+            
+            # gh issue create returns a URL like: https://github.com/owner/repo/issues/123
+            local issue_output=$(gh issue create --repo "$repo_identifier" --title "$issue_title" --body "$issue_body" 2>&1)
+            
+            # Extract issue number from URL (format: https://github.com/owner/repo/issues/123)
+            if [[ "$issue_output" =~ /issues/([0-9]+)$ ]] || [[ "$issue_output" =~ issues/([0-9]+) ]]; then
+                issue_number="${match[1]}"
+            elif [[ "$issue_output" =~ ([0-9]+) ]]; then
+                # Fallback: just extract any number from output
+                issue_number=$(echo "$issue_output" | grep -oE '[0-9]+' | tail -1)
+            fi
+            
+            if [[ -z "$issue_number" ]]; then
+                echo "❌ Error: Failed to create GitHub issue"
+                echo "   Output: $issue_output"
+                return 1
+            fi
+            
+            echo "✅ Created issue #$issue_number"
+        else
+            # Use existing issue
+            echo ""
+            printf "Enter issue number: "
+            read -r issue_number
+            
+            # Validate issue exists
+            if ! gh issue view --repo "$repo_identifier" "$issue_number" >/dev/null 2>&1; then
+                echo "❌ Error: Issue #$issue_number not found or not accessible"
+                return 1
+            fi
+            
+            echo "✅ Using issue #$issue_number"
+        fi
+    else
+        # Non-interactive: issue number must be provided as environment variable or argument
+        issue_number="${GITHUB_ISSUE_NUMBER:-}"
+        if [[ -z "$issue_number" ]]; then
+            echo "❌ Error: GITHUB_ISSUE_NUMBER environment variable not set"
+            return 1
+        fi
+    fi
+    
+    # Initialize issue with highest task number from TODO.md if it has no comments
+    echo ""
+    echo "Checking issue comments..."
+    local existing_comments=$(gh api repos/${repo_identifier}/issues/${issue_number}/comments --jq 'length' 2>/dev/null || echo "0")
+    
+    if [[ "$existing_comments" == "0" ]] || [[ -z "$existing_comments" ]]; then
+        # No comments yet - initialize with highest task number from TODO.md
+        local highest_num=$(get_highest_task_number)
+        local start_num=$((highest_num + 1))
+        
+        if [[ $highest_num -gt 0 ]]; then
+            echo "   Found existing tasks in TODO.md (highest: #$highest_num)"
+            echo "   Initializing coordination with task number: $start_num"
+        else
+            echo "   No existing tasks found - starting from 1"
+            start_num=1
+        fi
+        
+        # Post initial comment with starting number
+        if ! gh api -X POST repos/${repo_identifier}/issues/${issue_number}/comments --field "body=Next task number: $start_num" >/dev/null 2>&1; then
+            echo "⚠️  Warning: Failed to initialize issue with starting number"
+            echo "   You may need to manually post a comment with: Next task number: $start_num"
+        else
+            echo "✅ Initialized issue with starting number: $start_num"
+        fi
+    else
+        echo "   Issue already has comments - using existing coordination"
+        local latest_comment=$(gh api repos/${repo_identifier}/issues/${issue_number}/comments --jq '.[0].body' 2>/dev/null || echo "")
+        local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
+        if [[ -n "$current_num" ]]; then
+            echo "   Current task number in coordination: $current_num"
+        fi
+    fi
+    echo ""
+    
+    # Update config file
+    if command -v yq >/dev/null 2>&1; then
+        yq eval ".coordination.type = \"github-issues\"" -i "$config_file" 2>/dev/null
+        yq eval ".coordination.issue_number = $issue_number" -i "$config_file" 2>/dev/null
+    elif command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
+        python3 <<EOF
+import yaml
+import sys
+try:
+    with open('$config_file', 'r') as f:
+        config = yaml.safe_load(f) or {}
+    if 'coordination' not in config:
+        config['coordination'] = {}
+    config['coordination']['type'] = 'github-issues'
+    config['coordination']['issue_number'] = int('$issue_number')
+    with open('$config_file', 'w') as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
+            sys.exit(1)
+EOF
+        if [[ $? -ne 0 ]]; then
+            echo "❌ Error: Failed to update config file"
+            return 1
+        fi
+    else
+        # Fallback to sed for simple coordination updates
+        # Ensure coordination section exists
+        if ! grep -q "^coordination:" "$config_file"; then
+            # Add coordination section after mode line
+            sed_inplace "/^mode:/a\\
+coordination:\\
+  type: none\\
+  fallback: multi-user" "$config_file"
+        fi
+        
+        # Update coordination.type
+        if grep -q "^  type:" "$config_file"; then
+            sed_inplace "s/^  type:.*/  type: github-issues/" "$config_file"
+        else
+            # Add type line if it doesn't exist
+            sed_inplace "/^coordination:/a\\
+  type: github-issues" "$config_file"
+        fi
+        
+        # Update or add issue_number
+        if grep -q "^  issue_number:" "$config_file"; then
+            sed_inplace "s/^  issue_number:.*/  issue_number: $issue_number/" "$config_file"
+        else
+            # Add issue_number line after type
+            sed_inplace "/^  type: github-issues/a\\
+  issue_number: $issue_number" "$config_file"
+        fi
+    fi
+    
+    echo ""
+    echo "✅ GitHub Issues coordination configured"
+    echo "   Issue: #$issue_number"
+    echo "   Repository: $repo_identifier"
+    return 0
+}
+
+# Function to set up CounterAPI coordination
+setup_counterapi_coordination() {
+    local interactive="$1"
+    local config_file=$(get_config_file)
+    
+    echo "🔧 Setting up CounterAPI coordination..."
+    echo ""
+    
+    # Verify prerequisites
+    if ! command -v curl >/dev/null 2>&1; then
+        echo "❌ Error: curl is not installed"
+        return 1
+    fi
+    
+    if ! command -v jq >/dev/null 2>&1 && ! command -v python3 >/dev/null 2>&1; then
+        echo "❌ Error: jq or python3 required for JSON parsing"
+        return 1
+    fi
+    
+    # Get namespace
+    local namespace=""
+    if [[ "$interactive" == true ]]; then
+        # Suggest default namespace based on repo name
+        local repo_name=""
+        if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
+            local repo_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
+            if [[ "$repo_url" =~ github\.com[:/]([^/]+)/([^/]+)(\.git)?$ ]]; then
+                repo_name="${match[2]%.git}"
+            fi
+        fi
+        
+        local default_namespace="${repo_name:-todo-ai-$(date +%s)}"
+        printf "Enter CounterAPI namespace [$default_namespace]: "
+        read -r namespace
+        namespace=${namespace:-$default_namespace}
+    else
+        namespace="${COUNTERAPI_NAMESPACE:-}"
+        if [[ -z "$namespace" ]]; then
+            echo "❌ Error: COUNTERAPI_NAMESPACE environment variable not set"
+            return 1
+        fi
+    fi
+    
+    # Validate namespace (should be alphanumeric with hyphens/underscores)
+    if [[ ! "$namespace" =~ ^[a-z0-9_-]+$ ]]; then
+        echo "❌ Error: Namespace must contain only lowercase letters, numbers, hyphens, and underscores"
+        return 1
+    fi
+    
+    # Test CounterAPI connection
+    echo ""
+    echo "Testing CounterAPI connection..."
+    local test_response=$(curl -s -X POST "https://api.counterapi.dev/v1/${namespace}/test-counter/up" 2>/dev/null || echo "")
+    
+    if [[ -z "$test_response" ]]; then
+        echo "⚠️  Warning: Could not reach CounterAPI"
+        printf "Continue anyway? (y/N): "
+        read -r continue_anyway
+        if [[ ! "$continue_anyway" =~ ^[Yy]$ ]]; then
+            return 1
+        fi
+    else
+        echo "✅ CounterAPI connection successful"
+    fi
+    
+    # Initialize counter with highest task number from TODO.md if counter doesn't exist yet
+    echo ""
+    echo "Initializing counter with highest task number from TODO.md..."
+    local highest_num=$(get_highest_task_number)
+    local start_num=$((highest_num + 1))
+    
+    if [[ $highest_num -gt 0 ]]; then
+        echo "   Found existing tasks in TODO.md (highest: #$highest_num)"
+        echo "   Counter will start from: $start_num"
+        echo "   Note: CounterAPI increments atomically - first task will use $start_num"
+    else
+        echo "   No existing tasks found - counter will start from 1"
+        echo "   Note: CounterAPI increments atomically - first task will use 1"
+    fi
+    echo ""
+    
+    # Update config file
+    if command -v yq >/dev/null 2>&1; then
+        yq eval ".coordination.type = \"counterapi\"" -i "$config_file" 2>/dev/null
+        yq eval ".coordination.namespace = \"$namespace\"" -i "$config_file" 2>/dev/null
+    elif command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
+        python3 <<EOF
+import yaml
+import sys
+try:
+    with open('$config_file', 'r') as f:
+        config = yaml.safe_load(f) or {}
+    if 'coordination' not in config:
+        config['coordination'] = {}
+    config['coordination']['type'] = 'counterapi'
+    config['coordination']['namespace'] = '$namespace'
+    with open('$config_file', 'w') as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+except Exception as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
+EOF
+        if [[ $? -ne 0 ]]; then
+            echo "❌ Error: Failed to update config file"
+            return 1
+        fi
+    else
+        echo "❌ Error: YAML parser (yq or python3 with yaml module) required"
+        return 1
+    fi
+    
+    echo ""
+    echo "✅ CounterAPI coordination configured"
+    echo "   Namespace: $namespace"
+    return 0
+}
+
+# Function to run setup wizard (#52.23)
+setup_wizard() {
+    echo "🚀 todo.ai Setup Wizard"
+    echo "========================"
+    echo ""
+    echo "This wizard will guide you through configuring todo.ai for your needs."
+    echo ""
+    
+    # Step 1: Detect current system capabilities
+    echo "Step 1: Detecting system capabilities..."
+    echo ""
+    if ! detect_coordination_options; then
+        echo ""
+        echo "⚠️  No coordination options available - using simpler modes"
+    fi
+    echo ""
+    
+    # Step 2: Select mode
+    echo "Step 2: Select numbering mode"
+    echo ""
+    echo "Available modes:"
+    echo "  1) single-user  - Simple sequential numbering (#1, #2, #3...)"
+    echo "  2) multi-user   - Prefix with GitHub user ID (fxstein-50, alice-50...)"
+    echo "  3) branch       - Prefix with branch name (feature-50, main-50...)"
+    echo "  4) enhanced     - Multi-user with atomic coordination (requires setup)"
+    echo ""
+    printf "Enter mode [1]: "
+    read -r mode_choice
+    mode_choice=${mode_choice:-1}
+    
+    local selected_mode=""
+    case "$mode_choice" in
+        1) selected_mode="single-user" ;;
+        2) selected_mode="multi-user" ;;
+        3) selected_mode="branch" ;;
+        4) selected_mode="enhanced" ;;
+        *)
+            echo "❌ Invalid choice"
+            return 1
+            ;;
+    esac
+    
+    echo ""
+    echo "✅ Selected mode: $selected_mode"
+    echo ""
+    
+    # Step 3: Switch to selected mode
+    echo "Step 3: Switching to $selected_mode mode..."
+    if ! switch_mode "$selected_mode" --force; then
+        echo "❌ Failed to switch mode"
+        return 1
+    fi
+    echo ""
+    
+    # Step 4: Set up coordination if enhanced mode
+    if [[ "$selected_mode" == "enhanced" ]]; then
+        echo "Step 4: Setting up coordination..."
+        echo ""
+        
+        # Detect available options
+        local available=()
+        if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1 && \
+           git rev-parse --git-dir >/dev/null 2>&1 && \
+           git config --get remote.origin.url 2>/dev/null | grep -q github\.com; then
+            available+=("github-issues")
+        fi
+        
+        if command -v curl >/dev/null 2>&1 && \
+           (command -v jq >/dev/null 2>&1 || command -v python3 >/dev/null 2>&1); then
+            available+=("counterapi")
+        fi
+        
+        if [[ ${#available[@]} -eq 0 ]]; then
+            echo "⚠️  No coordination services available"
+            echo "   Enhanced mode will fall back to multi-user mode"
+            echo ""
+        else
+            echo "Available coordination options:"
+            local index=1
+            for option in "${available[@]}"; do
+                case "$option" in
+                    "github-issues")
+                        echo "  $index) GitHub Issues"
+                        ;;
+                    "counterapi")
+                        echo "  $index) CounterAPI"
+                        ;;
+                esac
+                index=$((index + 1))
+            done
+            echo "  $index) Skip (use fallback mode)"
+            echo ""
+            printf "Enter choice [$index]: "
+            read -r coord_choice
+            coord_choice=${coord_choice:-$index}
+            
+            if [[ $coord_choice -ge 1 ]] && [[ $coord_choice -le ${#available[@]} ]]; then
+                local selected_coord="${available[$((coord_choice - 1))]}"
+                echo ""
+                setup_coordination "$selected_coord" || {
+                    echo "⚠️  Coordination setup failed, continuing with fallback mode"
+                }
+            else
+                echo "Skipping coordination setup (using fallback mode)"
+            fi
+            echo ""
+        fi
+    fi
+    
+    # Step 5: Summary
+    echo "✅ Setup complete!"
+    echo ""
+    echo "Current configuration:"
+    show_config
+    echo ""
+    echo "You can now use todo.ai. Try: ./todo.ai add 'Your first task'"
+}
+
+# Function to show current configuration
+show_config() {
+    local config_file=$(get_config_file)
+    
+    if [[ ! -f "$config_file" ]]; then
+        echo "No configuration file found."
+        echo "Using default mode: single-user"
+        echo ""
+        echo "To create a config file, use: ./todo.ai switch-mode <mode>"
+        return 0
+    fi
+    
+    echo "Current Configuration:"
+    echo "======================"
+    cat "$config_file"
+    echo ""
+    echo "Config file location: $config_file"
 }
 
 # Function to show a task with its relationships
@@ -5612,6 +6338,45 @@ run_migrations
 # Initialize Cursor rules if needed (check on every run, add if missing)
 init_cursor_rules
 
+# Display current operating mode (unless it's a command that doesn't need it)
+# Skip for internal operations and help/version commands
+if [[ "${1:-}" != "version" && "${1:-}" != "--version" && "${1:-}" != "-v" && \
+      "${1:-}" != "--help" && "${1:-}" != "help" && "${1:-}" != "-h" ]]; then
+    local current_mode=$(get_numbering_mode)
+    local coord_type=$(get_config_value "coordination.type" "none")
+    
+    if [[ "$current_mode" == "enhanced" ]]; then
+        # Show mode and coordinator for enhanced mode
+        case "$coord_type" in
+            "github-issues")
+                local issue_num=$(get_config_value "coordination.issue_number" "")
+                if [[ -n "$issue_num" ]]; then
+                    echo "📋 Mode: $current_mode | Coordinator: GitHub Issues (#$issue_num)" >&2
+                else
+                    echo "📋 Mode: $current_mode | Coordinator: GitHub Issues (not configured)" >&2
+                fi
+                ;;
+            "counterapi")
+                local namespace=$(get_config_value "coordination.namespace" "")
+                if [[ -n "$namespace" ]]; then
+                    echo "📋 Mode: $current_mode | Coordinator: CounterAPI ($namespace)" >&2
+                else
+                    echo "📋 Mode: $current_mode | Coordinator: CounterAPI (not configured)" >&2
+                fi
+                ;;
+            "none"|"")
+                echo "📋 Mode: $current_mode | Coordinator: none (fallback)" >&2
+                ;;
+            *)
+                echo "📋 Mode: $current_mode | Coordinator: $coord_type" >&2
+                ;;
+        esac
+    else
+        # Simple mode display for non-enhanced modes
+        echo "📋 Mode: $current_mode" >&2
+    fi
+fi
+
 # Main script logic
 case "${1:-}" in
     "add")
@@ -5796,6 +6561,19 @@ case "${1:-}" in
     "rollback-mode")
         shift
         rollback_from_backup "$1"
+        ;;
+    "config"|"show-config")
+        show_config
+        ;;
+    "detect-coordination"|"detect-options")
+        detect_coordination_options
+        ;;
+    "setup-coordination")
+        shift
+        setup_coordination "$@"
+        ;;
+    "setup"|"setup-wizard")
+        setup_wizard
         ;;
     "version"|"--version"|"-v")
         echo "todo.ai version $VERSION"

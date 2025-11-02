@@ -3,6 +3,15 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
+  - [ ] **#52.7** Review design document and evaluate proposed solutions `#review`
+  - [ ] **#52.6** Design task resolution mechanism: how to detect and resolve numbering conflicts automatically or with user guidance `#docs`
+  - [ ] **#52.5** Design distributed task numbering scheme: alternatives to sequential numbering (e.g., UUIDs, namespaces, prefix-based) `#docs`
+  - [ ] **#52.4** Design branch/PR task merging strategy: how to handle task number conflicts when merging branches `#docs`
+  - [ ] **#52.3** Design document: propose solution architecture for conflict-free task numbering in multi-user environment `#docs`
+  - [ ] **#52.2** Research existing solutions: how other task management tools handle multi-user numbering conflicts `#research`
+  - [ ] **#52.1** Analyze need: identify scenarios where multi-user/multi-branch task conflicts occur `#research`
+- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
   - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
   - [ ] **#49.9** Implement high-priority security improvements identified in audit `#code`
@@ -213,7 +222,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 01:43:14 CET 2025
+**Last Updated:** Sun Nov  2 02:07:06 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

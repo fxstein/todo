@@ -251,6 +251,10 @@ analyze_commits() {
                 # feat: prefix but no specific file checks - assume user-facing
                 commit_level="minor"
             fi
+        # Check for explicit PATCH prefixes (docs:, chore:) - these should never be MINOR
+        elif [[ "$lower_commit" =~ ^(docs|chore): ]]; then
+            # Explicitly PATCH - documentation and maintenance tasks are always PATCH
+            commit_level="patch"
         # Check for MINOR - Feature keywords (if not backend-only)
         elif [[ "$lower_commit" =~ (add|new|implement|create|support) ]]; then
             # Check if this commit only changed backend files

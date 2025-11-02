@@ -414,7 +414,9 @@ generate_release_notes() {
             continue
         fi
         
-        if [[ "$lower_msg" =~ (breaking|break|major|!:) ]] || 
+        # Check for MAJOR - Breaking changes (must contain #MAJOR as a tag, not as part of "tag" or "detection")
+        if (echo "$commit_msg" | grep -qi "#MAJOR" && ! echo "$commit_msg" | grep -qiE "MAJOR tag|tag.*MAJOR|MAJOR.*detection|detection.*MAJOR") ||
+           [[ "$lower_msg" =~ (breaking|break|!:) ]] || 
            [[ "$lower_msg" =~ ^(feat|fix|refactor|perf)!: ]]; then
             breaking_commits+=("- ${commit_msg} ${commit_link}")
         elif [[ "$lower_msg" =~ ^(feat|feature): ]] || 

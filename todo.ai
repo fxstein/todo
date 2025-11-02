@@ -2333,19 +2333,45 @@ init_backups_dir() {
 # Function to get script path
 get_script_path() {
     local script_path
-    if [[ -f "${0:a}" ]]; then
+    
+    # Strategy 1: Try zsh-specific absolute path (works when script is executed directly)
+    if [[ -f "${0:a}" ]] && [[ "${0:a}" =~ ^/ ]]; then
         script_path="${0:a}"
+    # Strategy 2: If script is executed via PATH, use command -v/which to find it
+    elif command -v todo.ai >/dev/null 2>&1; then
+        # Get the actual path from PATH
+        script_path=$(command -v todo.ai 2>/dev/null || which todo.ai 2>/dev/null || echo "")
+        # Verify it exists and is readable
+        if [[ -z "$script_path" ]] || [[ ! -f "$script_path" ]]; then
+            script_path=""
+        fi
+    # Strategy 3: Try current directory
     elif [[ -f "$(pwd)/todo.ai" ]]; then
         script_path="$(pwd)/todo.ai"
+    # Strategy 4: Try relative path
     elif [[ -f "./todo.ai" ]]; then
         script_path="./todo.ai"
     else
         return 1
     fi
     
+    # Ensure we found a valid path
+    if [[ -z "$script_path" ]] || [[ ! -f "$script_path" ]]; then
+        return 1
+    fi
+    
     # Ensure absolute path
     if [[ ! "$script_path" =~ ^/ ]]; then
-        script_path="$(cd "$(dirname "$script_path")" && pwd)/$(basename "$script_path")"
+        script_path="$(cd "$(dirname "$script_path")" 2>/dev/null && pwd)/$(basename "$script_path")"
+        # If cd failed, try realpath if available
+        if [[ ! "$script_path" =~ ^/ ]] && command -v realpath >/dev/null 2>&1; then
+            script_path=$(realpath "$script_path" 2>/dev/null || echo "$script_path")
+        fi
+    fi
+    
+    # Final verification
+    if [[ -z "$script_path" ]] || [[ ! -f "$script_path" ]] || [[ ! "$script_path" =~ ^/ ]]; then
+        return 1
     fi
     
     echo "$script_path"

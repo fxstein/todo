@@ -2,6 +2,26 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 02:49:04 | fxstein | ADD_SUBTASK | 55.4 | Close GitHub issue #17 when fix has been confirmed (parent: #55)
+2025-11-02 02:46:58 | fxstein | COMPLETE | 55.2 | Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin
+2025-11-02 02:46:56 | fxstein | COMPLETE | 55.1 | Investigate get_script_path() function: how it detects script location when installed system-wide
+2025-11-02 02:46:06 | fxstein | ARCHIVE | 56 | Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check (with 0 subtasks)
+2025-11-02 02:45:48 | fxstein | COMPLETE | 56 | Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check
+2025-11-02 02:41:39 | fxstein | ADD | 56 | Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check
+2025-11-02 02:38:41 | fxstein | ADD_SUBTASK | 55.3 | Test update command from system-wide installation location (parent: #55)
+2025-11-02 02:38:39 | fxstein | ADD_SUBTASK | 55.2 | Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin (parent: #55)
+2025-11-02 02:38:38 | fxstein | ADD_SUBTASK | 55.1 | Investigate get_script_path() function: how it detects script location when installed system-wide (parent: #55)
+2025-11-02 02:38:27 | fxstein | ADD | 55 | Fix update command when installed to system directory in PATH (GitHub issue #17)
+2025-11-02 02:38:26 | fxstein | DELETE | 51.1 | Investigate get_script_path() function: how it detects script location when installed system-wide
+2025-11-02 02:38:26 | fxstein | DELETE | 51.2 | Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin
+2025-11-02 02:38:26 | fxstein | DELETE | 51.3 | Test update command from system-wide installation location
+2025-11-02 02:38:25 | fxstein | DELETE | 51 | Add contributor section to release summary: list all contributors for each release
+2025-11-02 02:38:22 | fxstein | MODIFY | 51 | Add contributor section to release summary: list all contributors for each release
+2025-11-02 02:37:53 | fxstein | MODIFY | 51 | Fix update command when installed to system directory in PATH (GitHub issue #17)
+2025-11-02 02:34:15 | fxstein | ADD_SUBTASK | 51.3 | Test update command from system-wide installation location (parent: #51)
+2025-11-02 02:34:14 | fxstein | ADD_SUBTASK | 51.2 | Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin (parent: #51)
+2025-11-02 02:34:12 | fxstein | ADD_SUBTASK | 51.1 | Investigate get_script_path() function: how it detects script location when installed system-wide (parent: #51)
+2025-11-02 02:34:05 | fxstein | ADD | 51 | Fix update command when installed to system directory in PATH (GitHub issue #17)
 2025-11-02 02:07:06 | fxstein | ADD_SUBTASK | 52.7 | Review design document and evaluate proposed solutions (parent: #52)
 2025-11-02 02:07:04 | fxstein | ADD_SUBTASK | 52.6 | Design task resolution mechanism: how to detect and resolve numbering conflicts automatically or with user guidance (parent: #52)
 2025-11-02 02:07:03 | fxstein | ADD_SUBTASK | 52.5 | Design distributed task numbering scheme: alternatives to sequential numbering (e.g., UUIDs, namespaces, prefix-based) (parent: #52)

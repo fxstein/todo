@@ -4,10 +4,21 @@
 
 ## Tasks
 - [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
-  - [ ] **#52.7** Review design document and evaluate proposed solutions `#review`
-  - [ ] **#52.6** Design task resolution mechanism: how to detect and resolve numbering conflicts automatically or with user guidance `#docs`
-  - [ ] **#52.5** Design distributed task numbering scheme: alternatives to sequential numbering (e.g., UUIDs, namespaces, prefix-based) `#docs`
-  - [ ] **#52.4** Design branch/PR task merging strategy: how to handle task number conflicts when merging branches `#docs`
+  - [ ] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
+  - [ ] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
+  - [ ] **#52.16** Test mode switching: verify migration, backup creation, and rollback functionality `#test`
+  - [ ] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
+  - [ ] **#52.14** Create user documentation: guide for adopting and switching between numbering modes `#docs`
+  - [ ] **#52.13** Implement task reference resolution: auto-add user prefix when user references tasks by number only `#code`
+  - [ ] **#52.12** Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs `#code`
+  - [ ] **#52.11** Implement Mode 4 (Enhanced Multi-User): GitHub Issues or CounterAPI coordination `#code`
+  - [ ] **#52.10** Implement Mode 3 (Branch Mode): branch prefix-based numbering `#code`
+  - [ ] **#52.9** Implement Mode 2 (Multi-User): prefix-based numbering with GitHub user ID detection `#code`
+  - [ ] **#52.8** Implement Mode 1 (Single-User): ensure backward compatibility with existing behavior `#code`
+  - [   ] **#52.7** Implement and test configuration system: YAML config file reading, validation, and mode detection `#code` `#test`
+  - [ ] **#52.6** Implement automatic migration path between numbering modes: renumber tasks when switching modes `#code`
+  - [ ] **#52.5** Implement mode switching command: allow users to switch between numbering modes (single-user, multi-user, branch, enhanced) `#code`
+  - [ ] **#52.4** Implement backup and rollback system for mode switching `#code` `#safety`
   - [x] **#52.3** Design document: propose solution architecture for conflict-free task numbering in multi-user environment `#docs`
   - [x] **#52.2** Research existing solutions: how other task management tools handle multi-user numbering conflicts `#research`
   - [x] **#52.1** Analyze need: identify scenarios where multi-user/multi-branch task conflicts occur `#research`
@@ -234,7 +245,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 03:17:19 CET 2025
+**Last Updated:** Sun Nov  2 13:04:36 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

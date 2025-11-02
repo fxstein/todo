@@ -52,15 +52,29 @@ User Action: Add Task
 
 **Purpose:** Synchronize with remote state before assigning task numbers.
 
-**Critical Decision: Pull from main branch, not current branch**
+**Critical Decision: Coordinate with main AND current branch's remote state**
 
-Each branch has its own copy of the serial file, but we need to coordinate with the authoritative source (main branch) to ensure task numbers are sequential across all branches.
+Each branch has its own copy of the serial file. We need to coordinate with:
+1. **Main branch** (authoritative for merged tasks)
+2. **Current branch's remote** (for unmerged tasks already pushed to this branch)
+
+**The Problem:**
+- If we only check main, feature branches can create conflicts
+- Example: Branch A fetches main (#49), calculates #50, pushes to Branch A
+- Main still has #49 (Branch A can't push to main)
+- Branch B fetches main (#49), calculates #50 → conflict when merging!
+
+**The Solution:**
+- Check main's max (merged tasks)
+- Check current branch's remote max (unmerged but pushed tasks on this branch)
+- Calculate MAX(local, main, current_branch_remote) + 1
+- Accept that cross-branch conflicts can occur until merge (resolve at merge time)
 
 **Implementation:**
-- Perform `git pull` from **main branch** before assigning new task numbers
-- Target only `TODO.md` and `.todo.ai/.todo.ai.serial` files
-- Merge main's serial file state into current branch
-- Handle pull failures gracefully (network issues, authentication, etc.)
+- Fetch from **main branch** (authoritative source)
+- Fetch from **current branch's remote** (if on a feature branch)
+- Check both for highest task numbers
+- Use MAX of all sources for safe numbering
 
 **When to Pull:**
 - Before `add` command (new tasks)
@@ -69,27 +83,34 @@ Each branch has its own copy of the serial file, but we need to coordinate with 
 
 **Pull Strategy:**
 ```bash
-# Pull from main branch (authoritative source)
-# Get main's TODO.md and serial file for coordination
+# Fetch from main branch (authoritative source)
 git fetch origin main --quiet 2>/dev/null || true
 
-# Check out main's version of TODO.md and serial file temporarily
-# (for comparison, not replacement)
+# Get main's TODO.md and serial file for coordination
 git show origin/main:TODO.md > "$TODO_FILE.tmp.main" 2>/dev/null || true
 git show origin/main:.todo.ai/.todo.ai.serial > "$SERIAL_FILE.tmp.main" 2>/dev/null || true
+
+# If on a feature branch, also fetch from current branch's remote
+current_branch=$(git branch --show-current 2>/dev/null || echo "")
+if [[ -n "$current_branch" ]] && [[ "$current_branch" != "main" ]]; then
+    git fetch origin "$current_branch" --quiet 2>/dev/null || true
+    git show "origin/$current_branch:TODO.md" > "$TODO_FILE.tmp.branch" 2>/dev/null || true
+    git show "origin/$current_branch:.todo.ai/.todo.ai.serial" > "$SERIAL_FILE.tmp.branch" 2>/dev/null || true
+fi
 
 # Use these for MAX calculation (see step 2)
 ```
 
-**Why pull from main?**
-- Main branch is the authoritative source of truth for task numbers
-- Feature branches should coordinate with main, not with each other
-- Prevents conflicts when merging branches back to main
-- Ensures sequential numbering across the entire repository
+**Why coordinate with main AND current branch?**
+- **Main is authoritative**: Contains all merged tasks (definitive sequence)
+- **Current branch remote**: Contains unmerged tasks already pushed to this branch
+- **Prevents local conflicts**: If we already pushed #50 to Branch A, next add on Branch A should see it
+- **Cross-branch conflicts**: Two different feature branches may still conflict (resolved at merge time)
 
-**Alternative: Pull from upstream/base branch**
-- If on a feature branch, could pull from the branch's base (parent branch)
-- But main is simpler and ensures consistency across all branches
+**Limitations:**
+- We can't see unmerged tasks from OTHER feature branches until merge
+- Example: Branch A has #50 (not in main), Branch B won't see it until merge
+- This is acceptable: conflicts resolved at merge time via conflict resolution
 
 ---
 
@@ -132,43 +153,57 @@ get_highest_task_number() {
 calculate_next_task_number() {
     local local_file="$TODO_FILE"
     
-    # Get main's TODO.md content (from git_pull_todo_files)
-    local main_todo="${MAIN_TODO_CONTENT:-}"
-    local main_todo_file=""
-    
-    # If we have main's content, write it to temp file for comparison
-    if [[ -n "$main_todo" ]]; then
-        main_todo_file=$(mktemp)
-        echo "$main_todo" > "$main_todo_file"
-    fi
-    
     # Find highest task number in local TODO.md
     local local_max=$(get_highest_task_number "$local_file")
     
-    # Find highest task number in main's TODO.md
+    # Check main's TODO.md (from git_pull_todo_files)
     local main_max=0
-    if [[ -n "$main_todo_file" ]] && [[ -f "$main_todo_file" ]]; then
-        main_max=$(get_highest_task_number "$main_todo_file")
-        rm -f "$main_todo_file"
-    fi
-    
-    # Also check main's serial file (if available)
-    local main_serial="${MAIN_SERIAL_CONTENT:-}"
-    if [[ -n "$main_serial" ]] && [[ "$main_serial" =~ ^[0-9]+$ ]]; then
-        # Serial file contains next available number, so subtract 1 for current highest
-        local main_serial_max=$((main_serial - 1))
-        if [[ $main_serial_max -gt $main_max ]]; then
-            main_max=$main_serial_max
+    if [[ -f "$TODO_FILE.tmp.main" ]]; then
+        main_max=$(get_highest_task_number "$TODO_FILE.tmp.main")
+        # Also check main's serial file
+        if [[ -f "$SERIAL_FILE.tmp.main" ]]; then
+            local main_serial=$(cat "$SERIAL_FILE.tmp.main" 2>/dev/null || echo "0")
+            if [[ "$main_serial" =~ ^[0-9]+$ ]]; then
+                local main_serial_max=$((main_serial - 1))
+                if [[ $main_serial_max -gt $main_max ]]; then
+                    main_max=$main_serial_max
+                fi
+            fi
         fi
     fi
     
-    # Take maximum and add 1
-    local next_id
-    if [[ $local_max -gt $main_max ]]; then
-        next_id=$((local_max + 1))
-    else
-        next_id=$((main_max + 1))
+    # Check current branch's remote TODO.md (if on feature branch)
+    local branch_max=0
+    local current_branch=$(git branch --show-current 2>/dev/null || echo "")
+    if [[ -n "$current_branch" ]] && [[ "$current_branch" != "main" ]]; then
+        if [[ -f "$TODO_FILE.tmp.branch" ]]; then
+            branch_max=$(get_highest_task_number "$TODO_FILE.tmp.branch")
+            # Also check branch's remote serial file
+            if [[ -f "$SERIAL_FILE.tmp.branch" ]]; then
+                local branch_serial=$(cat "$SERIAL_FILE.tmp.branch" 2>/dev/null || echo "0")
+                if [[ "$branch_serial" =~ ^[0-9]+$ ]]; then
+                    local branch_serial_max=$((branch_serial - 1))
+                    if [[ $branch_serial_max -gt $branch_max ]]; then
+                        branch_max=$branch_serial_max
+                    fi
+                fi
+            fi
+        fi
     fi
+    
+    # Take maximum of all sources and add 1
+    local overall_max=$local_max
+    if [[ $main_max -gt $overall_max ]]; then
+        overall_max=$main_max
+    fi
+    if [[ $branch_max -gt $overall_max ]]; then
+        overall_max=$branch_max
+    fi
+    
+    local next_id=$((overall_max + 1))
+    
+    # Cleanup temp files
+    rm -f "$TODO_FILE.tmp.main" "$TODO_FILE.tmp.branch" "$SERIAL_FILE.tmp.main" "$SERIAL_FILE.tmp.branch" 2>/dev/null || true
     
     echo $next_id
 }
@@ -247,12 +282,13 @@ git push origin $(git branch --show-current) --quiet 2>/dev/null || {
 
 **Example:**
 - Main: Highest task `#49`
-- Branch A: Fetches from origin/main (sees `#49`), calculates MAX(49, 49) + 1 = `#50`, commits to Branch A, pushes to origin/Branch A
-- Branch B: Fetches from origin/main (still sees `#49` if Branch A hasn't merged to main yet), calculates MAX(49, 49) + 1 = `#50`, commits to Branch B, pushes to origin/Branch B
-- If Branch A merges to main first → main now has `#50` (and serial file = 51)
-- Branch B's next fetch from main will see `#50` and if it tries to add another task, will calculate `#51`
-- When Branch B merges to main: Git will merge the serial files (Branch B has `#50`, main has `#50`) → one becomes `#50`, one is renumbered
-- Result: No duplicate numbers in main, sequential numbering maintained
+- Branch A: Fetches from origin/main (sees `#49`), fetches from origin/Branch A (sees `#49`), calculates MAX(49, 49, 49) + 1 = `#50`, commits to Branch A, pushes to origin/Branch A
+- Branch B: Fetches from origin/main (sees `#49`), fetches from origin/Branch B (sees `#49`), calculates MAX(49, 49, 49) + 1 = `#50`, commits to Branch B, pushes to origin/Branch B
+- **Note**: Branch B can't see Branch A's `#50` because it's on a different branch (this is a limitation we accept)
+- When Branch A merges to main first → main now has `#50` (and serial file = 51)
+- When Branch B tries to merge to main: Git merge conflict in TODO.md and serial file (both have `#50`)
+- **Conflict resolution**: Git detects duplicate `#50`, automatic or manual resolution renumbers one to `#51`
+- Result: No duplicate numbers in main after merge resolution, sequential numbering maintained
 
 ---
 
@@ -449,55 +485,60 @@ add_subtask() {
 
 ### 3. Git Pull Helper Function
 
-**Purpose:** Centralize git pull logic for TODO files. **Always pulls from main branch** for coordination.
+**Purpose:** Centralize git pull logic for TODO files. **Coordinates with main AND current branch's remote** for safe numbering.
 
 **Implementation:**
 ```bash
 git_pull_todo_files() {
-    # Always pull from main branch (authoritative source)
-    # This ensures coordination across all branches
-    
-    # Fetch latest main branch state
+    # Fetch from main branch (authoritative source for merged tasks)
     git fetch origin main --quiet 2>/dev/null || {
         log_todo_action "WARNING" "GIT_FETCH_FAILED" "Could not fetch from main, using local state"
-        return 1
+        # Continue anyway - will use local state only
     }
     
     # Get main's TODO.md and serial file for comparison
-    # We don't replace local files, just use them for MAX calculation
-    local main_todo=$(git show origin/main:TODO.md 2>/dev/null || echo "")
-    local main_serial=$(git show origin/main:.todo.ai/.todo.ai.serial 2>/dev/null || echo "")
+    git show origin/main:TODO.md > "$TODO_FILE.tmp.main" 2>/dev/null || true
+    git show origin/main:.todo.ai/.todo.ai.serial > "$SERIAL_FILE.tmp.main" 2>/dev/null || true
     
-    # Store these for MAX algorithm
-    export MAIN_TODO_CONTENT="$main_todo"
-    export MAIN_SERIAL_CONTENT="$main_serial"
-    
-    # Also try to merge main's changes into current branch (if on a branch)
+    # If on a feature branch, also fetch from current branch's remote
+    # This ensures we see unmerged tasks already pushed to this branch
     local current_branch=$(git branch --show-current 2>/dev/null || echo "")
     if [[ -n "$current_branch" ]] && [[ "$current_branch" != "main" ]]; then
-        # On a feature branch: merge main's TODO files into current branch
-        # This updates local branch with main's state
-        git merge origin/main --no-commit --no-ff -- TODO.md .todo.ai/.todo.ai.serial 2>/dev/null || {
-            # If merge fails (conflicts), continue with local state
-            # MAX algorithm will handle coordination
-            git merge --abort 2>/dev/null || true
+        # Fetch from current branch's remote
+        git fetch origin "$current_branch" --quiet 2>/dev/null || {
+            log_todo_action "WARNING" "GIT_FETCH_BRANCH_FAILED" "Could not fetch from origin/$current_branch, using main and local state"
+            # Continue anyway - will use main and local state
         }
+        
+        # Get current branch's remote TODO.md and serial file
+        git show "origin/$current_branch:TODO.md" > "$TODO_FILE.tmp.branch" 2>/dev/null || true
+        git show "origin/$current_branch:.todo.ai/.todo.ai.serial" > "$SERIAL_FILE.tmp.branch" 2>/dev/null || true
     fi
+    
+    # Temp files are now available for MAX algorithm in calculate_next_task_number()
+    # They will be cleaned up after use
     
     return 0
 }
 ```
 
-**Why Pull from Main:**
-- **Main is authoritative**: Main branch contains the official task numbering sequence
-- **Feature branch coordination**: Feature branches coordinate with main, not with each other
-- **Prevents cross-branch conflicts**: All branches use main as reference point
-- **Merge-time simplicity**: When merging feature branches to main, serial files are already aligned
+**Why Coordinate with Main AND Current Branch:**
+- **Main is authoritative**: Contains all merged tasks (definitive sequence)
+- **Current branch remote**: Contains unmerged tasks already pushed to this branch
+- **Prevents local conflicts**: If we already pushed #50 to Branch A remote, next add on Branch A should see it and use #51
+- **Cross-branch coordination**: We can't see other feature branches' unmerged tasks (acceptable - resolved at merge time)
+
+**Limitations and Trade-offs:**
+- **Cross-branch conflicts possible**: Branch A and Branch B may both calculate #50 if they fetch at the same time
+- **Acceptable**: Conflicts are resolved at merge time via Git's merge conflict resolution
+- **Alternative**: Could fetch ALL remote branches (expensive, complex)
+- **Chosen approach**: Coordinate with main + current branch (good balance of simplicity and effectiveness)
 
 **Error Handling:**
-- If fetch fails (network, auth, etc.), continue with local state
-- If merge fails (conflicts), abort merge and continue with local state
-- Log warning but don't block user
+- If main fetch fails: Continue with local and current branch state only
+- If current branch fetch fails: Continue with main and local state only
+- If both fail: Continue with local state only (worst case - conflicts possible)
+- Log warnings but don't block user
 - Better to have slightly outdated state than to block entirely
 
 ---
@@ -613,13 +654,23 @@ auto_resolve_conflicts() {
 
 **If on feature branch:**
 ```
-1. Fetch from origin/main
-2. Calculate MAX(local feature branch, main) + 1
-3. Assign task number
-4. Commit to feature branch
-5. Push to origin/feature-branch
-6. When merging to main: Merge serial file state with main
+1. Fetch from origin/main (for merged tasks)
+2. Fetch from origin/feature-branch (for unmerged tasks on this branch)
+3. Calculate MAX(local, main, feature-branch remote) + 1
+4. Assign task number
+5. Commit to feature branch
+6. Push to origin/feature-branch (make visible for next operation on this branch)
+7. When merging to main: Merge serial file state with main (conflicts resolved if any)
 ```
+
+**Example:**
+- Main: `#49`
+- Branch A local: `#49`
+- Branch A remote (already pushed): `#50`
+- Fetch from main (sees `#49`), fetch from origin/Branch A (sees `#50`)
+- Calculate MAX(49, 49, 50) + 1 = `#51`
+- Assign `#51`, commit, push → Branch A remote now has `#50-51`
+- Next add on Branch A will fetch and see `#51`, calculate `#52`
 
 ---
 

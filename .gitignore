@@ -22,3 +22,6 @@ RELEASE_SUMMARY.md
 # These are generated on install/update and don't need to be committed
 .cursor/rules/todo.ai-*.mdc
 
+# Backup files created by mode switching and rollback operations
+.todo.ai/backups/
+

@@ -1,7 +1,37 @@
-# Release Summary
+# Release Summary: Fix Update Command for System-Wide Installations
 
-This release fixes a critical bug in the bug reporting feature where bug reports were being created in the customer's repository instead of the todo.ai repository. This fix ensures that when users report bugs about todo.ai, the issues are correctly created in the todo.ai repository at https://github.com/fxstein/todo.ai/issues, regardless of where the tool is installed.
+This release addresses a critical bug where the `update` command failed when `todo.ai` was installed to a system directory in PATH (e.g., `/usr/local/bin` or `/usr/bin`). The issue was reported in GitHub issue #17 and affected users who installed `todo.ai` system-wide for global access.
 
-The release also includes documentation improvements with the addition of a comprehensive multi-user/multi-branch conflict analysis document. This document identifies and analyzes eight different conflict scenarios that can occur when using todo.ai in collaborative environments, providing a foundation for future multi-user support features.
+## Key Improvements
 
-These improvements ensure that bug reports reach the correct destination and lay the groundwork for understanding and addressing task numbering conflicts in multi-user scenarios.
+**Fixed Update Command for System-Wide Installations:**
+- Enhanced the `get_script_path()` function to properly detect the script location when installed system-wide
+- Added support for locating the script via `command -v` and `which` when executed from PATH
+- Implemented robust path validation and absolute path conversion with fallback to `realpath`
+- The update command now works correctly regardless of installation method (local project directory or system-wide PATH installation)
+
+## Technical Details
+
+The fix implements a multi-strategy approach to locate the script:
+1. First tries zsh-specific absolute path expansion (for direct execution)
+2. Uses `command -v`/`which` to find the script in PATH (for system-wide installations)
+3. Falls back to current directory and relative path detection
+
+This ensures compatibility with all installation scenarios while maintaining backward compatibility with existing local installations.
+
+## Usage
+
+For AI Agents:
+```bash
+Fix update command for system-wide installations
+```
+
+For Humans:
+```bash
+Tell todo.ai to update itself: todo.ai update
+```
+
+---
+
+**Fixes:** GitHub issue #17  
+**Task:** #55

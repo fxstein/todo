@@ -254,12 +254,30 @@ Store task number in a discussion post (not practical).
 - ⚠️ **Least privilege:** Fine-grained tokens are recommended for better security
 - ⚠️ **Repository access:** User must have write access to the repository
 
+**CRITICAL LIMITATION: Fork Access**
+
+- ❌ **No write access to upstream:** Users working with forks **cannot** write to the upstream repository
+- ❌ **Only fork write access:** Fork contributors can only write to their own fork
+- ❌ **Breaks single source of truth:** Counter file in upstream cannot be updated by fork contributors
+- ❌ **Collaborators only:** Only repository collaborators/maintainers can update upstream counter
+
+**Impact:**
+- ✅ **Works for collaborators:** Repository contributors/maintainers can use this approach
+- ❌ **Does NOT work for forks:** Fork contributors cannot update upstream counter file
+- ⚠️ **Limited applicability:** Only viable for repositories where all users are collaborators
+- ⚠️ **Not suitable for open source:** Cannot work with public repositories where contributors use forks
+
+**This is a major limitation for open-source or public repository scenarios where contributors use forks!**
+
 **Limitations:**
+- ❌ **CRITICAL: No fork write access** - Fork contributors cannot write to upstream repository
+- ❌ **Collaborators only** - Only repository collaborators can update counter file
 - ⚠️ **Requires repository context** - Must know repository owner/name
 - ⚠️ **File must be committed** - Changes go through Git (can be automated)
 - ⚠️ **Rate limits:** 5,000 requests/hour (authenticated)
 - ⚠️ **Network required** - Cannot work offline
 - ⚠️ **Authentication required** - GitHub tokens needed for all users
+- ⚠️ **Not suitable for open source** - Public repos with fork-based contributions won't work
 
 **Trade-offs:**
 - ✅ **Provides true atomic assignment** - Much better than Git-based coordination

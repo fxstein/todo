@@ -3,14 +3,14 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#fxstein-14** Manual duplicate test task 2 #deleteme
-- [ ] **#fxstein-13** Manual duplicate test task 1 #deleteme
-- [ ] **#fxstein-12** Test duplicate #2 again #deleteme
-- [ ] **#fxstein-11** Test duplicate #2 #deleteme
-- [ ] **#fxstein-10** Test duplicate #1 again #deleteme
-- [ ] **#fxstein-9** Duplicate ID for conflict test #deleteme
-- [ ] **#fxstein-15** Test duplicate #1 #deleteme
-- [ ] **#fxstein-6** Test duplicate task #60 for conflict resolution #deleteme
+- [ ] **#fxstein-14** Manual duplicate test task 2 `#deleteme`
+- [ ] **#fxstein-13** Manual duplicate test task 1 `#deleteme`
+- [ ] **#fxstein-12** Test duplicate #2 again `#deleteme`
+- [ ] **#fxstein-11** Test duplicate #2 `#deleteme`
+- [ ] **#fxstein-10** Test duplicate #1 again `#deleteme`
+- [ ] **#fxstein-9** Duplicate ID for conflict test `#deleteme`
+- [ ] **#fxstein-15** Test duplicate #1 `#deleteme`
+- [ ] **#fxstein-6** Test duplicate task #60 for conflict resolution `#deleteme`
 - [ ] **#60** Test single-user mode task somthing else D `#deleteme`
 - [ ] **#103** Test single-user mode task somthing else C `#deleteme`
 - [ ] **#fxstein-5** Test multi-user mode task something else B `#deleteme`

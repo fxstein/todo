@@ -1,37 +1,28 @@
-This release introduces a comprehensive uninstall feature that makes it easy to cleanly remove `todo.ai` from your system.
+# Release Summary
 
-**New Feature: Uninstall Command**
+## Key Improvements
 
-The new `uninstall` command provides a safe and straightforward way to remove `todo.ai`. It automatically detects where the tool is installed and what associated files exist, then gives you clear control over what gets removed.
+This release introduces a comprehensive solution to prevent GitHub auto-linking conflicts with task numbers in commit messages. The tool now enforces a new `task#nn` format (e.g., `task#15`, `task#50`) instead of the simple `#nn` format, which prevents GitHub from automatically linking task numbers to issues or pull requests.
 
-**Key Features:**
-- **Safe by default**: User data (TODO.md and `.todo.ai/` directory) is preserved unless explicitly requested
-- **Automatic detection**: Finds the script location, data directory, and Cursor rules automatically
-- **Clear preview**: Shows exactly what will be removed before asking for confirmation
-- **Flexible options**: Choose what to remove with `--remove-data`, `--remove-rules`, or `--all`
-- **Complete cleanup**: Optionally removes the script, data directory, and Cursor rules created by `todo.ai`
+The implementation includes thorough analysis of the problem, documentation of historical commits, and automated enforcement through Cursor rules. All future commits will automatically use the correct format, ensuring clean commit history without false GitHub issue links.
 
-**Usage:**
-```bash
-# Remove script only (preserves data and rules)
-./todo.ai uninstall
+**User-facing benefits:**
+- Cleaner commit history without unwanted GitHub issue links
+- Clear distinction between task numbers and GitHub issues
+- Automated enforcement through Cursor rules for all installations
+- Backward-compatible approach that doesn't rewrite history
 
-# Remove script and data directory
-./todo.ai uninstall --remove-data
+## Notable Changes
 
-# Remove script and Cursor rules
-./todo.ai uninstall --remove-rules
+The release includes a new Cursor rule (`todo.ai-commit-format.mdc`) that automatically enforces the `task#nn` format for all end-user installations, ensuring consistent formatting across all users. Developer rules have also been updated to include task number format guidelines, making it clear to agents how to reference tasks in commits.
 
-# Remove everything (script, data, and rules)
-./todo.ai uninstall --all
-```
+Historical commits have been documented in a migration plan, but remain unchanged to preserve Git history integrity. The solution follows a non-destructive approach while ensuring all future commits use the correct format.
 
-**For AI Agents:**
-```bash
-./todo.ai uninstall [--remove-data] [--remove-rules] [--all]
-```
+## Technical Details
 
-**For Humans:**
-Tell your agent: "Uninstall todo.ai" or "Remove todo.ai from the system"
-
-The uninstall process is interactive and will show you what will be removed before asking for confirmation. Your `TODO.md` file is always preserved as it contains your task data.
+- Created comprehensive analysis document (`docs/TASK_NUMBERING_SCHEMA_ANALYSIS.md`) with 6 alternative numbering schema options
+- Selected Option 1: `task#nn` format as the recommended solution
+- Documented 20+ historical commits with old format in `docs/COMMIT_FORMAT_MIGRATION.md`
+- Implemented automated Cursor rule enforcement for commit message format
+- Updated developer rules with task number format guidelines
+- Created new commits demonstrating the correct format

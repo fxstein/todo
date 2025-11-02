@@ -3,7 +3,7 @@
 # This file configures the task numbering system for this repository
 
 # Mode: single-user | multi-user | branch | enhanced
-mode: multi-user
+mode: enhanced
 
 # Coordination settings (for enhanced mode)
 coordination:

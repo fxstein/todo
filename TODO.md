@@ -3,24 +3,14 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#fxstein-14** Manual duplicate test task 2 `#deleteme`
-- [ ] **#fxstein-13** Manual duplicate test task 1 `#deleteme`
-- [ ] **#fxstein-12** Test duplicate #2 again `#deleteme`
-- [ ] **#fxstein-11** Test duplicate #2 `#deleteme`
-- [ ] **#fxstein-10** Test duplicate #1 again `#deleteme`
-- [ ] **#fxstein-9** Duplicate ID for conflict test `#deleteme`
-- [ ] **#fxstein-15** Test duplicate #1 `#deleteme`
-- [ ] **#fxstein-6** Test duplicate task #60 for conflict resolution `#deleteme`
-- [ ] **#60** Test single-user mode task somthing else D `#deleteme`
-- [ ] **#103** Test single-user mode task somthing else C `#deleteme`
-- [ ] **#fxstein-5** Test multi-user mode task something else B `#deleteme`
-- [ ] **#main-3** Test branch mode task `#deleteme`
-- [ ] **#fxstein-7** Test multi-user mode task something else A `#deleteme`
-- [ ] **#fxstein-8** Test multi-user mode task `#deleteme`
-  - [ ] **#fxstein-5.1** Test subtask in multi-user mode `#deleteme`
-- [x] **#104** Test single-user mode task `#deleteme`
+- [ ] **#fxstein-21** Test fallback scenario 5: CounterAPI unavailable (invalid namespace) #deleteme
+- [ ] **#fxstein-20** Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues) #deleteme
+- [ ] **#fxstein-19** Test fallback scenario 3: CounterAPI unavailable (no namespace) #deleteme
+- [ ] **#fxstein-18** Test fallback scenario 2: GitHub Issues unavailable (no issue_number) #deleteme
+- [ ] **#fxstein-17** Test fallback scenario 1: coordination.type=none #deleteme
+- [ ] **#fxstein-16** Test enhanced mode task creation #deleteme
 - [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
-  - [ ] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
+  - [x] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
   - [x] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
   - [x] **#52.16** Test mode switching: verify migration, backup creation, and rollback functionality `#test`
   - [x] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
@@ -105,15 +95,6 @@
   - [x] **#50.2** Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs `#research` (2025-11-02)
   - [x] **#50.1** Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers `#docs` (2025-11-02)
 - [x] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#setup` `#git` (2025-11-02)
-  - [x] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (2025-11-02)
-  - [x] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (2025-11-02)
-  - [x] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (2025-11-02)
-  - [x] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (2025-11-02)
-  - [x] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (2025-11-02)
-  - [x] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (2025-11-02)
-  - [x] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (2025-11-02)
-  - [x] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (2025-11-02)
-  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02) (2025-11-02)
 - [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup` (2025-11-02)
 - [x] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature` (2025-11-02)
   - [x] **#37.12** Update release process documentation to include migration workflow (2025-11-02)
@@ -158,7 +139,6 @@
   - [x] **#38.1** Analyze current delete_task function behavior (2025-11-01)
 - [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
 - [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#setup` `#git` (2025-11-01)
-  - [ ] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (2025-11-01)
 - [x] **#5** Initialize repository structure and configuration `#setup` `#repo` (2025-11-01)
 - [x] **#36** Create release process for todo.ai on GitHub (2025-11-01)
   - [x] **#36.5** Review and finetune release numbering logic (2025-11-01)
@@ -231,6 +211,32 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] **#main-3** Test branch mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-9** Duplicate ID for conflict test `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-8** Test multi-user mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-7** Test multi-user mode task something else A `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-6** Test duplicate task #60 for conflict resolution `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#fxstein-5.1** Test subtask in multi-user mode `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-5** Test multi-user mode task something else B `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02) (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-15** Test duplicate #1 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-14** Manual duplicate test task 2 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-13** Manual duplicate test task 1 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-12** Test duplicate #2 again `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-11** Test duplicate #2 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-10** Test duplicate #1 again `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#60** Test single-user mode task somthing else D `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#104** Test single-user mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#103** Test single-user mode task somthing else C `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#59** Test duplicate numbering bug `#test` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#58** Test single-user mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
@@ -271,7 +277,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 14:46:44 CET 2025
+**Last Updated:** Sun Nov  2 14:54:35 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

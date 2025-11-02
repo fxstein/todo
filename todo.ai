@@ -556,6 +556,10 @@ show_usage() {
     echo "  ./todo.ai uninstall                  # Uninstall script only"
     echo "  ./todo.ai uninstall --all             # Uninstall script, data, and rules"
     echo "  ./todo.ai version                    # Show version"
+    echo ""
+    echo "Copyright 2025 Oliver Ratzesberger"
+    echo "Licensed under the Apache License, Version 2.0"
+    echo "Repository: $REPO_URL"
 }
 
 # Function to validate command arguments and detect invalid options

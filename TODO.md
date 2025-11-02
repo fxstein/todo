@@ -3,33 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#fxstein-23** Another test `#test`
-- [ ] **#fxstein-22** Test tag formatting with backticks `#deleteme`
-- [ ] **#fxstein-21** Test fallback scenario 5: CounterAPI unavailable (invalid namespace) `#deleteme`
-- [ ] **#fxstein-20** Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues) `#deleteme`
-- [ ] **#fxstein-19** Test fallback scenario 3: CounterAPI unavailable (no namespace) `#deleteme`
-- [ ] **#fxstein-18** Test fallback scenario 2: GitHub Issues unavailable (no issue_number) `#deleteme`
-- [ ] **#fxstein-17** Test fallback scenario 1: coordination.type=none `#deleteme`
-- [ ] **#fxstein-16** Test enhanced mode task creation `#deleteme`
-- [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
-  - [x] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
-  - [x] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
-  - [x] **#52.16** Test mode switching: verify migration, backup creation, and rollback functionality `#test`
-  - [x] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
-  - [x] **#52.14** Create user documentation: guide for adopting and switching between numbering modes `#docs`
-  - [x] **#52.13** Implement task reference resolution: auto-add user prefix when user references tasks by number only `#code`
-  - [x] **#52.12** Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs `#code`
-  - [x] **#52.11** ✅ Implemented Mode 4 (Enhanced Multi-User) - GitHub Issues/CounterAPI coordination `#code`
-  - [x] **#52.10** ✅ Implemented Mode 3 (Branch Mode) - branch prefix-based numbering `#code`
-  - [x] **#52.9** ✅ Implemented Mode 2 (Multi-User) - prefix-based numbering `#code`
-  - [x] **#52.8** ✅ Implemented Mode 1 (Single-User) - backward compatible `#code`
-  - [x] **#52.7** ✅ Implemented configuration system (YAML reading, validation, mode detection) `#code` `#test`
-  - [x] **#52.6** Implement automatic migration path between numbering modes: renumber tasks when switching modes `#code`
-  - [x] **#52.5** Implement mode switching command: allow users to switch between numbering modes (single-user, multi-user, branch, enhanced) `#code`
-  - [x] **#52.4** ✅ Implemented backup and rollback system for mode switching `#code` `#safety`
-  - [x] **#52.3** Design document: propose solution architecture for conflict-free task numbering in multi-user environment `#docs`
-  - [x] **#52.2** Research existing solutions: how other task management tools handle multi-user numbering conflicts `#research`
-  - [x] **#52.1** Analyze need: identify scenarios where multi-user/multi-branch task conflicts occur `#research`
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
   - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
@@ -76,6 +49,31 @@
 ------------------
 
 ## Recently Completed
+- [x] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature` `#MAJOR` (2025-11-02)
+  - [x] **#52.24** Document setup instructions for each coordination service: prerequisites, configuration steps, and verification `#docs` (2025-11-02)
+  - [x] **#52.23** Add setup wizard/command that guides users through mode and coordination selection with validation `#feature` (2025-11-02)
+  - [x] **#52.22** Create comprehensive documentation for all mode and coordination combinations (single-user, multi-user, branch, enhanced with github-issues, counterapi, none) `#docs` (2025-11-02)
+  - [x] **#52.21** Implement automated setup command for coordination services (github-issues, counterapi) with interactive prompts `#code` (2025-11-02)
+  - [x] **#52.20** Create function to detect and list available coordination options based on system capabilities (gh CLI, curl, jq, python3, etc.) `#code` (2025-11-02)
+  - [x] **#52.19** Verify current operating mode display and mode switching functionality `#test` (2025-11-02)
+  - [x] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test` (2025-11-02)
+  - [x] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test` (2025-11-02)
+  - [x] **#52.16** Test mode switching: verify migration, backup creation, and rollback functionality `#test` (2025-11-02)
+  - [x] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test` (2025-11-02)
+  - [x] **#52.14** Create user documentation: guide for adopting and switching between numbering modes `#docs` (2025-11-02)
+  - [x] **#52.13** Implement task reference resolution: auto-add user prefix when user references tasks by number only `#code` (2025-11-02)
+  - [x] **#52.12** Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs `#code` (2025-11-02)
+  - [x] **#52.11** ✅ Implemented Mode 4 (Enhanced Multi-User) - GitHub Issues/CounterAPI coordination `#code` (2025-11-02)
+  - [x] **#52.10** ✅ Implemented Mode 3 (Branch Mode) - branch prefix-based numbering `#code` (2025-11-02)
+  - [x] **#52.9** ✅ Implemented Mode 2 (Multi-User) - prefix-based numbering `#code` (2025-11-02)
+  - [x] **#52.8** ✅ Implemented Mode 1 (Single-User) - backward compatible `#code` (2025-11-02)
+  - [x] **#52.7** ✅ Implemented configuration system (YAML reading, validation, mode detection) `#code` `#test` (2025-11-02)
+  - [x] **#52.6** Implement automatic migration path between numbering modes: renumber tasks when switching modes `#code` (2025-11-02)
+  - [x] **#52.5** Implement mode switching command: allow users to switch between numbering modes (single-user, multi-user, branch, enhanced) `#code` (2025-11-02)
+  - [x] **#52.4** ✅ Implemented backup and rollback system for mode switching `#code` `#safety` (2025-11-02)
+  - [x] **#52.3** Design document: propose solution architecture for conflict-free task numbering in multi-user environment `#docs` (2025-11-02)
+  - [x] **#52.2** Research existing solutions: how other task management tools handle multi-user numbering conflicts `#research` (2025-11-02)
+  - [x] **#52.1** Analyze need: identify scenarios where multi-user/multi-branch task conflicts occur `#research` (2025-11-02)
 - [x] **#53** Fix bug reporting: reports to wrong repository (customer repo instead of todo.ai repo) `#bug` (2025-11-02)
   - [x] **#53.1** Test bug reporting from a different repository to verify it reports to todo.ai repo (2025-11-02)
 - [x] **#55** Fix update command when installed to system directory in PATH (GitHub issue #17) `#bug` (2025-11-02)
@@ -149,63 +147,15 @@
   - [x] **#36.2** Review release process document (2025-11-01)
   - [x] **#36.1** Create release process document (2025-11-01)
 - [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
-- [x] **#30** Implement versioned backups and rollback capability `#feature` (2025-10-30)
-  - [x] **#30.11** Test backup and rollback functionality `#test` (2025-10-30)
-  - [x] **#30.10** Remove old .bak file creation logic `#cleanup` (2025-10-30)
-  - [x] **#30.9** Update help text and show_usage() to include new commands `#docs` (2025-10-30)
-  - [x] **#30.8** Add 'backups' or 'list-backups' command to view available backups `#code` (2025-10-30)
-  - [x] **#30.7** Add 'rollback' command to main script command handler `#code` (2025-10-30)
-  - [x] **#30.6** Implement version-specific rollback (restore by timestamp or version) `#code` (2025-10-30)
-  - [x] **#30.5** Implement default rollback (restore latest backup) `#code` (2025-10-30)
-  - [x] **#30.4** Create rollback() function to restore from backup `#code` (2025-10-30)
-  - [x] **#30.3** Create list_backups() function to show available backup versions `#code` (2025-10-30)
-  - [x] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (2025-10-30)
-  - [x] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (2025-10-30)
 - [x] **#28** Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial `#setup` (2025-10-30)
-  - [x] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (2025-10-30)
-  - [x] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (2025-10-30)
-  - [x] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (2025-10-30)
-  - [x] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (2025-10-30)
 - [x] **#17** Create Cursor rules for repository `#setup` `#docs` (2025-10-30)
-  - [x] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (2025-10-30)
-  - [x] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (2025-10-30)
 - [x] **#26** Rename .todo/ directory to .todo.ai/ `#setup` (2025-10-30)
-  - [x] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (2025-10-30)
-  - [x] **#26.9** Verify git tracking of .todo.ai/ `#test` (2025-10-30)
-  - [x] **#26.8** Test script execution after rename `#test` (2025-10-30)
-  - [x] **#26.7** Update any documentation files `#docs` (2025-10-30)
-  - [x] **#26.6** Update README.md if it mentions .todo/ `#docs` (2025-10-30)
-  - [x] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (2025-10-30)
-  - [x] **#26.4** Update all references to .todo/ in script code `#code` (2025-10-30)
-  - [x] **#26.3** Update LOG_FILE path in todo.ai script `#code` (2025-10-30)
-  - [x] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (2025-10-30)
-  - [x] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (2025-10-30)
 - [x] **#25** Rename repository from todo to todo.ai `#setup` (2025-10-30)
-  - [x] **#25.6** Update header comment in todo.ai `#code` (2025-10-30)
-  - [x] **#25.5** Update README.md repository references `#docs` (2025-10-30)
-  - [x] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (2025-10-30)
-  - [x] **#25.3** Update REPO_URL in todo.ai script `#code` (2025-10-30)
-  - [x] **#25.2** Update local git remote URL after GitHub rename `#repo` (2025-10-30)
-  - [x] **#25.1** Rename repository on GitHub (manual step) `#repo` (2025-10-30)
 - [x] **#23** Rename todo.ai to todo.ai `#setup` (2025-10-30)
-  - [x] **#23.10** Test update command works with new filename `#test` (2025-10-30)
-  - [x] **#23.9** Test installation and execution after rename `#test` (2025-10-30)
-  - [x] **#23.8** Update all inline comments and documentation in script `#code` (2025-10-30)
-  - [x] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (2025-10-30)
-  - [x] **#23.6** Update help text and show_usage() examples `#code` (2025-10-30)
-  - [x] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (2025-10-30)
-  - [x] **#23.4** Update self-references in update_tool() function `#code` (2025-10-30)
-  - [x] **#23.3** Update TODO.md template path references `#setup` (2025-10-30)
-  - [x] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (2025-10-30)
-  - [x] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (2025-10-30)
 - [x] **#22** Create update instructions and functions for todo.ai `#setup` (2025-10-30)
-  - [x] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (2025-10-30)
-  - [x] **#22.2** Option 2: Add version info + update command `#setup` (2025-10-30)
-  - [x] **#22.1** Option 1: Simple re-download instruction in README `#docs` (2025-10-30)
 - [x] **#20** Create radically simplified README.md `#docs` (2025-10-30)
 - [x] **#6** Update TODO.md template for this repository `#setup` `#docs` (2025-10-30)
 - [x] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup` (2025-10-30)
-  - [x] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (2025-10-30)
 - [x] **#13** All formatting fixes complete `#setup` (2025-10-30)
 - [x] **#12** Final formatting test `#test` (2025-10-30)
 - [x] **#11** Test new append method `#test` (2025-10-30)
@@ -213,6 +163,73 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] **#fxstein-106** clean the car (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#64** Test after fix (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#63** Test coordination after mode switch (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#62** Test coordination after fix (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.3** Create list_backups() function to show available backup versions `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.4** Create rollback() function to restore from backup `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.5** Implement default rollback (restore latest backup) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.6** Implement version-specific rollback (restore by timestamp or version) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.7** Add 'rollback' command to main script command handler `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.8** Add 'backups' or 'list-backups' command to view available backups `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.9** Update help text and show_usage() to include new commands `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.10** Remove old .bak file creation logic `#cleanup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.11** Test backup and rollback functionality `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#30** Implement versioned backups and rollback capability `#feature` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-29** Test task 2 (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-28** Test coordination numbering (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-27** Test task after coordination setup (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#61** Test single-user mode `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.4** Update all references to .todo/ in script code `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.6** Update README.md if it mentions .todo/ `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.7** Update any documentation files `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-26** to buy folwers (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-25** Mode check `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-24** Test mode display `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.4** Update self-references in update_tool() function `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.6** Update help text and show_usage() examples `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-23** Another test `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-16** Test enhanced mode task creation `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-17** Test fallback scenario 1: coordination.type=none `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-18** Test fallback scenario 2: GitHub Issues unavailable (no issue_number) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-19** Test fallback scenario 3: CounterAPI unavailable (no namespace) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-20** Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-21** Test fallback scenario 5: CounterAPI unavailable (invalid namespace) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-22** Test tag formatting with backticks `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#main-3** Test branch mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#fxstein-9** Duplicate ID for conflict test `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
 - [D] **#fxstein-8** Test multi-user mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
@@ -279,7 +296,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 14:57:00 CET 2025
+**Last Updated:** Sun Nov  2 18:14:39 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

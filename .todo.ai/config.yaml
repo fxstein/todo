@@ -3,13 +3,12 @@
 # This file configures the task numbering system for this repository
 
 # Mode: single-user | multi-user | branch | enhanced
-mode: enhanced
+mode: single-user
 
 # Coordination settings (for enhanced mode)
 coordination:
-  type: counterapi
-  namespace: todo-ai-fxstein
-
+  type: github-issues
+  issue_number: 23
 # Conflict resolution settings
 conflict_resolution:
   enabled: true

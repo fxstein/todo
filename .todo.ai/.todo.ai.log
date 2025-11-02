@@ -2,6 +2,549 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 18:14:39 | fxstein | ARCHIVE | 52 | Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering (with 24 subtasks)
+2025-11-02 18:14:30 | fxstein | COMPLETE | 52 | Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering
+2025-11-02 17:59:33 | fxstein | ADD | 121 | Test task after reset to 120
+2025-11-02 17:55:55 | fxstein | ADD | 118 | Test task 3 in single-user mode with coordination
+2025-11-02 17:55:51 | fxstein | ADD | 117 | Test task 2 in single-user mode with coordination
+2025-11-02 17:55:46 | fxstein | ADD | 116 | Test task 1 in single-user mode with coordination
+2025-11-02 17:55:32 | fxstein | MODE_SWITCH | enhanced → single-user | Switched from enhanced to single-user
+2025-11-02 17:36:09 | fxstein | ADD | fxstein-115 | Test task after sync fix
+2025-11-02 17:29:07 | fxstein | ADD | fxstein-112 | Test task after implementing improvements
+2025-11-02 17:17:52 | fxstein | ADD | fxstein-111 | Test task after fixing GitHub Issues config
+2025-11-02 17:17:29 | fxstein | ADD | fxstein-110 | Test task with GitHub Issues coordination
+2025-11-02 17:15:53 | fxstein | ADD | fxstein-113 | Test enhanced output with coordinator info
+2025-11-02 17:13:31 | fxstein | ADD | fxstein-112 | cook dinner
+2025-11-02 17:11:03 | fxstein | ADD | fxstein-111 | mow the lawn
+2025-11-02 17:10:07 | fxstein | ADD | fxstein-110 | Test task with CounterAPI coordination
+2025-11-02 17:07:49 | fxstein | ADD | fxstein-109 | wipe the windows
+2025-11-02 17:04:54 | fxstein | ADD | fxstein-108 | Second test to verify order
+2025-11-02 17:03:59 | fxstein | ADD | fxstein-107 | Test task to verify comment is posted before adding
+2025-11-02 17:03:55 | fxstein | DELETE | fxstein-106 | - [D] **#fxstein-106** clean the car
+2025-11-02 17:00:21 | fxstein | ADD | fxstein-106 | clean the car
+2025-11-02 16:59:29 | fxstein | ADD | fxstein-106 | Test coordination after final fix
+2025-11-02 16:59:25 | fxstein | DELETE | 64 | Test after fix
+2025-11-02 16:58:31 | fxstein | ADD | 64 | Test after fix
+2025-11-02 16:58:09 | fxstein | DELETE | 63 | Test coordination after mode switch
+2025-11-02 16:56:18 | fxstein | DELETE | 63 | Test coordination after mode switch
+2025-11-02 16:55:12 | fxstein | ADD | 63 | Test coordination after mode switch
+2025-11-02 16:55:09 | fxstein | MODE_SWITCH | single-user → enhanced | Switched from single-user to enhanced
+2025-11-02 16:55:06 | fxstein | DELETE | 62 | Test coordination after fix
+2025-11-02 16:52:16 | fxstein | ADD | 62 | Test coordination after fix
+2025-11-02 16:52:13 | fxstein | DELETE | 30.1 | Create .todo.ai/backups/ directory for storing versioned backups
+2025-11-02 16:52:12 | fxstein | DELETE | 30.2 | Modify update_tool() to save backups with timestamp to .todo.ai/backups/
+2025-11-02 16:52:12 | fxstein | DELETE | 30.3 | Create list_backups() function to show available backup versions
+2025-11-02 16:52:12 | fxstein | DELETE | 30.4 | Create rollback() function to restore from backup
+2025-11-02 16:52:12 | fxstein | DELETE | 30.5 | Implement default rollback (restore latest backup)
+2025-11-02 16:52:12 | fxstein | DELETE | 30.6 | Implement version-specific rollback (restore by timestamp or version)
+2025-11-02 16:52:12 | fxstein | DELETE | 30.7 | Add 'rollback' command to main script command handler
+2025-11-02 16:52:12 | fxstein | DELETE | 30.8 | Add 'backups' or 'list-backups' command to view available backups
+2025-11-02 16:52:12 | fxstein | DELETE | 30.9 | Update help text and show_usage() to include new commands
+2025-11-02 16:52:12 | fxstein | DELETE | 30.10 | Remove old .bak file creation logic
+2025-11-02 16:52:12 | fxstein | DELETE | 30.11 | Test backup and rollback functionality
+2025-11-02 16:52:12 | fxstein | DELETE | 30 | Implement versioned backups and rollback capability
+2025-11-02 16:51:30 | fxstein | ADD | fxstein-30 | Test coordination with sed fallback
+2025-11-02 16:51:27 | fxstein | DELETE | fxstein-29 | - [D] **#fxstein-29** Test task 2
+2025-11-02 16:50:30 | fxstein | DELETE | fxstein-29 | - [D] **#fxstein-29** Test task 2
+2025-11-02 16:50:17 | fxstein | DELETE | 28.1 | Rename .todo.log to .todo.ai.log using git mv
+2025-11-02 16:50:17 | fxstein | DELETE | 28.2 | Rename .todo_serial to .todo.ai_serial using git mv
+2025-11-02 16:50:17 | fxstein | DELETE | 28.3 | Update LOG_FILE path reference in todo.ai script
+2025-11-02 16:50:17 | fxstein | DELETE | 28.4 | Update SERIAL_FILE path reference in todo.ai script
+2025-11-02 16:50:17 | fxstein | DELETE | fxstein-28 | - [D] **#fxstein-28** Test coordination numbering
+2025-11-02 16:50:13 | fxstein | ADD | fxstein-29 | Test task 2
+2025-11-02 16:49:47 | fxstein | ADD | fxstein-28 | Test coordination numbering
+2025-11-02 16:49:44 | fxstein | DELETE | fxstein-27 | - [D] **#fxstein-27** Test task after coordination setup
+2025-11-02 16:49:26 | fxstein | ADD | fxstein-27 | Test task after coordination setup
+2025-11-02 16:36:00 | fxstein | COMPLETE | 52.24 | Document setup instructions for each coordination service: prerequisites, configuration steps, and verification
+2025-11-02 16:36:00 | fxstein | COMPLETE | 52.23 | Add setup wizard/command that guides users through mode and coordination selection with validation
+2025-11-02 16:36:00 | fxstein | COMPLETE | 52.22 | Create comprehensive documentation for all mode and coordination combinations (single-user, multi-user, branch, enhanced with github-issues, counterapi, none)
+2025-11-02 16:36:00 | fxstein | COMPLETE | 52.21 | Implement automated setup command for coordination services (github-issues, counterapi) with interactive prompts
+2025-11-02 16:36:00 | fxstein | COMPLETE | 52.20 | Create function to detect and list available coordination options based on system capabilities (gh CLI, curl, jq, python3, etc.)
+2025-11-02 16:27:01 | fxstein | DELETE | 61 | Test single-user mode
+2025-11-02 16:26:26 | fxstein | DELETE | 26.1 | Rename directory using git mv: .todo/ -> .todo.ai/
+2025-11-02 16:26:26 | fxstein | DELETE | 26.2 | Update SERIAL_FILE path in todo.ai script
+2025-11-02 16:26:26 | fxstein | DELETE | 26.3 | Update LOG_FILE path in todo.ai script
+2025-11-02 16:26:26 | fxstein | DELETE | 26.4 | Update all references to .todo/ in script code
+2025-11-02 16:26:25 | fxstein | DELETE | 26.5 | Update environment variable names (TODO_SERIAL, TODO_LOG)
+2025-11-02 16:26:25 | fxstein | DELETE | 26.6 | Update README.md if it mentions .todo/
+2025-11-02 16:26:25 | fxstein | DELETE | 26.7 | Update any documentation files
+2025-11-02 16:26:25 | fxstein | DELETE | 26.8 | Test script execution after rename
+2025-11-02 16:26:25 | fxstein | DELETE | 26.9 | Verify git tracking of .todo.ai/
+2025-11-02 16:26:25 | fxstein | DELETE | 26.10 | Update .cursorrules to reference .todo.ai/ instead of .todo/
+2025-11-02 16:26:25 | fxstein | DELETE | fxstein-26 | - [D] **#fxstein-26** to buy folwers
+2025-11-02 16:26:25 | fxstein | DELETE | 25.1 | Rename repository on GitHub (manual step)
+2025-11-02 16:26:25 | fxstein | DELETE | 25.2 | Update local git remote URL after GitHub rename
+2025-11-02 16:26:25 | fxstein | DELETE | 25.3 | Update REPO_URL in todo.ai script
+2025-11-02 16:26:24 | fxstein | DELETE | 25.4 | Update SCRIPT_URL in todo.ai script
+2025-11-02 16:26:24 | fxstein | DELETE | 25.5 | Update README.md repository references
+2025-11-02 16:26:24 | fxstein | DELETE | 25.6 | Update header comment in todo.ai
+2025-11-02 16:26:24 | fxstein | DELETE | fxstein-25 | - [D] **#fxstein-25** Mode check
+2025-11-02 16:26:24 | fxstein | DELETE | fxstein-24 | - [D] **#fxstein-24** Test mode display
+2025-11-02 15:47:42 | fxstein | MODIFY | fxstein-52 | Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering
+2025-11-02 15:47:27 | fxstein | MODIFY | fxstein-52 | Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering
+2025-11-02 15:46:52 | fxstein | ADD_SUBTASK | 52.24 | Document setup instructions for each coordination service: prerequisites, configuration steps, and verification (parent: #52)
+2025-11-02 15:46:49 | fxstein | ADD_SUBTASK | 52.23 | Add setup wizard/command that guides users through mode and coordination selection with validation (parent: #52)
+2025-11-02 15:46:47 | fxstein | ADD_SUBTASK | 52.22 | Create comprehensive documentation for all mode and coordination combinations (single-user, multi-user, branch, enhanced with github-issues, counterapi, none) (parent: #52)
+2025-11-02 15:46:44 | fxstein | ADD_SUBTASK | 52.21 | Implement automated setup command for coordination services (github-issues, counterapi) with interactive prompts (parent: #52)
+2025-11-02 15:46:41 | fxstein | ADD_SUBTASK | 52.20 | Create function to detect and list available coordination options based on system capabilities (gh CLI, curl, jq, python3, etc.) (parent: #52)
+2025-11-02 15:20:02 | fxstein | ADD | fxstein-26 | to buy folwers
+2025-11-02 15:15:01 | fxstein | ADD | fxstein-25 | Mode check
+2025-11-02 15:13:39 | fxstein | COMPLETE | 52.19 | Verify current operating mode display and mode switching functionality
+2025-11-02 15:13:30 | fxstein | MODE_SWITCH | single-user → enhanced | Switched from single-user to enhanced
+2025-11-02 15:13:30 | fxstein | ADD | 61 | Test single-user mode
+2025-11-02 15:13:29 | fxstein | MODE_SWITCH | enhanced → single-user | Switched from enhanced to single-user
+2025-11-02 15:13:25 | fxstein | ADD | fxstein-24 | Test mode display
+2025-11-02 15:12:48 | fxstein | ADD_SUBTASK | 52.19 | Verify current operating mode display and mode switching functionality (parent: #52)
+2025-11-02 15:10:29 | fxstein | MODE_SWITCH | single-user → enhanced | Switched from single-user to enhanced
+2025-11-02 15:10:26 | fxstein | MODE_SWITCH | enhanced → single-user | Switched from enhanced to single-user
+2025-11-02 15:06:36 | fxstein | DELETE | 23.1 | Update script filename: todo.zsh -> todo.ai
+2025-11-02 15:06:36 | fxstein | DELETE | 23.2 | Update all references in README.md (installation, examples, commands)
+2025-11-02 15:06:36 | fxstein | DELETE | 23.3 | Update TODO.md template path references
+2025-11-02 15:06:36 | fxstein | DELETE | 23.4 | Update self-references in update_tool() function
+2025-11-02 15:06:36 | fxstein | DELETE | 23.5 | Update Cursor rules to reference todo.ai instead of todo.zsh
+2025-11-02 15:06:36 | fxstein | DELETE | 23.6 | Update help text and show_usage() examples
+2025-11-02 15:06:36 | fxstein | DELETE | 23.7 | Update init_cursor_rules() to reference todo.ai
+2025-11-02 15:06:36 | fxstein | DELETE | 23.8 | Update all inline comments and documentation in script
+2025-11-02 15:06:36 | fxstein | DELETE | 23.9 | Test installation and execution after rename
+2025-11-02 15:06:35 | fxstein | DELETE | 23.10 | Test update command works with new filename
+2025-11-02 15:06:35 | fxstein | DELETE | fxstein-23 | - [D] **#fxstein-23** Another test
+2025-11-02 15:05:35 | fxstein | DELETE | fxstein-16 | - [D] **#fxstein-16** Test enhanced mode task creation
+2025-11-02 15:05:35 | fxstein | DELETE | 17.1 | Enforce todo.ai usage for all task tracking
+2025-11-02 15:05:35 | fxstein | DELETE | 17.3 | Ensure TODO.md and .todo.ai/ are always committed together
+2025-11-02 15:05:35 | fxstein | DELETE | fxstein-17 | - [D] **#fxstein-17** Test fallback scenario 1: coordination.type=none
+2025-11-02 15:05:34 | fxstein | DELETE | 18.1 | Remove path from todo.ai upon init
+2025-11-02 15:05:34 | fxstein | DELETE | fxstein-18 | - [D] **#fxstein-18** Test fallback scenario 2: GitHub Issues unavailable (no issue_number)
+2025-11-02 15:05:34 | fxstein | DELETE | fxstein-19 | - [D] **#fxstein-19** Test fallback scenario 3: CounterAPI unavailable (no namespace)
+2025-11-02 15:05:33 | fxstein | DELETE | fxstein-20 | - [D] **#fxstein-20** Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues)
+2025-11-02 15:05:33 | fxstein | DELETE | fxstein-21 | - [D] **#fxstein-21** Test fallback scenario 5: CounterAPI unavailable (invalid namespace)
+2025-11-02 15:05:33 | fxstein | DELETE | 22.1 | Option 1: Simple re-download instruction in README
+2025-11-02 15:05:33 | fxstein | DELETE | 22.2 | Option 2: Add version info + update command
+2025-11-02 15:05:33 | fxstein | DELETE | 22.3 | Option 3: Auto-check version on startup (informational only)
+2025-11-02 15:05:32 | fxstein | DELETE | fxstein-22 | - [D] **#fxstein-22** Test tag formatting with backticks
+2025-11-02 15:02:55 | fxstein | DELETE | fxstein-10 | - [D] **#fxstein-10** Test duplicate #1 again
+2025-11-02 15:02:55 | fxstein | DELETE | fxstein-1 | - [D] **#fxstein-1** Test multi-user mode task 2
+2025-11-02 15:02:54 | fxstein | DELETE | fxstein-9 | - [D] **#fxstein-9** Duplicate ID for conflict test
+2025-11-02 15:02:53 | fxstein | DELETE | fxstein-8 | - [D] **#fxstein-8** Test multi-user mode task
+2025-11-02 15:02:53 | fxstein | DELETE | 7.1 | Add setup instructions documenting that .todo.ai/ must be tracked in git
+2025-11-02 15:02:53 | fxstein | DELETE | fxstein-7 | - [D] **#fxstein-7** Test multi-user mode task something else A
+2025-11-02 15:02:52 | fxstein | DELETE | 60 | Test single-user mode task somthing else D
+2025-11-02 15:02:51 | fxstein | DELETE | fxstein-6 | - [D] **#fxstein-6** Test duplicate task #60 for conflict resolution
+2025-11-02 15:02:50 | fxstein | DELETE | 59 | Test duplicate numbering bug
+2025-11-02 15:02:50 | fxstein | DELETE | 58 | Test single-user mode task 2
+2025-11-02 15:02:49 | fxstein | DELETE | 57.1 | Test subtask
+2025-11-02 15:02:49 | fxstein | DELETE | 57 | Test single-user mode task 1
+2025-11-02 15:02:48 | fxstein | DELETE | 56 | Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check
+2025-11-02 15:02:47 | fxstein | DELETE | 55.1 | Investigate get_script_path() function: how it detects script location when installed system-wide
+2025-11-02 15:02:47 | fxstein | DELETE | 55.2 | Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin
+2025-11-02 15:02:47 | fxstein | DELETE | 55.3 | Test update command from system-wide installation location
+2025-11-02 15:02:46 | fxstein | DELETE | 55.4 | Close GitHub issue #17 when fix has been confirmed
+2025-11-02 15:02:46 | fxstein | DELETE | 55 | Fix update command when installed to system directory in PATH (GitHub issue #17)
+2025-11-02 15:02:46 | fxstein | DELETE | 53.1 | Test bug reporting from a different repository to verify it reports to todo.ai repo
+2025-11-02 15:02:46 | fxstein | DELETE | 53 | Fix bug reporting: reports to wrong repository (customer repo instead of todo.ai repo)
+2025-11-02 15:02:45 | fxstein | DELETE | 52.1 | Analyze need: identify scenarios where multi-user/multi-branch task conflicts occur
+2025-11-02 15:02:45 | fxstein | DELETE | 52.2 | Research existing solutions: how other task management tools handle multi-user numbering conflicts
+2025-11-02 15:02:45 | fxstein | DELETE | 52.3 | Design document: propose solution architecture for conflict-free task numbering in multi-user environment
+2025-11-02 15:02:45 | fxstein | DELETE | 52.4 | ✅ Implemented backup and rollback system for mode switching
+2025-11-02 15:02:44 | fxstein | DELETE | 52.5 | Implement mode switching command: allow users to switch between numbering modes (single-user, multi-user, branch, enhanced)
+2025-11-02 15:02:44 | fxstein | DELETE | 52.6 | Implement automatic migration path between numbering modes: renumber tasks when switching modes
+2025-11-02 15:02:44 | fxstein | DELETE | 52.7 | ✅ Implemented configuration system (YAML reading, validation, mode detection)
+2025-11-02 15:02:44 | fxstein | DELETE | 52.8 | ✅ Implemented Mode 1 (Single-User) - backward compatible
+2025-11-02 15:02:44 | fxstein | DELETE | 52.9 | ✅ Implemented Mode 2 (Multi-User) - prefix-based numbering
+2025-11-02 15:02:44 | fxstein | DELETE | 52.10 | ✅ Implemented Mode 3 (Branch Mode) - branch prefix-based numbering
+2025-11-02 15:02:44 | fxstein | DELETE | 52.11 | ✅ Implemented Mode 4 (Enhanced Multi-User) - GitHub Issues/CounterAPI coordination
+2025-11-02 15:02:44 | fxstein | DELETE | 52.12 | Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs
+2025-11-02 15:02:44 | fxstein | DELETE | 52.13 | Implement task reference resolution: auto-add user prefix when user references tasks by number only
+2025-11-02 15:02:44 | fxstein | DELETE | 52.14 | Create user documentation: guide for adopting and switching between numbering modes
+2025-11-02 15:02:44 | fxstein | DELETE | 52.15 | Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling
+2025-11-02 15:02:44 | fxstein | DELETE | 52.16 | Test mode switching: verify migration, backup creation, and rollback functionality
+2025-11-02 15:02:43 | fxstein | DELETE | 52.17 | Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs
+2025-11-02 15:02:43 | fxstein | DELETE | 52.18 | Test fallback scenarios: verify graceful degradation when coordination services are unavailable
+2025-11-02 15:02:43 | fxstein | DELETE | 52 | Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering
+2025-11-02 15:02:43 | fxstein | DELETE | 51.3 | Test update command from system-wide installation location
+2025-11-02 15:02:42 | fxstein | DELETE | 51.2 | Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin
+2025-11-02 15:02:42 | fxstein | DELETE | 51.1 | Investigate get_script_path() function: how it detects script location when installed system-wide
+2025-11-02 15:02:42 | fxstein | DELETE | 51 | Add contributor section to release summary: list all contributors for each release
+2025-11-02 15:02:41 | fxstein | DELETE | 50.1 | Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers
+2025-11-02 15:02:41 | fxstein | DELETE | 50.2 | Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs
+2025-11-02 15:02:41 | fxstein | DELETE | 50.3 | Propose solution: design numbering schema or commit message format to avoid conflicts
+2025-11-02 15:02:41 | fxstein | DELETE | 50.4 | Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them
+2025-11-02 15:02:41 | fxstein | DELETE | 50 | Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages
+2025-11-02 15:02:40 | fxstein | DELETE | fxstein-5.1 |   - [D] **#fxstein-5.1** Test subtask in multi-user mode
+2025-11-02 15:02:40 | fxstein | DELETE | fxstein-5 | - [D] **#fxstein-5** Test multi-user mode task something else B
+2025-11-02 15:02:39 | fxstein | DELETE | 49.1 | Analyze installation security: curl download verification, HTTPS validation, and integrity checks
+2025-11-02 15:02:39 | fxstein | DELETE | 49.2 | Investigate update process security: automatic update downloads, code verification, and execution risks
+2025-11-02 15:02:39 | fxstein | DELETE | 49.3 | Assess code execution risks: migration system, script execution, and dynamic code loading
+2025-11-02 15:02:39 | fxstein | DELETE | 49.4 | Examine Cursor rules injection vectors: preventing malicious rules from being installed or modified
+2025-11-02 15:02:39 | fxstein | DELETE | 49.5 | Analyze prompt injection risks: malicious content in TODO.md affecting AI agent behavior
+2025-11-02 15:02:39 | fxstein | DELETE | 49.6 | Review file system access: what files can be read/written and potential data exfiltration risks
+2025-11-02 15:02:39 | fxstein | DELETE | 49.7 | Evaluate supply chain security: repository compromise, MITM attacks, and code signing
+2025-11-02 15:02:39 | fxstein | DELETE | 49.8 | Create security improvement recommendations document based on findings
+2025-11-02 15:02:38 | fxstein | DELETE | 49.9 | Implement high-priority security improvements identified in audit
+2025-11-02 15:02:38 | fxstein | DELETE | 49.10 | Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security
+2025-11-02 15:02:38 | fxstein | DELETE | 49 | Investigate cybersecurity implications of todo.ai installation, updates, and operations
+2025-11-02 15:02:38 | fxstein | DELETE | 48.1 | Research update execution pattern: how to execute new version's code after download
+2025-11-02 15:02:37 | fxstein | DELETE | 48.2 | Design solution: download → execute new version → replace old version
+2025-11-02 15:02:37 | fxstein | DELETE | 48.3 | Implement update fix: execute new version's migrations and update logic before replacement
+2025-11-02 15:02:37 | fxstein | DELETE | 48.4 | Test update workflow: verify migrations execute in new version after update
+2025-11-02 15:02:37 | fxstein | DELETE | 48 | Fix update logic error: new version update logic never executes
+2025-11-02 15:02:36 | fxstein | DELETE | 47.1 | Create design document for feature request system (similar to bug reporting design)
+2025-11-02 15:02:36 | fxstein | DELETE | 47.2 | Implement feature request command handler and template generation
+2025-11-02 15:02:36 | fxstein | DELETE | 47.3 | Add duplicate detection for existing feature requests (similarity matching)
+2025-11-02 15:02:36 | fxstein | DELETE | 47.4 | Implement 'me too' reply for existing feature requests
+2025-11-02 15:02:36 | fxstein | DELETE | 47.5 | Add manual confirmation requirement (always ask before creating feature request)
+2025-11-02 15:02:36 | fxstein | DELETE | 47.6 | Integrate feature request rules into cursor rules (similar to bug reporting rules)
+2025-11-02 15:02:36 | fxstein | DELETE | 47.7 | Update help screen and documentation with feature request command
+2025-11-02 15:02:36 | fxstein | DELETE | 47.8 | Test feature request creation, duplicate detection, and 'me too' workflow
+2025-11-02 15:02:36 | fxstein | DELETE | 47 | Implement feature request capability for todo.ai (similar to bug reporting)
+2025-11-02 15:02:35 | fxstein | DELETE | 46.1 | Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH
+2025-11-02 15:02:35 | fxstein | DELETE | 46.2 | Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features
+2025-11-02 15:02:35 | fxstein | DELETE | 46.3 | Implement fix: check for functional changes in todo.ai before file-based classification
+2025-11-02 15:02:35 | fxstein | DELETE | 46.4 | Handle ambiguous cases: migrations that affect users vs pure infrastructure changes
+2025-11-02 15:02:35 | fxstein | DELETE | 46.5 | Test fix: verify cursor rules migration would be classified as MINOR with fix applied
+2025-11-02 15:02:35 | fxstein | DELETE | 46.6 | Create mapping document: tags to release types with priority matrix showing numbering decisions
+2025-11-02 15:02:35 | fxstein | DELETE | 46 | Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR
+2025-11-02 15:02:33 | fxstein | DELETE | 45.1 | Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration
+2025-11-02 15:02:33 | fxstein | DELETE | 45.2 | Create design document for pre-release workflow and integration with existing release process
+2025-11-02 15:02:33 | fxstein | DELETE | 45.3 | Implement pre-release support in release.sh script (--prerelease flag, version parsing)
+2025-11-02 15:02:33 | fxstein | DELETE | 45.4 | Add GitHub pre-release flag support (gh release create --prerelease)
+2025-11-02 15:02:33 | fxstein | DELETE | 45.5 | Implement workflow: create pre-release → test → fix if needed → promote to official release
+2025-11-02 15:02:33 | fxstein | DELETE | 45.6 | Add command to promote pre-release to official release (remove --prerelease flag)
+2025-11-02 15:02:33 | fxstein | DELETE | 45.7 | Update release process documentation with pre-release workflow
+2025-11-02 15:02:33 | fxstein | DELETE | 45.8 | Test pre-release creation and promotion workflow
+2025-11-02 15:02:33 | fxstein | DELETE | 45 | Enhance release process with pre-release support for beta/testing versions
+2025-11-02 15:02:32 | fxstein | DELETE | 44.1 | Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com
+2025-11-02 15:02:32 | fxstein | DELETE | 44.2 | Create design document for .cursorrules to .cursor/rules/ migration
+2025-11-02 15:02:32 | fxstein | DELETE | 44.3 | Implement migration logic to convert .cursorrules sections to .mdc files
+2025-11-02 15:02:32 | fxstein | DELETE | 44.4 | Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file
+2025-11-02 15:02:32 | fxstein | DELETE | 44.5 | Create migration to convert existing .cursorrules to .cursor/rules/ on update
+2025-11-02 15:02:32 | fxstein | DELETE | 44.6 | Test migration with existing .cursorrules files
+2025-11-02 15:02:31 | fxstein | DELETE | 44.7 | Update documentation to reflect .cursor/rules/ structure
+2025-11-02 15:02:31 | fxstein | DELETE | 44.8 | Update release process docs to reference .cursor/rules/ instead of .cursorrules
+2025-11-02 15:02:31 | fxstein | DELETE | 44.9 | Manage installation path of tool relative to cursor rules
+2025-11-02 15:02:31 | fxstein | DELETE | 44.10 | Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits
+2025-11-02 15:02:31 | fxstein | DELETE | 44 | Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure
+2025-11-02 15:02:30 | fxstein | DELETE | 43.1 | Write design document for uninstall feature
+2025-11-02 15:02:30 | fxstein | DELETE | 43.2 | Implement and test uninstall feature
+2025-11-02 15:02:30 | fxstein | DELETE | 43.3 | Enhance README.md to show simple uninstall command
+2025-11-02 15:02:30 | fxstein | DELETE | 43.4 | Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope
+2025-11-02 15:02:30 | fxstein | DELETE | 43 | Create uninstall feature
+2025-11-02 15:02:29 | fxstein | DELETE | 42.1 | Create design document for bug reporting feature
+2025-11-02 15:02:29 | fxstein | DELETE | 42.2 | Implement bug detection and reporting logic
+2025-11-02 15:02:29 | fxstein | DELETE | 42.3 | Implement duplicate issue detection and 'me too' reply functionality
+2025-11-02 15:02:29 | fxstein | DELETE | 42.4 | Create bug report template with logs and data attachment
+2025-11-02 15:02:29 | fxstein | DELETE | 42.5 | Test bug reporting with GitHub CLI integration
+2025-11-02 15:02:29 | fxstein | DELETE | 42.6 | Test duplicate detection and 'me too' reply flow
+2025-11-02 15:02:29 | fxstein | DELETE | 42 | Implement self-reporting bug feature for GitHub Issues
+2025-11-02 15:02:28 | fxstein | DELETE | 41.1 | Level 1 subtask
+2025-11-02 15:02:28 | fxstein | DELETE | 41.1.1 | Level 2 nested subtask
+2025-11-02 15:02:28 | fxstein | DELETE | 41 | Test parent for nested subtasks
+2025-11-02 15:02:27 | fxstein | DELETE | 40.2 | Subtask B
+2025-11-02 15:02:27 | fxstein | DELETE | 40.1 | Subtask A
+2025-11-02 15:02:27 | fxstein | DELETE | 40 | Test parent task 2
+2025-11-02 15:02:26 | fxstein | DELETE | fxstein-4 | - [D] **#fxstein-4** Test multi-user mode task 1
+2025-11-02 15:02:25 | fxstein | DELETE | 39.1 | Test subtask 1
+2025-11-02 15:02:25 | fxstein | DELETE | 39.1.1 | Test nested subtask
+2025-11-02 15:02:25 | fxstein | DELETE | 39.2 | Test subtask 2
+2025-11-02 15:02:25 | fxstein | DELETE | 39 | Test parent task for deletion bug fix
+2025-11-02 15:02:24 | fxstein | DELETE | 38.1 | Analyze current delete_task function behavior
+2025-11-02 15:02:24 | fxstein | DELETE | 38.2 | Implement automatic subtask deletion when deleting parent task
+2025-11-02 15:02:24 | fxstein | DELETE | 38.3 | Test deletion of parent task with subtasks (verify subtasks deleted)
+2025-11-02 15:02:24 | fxstein | DELETE | 38.4 | Test deletion of parent task with nested subtasks (2-level)
+2025-11-02 15:02:24 | fxstein | DELETE | 38.5 | Test deletion of subtask only (should not delete parent or siblings)
+2025-11-02 15:02:24 | fxstein | DELETE | 38.6 | Verify orphaned subtask detection still works correctly
+2025-11-02 15:02:24 | fxstein | DELETE | 38 | Fix orphaned subtasks bug: delete subtasks when deleting parent task
+2025-11-02 15:02:23 | fxstein | DELETE | 37.1 | Create design document for migration/cleanup system architecture
+2025-11-02 15:02:23 | fxstein | DELETE | 37.2 | Create migration registry structure in todo.ai script
+2025-11-02 15:02:23 | fxstein | DELETE | 37.3 | Implement version comparison function for semantic versioning
+2025-11-02 15:02:22 | fxstein | DELETE | 37.4 | Implement migration execution system with run_migrations function
+2025-11-02 15:02:22 | fxstein | DELETE | 37.5 | Create migration lock mechanism to prevent concurrent execution
+2025-11-02 15:02:22 | fxstein | DELETE | 37.6 | Implement first migration: section order fix (v1.3.5)
+2025-11-02 15:02:22 | fxstein | DELETE | 37.7 | Add migration execution to script startup (after version check)
+2025-11-02 15:02:22 | fxstein | DELETE | 37.8 | Create unit tests for migration system (version comparison, idempotency)
+2025-11-02 15:02:22 | fxstein | DELETE | 37.9 | Create integration tests for migration execution during update
+2025-11-02 15:02:22 | fxstein | DELETE | 37.10 | Test migration system with real TODO.md files (wrong section order)
+2025-11-02 15:02:22 | fxstein | DELETE | 37.11 | Document migration creation process for developers
+2025-11-02 15:02:22 | fxstein | DELETE | 37.12 | Update release process documentation to include migration workflow
+2025-11-02 15:02:22 | fxstein | DELETE | 37 | Build release migration and cleanup system for one-time migrations and cleanups
+2025-11-02 15:02:21 | fxstein | DELETE | 36.1 | Create release process document
+2025-11-02 15:02:21 | fxstein | DELETE | 36.2 | Review release process document
+2025-11-02 15:02:21 | fxstein | DELETE | 36.3 | Create release management process
+2025-11-02 15:02:21 | fxstein | DELETE | 36.4 | Create permanent release log file with detailed timestamps
+2025-11-02 15:02:21 | fxstein | DELETE | 36.5 | Review and finetune release numbering logic
+2025-11-02 15:02:21 | fxstein | DELETE | 36 | Create release process for todo.ai on GitHub
+2025-11-02 15:02:19 | fxstein | DELETE | 35.1 | Research todo.ai testing requirements and existing docs
+2025-11-02 15:02:19 | fxstein | DELETE | 35.2 | Define test framework architecture and tooling
+2025-11-02 15:02:19 | fxstein | DELETE | 35.3 | Create tests directory and draft detailed test plan document
+2025-11-02 15:02:19 | fxstein | DELETE | 35 | Build comprehensive test framework for todo.ai
+2025-11-02 15:02:18 | fxstein | DELETE | 34.1.1 | Level 2 sub-subtask
+2025-11-02 15:02:18 | fxstein | DELETE | 34.1 | Level 1 subtask
+2025-11-02 15:02:18 | fxstein | DELETE | 34 | Final nested subtask test
+2025-11-02 15:02:17 | fxstein | DELETE | 33.1.1 | Test sub-subtask creation
+2025-11-02 15:02:17 | fxstein | DELETE | 33.1 | Add subtask to main task
+2025-11-02 15:02:17 | fxstein | DELETE | 33 | Test nested subtasks implementation
+2025-11-02 15:02:16 | fxstein | DELETE | 32 | Implement nested subtasks support (2-level limit)
+2025-11-02 15:02:16 | fxstein | DELETE | 31 | Test task after serial rename
+2025-11-02 15:02:15 | fxstein | DELETE | 30.1 | Create .todo.ai/backups/ directory for storing versioned backups
+2025-11-02 15:02:15 | fxstein | DELETE | 30.2 | Modify update_tool() to save backups with timestamp to .todo.ai/backups/
+2025-11-02 15:02:15 | fxstein | DELETE | 30.3 | Create list_backups() function to show available backup versions
+2025-11-02 15:02:14 | fxstein | DELETE | 30.4 | Create rollback() function to restore from backup
+2025-11-02 15:02:14 | fxstein | DELETE | 30.5 | Implement default rollback (restore latest backup)
+2025-11-02 15:02:14 | fxstein | DELETE | 30.6 | Implement version-specific rollback (restore by timestamp or version)
+2025-11-02 15:02:14 | fxstein | DELETE | 30.7 | Add 'rollback' command to main script command handler
+2025-11-02 15:02:14 | fxstein | DELETE | 30.8 | Add 'backups' or 'list-backups' command to view available backups
+2025-11-02 15:02:14 | fxstein | DELETE | 30.9 | Update help text and show_usage() to include new commands
+2025-11-02 15:02:14 | fxstein | DELETE | 30.10 | Remove old .bak file creation logic
+2025-11-02 15:02:14 | fxstein | DELETE | 30.11 | Test backup and rollback functionality
+2025-11-02 15:02:14 | fxstein | DELETE | 30 | Implement versioned backups and rollback capability
+2025-11-02 15:02:13 | fxstein | DELETE | 29 | Test task after file rename
+2025-11-02 15:02:12 | fxstein | DELETE | 28.1 | Rename .todo.log to .todo.ai.log using git mv
+2025-11-02 15:02:12 | fxstein | DELETE | 28.2 | Rename .todo_serial to .todo.ai_serial using git mv
+2025-11-02 15:02:12 | fxstein | DELETE | 28.3 | Update LOG_FILE path reference in todo.ai script
+2025-11-02 15:02:12 | fxstein | DELETE | 28.4 | Update SERIAL_FILE path reference in todo.ai script
+2025-11-02 15:02:12 | fxstein | DELETE | 28 | Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial
+2025-11-02 15:02:11 | fxstein | DELETE | 27 | Test task after .todo.ai rename
+2025-11-02 15:02:10 | fxstein | DELETE | 26.1 | Rename directory using git mv: .todo/ -> .todo.ai/
+2025-11-02 15:02:10 | fxstein | DELETE | 26.2 | Update SERIAL_FILE path in todo.ai script
+2025-11-02 15:02:10 | fxstein | DELETE | 26.3 | Update LOG_FILE path in todo.ai script
+2025-11-02 15:02:10 | fxstein | DELETE | 26.4 | Update all references to .todo/ in script code
+2025-11-02 15:02:10 | fxstein | DELETE | 26.5 | Update environment variable names (TODO_SERIAL, TODO_LOG)
+2025-11-02 15:02:10 | fxstein | DELETE | 26.6 | Update README.md if it mentions .todo/
+2025-11-02 15:02:10 | fxstein | DELETE | 26.7 | Update any documentation files
+2025-11-02 15:02:10 | fxstein | DELETE | 26.8 | Test script execution after rename
+2025-11-02 15:02:09 | fxstein | DELETE | 26.9 | Verify git tracking of .todo.ai/
+2025-11-02 15:02:09 | fxstein | DELETE | 26.10 | Update .cursorrules to reference .todo.ai/ instead of .todo/
+2025-11-02 15:02:09 | fxstein | DELETE | 26 | Rename .todo/ directory to .todo.ai/
+2025-11-02 15:02:09 | fxstein | DELETE | 25.1 | Rename repository on GitHub (manual step)
+2025-11-02 15:02:08 | fxstein | DELETE | 25.2 | Update local git remote URL after GitHub rename
+2025-11-02 15:02:08 | fxstein | DELETE | 25.3 | Update REPO_URL in todo.ai script
+2025-11-02 15:02:08 | fxstein | DELETE | 25.4 | Update SCRIPT_URL in todo.ai script
+2025-11-02 15:02:08 | fxstein | DELETE | 25.5 | Update README.md repository references
+2025-11-02 15:02:08 | fxstein | DELETE | 25.6 | Update header comment in todo.ai
+2025-11-02 15:02:08 | fxstein | DELETE | fxstein-25 | - [D] **#fxstein-25** Test
+2025-11-02 15:02:07 | fxstein | DELETE | fxstein-24 | - [D] **#fxstein-24** Test yaml module check fix
+2025-11-02 15:02:07 | fxstein | DELETE | 23.1 | Update script filename: todo.zsh -> todo.ai
+2025-11-02 15:02:07 | fxstein | DELETE | 23.2 | Update all references in README.md (installation, examples, commands)
+2025-11-02 15:02:06 | fxstein | DELETE | 23.3 | Update TODO.md template path references
+2025-11-02 15:02:06 | fxstein | DELETE | 23.4 | Update self-references in update_tool() function
+2025-11-02 15:02:06 | fxstein | DELETE | 23.5 | Update Cursor rules to reference todo.ai instead of todo.zsh
+2025-11-02 15:02:06 | fxstein | DELETE | 23.6 | Update help text and show_usage() examples
+2025-11-02 15:02:06 | fxstein | DELETE | 23.7 | Update init_cursor_rules() to reference todo.ai
+2025-11-02 15:02:06 | fxstein | DELETE | 23.8 | Update all inline comments and documentation in script
+2025-11-02 15:02:06 | fxstein | DELETE | 23.9 | Test installation and execution after rename
+2025-11-02 15:02:06 | fxstein | DELETE | 23.10 | Test update command works with new filename
+2025-11-02 15:02:06 | fxstein | DELETE | fxstein-23 | - [D] **#fxstein-23** Another test
+2025-11-02 15:02:05 | fxstein | DELETE | 22.1 | Option 1: Simple re-download instruction in README
+2025-11-02 15:02:05 | fxstein | DELETE | 22.2 | Option 2: Add version info + update command
+2025-11-02 15:02:05 | fxstein | DELETE | 22.3 | Option 3: Auto-check version on startup (informational only)
+2025-11-02 15:02:05 | fxstein | DELETE | fxstein-22 | - [D] **#fxstein-22** Test tag formatting with backticks
+2025-11-02 15:02:04 | fxstein | DELETE | fxstein-21 | - [D] **#fxstein-21** Test fallback scenario 5: CounterAPI unavailable (invalid namespace)
+2025-11-02 15:02:03 | fxstein | DELETE | fxstein-20 | - [D] **#fxstein-20** Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues)
+2025-11-02 15:02:02 | fxstein | DELETE | fxstein-19 | - [D] **#fxstein-19** Test fallback scenario 3: CounterAPI unavailable (no namespace)
+2025-11-02 15:02:01 | fxstein | DELETE | 18.1 | Remove path from todo.ai upon init
+2025-11-02 15:02:01 | fxstein | DELETE | fxstein-18 | - [D] **#fxstein-18** Test fallback scenario 2: GitHub Issues unavailable (no issue_number)
+2025-11-02 15:02:00 | fxstein | DELETE | 17.1 | Enforce todo.ai usage for all task tracking
+2025-11-02 15:02:00 | fxstein | DELETE | 17.3 | Ensure TODO.md and .todo.ai/ are always committed together
+2025-11-02 15:02:00 | fxstein | DELETE | fxstein-17 | - [D] **#fxstein-17** Test fallback scenario 1: coordination.type=none
+2025-11-02 15:01:59 | fxstein | DELETE | 15.9 | Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script
+2025-11-02 15:01:59 | fxstein | DELETE | 15.8 | Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md
+2025-11-02 15:01:59 | fxstein | DELETE | 15.7 | TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure
+2025-11-02 15:01:59 | fxstein | DELETE | 15.6 | Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools
+2025-11-02 15:01:59 | fxstein | DELETE | 15.5 | Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling
+2025-11-02 15:01:59 | fxstein | DELETE | 15.3 | JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors
+2025-11-02 15:01:59 | fxstein | DELETE | 15.2 | YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter
+2025-11-02 15:01:58 | fxstein | DELETE | 15.1 | Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config
+2025-11-02 15:01:58 | fxstein | DELETE | 15.4 | TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure
+2025-11-02 15:01:58 | fxstein | DELETE | fxstein-15 | - [D] **#fxstein-15** Test duplicate #1
+2025-11-02 15:01:57 | fxstein | DELETE | fxstein-14 | - [D] **#fxstein-14** Manual duplicate test task 2
+2025-11-02 15:01:56 | fxstein | DELETE | fxstein-13 | - [D] **#fxstein-13** Manual duplicate test task 1
+2025-11-02 15:01:55 | fxstein | DELETE | fxstein-12 | - [D] **#fxstein-12** Test duplicate #2 again
+2025-11-02 15:01:55 | fxstein | DELETE | fxstein-11 | - [D] **#fxstein-11** Test duplicate #2
+2025-11-02 15:01:54 | fxstein | DELETE | 104 | Test single-user mode task
+2025-11-02 15:01:53 | fxstein | DELETE | 103 | Test single-user mode task somthing else C
+2025-11-02 15:01:52 | fxstein | DELETE | 102 | Duplicate test task 2
+2025-11-02 15:01:51 | fxstein | DELETE | 101 | Add contributor section to release summary: list all contributors for each release
+2025-11-02 15:01:51 | fxstein | DELETE | 100 | Duplicate test task 1
+2025-11-02 15:01:50 | fxstein | DELETE | fxstein-10 | - [D] **#fxstein-10** Test duplicate #1 again
+2025-11-02 15:01:40 | fxstein | DELETE | 10
+100
+101
+102
+103
+104
+11
+12
+13
+14
+15
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+4
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+5
+50
+51
+52
+53
+55
+56
+57
+58
+59
+6
+60
+7
+8
+9
+fxstein-1
+fxstein-10
+fxstein-11
+fxstein-12
+fxstein-13
+fxstein-14
+fxstein-15
+fxstein-16
+fxstein-17
+fxstein-18
+fxstein-19
+fxstein-2
+fxstein-20
+fxstein-21
+fxstein-22
+fxstein-23
+fxstein-24
+fxstein-25
+fxstein-3
+fxstein-4
+fxstein-5
+fxstein-6
+fxstein-7
+fxstein-8
+fxstein-9
+main-1
+main-2
+main-3 | - [D] **#fxstein-24** Test yaml module check fix
+2025-11-02 15:01:30 | fxstein | DELETE | 10
+100
+101
+102
+103
+104
+11
+12
+13
+14
+15
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+4
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+5
+50
+51
+52
+53
+55
+56
+57
+58
+59
+6
+60
+7
+8
+9
+fxstein-1
+fxstein-10
+fxstein-11
+fxstein-12
+fxstein-13
+fxstein-14
+fxstein-15
+fxstein-16
+fxstein-17
+fxstein-18
+fxstein-19
+fxstein-2
+fxstein-20
+fxstein-21
+fxstein-22
+fxstein-23
+fxstein-24
+fxstein-25
+fxstein-3
+fxstein-4
+fxstein-5
+fxstein-6
+fxstein-7
+fxstein-8
+fxstein-9
+main-1
+main-2
+main-3 | - [D] **#fxstein-25** Test
+2025-11-02 15:00:10 | fxstein | ADD | fxstein-25 | Test
+2025-11-02 15:00:07 | fxstein | ADD | fxstein-24 | Test yaml module check fix
+2025-11-02 14:57:00 | fxstein | ADD | fxstein-23 | Another test
+2025-11-02 14:56:53 | fxstein | ADD | fxstein-22 | Test tag formatting with backticks
 2025-11-02 14:54:35 | fxstein | COMPLETE | 52.18 | Test fallback scenarios: verify graceful degradation when coordination services are unavailable
 2025-11-02 14:54:14 | fxstein | ADD | fxstein-21 | Test fallback scenario 5: CounterAPI unavailable (invalid namespace) #deleteme
 2025-11-02 14:54:09 | fxstein | ADD | fxstein-20 | Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues) #deleteme

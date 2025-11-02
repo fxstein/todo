@@ -23,11 +23,12 @@
   - [ ] **#47.2** Implement feature request command handler and template generation `#code`
   - [ ] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs`
 - [ ] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug`
+  - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs`
   - [ ] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test`
-  - [ ] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code`
-  - [ ] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code`
-  - [ ] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs`
-  - [ ] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research`
+  - [x] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code`
+  - [x] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code`
+  - [x] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs`
+  - [x] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research`
 - [ ] **#45** Enhance release process with pre-release support for beta/testing versions `#release`
   - [ ] **#45.8** Test pre-release creation and promotion workflow `#test`
   - [ ] **#45.7** Update release process documentation with pre-release workflow `#docs`
@@ -211,7 +212,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 01:09:49 CET 2025
+**Last Updated:** Sun Nov  2 01:20:40 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

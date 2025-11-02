@@ -777,10 +777,11 @@ fi
    - No new servers or services needed
    - Works with existing Git workflow
 
-4. **Prevents Most Conflicts:**
-   - MAX algorithm ensures no overlaps
-   - Immediate commit minimizes window
-   - Handles edge cases gracefully
+4. **Reduces and Resolves Conflicts:**
+   - MAX algorithm reduces conflicts (doesn't prevent all)
+   - Immediate commit minimizes conflict window
+   - Automatic conflict resolution handles conflicts gracefully
+   - Conflicts are expected and handled automatically
 
 5. **AI-Agent Friendly:**
    - All operations are automatic
@@ -791,14 +792,11 @@ fi
 
 ## Limitations and Trade-offs
 
-### Critical Limitation: Single Repository Scope
+### Critical Limitations
+
+#### 1. Single Repository Scope Only
 
 **This design only works within a single Git repository, not across forks or unreachable branches.**
-
-**What works:**
-- ✅ Multiple branches in the same repository
-- ✅ Multiple developers working on the same repository
-- ✅ Coordination via main branch and current branch remote
 
 **What does NOT work:**
 - ❌ **Multiple forks of the same repository** (cannot coordinate task numbers across forks)
@@ -815,23 +813,70 @@ fi
   - Complex (managing multiple remotes)
   - Incomplete (still can't see private forks)
 
+#### 2. Concurrent Branch Assignment Conflicts (Even Within Single Repo)
+
+**The MAX algorithm cannot prevent conflicts when multiple branches fetch simultaneously.**
+
+**The Problem:**
+- Branch A and Branch B both fetch from main at the same time (or nearly)
+- Both see the same max number (e.g., `#49`)
+- Both calculate the same next number (e.g., `#50`)
+- Both commit `#50` to their respective branches
+- Result: Duplicate task numbers across branches → conflicts at merge time
+
+**Why this happens:**
+- Git fetch operations are not atomic across branches
+- Even with MAX algorithm, concurrent fetches can occur
+- Time between fetch and commit creates a race condition window
+- Multiple developers working in parallel will inevitably create conflicts
+
 **Impact:**
-- Each fork maintains its own independent task numbering sequence
-- Task numbers may overlap between forks (e.g., Fork A has `#50`, Fork B also has `#50`)
-- When merging forks via pull requests, conflicts are resolved at merge time
-- This is **acceptable** for the use case: single-repo, multi-user collaboration
+- Task number conflicts are **expected and common** in multi-branch workflows
+- Conflicts are resolved at merge time via conflict resolution mechanism
+- This is a fundamental limitation of Git-based coordination (no true atomic assignment)
+
+**Example Scenario:**
+```
+Time 0: Main has #49
+Time 1: Branch A fetches main (sees #49), calculates #50
+Time 2: Branch B fetches main (sees #49), calculates #50  
+Time 3: Branch A commits #50 to Branch A
+Time 4: Branch B commits #50 to Branch B
+Time 5: Branch A merges to main → main has #50
+Time 6: Branch B tries to merge → CONFLICT: both have #50
+Time 7: Conflict resolution renumbers Branch B's #50 to #51
+```
+
+**Solution: Conflict Resolution (Not Prevention)**
+- Accept that conflicts will occur
+- Focus on **automatic conflict detection and resolution** rather than prevention
+- Renumber conflicting tasks automatically during merge
+- Update all references (subtasks, commit messages, relationships)
+
+**What the Design Actually Achieves:**
+- ✅ **Reduces conflicts**: MAX algorithm reduces conflicts compared to no coordination
+- ✅ **Detects conflicts**: Identifies duplicate task numbers during merge
+- ✅ **Resolves conflicts**: Automatically renumbers conflicting tasks at merge time
+- ✅ **Preserves sequential numbering**: After merge resolution, numbering is sequential
+
+**What the Design Does NOT Achieve:**
+- ❌ **Prevent all conflicts**: Concurrent branch operations will still create conflicts
+- ❌ **True atomic assignment**: Git doesn't provide atomic assignment across branches
+- ❌ **Zero-conflict guarantee**: Conflicts are expected and handled gracefully
 
 **Alternative Approaches (Not Implemented):**
-1. **External coordination service**: Use a shared API/service for task number assignment
+1. **External coordination service**: Use a shared API/service for task number assignment (requires central service)
 2. **UUID-based numbering**: Use UUIDs instead of sequential numbers (breaks simplicity)
 3. **Namespace-based numbering**: Prefix task numbers with branch/fork identifier (e.g., `feature-auth#50`)
 4. **Server-side assignment**: Require a central server for all task management (not distributed)
+5. **Lock-based assignment**: Use Git locks or external locking mechanism (complex, slow)
 
 **Chosen Approach Rationale:**
-- Git-based coordination works for the primary use case: single repository, multiple branches
-- Accepts limitation that it doesn't work across forks
-- Simplicity and effectiveness for the intended scope
-- Conflicts resolved at merge time (Git's native capability)
+- **Accept conflicts, handle gracefully**: Rather than trying to prevent all conflicts, accept they'll occur
+- **Focus on resolution**: Automatic conflict detection and resolution is more practical
+- **Balance simplicity and effectiveness**: Git-based coordination is simple; conflict resolution handles edge cases
+- **Works for intended scope**: Single repository, multi-branch collaboration with conflict resolution
+- **Trade-off**: Conflicts are acceptable because they're automatically resolved
 
 ### Other Limitations
 
@@ -939,9 +984,14 @@ The **Git-Based Atomic Assignment** architecture provides a robust solution for 
 **Scope and Limitations:**
 - ✅ Works for: Single repository, multiple branches, multiple developers
 - ❌ Does NOT work for: Multiple forks, cross-repository coordination, unreachable branches
-- ⚠️ Trade-off: Accepts that cross-fork conflicts are resolved at merge time
+- ⚠️ **Critical**: Even within single repo, concurrent branch operations will create conflicts
+- ✅ **Solution**: Automatic conflict detection and resolution handles conflicts gracefully
+- ⚠️ **Trade-off**: Accepts that conflicts occur, focuses on resolution rather than prevention
 
-This architecture balances simplicity with effectiveness for the intended use case: **single repository, multi-branch collaboration**. For multi-fork scenarios, task numbering conflicts are resolved during pull request merges (Git's native capability).
+This architecture balances simplicity with effectiveness for the intended use case: **single repository, multi-branch collaboration with conflict resolution**. The design acknowledges that conflicts will occur and focuses on automatic detection and resolution rather than preventing all conflicts.
+
+**Key Insight:**
+The MAX algorithm **reduces** conflicts but cannot **prevent** all conflicts due to the race condition window between fetch and commit. The design's strength is in **handling conflicts gracefully** rather than preventing them entirely.
 
 ---
 

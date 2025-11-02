@@ -553,6 +553,12 @@ main() {
         if echo "$line" | grep -qE "release/RELEASE_LOG\.log|^RELEASE_LOG\.log"; then
             continue
         fi
+        # Skip .todo.ai/.todo.ai.serial and .todo.ai/.todo.ai.log - these are normal operational files
+        # They change whenever tasks are added/completed, which is expected behavior
+        # Excluding them prevents blocking releases due to normal task management activity
+        if echo "$line" | grep -qE "\.todo\.ai/\.todo\.ai\.(serial|log)"; then
+            continue
+        fi
         # All other files are uncommitted
         if [[ -n "$line" ]]; then
             if [[ -n "$uncommitted" ]]; then
@@ -701,6 +707,19 @@ main() {
     if [[ "$summary_needs_commit" == true ]] && [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
         log_release_step "COMMIT SUMMARY" "Adding release summary file to commit: ${SUMMARY_FILE}"
         git add "$SUMMARY_FILE"
+    fi
+    
+    # Commit TODO.md and .todo.ai files if they're uncommitted (they should always be committed together)
+    local todo_status=$(git status -s | grep -E "(TODO\.md|\.todo\.ai/)" || echo "")
+    if [[ -n "$todo_status" ]]; then
+        if echo "$todo_status" | grep -q "TODO.md"; then
+            log_release_step "COMMIT TODO" "Adding TODO.md to commit"
+            git add TODO.md
+        fi
+        if echo "$todo_status" | grep -qE "\.todo\.ai/"; then
+            log_release_step "COMMIT TODO_DATA" "Adding .todo.ai/ files to commit"
+            git add .todo.ai/.todo.ai.serial .todo.ai/.todo.ai.log 2>/dev/null || true
+        fi
     fi
     
     local commit_msg="Bump version to $NEW_VERSION"

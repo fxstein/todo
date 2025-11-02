@@ -8,11 +8,10 @@
 - [ ] **#fxstein-12** Test duplicate #2 again #deleteme
 - [ ] **#fxstein-11** Test duplicate #2 #deleteme
 - [ ] **#fxstein-10** Test duplicate #1 again #deleteme
-- [ ] **#fxstein-9** Duplicate ID for conflict test #deleteme
-- [ ] **#fxstein-15** Test duplicate #1 #deleteme
+- [ ] **#fxstein-9** Test duplicate #1 #deleteme
 - [ ] **#fxstein-6** Test duplicate task #60 for conflict resolution #deleteme
-- [ ] **#60** Test single-user mode task somthing else D `#deleteme`
-- [ ] **#103** Test single-user mode task somthing else C `#deleteme`
+- [] **#60** Test single-user mode task somthing else D `#deleteme`
+- [] **#103** Test single-user mode task somthing else C `#deleteme`
 - [ ] **#fxstein-5** Test multi-user mode task something else B `#deleteme`
 - [ ] **#main-3** Test branch mode task `#deleteme`
 - [ ] **#fxstein-7** Test multi-user mode task something else A `#deleteme`
@@ -21,7 +20,7 @@
 - [x] **#104** Test single-user mode task `#deleteme`
 - [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
   - [ ] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
-  - [x] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
+  - [ ] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
   - [x] **#52.16** Test mode switching: verify migration, backup creation, and rollback functionality `#test`
   - [x] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
   - [x] **#52.14** Create user documentation: guide for adopting and switching between numbering modes `#docs`
@@ -271,7 +270,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 14:46:44 CET 2025
+**Last Updated:** Sun Nov  2 14:46:08 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

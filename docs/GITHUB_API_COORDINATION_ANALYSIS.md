@@ -405,6 +405,208 @@ Store task number in a discussion post (not practical).
 
 ---
 
+## Alternative: Free Cloud APIs & Storage Services
+
+Beyond GitHub APIs, several free cloud APIs and storage services provide atomic counter coordination capabilities:
+
+### 1. CounterAPI ⭐ (DEDICATED COUNTER SERVICE)
+
+**URL:** `https://api.counterapi.dev/v1/`
+
+**Service:** Dedicated counting/counter API service
+
+**Pros:**
+- ✅ **Designed for counting** - Purpose-built for counter use cases
+- ✅ **Free tier** - Unlimited API access on free plan
+- ✅ **REST API** - Simple HTTP requests
+- ✅ **No authentication required** - Works without tokens (for basic usage)
+- ✅ **Atomic operations** - Built-in atomic increment
+- ✅ **Works from anywhere** - Not tied to GitHub or repositories
+
+**Cons:**
+- ⚠️ **Third-party dependency** - Relies on external service
+- ⚠️ **Service availability** - Depends on CounterAPI being online
+- ⚠️ **Not repository-integrated** - Counter is separate from repository
+
+**Example Usage:**
+```bash
+# Get current value
+current_num=$(curl -s "https://api.counterapi.dev/v1/NAMESPACE/COUNTER_NAME" | jq '.value')
+
+# Increment atomically
+new_num=$(curl -s -X POST "https://api.counterapi.dev/v1/NAMESPACE/COUNTER_NAME/up" | jq '.value')
+```
+
+**Feasibility:** Very promising - dedicated service for this exact use case!
+
+---
+
+### 2. Abacus (Free Counting API)
+
+**URL:** `https://v2.jasoncameron.dev/abacus/api/`
+
+**Service:** Free counting API with namespaces
+
+**Pros:**
+- ✅ **Free counting API** - Purpose-built for counters
+- ✅ **Namespace support** - Can organize counters by namespace
+- ✅ **REST API** - Simple HTTP requests
+- ✅ **Optional expiration** - Counters can have expiration dates
+
+**Cons:**
+- ⚠️ **Third-party dependency** - Relies on external service
+- ⚠️ **Service availability** - Depends on service being online
+- ⚠️ **Not repository-integrated** - Counter is separate from repository
+
+**Feasibility:** Good option - similar to CounterAPI
+
+---
+
+### 3. Firebase Firestore
+
+**URL:** `https://firestore.googleapis.com/v1/`
+
+**Service:** Google's NoSQL database with free tier
+
+**Pros:**
+- ✅ **Atomic transactions** - True atomic read-modify-write operations
+- ✅ **Free tier** - Generous free quota (50K reads/day, 20K writes/day)
+- ✅ **Google infrastructure** - Highly reliable and scalable
+- ✅ **SDK support** - Official SDKs for many languages
+- ✅ **Real-time sync** - Can listen to changes in real-time
+
+**Cons:**
+- ⚠️ **Requires Google account** - Users need Firebase project setup
+- ⚠️ **Authentication needed** - Requires Firebase authentication
+- ⚠️ **Not repository-integrated** - Counter is separate from repository
+- ⚠️ **More complex setup** - Requires Firebase project configuration
+
+**Example Usage:**
+```javascript
+// Using Firebase Admin SDK
+const counterRef = db.collection('counters').doc('taskCounter');
+const newValue = await db.runTransaction(async (transaction) => {
+    const counter = await transaction.get(counterRef);
+    const newCount = (counter.data()?.value || 0) + 1;
+    transaction.update(counterRef, { value: newCount });
+    return newCount;
+});
+```
+
+**Feasibility:** Excellent atomic operations, but requires Firebase setup
+
+---
+
+### 4. Cloudflare Durable Objects
+
+**URL:** Cloudflare Workers with Durable Objects
+
+**Service:** Cloudflare's edge computing with transactional storage
+
+**Pros:**
+- ✅ **Atomic operations** - Strong consistency guarantees
+- ✅ **Free tier** - Generous free quota
+- ✅ **Global distribution** - Low latency worldwide
+- ✅ **Transactional storage** - Built-in atomic operations
+
+**Cons:**
+- ⚠️ **Requires Cloudflare account** - Users need Cloudflare setup
+- ⚠️ **More complex** - Requires Workers deployment
+- ⚠️ **Not repository-integrated** - Counter is separate from repository
+- ⚠️ **JavaScript/TypeScript** - Primarily for Workers platform
+
+**Feasibility:** Good atomic operations, but requires Cloudflare platform
+
+---
+
+### 5. JSONBin.io
+
+**URL:** `https://api.jsonbin.io/v3/`
+
+**Service:** Free JSON storage API
+
+**Pros:**
+- ✅ **Free tier** - Free JSON storage
+- ✅ **REST API** - Simple HTTP requests
+- ✅ **JSON-based** - Easy to store counter data
+- ✅ **Version history** - Tracks changes over time
+
+**Cons:**
+- ⚠️ **Not truly atomic** - Requires read-modify-write with retry
+- ⚠️ **Rate limits** - Free tier has rate limits
+- ⚠️ **Third-party dependency** - Relies on external service
+- ⚠️ **Not repository-integrated** - Counter is separate from repository
+
+**Feasibility:** Good for simple storage, but not atomic by default
+
+---
+
+### 6. Google Sheets API
+
+**URL:** `https://sheets.googleapis.com/v4/`
+
+**Service:** Google Sheets as database
+
+**Pros:**
+- ✅ **Free tier** - Google Sheets is free
+- ✅ **Familiar interface** - Users can see/edit in spreadsheet
+- ✅ **REST API** - Simple HTTP requests
+- ✅ **Visible/auditable** - Changes visible in spreadsheet
+
+**Cons:**
+- ⚠️ **Not truly atomic** - Requires read-modify-write with retry
+- ⚠️ **Requires OAuth** - Google authentication needed
+- ⚠️ **Rate limits** - API has rate limits
+- ⚠️ **Slower** - Not optimized for high-frequency updates
+
+**Feasibility:** Usable but not ideal - not atomic by default
+
+---
+
+## Comparison: Free Cloud APIs vs GitHub APIs
+
+| Service | Atomic Operations | Free Tier | Fork Support | Repository Integration | Setup Complexity |
+|---------|------------------|-----------|--------------|------------------------|------------------|
+| **CounterAPI** | ✅ Yes | ✅ Unlimited | ✅ Yes | ❌ No | ⭐ Very Easy |
+| **Abacus** | ✅ Yes | ✅ Free | ✅ Yes | ❌ No | ⭐ Very Easy |
+| **Firebase Firestore** | ✅ Yes | ✅ 50K reads/day | ✅ Yes | ❌ No | ⚠️ Medium |
+| **Cloudflare Durable** | ✅ Yes | ✅ Free tier | ✅ Yes | ❌ No | ⚠️ Complex |
+| **JSONBin.io** | ⚠️ Partial | ✅ Free | ✅ Yes | ❌ No | ⭐ Easy |
+| **GitHub Issues (Comments)** | ⚠️ Partial | ✅ Free | ✅ Yes | ✅ Yes | ⭐ Easy |
+| **GitHub Contents** | ✅ Yes | ✅ Free | ❌ No | ✅ Yes | ⭐ Easy |
+
+---
+
+## Recommendation: CounterAPI or Abacus for Simple Counter Use
+
+**For a simple, dedicated counter service:**
+
+1. **CounterAPI or Abacus** - Purpose-built for counters, very easy to use
+   - ✅ Simple REST API
+   - ✅ No authentication needed (basic usage)
+   - ✅ Atomic operations built-in
+   - ✅ Works for forks (no repository dependency)
+   - ⚠️ Third-party dependency (service availability risk)
+
+2. **Firebase Firestore** - For more robust needs
+   - ✅ True atomic transactions
+   - ✅ Free tier with generous limits
+   - ✅ Google infrastructure (highly reliable)
+   - ⚠️ Requires Firebase setup
+
+3. **GitHub Issues API** - For repository integration
+   - ✅ Repository-integrated
+   - ✅ Works for forks
+   - ✅ Visible in repository
+   - ⚠️ Not truly atomic (can retry)
+
+**Best Overall Option:**
+- **CounterAPI or Abacus** - If you want simplest solution, dedicated counter service
+- **GitHub Issues API** - If you want repository integration
+- **Firebase Firestore** - If you need true atomic transactions and don't mind setup
+
+---
+
 ## Next Steps
 
 1. **Verify SHA-based locking** - Test with concurrent requests to confirm optimistic locking works
@@ -414,4 +616,5 @@ Store task number in a discussion post (not practical).
 5. **Design authentication flow** - Token validation, error messages for missing permissions
 6. **Consider fallback** - What happens if API unavailable (offline mode)
 7. **Security documentation** - Guide for users on setting up tokens and permissions
+8. **Evaluate CounterAPI/Abacus** - Test dedicated counter services as alternative to GitHub APIs
 

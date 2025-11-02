@@ -75,8 +75,8 @@ get_config_value() {
         fi
     fi
     
-    # Fallback to Python if available
-    if command -v python3 >/dev/null 2>&1; then
+    # Fallback to Python if available (with yaml module)
+    if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
         local value=$(python3 <<EOF
 import yaml
 import sys
@@ -861,8 +861,8 @@ switch_mode() {
         # Try yq first
         if command -v yq >/dev/null 2>&1; then
             yq eval ".mode = \"$new_mode\"" -i "$config_file" 2>/dev/null || {
-                # Fallback to Python
-                if command -v python3 >/dev/null 2>&1; then
+                # Fallback to Python (with yaml module)
+                if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
                     python3 <<EOF
 import yaml
 import sys

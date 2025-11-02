@@ -228,7 +228,9 @@ analyze_commits() {
         # Default is PATCH - we only need to check for MAJOR and MINOR
         
         # Check for MAJOR - Breaking changes (highest priority)
-        if [[ "$lower_commit" =~ (breaking|break|major|!:) ]] || 
+        # Check for explicit MAJOR tag in commit message (case-insensitive)
+        if echo "$commit" | grep -qiE "(#MAJOR|#major)" || 
+           [[ "$lower_commit" =~ (breaking|break|!:) ]] || 
            [[ "$lower_commit" =~ ^(feat|fix|refactor|perf)!: ]]; then
             commit_level="major"
         # Check for MINOR - User-facing features

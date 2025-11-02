@@ -1,37 +1,18 @@
-# Release Summary: Fix Update Command for System-Wide Installations
+# Release Summary
 
-This release addresses a critical bug where the `update` command failed when `todo.ai` was installed to a system directory in PATH (e.g., `/usr/local/bin` or `/usr/bin`). The issue was reported in GitHub issue #17 and affected users who installed `todo.ai` system-wide for global access.
+This release introduces a comprehensive multi-user, multi-branch, and PR support system for todo.ai with conflict-free task numbering, along with extensive documentation improvements.
 
-## Key Improvements
+The most significant feature is the implementation of a hybrid task numbering system that supports four distinct modes: single-user, multi-user, branch-based, and enhanced multi-user with atomic coordination. This system enables teams to collaborate on shared TODO.md files without numbering conflicts, thanks to prefix-based task IDs and optional atomic coordination via GitHub Issues or CounterAPI. The enhanced mode provides true conflict-free numbering across multiple developers and branches, while maintaining backward compatibility with existing single-user installations.
 
-**Fixed Update Command for System-Wide Installations:**
-- Enhanced the `get_script_path()` function to properly detect the script location when installed system-wide
-- Added support for locating the script via `command -v` and `which` when executed from PATH
-- Implemented robust path validation and absolute path conversion with fallback to `realpath`
-- The update command now works correctly regardless of installation method (local project directory or system-wide PATH installation)
+Additionally, this release includes a complete getting started guide with interactive setup wizard, making todo.ai accessible to new users with step-by-step configuration. The documentation has been significantly expanded with a comprehensive index, usage patterns for various development scenarios, and detailed coordination setup instructions. The setup wizard automatically detects system capabilities and guides users through mode selection and coordination configuration, removing barriers to adoption.
 
-## Technical Details
+**Technical highlights:**
+- Hybrid numbering system with four modes: single-user, multi-user, branch, and enhanced
+- Atomic coordination via GitHub Issues API and CounterAPI for conflict-free numbering
+- Automatic mode switching with backup and rollback capabilities
+- Conflict detection and automatic resolution for duplicate task IDs
+- Comprehensive documentation including getting started guide and usage patterns
+- Interactive setup wizard with automatic prerequisite detection
 
-The fix implements a multi-strategy approach to locate the script:
-1. First tries zsh-specific absolute path expansion (for direct execution)
-2. Uses `command -v`/`which` to find the script in PATH (for system-wide installations)
-3. Falls back to current directory and relative path detection
-
-This ensures compatibility with all installation scenarios while maintaining backward compatibility with existing local installations.
-
-## Usage
-
-For AI Agents:
-```bash
-Fix update command for system-wide installations
-```
-
-For Humans:
-```bash
-Tell todo.ai to update itself: todo.ai update
-```
-
----
-
-**Fixes:** GitHub issue #17  
-**Task:** #55
+**Task:** #52  
+**Commit:** ([7849e66](https://github.com/fxstein/todo.ai/commit/7849e66))

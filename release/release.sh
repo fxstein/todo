@@ -582,14 +582,33 @@ main() {
         fi
     fi
     
+    # Auto-commit any remaining uncommitted changes (except those already handled)
     if [[ -n "$uncommitted" ]]; then
-        echo -e "${RED}❌ Error: Uncommitted changes detected${NC}"
+        echo -e "${YELLOW}⚠️  Auto-committing uncommitted changes before release...${NC}"
         echo "Uncommitted files:"
         echo -e "$uncommitted"
         echo ""
-        echo "Please commit or stash changes before releasing"
-        log_release_step "ERROR - Uncommitted Changes" "Release aborted due to uncommitted changes:\n\n$uncommitted"
-        exit 1
+        
+        # Add all remaining uncommitted files
+        local uncommitted_files=$(echo -e "$uncommitted" | sed 's/^[?AM] */ /' | sed 's/^ //' | grep -v "^$" || true)
+        for file in ${uncommitted_files[@]}; do
+            if [[ -f "$file" ]]; then
+                echo "Adding: $file"
+                git add "$file"
+            fi
+        done
+        
+        # Commit with a generic message
+        local auto_commit_msg="chore: Auto-commit changes before release"
+        git commit -m "$auto_commit_msg" || {
+            echo -e "${RED}❌ Error: Failed to auto-commit changes${NC}"
+            echo "Please commit or stash changes manually before releasing"
+            log_release_step "ERROR - Auto-Commit Failed" "Failed to auto-commit uncommitted changes"
+            exit 1
+        }
+        log_release_step "AUTO-COMMIT" "Auto-committed uncommitted changes: $uncommitted"
+        echo -e "${GREEN}✓ Changes auto-committed${NC}"
+        echo ""
     fi
     
     # Get current version

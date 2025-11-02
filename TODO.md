@@ -3,6 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent `#bug`
+  - [ ] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test`
+  - [ ] **#126.3** Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode) `#bug`
+  - [ ] **#126.2** Verify coordination should work with single-user mode without forcing enhanced (verified - validation supports single-user + coordination) `#bug`
+  - [ ] **#126.1** Investigate setup-coordination command mode switching logic (completed - found hardcoded mode: enhanced on line 3353) `#bug`
 - [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
   - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
@@ -308,6 +313,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 20:30:07 CET 2025
+**Last Updated:** Sun Nov  2 23:25:05 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

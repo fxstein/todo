@@ -3347,10 +3347,12 @@ setup_coordination() {
     mkdir -p "$config_dir" 2>/dev/null || return 1
     
     # Ensure config file exists
+    # Get current mode (defaults to single-user if no config exists)
+    local current_mode=$(get_numbering_mode)
     if [[ ! -f "$config_file" ]]; then
         cat > "$config_file" <<EOF
 # todo.ai Configuration File
-mode: enhanced
+mode: $current_mode
 coordination:
   type: none
   fallback: multi-user

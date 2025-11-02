@@ -494,13 +494,11 @@ git push origin fix/authentication-bug
 ```
 
 ### Pattern 2: Multi-User Mode
-```json
-{
-  "mode": "multi-user",
-  "coordination": {
-    "type": "none"
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+mode: multi-user
+coordination:
+  type: none
 ```
 
 ### Pattern 2: Enhanced Multi-User Mode

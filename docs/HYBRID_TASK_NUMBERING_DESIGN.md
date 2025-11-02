@@ -2,6 +2,8 @@
 
 ## Overview
 
+> **Related Documentation:** See [Usage Patterns](USAGE_PATTERNS.md) for practical examples of how to use these numbering modes in different development scenarios.
+
 This document designs a hybrid task numbering system for `todo.ai` that supports multiple modes of operation, from simple single-user sequential numbering to sophisticated multi-user coordination with conflict resolution.
 
 **Key Philosophy:**

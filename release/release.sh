@@ -192,55 +192,128 @@ analyze_commits() {
         return
     fi
     
-    # Priority 1: Check for explicit backend prefixes (fastest, explicit)
-    if echo "$commits" | grep -qiE "^(backend|infra|release|internal):"; then
-        echo "patch"
-        return
+    # Scan all commits and classify each by release level
+    # We step down from highest to lowest: MAJOR > MINOR > PATCH
+    # A single MAJOR commit makes the entire release MAJOR
+    # A single MINOR commit (with no MAJOR) makes the entire release MINOR
+    # Otherwise, it's PATCH
+    
+    local highest_level="patch"
+    
+    # Get individual commit hashes to check per-commit file changes
+    local commit_hashes
+    if [[ "$commit_range" == "HEAD" ]]; then
+        commit_hashes=$(git log "$commit_range" --pretty=format:"%H" --no-merges 2>/dev/null || echo "")
+    elif [[ ! "$commit_range" =~ \.\. ]]; then
+        commit_hashes="$commit_range"
+    else
+        commit_hashes=$(git log "$commit_range" --pretty=format:"%H" --no-merges 2>/dev/null || echo "")
     fi
     
-    # Priority 2: Check for backend-only file changes (catches forgotten prefixes)
-    if is_backend_only_release "$commit_range"; then
-        echo "patch"
-        return
-    fi
-    
-    # Priority 3: Continue with existing keyword analysis (frontend/mixed releases)
-    local breaking_count=0
-    local feature_count=0
-    local fix_count=0
-    local other_count=0
-    
-    while IFS= read -r commit || [[ -n "$commit" ]]; do
-        [[ -z "$commit" ]] && continue
-        local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]' 2>/dev/null || echo "$commit")
+    # Process each commit individually
+    while IFS= read -r commit_hash || [[ -n "$commit_hash" ]]; do
+        [[ -z "$commit_hash" ]] && continue
         
-        # Check for breaking changes
+        # Get commit message for this specific commit
+        local commit=$(git log -1 --pretty=format:"%s" "$commit_hash" 2>/dev/null || echo "")
+        [[ -z "$commit" ]] && continue
+        
+        local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]' 2>/dev/null || echo "$commit")
+        local commit_level="patch"
+        
+        # Get files changed in this specific commit
+        local commit_files=$(git diff-tree --no-commit-id --name-only -r "$commit_hash" 2>/dev/null || echo "")
+        
+        # Classify this commit by stepping down from highest to lowest level
+        # Default is PATCH - we only need to check for MAJOR and MINOR
+        
+        # Check for MAJOR - Breaking changes (highest priority)
         if [[ "$lower_commit" =~ (breaking|break|major|!:) ]] || 
            [[ "$lower_commit" =~ ^(feat|fix|refactor|perf)!: ]]; then
-            breaking_count=$((breaking_count + 1))
-        # Check for features
-        elif [[ "$lower_commit" =~ ^(feat|feature): ]] || 
-             [[ "$lower_commit" =~ (add|new|implement|create|support) ]]; then
-            feature_count=$((feature_count + 1))
-        # Check for fixes
-        elif [[ "$lower_commit" =~ ^(fix|bugfix|patch): ]] || 
-             [[ "$lower_commit" =~ (fix|bug|patch|hotfix|correct) ]]; then
-            fix_count=$((fix_count + 1))
-        else
-            other_count=$((other_count + 1))
+            commit_level="major"
+        # Check for MINOR - User-facing features
+        elif [[ "$lower_commit" =~ ^(feat|feature): ]]; then
+            # Check if this is a user-facing feature based on files changed in this commit
+            local todo_ai_changed=false
+            local cursor_rules_changed=false
+            
+            # Skip if explicitly marked as backend
+            if echo "$commit" | grep -qiE "(backend|infra|release|internal|refactor|developer)"; then
+                # Explicitly backend - stays PATCH (default)
+                commit_level="patch"
+            elif echo "$commit_files" | grep -q "^todo\.ai$"; then
+                # todo.ai changed - assume user-facing unless explicitly backend
+                commit_level="minor"
+            elif echo "$commit_files" | grep -q "^\.cursor/rules/"; then
+                # .cursor/rules/ changed - assume user-facing unless explicitly backend
+                commit_level="minor"
+            else
+                # feat: prefix but no specific file checks - assume user-facing
+                commit_level="minor"
+            fi
+        # Check for MINOR - Feature keywords (if not backend-only)
+        elif [[ "$lower_commit" =~ (add|new|implement|create|support) ]]; then
+            # Check if this commit only changed backend files
+            local has_frontend=false
+            local has_backend=false
+            
+            while IFS= read -r file || [[ -n "$file" ]]; do
+                [[ -z "$file" ]] && continue
+                
+                # Check if frontend (user-facing docs or todo.ai)
+                if [[ "$file" == "README.md" ]] || [[ "$file" == "todo.ai" ]] || 
+                   [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
+                    if [[ "$file" != "docs/TEST_PLAN.md" ]]; then
+                        has_frontend=true
+                    fi
+                fi
+                
+                # Check if backend (infrastructure)
+                if [[ "$file" =~ ^(release/release\.sh|\.cursor/rules/|\.todo\.ai/|tests/|release/RELEASE_SUMMARY\.md|release/RELEASE_LOG\.log|release/RELEASE_PROCESS\.md|docs/TEST_PLAN\.md|release/RELEASE_NUMBERING_ANALYSIS\.md)$ ]] ||
+                   [[ "$file" =~ ^release/ ]] || [[ "$file" =~ ^\.cursor/rules/ ]] ||
+                   [[ "$file" =~ ^\.todo\.ai/ ]] || [[ "$file" =~ ^tests/ ]]; then
+                    has_backend=true
+                fi
+            done <<< "$commit_files"
+            
+            # If only backend files changed in this commit, it stays PATCH (default)
+            # Otherwise, it's MINOR
+            if [[ "$has_backend" == true ]] && [[ "$has_frontend" == false ]]; then
+                # Backend-only - stays PATCH (default)
+                commit_level="patch"
+            else
+                commit_level="minor"
+            fi
         fi
-    done <<< "$commits"
+        # Everything else defaults to PATCH (commit_level="patch" already set above)
+        
+        # Update highest level if this commit has a higher priority
+        case "$commit_level" in
+            major)
+                # MAJOR is highest possible, no need to check other commits
+                echo "major"
+                return
+                ;;
+            minor)
+                # Only upgrade to minor if we haven't found a major yet
+                if [[ "$highest_level" != "major" ]]; then
+                    highest_level="minor"
+                fi
+                ;;
+            patch)
+                # Keep patch as lowest level (default)
+                ;;
+        esac
+    done <<< "$commit_hashes"
     
-    # Determine bump type
-    if [[ $breaking_count -gt 0 ]]; then
-        echo "major"
-    elif [[ $feature_count -gt 0 ]]; then
-        echo "minor"
-    elif [[ $fix_count -gt 0 ]] || [[ $other_count -gt 0 ]]; then
+    # If highest level is still patch, check if entire release is backend-only
+    if [[ "$highest_level" == "patch" ]] && is_backend_only_release "$commit_range"; then
         echo "patch"
-    else
-        echo "patch"
+        return
     fi
+    
+    # Return the highest level found
+    echo "$highest_level"
 }
 
 # Calculate next version

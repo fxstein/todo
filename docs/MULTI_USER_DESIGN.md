@@ -4,6 +4,8 @@
 
 This document proposes the solution architecture for conflict-free task numbering in a multi-user, multi-branch, and pull request environment for `todo.ai`.
 
+**Scope:** This design is intended for **single Git repository** scenarios where multiple users work on different branches within the same repository. It does **not** support coordination across forks or completely independent repositories.
+
 ## Decision Summary
 
 **Selected Approach:** Git-Based Atomic Assignment (Option 1)
@@ -789,13 +791,57 @@ fi
 
 ## Limitations and Trade-offs
 
+### Critical Limitation: Single Repository Scope
+
+**This design only works within a single Git repository, not across forks or unreachable branches.**
+
+**What works:**
+- ✅ Multiple branches in the same repository
+- ✅ Multiple developers working on the same repository
+- ✅ Coordination via main branch and current branch remote
+
+**What does NOT work:**
+- ❌ **Multiple forks of the same repository** (cannot coordinate task numbers across forks)
+- ❌ **Multiple remote repositories** (cannot see task numbers in other remotes)
+- ❌ **Completely independent branches** (cannot coordinate if branches never merge)
+- ❌ **Cross-fork collaboration** (each fork would have its own task numbering sequence)
+
+**Why this limitation exists:**
+- Git-based coordination requires access to all branches/remotes being coordinated
+- Forks are separate repositories with separate Git histories
+- We cannot fetch or query branches from forks we don't have access to
+- Even if we could, fetching ALL remote branches from ALL forks would be:
+  - Expensive (network overhead)
+  - Complex (managing multiple remotes)
+  - Incomplete (still can't see private forks)
+
+**Impact:**
+- Each fork maintains its own independent task numbering sequence
+- Task numbers may overlap between forks (e.g., Fork A has `#50`, Fork B also has `#50`)
+- When merging forks via pull requests, conflicts are resolved at merge time
+- This is **acceptable** for the use case: single-repo, multi-user collaboration
+
+**Alternative Approaches (Not Implemented):**
+1. **External coordination service**: Use a shared API/service for task number assignment
+2. **UUID-based numbering**: Use UUIDs instead of sequential numbers (breaks simplicity)
+3. **Namespace-based numbering**: Prefix task numbers with branch/fork identifier (e.g., `feature-auth#50`)
+4. **Server-side assignment**: Require a central server for all task management (not distributed)
+
+**Chosen Approach Rationale:**
+- Git-based coordination works for the primary use case: single repository, multiple branches
+- Accepts limitation that it doesn't work across forks
+- Simplicity and effectiveness for the intended scope
+- Conflicts resolved at merge time (Git's native capability)
+
+### Other Limitations
+
 1. **Requires Git:**
    - Not applicable to non-Git repositories
    - Requires network access for coordination
    - Fails gracefully if Git unavailable
 
 2. **Small Conflict Window:**
-   - Rare conflicts still possible
+   - Rare conflicts still possible (even within single repo)
    - Requires conflict resolution mechanism
    - May need manual intervention in edge cases
 

@@ -49,24 +49,32 @@ gh api -X PATCH gists/GIST_ID \
 
 ---
 
-### 2. GitHub Issues API
+### 2. GitHub Issues API ⭐ (BEST FOR FORKS)
 
 **URL:** `https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}`
 
 **Endpoints:**
 - `GET /repos/{owner}/{repo}/issues/{issue_number}` - Retrieve issue
-- `PATCH /repos/{owner}/{repo}/issues/{issue_number}` - Update issue
+- `PATCH /repos/{owner}/{repo}/issues/{issue_number}` - Update issue (requires write access)
 - `POST /repos/{owner}/{repo}/issues` - Create new issue
+- `POST /repos/{owner}/{repo}/issues/{issue_number}/comments` - Comment on issue
 
 **Use Case:**
-Store the current "next available task number" in a dedicated Issue's body or title.
+Store the current "next available task number" in a dedicated Issue's body. **OR** use issue comments to append atomic updates.
+
+**CRITICAL ADVANTAGE: Fork Contributors CAN Interact!**
+- ✅ **Fork contributors CAN create/comment on upstream issues** - No write access needed!
+- ✅ **Public repo access:** Only needs `public_repo` scope (not full write access)
+- ✅ **Works for open source:** Fork contributors can participate in coordination
+- ✅ **Read access sufficient:** Can create and comment on issues with just read access
 
 **Pros:**
+- ✅ **Fork-friendly:** Fork contributors can interact with upstream issues
 - ✅ Repository-scoped (visible in repository)
-- ✅ Can be locked (prevent edits)
 - ✅ Accessible via GitHub CLI (`gh`)
 - ✅ Integrates with repository workflow
 - ✅ Can use labels, milestones for metadata
+- ✅ **Lower permission requirement:** `public_repo` scope enough for public repos
 
 **Cons:**
 - ⚠️ **ETag/optimistic locking support unclear** - Need to verify conditional requests
@@ -74,8 +82,11 @@ Store the current "next available task number" in a dedicated Issue's body or ti
 - ⚠️ **Concurrency handling:** May need retry logic
 - ⚠️ **Repository-specific** - Requires repository context
 - ⚠️ **Issues are meant for bugs/features** - Using for coordination is unconventional
+- ⚠️ **Cannot update existing issue** without write access (can only create/comment)
 
-**Implementation Example:**
+**Two Implementation Approaches:**
+
+**Approach 1: Update Issue Body (Requires Write Access)**
 ```bash
 # Get current number from issue body
 current_num=$(gh api repos/:owner/:repo/issues/:issue_number --jq '.body' | grep -oP '\d+')
@@ -85,11 +96,33 @@ new_num=$((current_num + 1))
 gh api -X PATCH repos/:owner/:repo/issues/:issue_number \
   --field "body=Current next task number: $new_num"
 ```
+- ⚠️ **Requires write access** - Only works for collaborators
+- ⚠️ **Not suitable for forks** - Fork contributors cannot update
+
+**Approach 2: Append Comments (Works for Forks!)**
+```bash
+# Get latest task number from issue comments
+latest_comment=$(gh api repos/:owner/:repo/issues/:issue_number/comments --jq '.[0].body')
+
+# Extract number from comment
+current_num=$(echo "$latest_comment" | grep -oP '\d+')
+
+# Increment and append as new comment
+new_num=$((current_num + 1))
+gh api -X POST repos/:owner/:repo/issues/:issue_number/comments \
+  --field "body=Next task number: $new_num"
+```
+- ✅ **Works for fork contributors** - Can comment without write access
+- ✅ **Atomic assignment possible** - Last comment wins
+- ✅ **Works for open source** - Fork contributors can participate
 
 **Atomicity:**
-- ⚠️ **Not truly atomic** - Requires read-modify-write
-- ⚠️ **Race conditions possible**
-- ✅ **Can use retry logic**
+- ⚠️ **Not truly atomic** - Requires read-modify-write or read-comment
+- ⚠️ **Race conditions possible** - Two users can read same number
+- ✅ **Can use retry logic** - Check latest comment, retry if changed
+- ✅ **Comment-based approach** - Last comment with highest number wins (simpler)
+
+**This is the BEST option for fork-based workflows!**
 
 ---
 
@@ -290,12 +323,13 @@ Store task number in a discussion post (not practical).
 
 ## Comparison Table
 
-| API | Atomic Assignment | Optimistic Locking | Repository Scope | Offline Support | Rate Limit |
-|-----|------------------|-------------------|------------------|-----------------|------------|
+| API | Atomic Assignment | Optimistic Locking | Repository Scope | Fork Support | Rate Limit |
+|-----|------------------|-------------------|------------------|--------------|------------|
+| **Issues (Comments)** | ⚠️ Partial | ❌ No (retry only) | ✅ Yes | ✅ **YES** | 5,000/hr |
 | **Repository Contents** | ✅ Yes (with SHA) | ✅ Yes (SHA-based) | ✅ Yes | ❌ No | 5,000/hr |
-| Gists | ⚠️ Partial | ❌ No (retry only) | ❌ No | ❌ No | 5,000/hr |
-| Issues | ⚠️ Partial | ❌ No (retry only) | ✅ Yes | ❌ No | 5,000/hr |
-| Git-based | ❌ No | ❌ No | ✅ Yes | ✅ Yes | N/A |
+| Gists | ⚠️ Partial | ❌ No (retry only) | ❌ No | ⚠️ Partial | 5,000/hr |
+| Issues (Update) | ⚠️ Partial | ❌ No (retry only) | ✅ Yes | ❌ No | 5,000/hr |
+| Git-based | ❌ No | ❌ No | ✅ Yes | ❌ No | N/A |
 
 ---
 

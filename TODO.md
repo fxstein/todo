@@ -212,6 +212,6 @@
 ---
 
 **Last Updated:** Sun Nov  2 01:02:22 CET 2025
-**Repository:** https://github.com/fxstein/todo.ai 
+**Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

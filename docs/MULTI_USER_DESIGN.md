@@ -25,16 +25,24 @@ Instead of requiring a central server (like GitHub Issues or JIRA), we use Git i
 ```
 User Action: Add Task
     ↓
-1. Git Pull (get latest state)
+1. Git Pull from main (get latest authoritative state)
     ↓
 2. Calculate MAX(local, remote) + 1
     ↓
 3. Assign task number
     ↓
-4. Commit immediately
+4. Commit immediately (local commit)
     ↓
-5. Done (minimal conflict window)
+5. Push to current branch (make visible to others)
+    ↓
+6. Done (minimal conflict window)
 ```
+
+**Key Points:**
+- **Pull from main**: Always pull from main branch to get authoritative task numbers
+- **Commit locally**: Commit changes to current branch (feature branch or main)
+- **Push to current branch**: Push immediately after commit to make changes visible
+- **Serial file coordination**: Serial file is synchronized across all branches via main
 
 ---
 
@@ -44,9 +52,14 @@ User Action: Add Task
 
 **Purpose:** Synchronize with remote state before assigning task numbers.
 
+**Critical Decision: Pull from main branch, not current branch**
+
+Each branch has its own copy of the serial file, but we need to coordinate with the authoritative source (main branch) to ensure task numbers are sequential across all branches.
+
 **Implementation:**
-- Perform `git pull` (or equivalent) before assigning new task numbers
+- Perform `git pull` from **main branch** before assigning new task numbers
 - Target only `TODO.md` and `.todo.ai/.todo.ai.serial` files
+- Merge main's serial file state into current branch
 - Handle pull failures gracefully (network issues, authentication, etc.)
 
 **When to Pull:**
@@ -56,12 +69,27 @@ User Action: Add Task
 
 **Pull Strategy:**
 ```bash
-# Silent pull (no output if no changes)
-git pull --quiet origin <branch> -- TODO.md .todo.ai/.todo.ai.serial 2>/dev/null || true
+# Pull from main branch (authoritative source)
+# Get main's TODO.md and serial file for coordination
+git fetch origin main --quiet 2>/dev/null || true
 
-# If pull fails, continue with local state (better than blocking)
-# User can retry or resolve manually
+# Check out main's version of TODO.md and serial file temporarily
+# (for comparison, not replacement)
+git show origin/main:TODO.md > "$TODO_FILE.tmp.main" 2>/dev/null || true
+git show origin/main:.todo.ai/.todo.ai.serial > "$SERIAL_FILE.tmp.main" 2>/dev/null || true
+
+# Use these for MAX calculation (see step 2)
 ```
+
+**Why pull from main?**
+- Main branch is the authoritative source of truth for task numbers
+- Feature branches should coordinate with main, not with each other
+- Prevents conflicts when merging branches back to main
+- Ensures sequential numbering across the entire repository
+
+**Alternative: Pull from upstream/base branch**
+- If on a feature branch, could pull from the branch's base (parent branch)
+- But main is simpler and ensures consistency across all branches
 
 ---
 
@@ -103,21 +131,43 @@ get_highest_task_number() {
 # Calculate next safe task number
 calculate_next_task_number() {
     local local_file="$TODO_FILE"
-    local remote_file="${TODO_FILE}.remote"  # From git pull
     
+    # Get main's TODO.md content (from git_pull_todo_files)
+    local main_todo="${MAIN_TODO_CONTENT:-}"
+    local main_todo_file=""
+    
+    # If we have main's content, write it to temp file for comparison
+    if [[ -n "$main_todo" ]]; then
+        main_todo_file=$(mktemp)
+        echo "$main_todo" > "$main_todo_file"
+    fi
+    
+    # Find highest task number in local TODO.md
     local local_max=$(get_highest_task_number "$local_file")
-    local remote_max=0
     
-    if [[ -f "$remote_file" ]]; then
-        remote_max=$(get_highest_task_number "$remote_file")
+    # Find highest task number in main's TODO.md
+    local main_max=0
+    if [[ -n "$main_todo_file" ]] && [[ -f "$main_todo_file" ]]; then
+        main_max=$(get_highest_task_number "$main_todo_file")
+        rm -f "$main_todo_file"
+    fi
+    
+    # Also check main's serial file (if available)
+    local main_serial="${MAIN_SERIAL_CONTENT:-}"
+    if [[ -n "$main_serial" ]] && [[ "$main_serial" =~ ^[0-9]+$ ]]; then
+        # Serial file contains next available number, so subtract 1 for current highest
+        local main_serial_max=$((main_serial - 1))
+        if [[ $main_serial_max -gt $main_max ]]; then
+            main_max=$main_serial_max
+        fi
     fi
     
     # Take maximum and add 1
     local next_id
-    if [[ $local_max -gt $remote_max ]]; then
+    if [[ $local_max -gt $main_max ]]; then
         next_id=$((local_max + 1))
     else
-        next_id=$((remote_max + 1))
+        next_id=$((main_max + 1))
     fi
     
     echo $next_id
@@ -131,25 +181,41 @@ calculate_next_task_number() {
 
 ---
 
-### 3. Immediate Commit After Assignment
+### 3. Immediate Commit and Push After Assignment
 
-**Purpose:** Minimize the conflict window by committing the task assignment immediately.
+**Purpose:** Minimize the conflict window by committing the task assignment immediately and making it visible to others.
 
 **Implementation:**
 - After assigning task number and adding to `TODO.md`
 - Update `.todo.ai/.todo.ai.serial` immediately
-- Commit both files in a single atomic commit
-- Do not wait for other operations
+- Commit both files in a single atomic commit to **current branch**
+- Push to current branch immediately to make changes visible
 
-**Commit Message Format:**
+**Commit and Push:**
 ```bash
+# Commit to current branch (feature branch or main)
 git commit -m "task: Add task #$task_id $task_description" -- TODO.md .todo.ai/.todo.ai.serial
+
+# Push to current branch immediately
+git push origin $(git branch --show-current) --quiet 2>/dev/null || {
+    # If push fails, log warning but don't block
+    # User can push manually later
+    log_todo_action "WARNING" "GIT_PUSH_FAILED" "Could not push changes, commit is local only"
+}
 ```
 
-**Why Immediate:**
+**Why Immediate Commit and Push:**
 - Reduces time between pull and commit (smaller conflict window)
-- Makes the assignment "visible" to other users quickly
+- Makes the assignment "visible" to other users quickly (via push)
+- Other users' next pull from main will see these changes
 - Follows atomic assignment pattern
+- Serial file on current branch is updated and pushed
+
+**Branch Strategy:**
+- **If on main branch**: Commit and push directly to main
+- **If on feature branch**: Commit and push to feature branch
+- **When merging to main**: Feature branch's serial file is merged with main's serial file
+- **After merge to main**: All branches pull from main's authoritative serial file state
 
 ---
 
@@ -181,10 +247,12 @@ git commit -m "task: Add task #$task_id $task_description" -- TODO.md .todo.ai/.
 
 **Example:**
 - Main: Highest task `#49`
-- Branch A pulls, calculates MAX(49, 49) + 1 = `#50`
-- Branch B pulls, calculates MAX(49, 49) + 1 = `#50`
-- If Branch A commits first, Branch B's pull will see `#50` and calculate `#51`
-- Result: No duplicate numbers
+- Branch A: Fetches from origin/main (sees `#49`), calculates MAX(49, 49) + 1 = `#50`, commits to Branch A, pushes to origin/Branch A
+- Branch B: Fetches from origin/main (still sees `#49` if Branch A hasn't merged to main yet), calculates MAX(49, 49) + 1 = `#50`, commits to Branch B, pushes to origin/Branch B
+- If Branch A merges to main first → main now has `#50` (and serial file = 51)
+- Branch B's next fetch from main will see `#50` and if it tries to add another task, will calculate `#51`
+- When Branch B merges to main: Git will merge the serial files (Branch B has `#50`, main has `#50`) → one becomes `#50`, one is renumbered
+- Result: No duplicate numbers in main, sequential numbering maintained
 
 ---
 
@@ -198,8 +266,10 @@ git commit -m "task: Add task #$task_id $task_description" -- TODO.md .todo.ai/.
 
 **Example:**
 - Main: `#45`
-- Branch A: Pulls (sees `#45`), adds `#46`, `#47`, commits, merges → Main now has `#47`
-- Branch B: Pulls (sees `#47`), adds `#48`, `#49`, commits, merges → No conflicts
+- Branch A: Fetches main (sees `#45`), adds `#46`, `#47`, commits to Branch A, pushes to Branch A, merges to main → Main now has `#47` (and serial file = 48)
+- Branch B: Fetches main (now sees `#47`), calculates MAX(local, 47) + 1 = `#48`, adds `#48`, `#49`, commits to Branch B, pushes to Branch B
+- When Branch B merges to main: No conflicts (Branch B has `#48-49`, main has `#47`)
+- Result: Sequential numbering: `#47`, `#48`, `#49`
 
 ---
 
@@ -308,23 +378,28 @@ git commit -m "task: Add task #$task_id $task_description" -- TODO.md .todo.ai/.
 **Pseudo-code:**
 ```bash
 add_todo() {
-    # Step 1: Pull latest changes
+    # Step 1: Pull latest changes from main (for coordination)
     git_pull_todo_files
     
-    # Step 2: Calculate next safe task number
+    # Step 2: Calculate next safe task number (using MAX of local and main)
     local next_id=$(calculate_next_task_number)
     
     # Step 3: Create task with safe number
     local task_line="- [ ] **#$next_id** $text $tags"
     add_task_to_file "$task_line"
     
-    # Step 4: Update serial file
+    # Step 4: Update serial file (on current branch)
     echo $((next_id + 1)) > "$SERIAL_FILE"
     
-    # Step 5: Commit immediately
+    # Step 5: Commit immediately to current branch
     git commit -m "task: Add task #$next_id $text" -- TODO.md "$SERIAL_FILE"
     
-    # Step 6: Log action
+    # Step 6: Push to current branch (make visible to others)
+    git push origin $(git branch --show-current) --quiet 2>/dev/null || {
+        log_todo_action "WARNING" "PUSH_FAILED" "Could not push, commit is local only"
+    }
+    
+    # Step 7: Log action
     log_todo_action "ADD" "$next_id" "$text"
     
     echo "Added: #$next_id $text"
@@ -374,27 +449,54 @@ add_subtask() {
 
 ### 3. Git Pull Helper Function
 
-**Purpose:** Centralize git pull logic for TODO files.
+**Purpose:** Centralize git pull logic for TODO files. **Always pulls from main branch** for coordination.
 
 **Implementation:**
 ```bash
 git_pull_todo_files() {
-    # Get current branch
-    local current_branch=$(git branch --show-current 2>/dev/null || echo "main")
+    # Always pull from main branch (authoritative source)
+    # This ensures coordination across all branches
     
-    # Pull only TODO-related files (silent, no output if no changes)
-    git pull --quiet origin "$current_branch" -- TODO.md .todo.ai/.todo.ai.serial 2>/dev/null || {
-        # If pull fails, log but don't block (better than blocking user)
-        log_todo_action "WARNING" "GIT_PULL_FAILED" "Could not pull latest changes, using local state"
+    # Fetch latest main branch state
+    git fetch origin main --quiet 2>/dev/null || {
+        log_todo_action "WARNING" "GIT_FETCH_FAILED" "Could not fetch from main, using local state"
         return 1
     }
+    
+    # Get main's TODO.md and serial file for comparison
+    # We don't replace local files, just use them for MAX calculation
+    local main_todo=$(git show origin/main:TODO.md 2>/dev/null || echo "")
+    local main_serial=$(git show origin/main:.todo.ai/.todo.ai.serial 2>/dev/null || echo "")
+    
+    # Store these for MAX algorithm
+    export MAIN_TODO_CONTENT="$main_todo"
+    export MAIN_SERIAL_CONTENT="$main_serial"
+    
+    # Also try to merge main's changes into current branch (if on a branch)
+    local current_branch=$(git branch --show-current 2>/dev/null || echo "")
+    if [[ -n "$current_branch" ]] && [[ "$current_branch" != "main" ]]; then
+        # On a feature branch: merge main's TODO files into current branch
+        # This updates local branch with main's state
+        git merge origin/main --no-commit --no-ff -- TODO.md .todo.ai/.todo.ai.serial 2>/dev/null || {
+            # If merge fails (conflicts), continue with local state
+            # MAX algorithm will handle coordination
+            git merge --abort 2>/dev/null || true
+        }
+    fi
     
     return 0
 }
 ```
 
+**Why Pull from Main:**
+- **Main is authoritative**: Main branch contains the official task numbering sequence
+- **Feature branch coordination**: Feature branches coordinate with main, not with each other
+- **Prevents cross-branch conflicts**: All branches use main as reference point
+- **Merge-time simplicity**: When merging feature branches to main, serial files are already aligned
+
 **Error Handling:**
-- If pull fails (network, auth, etc.), continue with local state
+- If fetch fails (network, auth, etc.), continue with local state
+- If merge fails (conflicts), abort merge and continue with local state
 - Log warning but don't block user
 - Better to have slightly outdated state than to block entirely
 
@@ -487,14 +589,36 @@ auto_resolve_conflicts() {
 
 ```
 1. User runs: ./todo.ai add "Task description"
-2. Script performs: git pull (sync with remote)
-3. Script calculates: MAX(local, remote) + 1
+2. Script fetches from origin/main (sync with authoritative source)
+3. Script calculates: MAX(local, main) + 1
 4. Assigns safe task number
 5. Adds to TODO.md
-6. Updates serial file
-7. Commits immediately (atomic assignment)
-8. Logs action
-9. Done
+6. Updates serial file (on current branch)
+7. Commits to current branch (atomic assignment)
+8. Pushes to current branch (make visible to others)
+9. Logs action
+10. Done
+```
+
+**Branch-Specific Behavior:**
+
+**If on main branch:**
+```
+1. Fetch from origin/main
+2. Calculate MAX(local main, remote main) + 1
+3. Assign task number
+4. Commit to main
+5. Push to origin/main
+```
+
+**If on feature branch:**
+```
+1. Fetch from origin/main
+2. Calculate MAX(local feature branch, main) + 1
+3. Assign task number
+4. Commit to feature branch
+5. Push to origin/feature-branch
+6. When merging to main: Merge serial file state with main
 ```
 
 ---

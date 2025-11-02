@@ -1557,6 +1557,13 @@ add_subtask() {
         return 1
     fi
     
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_parent_id=$(resolve_task_reference "$parent_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_parent_id" ]]; then
+        resolved_parent_id="$parent_id"
+    fi
+    parent_id="$resolved_parent_id"
+    
     # Check nesting depth of parent
     local parent_depth=$(get_nesting_depth "$parent_id")
     
@@ -1884,11 +1891,18 @@ complete_todo() {
     # Normalize any malformed checkboxes first
     normalize_checkboxes
     
-    # Expand ranges and collect all task IDs to complete
+    # Resolve task references and expand ranges
     local all_ids=()
     for id in "${task_ids[@]}"; do
+        # Resolve task reference (auto-add prefix for number-only references)
+        local resolved_id=$(resolve_task_reference "$id" 2>/dev/null)
+        if [[ $? -ne 0 ]] || [[ -z "$resolved_id" ]]; then
+            # If resolution failed, try using original ID (might be a range or already have prefix)
+            resolved_id="$id"
+        fi
+        
         # Match range format: 104.3-104.10 or 122.3-10 (both formats supported)
-        if [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]]; then
+        if [[ "$resolved_id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]] || [[ "$resolved_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)-[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)$ ]]; then
             # Full format: 122.3-122.10
             local parent=${match[1]}
             local start=${match[2]}
@@ -1978,6 +1992,13 @@ undo_todo() {
         return 1
     fi
     
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_number=$(resolve_task_reference "$number" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_number" ]]; then
+        resolved_number="$number"
+    fi
+    number="$resolved_number"
+    
     # Normalize any malformed checkboxes first
     normalize_checkboxes
     
@@ -2006,6 +2027,13 @@ modify_todo() {
         echo "Usage: ./todo.ai modify <id> \"<new text>\" [\"<new tags>\"]"
         return 1
     fi
+    
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
     
     # Normalize any malformed checkboxes first
     normalize_checkboxes
@@ -2132,6 +2160,13 @@ archive_task() {
         echo "Usage: ./todo.ai archive <id> [--reason <reason>]"
         return 1
     fi
+    
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
     
     # Normalize any malformed checkboxes first
     normalize_checkboxes
@@ -2297,10 +2332,16 @@ delete_task() {
     # Auto-purge expired deleted tasks first
     purge_expired_deleted_tasks
     
-    # Expand ranges and collect all task IDs (same logic as complete)
+    # Resolve task references and expand ranges
     local all_ids=()
     for id in "${task_ids[@]}"; do
-        if [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]]; then
+        # Resolve task reference (auto-add prefix for number-only references)
+        local resolved_id=$(resolve_task_reference "$id" 2>/dev/null)
+        if [[ $? -ne 0 ]] || [[ -z "$resolved_id" ]]; then
+            resolved_id="$id"
+        fi
+        
+        if [[ "$resolved_id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]] || [[ "$resolved_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)-[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)$ ]]; then
             local parent=${match[1]}
             local start=${match[2]}
             local end_parent=${match[3]}
@@ -2312,15 +2353,20 @@ delete_task() {
             else
                 all_ids+=("$id")
             fi
-        elif [[ "$id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)$ ]]; then
+        elif [[ "$resolved_id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)$ ]] || [[ "$resolved_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)-([0-9]+)$ ]]; then
             local parent=${match[1]}
             local start=${match[2]}
             local end=${match[3]}
+            # Get prefix if present
+            local prefix=""
+            if [[ "$resolved_id" =~ ^([a-z0-9]{1,7})- ]]; then
+                prefix="${match[1]}-"
+            fi
             for ((i=start; i<=end; i++)); do
-                all_ids+=("${parent}.${i}")
+                all_ids+=("${prefix}${parent}.${i}")
             done
         else
-            all_ids+=("$id")
+            all_ids+=("$resolved_id")
         fi
     done
     
@@ -2481,6 +2527,13 @@ restore_task() {
         return 1
     fi
     
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
+    
     # Simple implementation: move the task back to Tasks section
     # Get the task line (from Recently Completed or Deleted section)
     local task_line=$(grep "^- \[[xD~>\-]\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1)
@@ -2598,6 +2651,13 @@ show_task() {
         return 1
     fi
     
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
+    
     # Find and display the task
     local task_line=$(grep "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1)
     
@@ -2707,6 +2767,13 @@ relate_task() {
         return 1
     fi
     
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
+    
     # Verify task exists
     if ! grep -q "\*\*#$task_id\*\*" "$TODO_FILE"; then
         echo "Error: Task #$task_id not found"
@@ -2732,6 +2799,13 @@ add_note() {
         echo "Usage: ./todo.ai note <id> <note-text>"
         return 1
     fi
+    
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
     
     # Verify task exists
     local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)

@@ -927,16 +927,21 @@ fi
 
 ## Conclusion
 
-The **Git-Based Atomic Assignment** architecture provides a robust solution for multi-user conflict-free task numbering while preserving todo.ai's core strengths:
+The **Git-Based Atomic Assignment** architecture provides a robust solution for multi-user conflict-free task numbering within a **single Git repository** while preserving todo.ai's core strengths:
 
 - ✅ Simple sequential numbering maintained
 - ✅ Minimal changes to existing workflow
 - ✅ Uses existing Git infrastructure
-- ✅ Prevents most conflicts automatically
+- ✅ Prevents most conflicts automatically (within single repo)
 - ✅ Handles edge cases gracefully
 - ✅ AI-agent friendly
 
-This architecture balances simplicity with effectiveness, making it the ideal solution for todo.ai's multi-user support system.
+**Scope and Limitations:**
+- ✅ Works for: Single repository, multiple branches, multiple developers
+- ❌ Does NOT work for: Multiple forks, cross-repository coordination, unreachable branches
+- ⚠️ Trade-off: Accepts that cross-fork conflicts are resolved at merge time
+
+This architecture balances simplicity with effectiveness for the intended use case: **single repository, multi-branch collaboration**. For multi-fork scenarios, task numbering conflicts are resolved during pull request merges (Git's native capability).
 
 ---
 

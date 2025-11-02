@@ -3,6 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#50** Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages `#research`
+  - [ ] **#50.4** Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them `#code`
+  - [x] **#50.3** Propose solution: design numbering schema or commit message format to avoid conflicts `#docs`
+  - [x] **#50.2** Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs `#research`
+  - [x] **#50.1** Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers `#docs`
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
   - [ ] **#49.9** Implement high-priority security improvements identified in audit `#code`
   - [ ] **#49.8** Create security improvement recommendations document based on findings `#docs`
@@ -206,7 +211,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 00:46:51 CET 2025
+**Last Updated:** Sun Nov  2 01:02:22 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai 
 **Maintenance:** Use `todo.ai` script only
 

@@ -21,3 +21,11 @@ When making commits, use explicit prefixes to help the release script correctly 
 - If you forget a prefix, file analysis will catch backend-only changes
 - Mixed releases (both frontend and backend) use keyword analysis
 
+**Task Number References:**
+- **MUST use `task#nn` format** (e.g., `task#15`, `task#50`) when referencing todo.ai task numbers in commit messages
+- **NEVER use `#nn` format** for task numbers - this causes GitHub to auto-link to issues/PRs
+- ✅ Correct: `feat: Implement git hooks with pre-commit validation (task#15)`
+- ✅ Correct: `Archive completed task#15 (git hooks), delete task#21`
+- ❌ Incorrect: `feat: Implement git hooks (#15)` - will auto-link to issue #15
+- ❌ Incorrect: `feat: Implement git hooks (task #15)` - space breaks pattern
+

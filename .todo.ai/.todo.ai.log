@@ -2,6 +2,14 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 01:02:22 | fxstein | COMPLETE | 50.3 | Propose solution: design numbering schema or commit message format to avoid conflicts
+2025-11-02 01:02:22 | fxstein | COMPLETE | 50.2 | Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs
+2025-11-02 00:59:46 | fxstein | ADD_SUBTASK | 50.4 | Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them (parent: #50)
+2025-11-02 00:50:57 | fxstein | COMPLETE | 50.1 | Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers
+2025-11-02 00:50:26 | fxstein | ADD_SUBTASK | 50.3 | Propose solution: design numbering schema or commit message format to avoid conflicts (parent: #50)
+2025-11-02 00:50:24 | fxstein | ADD_SUBTASK | 50.2 | Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs (parent: #50)
+2025-11-02 00:50:23 | fxstein | ADD_SUBTASK | 50.1 | Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers (parent: #50)
+2025-11-02 00:50:15 | fxstein | ADD | 50 | Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages
 2025-11-02 00:46:51 | fxstein | DELETE | 21 | Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added
 2025-11-02 00:46:34 | fxstein | ARCHIVE | 15 | Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting (with 9 subtasks)
 2025-11-02 00:46:32 | fxstein | COMPLETE | 15 | Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting

@@ -56,6 +56,14 @@ get_config_file() {
 }
 
 # Read YAML config value (supports nested keys like coordination.type)
+# 
+# IMPORTANT YAML PARSING POLICY:
+# ==============================
+# This function and ALL YAML operations in this script ALWAYS use sed fallback when YAML parsers are missing.
+# NEVER show errors for missing YAML parsers (yq, python3-yaml) - always provide sed fallback.
+# This ensures the tool works on any system with basic shell utilities (sed, grep) without requiring
+# external YAML parsing tools.
+#
 get_config_value() {
     local key="$1"  # e.g., "mode" or "coordination.type"
     local config_file=$(get_config_file)
@@ -499,16 +507,31 @@ assign_task_number_enhanced_github_issues() {
     # Sort by created_at to ensure we get the newest comment, or use last element if already sorted
     local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
     
-    if [[ -z "$latest_comment" ]]; then
-        # No comments yet, start with 1
-        local new_num=1
-    else
+    # Get coordinator value from issue comment
+    local coordinator_value=0
+    if [[ -n "$latest_comment" ]]; then
         # Extract number from comment (format: "Next task number: 123" or just "123")
-        local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
-        if [[ -z "$current_num" ]]; then
-            current_num=0
+        local extracted_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
+        if [[ -n "$extracted_num" ]] && [[ "$extracted_num" =~ ^[0-9]+$ ]]; then
+            coordinator_value=$extracted_num
         fi
-        local new_num=$((current_num + 1))
+    fi
+    
+    # Get highest task number from TODO.md (checks both prefixed and non-prefixed tasks)
+    local highest_task_num=$(get_highest_task_number)
+    
+    # Use max(coordinator_value, highest_task_num) + 1 to ensure no duplicates
+    local max_value=$coordinator_value
+    if [[ $highest_task_num -gt $max_value ]]; then
+        max_value=$highest_task_num
+    fi
+    
+    local new_num=$((max_value + 1))
+    
+    # If coordinator was behind, log a warning
+    if [[ $coordinator_value -lt $highest_task_num ]]; then
+        echo "⚠️  Warning: Coordinator value ($coordinator_value) was behind TODO.md highest ($highest_task_num)" >&2
+        echo "   Using max value: $max_value, next task: $new_num" >&2
     fi
     
     # Append new number as comment (with retry on conflicts)
@@ -3147,6 +3170,66 @@ EOF
     esac
 }
 
+# Function to get current value from GitHub Issues coordination
+get_current_github_issues_value() {
+    local issue_num="$1"
+    local repo_url="$2"
+    
+    if [[ -z "$issue_num" ]] || [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
+        echo "0"
+        return 1
+    fi
+    
+    # Check GitHub CLI authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        echo "0"
+        return 1
+    fi
+    
+    # Get latest comment from issue
+    local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
+    
+    if [[ -z "$latest_comment" ]]; then
+        echo "0"
+        return 0
+    fi
+    
+    # Extract number from comment (format: "Next task number: 123" or just "123")
+    local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
+    if [[ -z "$current_num" ]] || ! [[ "$current_num" =~ ^[0-9]+$ ]]; then
+        echo "0"
+        return 0
+    fi
+    
+    echo "$current_num"
+    return 0
+}
+
+# Function to get current value from current coordinator (if switching)
+get_current_coordinator_value() {
+    local current_coord_type=$(get_config_value "coordination.type" "none")
+    
+    case "$current_coord_type" in
+        "github-issues")
+            local issue_num=$(get_config_value "coordination.issue_number" "")
+            local repo_url=$(git config --get remote.origin.url 2>/dev/null | sed 's/\.git$//' | sed 's/.*github\.com[:/]//' || echo "")
+            if [[ -n "$issue_num" ]] && [[ -n "$repo_url" ]]; then
+                get_current_github_issues_value "$issue_num" "$repo_url"
+                return 0
+            fi
+            ;;
+        "counterapi")
+            # CounterAPI doesn't have a GET endpoint, we can't reliably get current value
+            # So we'll just return 0 and rely on TODO.md highest number
+            echo "0"
+            return 0
+            ;;
+    esac
+    
+    echo "0"
+    return 0
+}
+
 # Function to get highest task number from TODO.md
 get_highest_task_number() {
     local highest=0
@@ -3222,78 +3305,71 @@ setup_github_issues_coordination() {
     echo "Repository: $repo_identifier"
     echo ""
     
-    # Get or create issue
+    # Auto-detect existing coordination issue or create new one
+    local issue_title="todo.ai Task Number Coordination"
     local issue_number=""
-    if [[ "$interactive" == true ]]; then
-        echo "Choose an option:"
-        echo "  1) Use an existing issue"
-        echo "  2) Create a new issue"
-        printf "Enter choice [1]: "
-        read -r choice
-        choice=${choice:-1}
-        
-        if [[ "$choice" == "2" ]]; then
-            # Create new issue
-            echo ""
-            echo "Creating new GitHub issue for task coordination..."
-            local issue_title="todo.ai Task Number Coordination"
-            local issue_body="This issue is used by todo.ai for atomic task number coordination.
-            
-Do not manually comment on this issue - it is managed automatically by todo.ai."
-            
-            # gh issue create returns a URL like: https://github.com/owner/repo/issues/123
-            local issue_output=$(gh issue create --repo "$repo_identifier" --title "$issue_title" --body "$issue_body" 2>&1)
-            
-            # Extract issue number from URL (format: https://github.com/owner/repo/issues/123)
-            if [[ "$issue_output" =~ /issues/([0-9]+)$ ]] || [[ "$issue_output" =~ issues/([0-9]+) ]]; then
-                issue_number="${match[1]}"
-            elif [[ "$issue_output" =~ ([0-9]+) ]]; then
-                # Fallback: just extract any number from output
-                issue_number=$(echo "$issue_output" | grep -oE '[0-9]+' | tail -1)
-            fi
-            
-            if [[ -z "$issue_number" ]]; then
-                echo "❌ Error: Failed to create GitHub issue"
-                echo "   Output: $issue_output"
-                return 1
-            fi
-            
-            echo "✅ Created issue #$issue_number"
-        else
-            # Use existing issue
-            echo ""
-            printf "Enter issue number: "
-            read -r issue_number
-            
-            # Validate issue exists
-            if ! gh issue view --repo "$repo_identifier" "$issue_number" >/dev/null 2>&1; then
-                echo "❌ Error: Issue #$issue_number not found or not accessible"
-                return 1
-            fi
-            
-            echo "✅ Using issue #$issue_number"
-        fi
+    
+    echo "Searching for existing coordination issue..."
+    # Search for issues with the coordination title (check both open and closed issues)
+    local existing_issues=$(gh issue list --repo "$repo_identifier" --state all --search "todo.ai Task Number Coordination" --json number,title --jq '.[].number' 2>/dev/null || echo "")
+    
+    if [[ -n "$existing_issues" ]]; then
+        # Use the first matching issue
+        issue_number=$(echo "$existing_issues" | head -1)
+        echo "✅ Found existing coordination issue #$issue_number"
     else
-        # Non-interactive: issue number must be provided as environment variable or argument
-        issue_number="${GITHUB_ISSUE_NUMBER:-}"
+        # No existing issue found, create a new one
+        echo "   No existing coordination issue found"
+        echo ""
+        echo "Creating new GitHub issue for task coordination..."
+        local issue_body="This issue is used by todo.ai for atomic task number coordination.
+        
+Do not manually comment on this issue - it is managed automatically by todo.ai."
+        
+        # gh issue create returns a URL like: https://github.com/owner/repo/issues/123
+        local issue_output=$(gh issue create --repo "$repo_identifier" --title "$issue_title" --body "$issue_body" 2>&1)
+        
+        # Extract issue number from URL (format: https://github.com/owner/repo/issues/123)
+        if [[ "$issue_output" =~ /issues/([0-9]+)$ ]] || [[ "$issue_output" =~ issues/([0-9]+) ]]; then
+            issue_number="${match[1]}"
+        elif [[ "$issue_output" =~ ([0-9]+) ]]; then
+            # Fallback: just extract any number from output
+            issue_number=$(echo "$issue_output" | grep -oE '[0-9]+' | tail -1)
+        fi
+        
         if [[ -z "$issue_number" ]]; then
-            echo "❌ Error: GITHUB_ISSUE_NUMBER environment variable not set"
+            echo "❌ Error: Failed to create GitHub issue"
+            echo "   Output: $issue_output"
             return 1
         fi
+        
+        echo "✅ Created issue #$issue_number"
     fi
     
-    # Initialize issue with highest task number from TODO.md if it has no comments
+    # Initialize issue with max(highest_task_number, current_coordinator_value) + 1 if it has no comments
     echo ""
     echo "Checking issue comments..."
     local existing_comments=$(gh api repos/${repo_identifier}/issues/${issue_number}/comments --jq 'length' 2>/dev/null || echo "0")
     
+    # Always check and sync with TODO.md highest number, even if issue has comments
+    local highest_num=$(get_highest_task_number)
+    local current_coord_value=$(get_current_coordinator_value)
+    
+    # Get max of highest_num and current_coord_value
+    local max_value=$highest_num
+    if [[ $current_coord_value -gt $max_value ]]; then
+        max_value=$current_coord_value
+    fi
+    
     if [[ "$existing_comments" == "0" ]] || [[ -z "$existing_comments" ]]; then
-        # No comments yet - initialize with highest task number from TODO.md
-        local highest_num=$(get_highest_task_number)
-        local start_num=$((highest_num + 1))
+        # No comments yet - initialize with max of highest task number from TODO.md and current coordinator value
+        local start_num=$((max_value + 1))
         
-        if [[ $highest_num -gt 0 ]]; then
+        if [[ $highest_num -gt 0 ]] || [[ $current_coord_value -gt 0 ]]; then
             echo "   Found existing tasks in TODO.md (highest: #$highest_num)"
+            if [[ $current_coord_value -gt 0 ]]; then
+                echo "   Found current coordinator value: #$current_coord_value"
+            fi
             echo "   Initializing coordination with task number: $start_num"
         else
             echo "   No existing tasks found - starting from 1"
@@ -3308,11 +3384,25 @@ Do not manually comment on this issue - it is managed automatically by todo.ai."
             echo "✅ Initialized issue with starting number: $start_num"
         fi
     else
-        echo "   Issue already has comments - using existing coordination"
-        local latest_comment=$(gh api repos/${repo_identifier}/issues/${issue_number}/comments --jq '.[0].body' 2>/dev/null || echo "")
+        # Issue has comments - check if coordinator is behind TODO.md and sync if needed
+        local latest_comment=$(gh api repos/${repo_identifier}/issues/${issue_number}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
         local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
         if [[ -n "$current_num" ]]; then
             echo "   Current task number in coordination: $current_num"
+            
+            # If coordinator is behind TODO.md, update it
+            if [[ $current_num -lt $highest_num ]]; then
+                local sync_num=$((max_value + 1))
+                echo "   ⚠️  Coordinator ($current_num) is behind TODO.md highest ($highest_num)"
+                echo "   Updating coordination to: $sync_num"
+                
+                # Post sync comment with correct number
+                if gh api -X POST repos/${repo_identifier}/issues/${issue_number}/comments --field "body=Next task number: $sync_num" >/dev/null 2>&1; then
+                    echo "   ✅ Coordinator synced to: $sync_num"
+                else
+                    echo "   ⚠️  Warning: Failed to sync coordinator"
+                fi
+            fi
         fi
     fi
     echo ""
@@ -3343,7 +3433,8 @@ EOF
             return 1
         fi
     else
-        # Fallback to sed for simple coordination updates
+        # Fallback to sed for simple coordination updates (always available)
+        # NOTE: We ALWAYS use sed fallback when YAML parsers are missing - never show errors
         # Ensure coordination section exists
         if ! grep -q "^coordination:" "$config_file"; then
             # Add coordination section after mode line
@@ -3362,14 +3453,19 @@ coordination:\\
   type: github-issues" "$config_file"
         fi
         
-        # Update or add issue_number
-        if grep -q "^  issue_number:" "$config_file"; then
-            sed_inplace "s/^  issue_number:.*/  issue_number: $issue_number/" "$config_file"
-        else
-            # Add issue_number line after type
-            sed_inplace "/^  type: github-issues/a\\
+    # Remove namespace if it exists (switching from counterapi)
+    if grep -q "^  namespace:" "$config_file"; then
+        sed_inplace "/^  namespace:/d" "$config_file"
+    fi
+    
+    # Update or add issue_number
+    if grep -q "^  issue_number:" "$config_file"; then
+        sed_inplace "s/^  issue_number:.*/  issue_number: $issue_number/" "$config_file"
+    else
+        # Add issue_number line after type
+        sed_inplace "/^  type: github-issues/a\\
   issue_number: $issue_number" "$config_file"
-        fi
+    fi
     fi
     
     echo ""
@@ -3444,23 +3540,36 @@ setup_counterapi_coordination() {
         echo "✅ CounterAPI connection successful"
     fi
     
-    # Initialize counter with highest task number from TODO.md if counter doesn't exist yet
+    # Initialize counter with max(highest_task_number, current_coordinator_value) + 1
     echo ""
-    echo "Initializing counter with highest task number from TODO.md..."
+    echo "Initializing counter with max of TODO.md and current coordinator..."
     local highest_num=$(get_highest_task_number)
-    local start_num=$((highest_num + 1))
+    local current_coord_value=$(get_current_coordinator_value)
     
-    if [[ $highest_num -gt 0 ]]; then
+    # Get max of highest_num and current_coord_value
+    local max_value=$highest_num
+    if [[ $current_coord_value -gt $max_value ]]; then
+        max_value=$current_coord_value
+    fi
+    
+    local start_num=$((max_value + 1))
+    
+    if [[ $highest_num -gt 0 ]] || [[ $current_coord_value -gt 0 ]]; then
         echo "   Found existing tasks in TODO.md (highest: #$highest_num)"
+        if [[ $current_coord_value -gt 0 ]]; then
+            echo "   Found current coordinator value: #$current_coord_value"
+        fi
         echo "   Counter will start from: $start_num"
         echo "   Note: CounterAPI increments atomically - first task will use $start_num"
     else
         echo "   No existing tasks found - counter will start from 1"
         echo "   Note: CounterAPI increments atomically - first task will use 1"
+        start_num=1
     fi
     echo ""
     
     # Update config file
+    # NOTE: We ALWAYS use sed fallback when YAML parsers are missing - never show errors
     if command -v yq >/dev/null 2>&1; then
         yq eval ".coordination.type = \"counterapi\"" -i "$config_file" 2>/dev/null
         yq eval ".coordination.namespace = \"$namespace\"" -i "$config_file" 2>/dev/null
@@ -3482,12 +3591,48 @@ except Exception as e:
     sys.exit(1)
 EOF
         if [[ $? -ne 0 ]]; then
-            echo "❌ Error: Failed to update config file"
-            return 1
+            # Fallback to sed if Python YAML fails
+            echo "⚠️  Python YAML update failed, using sed fallback..."
+        else
+            # Success - return early
+            echo ""
+            echo "✅ CounterAPI coordination configured"
+            echo "   Namespace: $namespace"
+            return 0
         fi
+    fi
+    
+    # Fallback to sed for simple coordination updates (always available)
+    # Ensure coordination section exists
+    if ! grep -q "^coordination:" "$config_file"; then
+        # Add coordination section after mode line
+        sed_inplace "/^mode:/a\\
+coordination:\\
+  type: none\\
+  fallback: multi-user" "$config_file"
+    fi
+    
+    # Update coordination.type
+    if grep -q "^  type:" "$config_file"; then
+        sed_inplace "s/^  type:.*/  type: counterapi/" "$config_file"
     else
-        echo "❌ Error: YAML parser (yq or python3 with yaml module) required"
-        return 1
+        # Add type line if it doesn't exist
+        sed_inplace "/^coordination:/a\\
+  type: counterapi" "$config_file"
+    fi
+    
+    # Update or add namespace
+    if grep -q "^  namespace:" "$config_file"; then
+        sed_inplace "s/^  namespace:.*/  namespace: $namespace/" "$config_file"
+    else
+        # Add namespace line after type
+        sed_inplace "/^  type: counterapi/a\\
+  namespace: $namespace" "$config_file"
+    fi
+    
+    # Remove issue_number if it exists (switching from github-issues)
+    if grep -q "^  issue_number:" "$config_file"; then
+        sed_inplace "/^  issue_number:/d" "$config_file"
     fi
     
     echo ""
@@ -3897,10 +4042,10 @@ lint_todo() {
         
         # Only check tasks in the "Tasks" section
         if [[ "$in_tasks" == true ]]; then
-            if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
-                echo "  ❌ Subtask not indented: $line"
-                indent_issues=$((indent_issues + 1))
-                issues_found=$((issues_found + 1))
+        if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
+            echo "  ❌ Subtask not indented: $line"
+            indent_issues=$((indent_issues + 1))
+            issues_found=$((issues_found + 1))
             fi
         fi
     done < "$TODO_FILE"
@@ -3955,12 +4100,12 @@ lint_todo() {
         
         # Only check tasks in the "Tasks" section
         if [[ "$in_tasks" == true ]]; then
-            if [[ "$line" =~ "^- \[.*\] " || "$line" =~ "^  - \[.*\] " ]]; then
-                # Check for various malformed checkbox patterns
-                if [[ "$line" =~ "\[  \]" || "$line" =~ "\[   \]" || "$line" =~ "\[    \]" || "$line" =~ "\[\]" ]]; then
-                    echo "  ❌ Malformed checkbox: $line"
-                    checkbox_issues=$((checkbox_issues + 1))
-                    issues_found=$((issues_found + 1))
+        if [[ "$line" =~ "^- \[.*\] " || "$line" =~ "^  - \[.*\] " ]]; then
+            # Check for various malformed checkbox patterns
+            if [[ "$line" =~ "\[  \]" || "$line" =~ "\[   \]" || "$line" =~ "\[    \]" || "$line" =~ "\[\]" ]]; then
+                echo "  ❌ Malformed checkbox: $line"
+                checkbox_issues=$((checkbox_issues + 1))
+                issues_found=$((issues_found + 1))
                 fi
             fi
         fi
@@ -4012,10 +4157,10 @@ lint_todo() {
         
         # Only collect parents from Tasks section
         if [[ "$in_tasks" == true ]]; then
-            if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
+        if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
                 local parent_id=$(echo "$line" | grep -o '#[a-z0-9-]*[0-9]\+' | sed 's/#//' | head -1)
                 if [[ -n "$parent_id" ]]; then
-                    seen_parents+=("$parent_id")
+            seen_parents+=("$parent_id")
                 fi
             fi
         fi
@@ -4061,14 +4206,14 @@ lint_todo() {
         # Only check subtasks in Tasks section
         if [[ "$in_tasks" == true ]]; then
             if [[ "$line" =~ '\*\*#([a-z0-9-]*[0-9]+)\.([0-9]+)\*\*' ]]; then
-                local parent_id="${match[1]}"
-                local subtask_id="${match[1]}.${match[2]}"
-                if [[ ! " ${seen_parents[@]} " =~ " ${parent_id} " ]]; then
-                    echo "  ❌ Orphaned subtask #$subtask_id (parent #$parent_id not found)"
-                    orphan_issues=$((orphan_issues + 1))
-                    issues_found=$((issues_found + 1))
-                fi
+            local parent_id="${match[1]}"
+            local subtask_id="${match[1]}.${match[2]}"
+            if [[ ! " ${seen_parents[@]} " =~ " ${parent_id} " ]]; then
+                echo "  ❌ Orphaned subtask #$subtask_id (parent #$parent_id not found)"
+                orphan_issues=$((orphan_issues + 1))
+                issues_found=$((issues_found + 1))
             fi
+        fi
         fi
     done < "$TODO_FILE"
     
@@ -4125,18 +4270,18 @@ lint_todo() {
         if [[ "$in_tasks" == true ]]; then
             # Match task IDs: **#task_id** or **#prefix-task_id**
             if [[ "$line" =~ '\*\*#([a-z0-9-]*[0-9]+(\.[0-9]+)?)\*\*' ]]; then
-                local task_id="${match[1]}"
-                if [[ " ${task_ids[@]} " =~ " ${task_id} " ]]; then
-                    if [[ ! " ${duplicates[@]} " =~ " ${task_id} " ]]; then
-                        echo "  ❌ Duplicate task ID: #$task_id"
-                        duplicates+=("$task_id")
-                        duplicate_issues=$((duplicate_issues + 1))
-                        issues_found=$((issues_found + 1))
-                    fi
-                else
-                    task_ids+=("$task_id")
+            local task_id="${match[1]}"
+            if [[ " ${task_ids[@]} " =~ " ${task_id} " ]]; then
+                if [[ ! " ${duplicates[@]} " =~ " ${task_id} " ]]; then
+                    echo "  ❌ Duplicate task ID: #$task_id"
+                    duplicates+=("$task_id")
+                    duplicate_issues=$((duplicate_issues + 1))
+                    issues_found=$((issues_found + 1))
                 fi
+            else
+                task_ids+=("$task_id")
             fi
+        fi
         fi
     done < "$TODO_FILE"
     

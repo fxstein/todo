@@ -4,6 +4,7 @@
 
 ## Tasks
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
+  - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
   - [ ] **#49.9** Implement high-priority security improvements identified in audit `#code`
   - [ ] **#49.8** Create security improvement recommendations document based on findings `#docs`
   - [ ] **#49.7** Evaluate supply chain security: repository compromise, MITM attacks, and code signing `#security`
@@ -212,7 +213,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 01:40:14 CET 2025
+**Last Updated:** Sun Nov  2 01:43:14 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

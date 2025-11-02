@@ -2602,14 +2602,44 @@ delete_task() {
         # If this is a parent task (no dots), automatically find all subtasks
         # If --with-subtasks flag is used, also include subtasks for subtasks (but that's unusual)
         if [[ "$id" != *.* ]] || [[ "$with_subtasks" == "true" ]]; then
+            # Extract numeric part of parent ID for matching subtasks
+            local parent_num=""
+            if [[ "$id" =~ ^([a-z0-9]{1,7}-)?([0-9]+)$ ]]; then
+                parent_num="${match[2]}"
+            else
+                parent_num="$id"
+            fi
+            
             # Find all direct subtasks and nested subtasks
             while IFS= read -r line; do
-                # Extract task ID from line (handles nested IDs)
-                if [[ "$line" =~ '#([0-9]+(\.[0-9]+)+)' ]]; then
-                    local task_id="${match[1]}"
-                    # Check if this task belongs to our parent (direct or nested subtask)
-                    if [[ "$task_id" =~ ^$id\. ]]; then
-                        expanded_ids+=("$task_id")
+                # Match task IDs: **#task_id** or **#prefix-task_id**
+                # Try with prefix first, then without
+                local task_prefix=""
+                local task_id=""
+                local full_task_id=""
+                
+                # Pattern 1: With prefix (e.g., **#fxstein-57.1**)
+                if [[ "$line" =~ '\*\*#([a-z0-9]{1,7})-([0-9]+(\.[0-9]+)+)\*\*' ]]; then
+                    task_prefix="${match[1]}-"
+                    task_id="${match[2]}"
+                    full_task_id="${task_prefix}${task_id}"
+                # Pattern 2: Without prefix (e.g., **#57.1**)
+                elif [[ "$line" =~ '\*\*#([0-9]+(\.[0-9]+)+)\*\*' ]]; then
+                    task_prefix=""
+                    task_id="${match[1]}"
+                    full_task_id="$task_id"
+                fi
+                
+                if [[ -n "$task_id" ]]; then
+                    # Extract numeric parent part from subtask (before the first dot)
+                    local subtask_parent_num=""
+                    if [[ "$task_id" =~ ^([0-9]+)\. ]]; then
+                        subtask_parent_num="${match[1]}"
+                    fi
+                    
+                    # Check if subtask belongs to this parent (by numeric part only, ignoring prefix)
+                    if [[ -n "$subtask_parent_num" ]] && [[ "$subtask_parent_num" == "$parent_num" ]]; then
+                        expanded_ids+=("$full_task_id")
                     fi
                 fi
             done < "$TODO_FILE"
@@ -2624,7 +2654,18 @@ delete_task() {
     
     for number in "${all_ids[@]}"; do
         # Find task (anywhere - Tasks or Recently Completed, handles nested subtasks)
+        # Try resolved ID first, then try original ID if resolution added a prefix that doesn't match
         local task_line=$(grep "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1)
+        
+        # If not found and number has a prefix, try without prefix (fallback for tasks created before mode switch)
+        if [[ -z "$task_line" ]] && [[ "$number" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
+            local number_without_prefix="${match[1]}"
+            task_line=$(grep "^- \[.\] \*\*#${number_without_prefix}\*\* \|^  - \[.\] \*\*#${number_without_prefix}\*\* \|^    - \[.\] \*\*#${number_without_prefix}\*\* " "$TODO_FILE" | head -1)
+            if [[ -n "$task_line" ]]; then
+                # Found with original number - update number to match actual task ID
+                number="$number_without_prefix"
+            fi
+        fi
         
         if [[ -z "$task_line" ]]; then
             echo "Warning: Task #$number not found, skipping"
@@ -2639,6 +2680,7 @@ delete_task() {
         task_line="$task_line (deleted $delete_date, expires $expire_date)"
         
         # Find task line number to also remove following notes (handles nested subtasks at any level)
+        # Use the actual number variable (which may have been updated to remove prefix)
         local task_line_num=$(grep -n "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
         
         if [[ -n "$task_line_num" ]]; then
@@ -3076,16 +3118,54 @@ lint_todo() {
     echo "🔍 Checking TODO.md for formatting issues..."
     echo ""
     
+    # Track which section we're in (skip Archived and Deleted)
+    local in_tasks=false
+    local in_recently_completed=false
+    local in_deleted=false
+    local skip_line=false
+    
     # Check for indentation issues
     echo "📋 Checking indentation:"
     local indent_issues=0
     
     # Find subtasks that are not properly indented (should start with "  -")
     while IFS= read -r line; do
-        if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
-            echo "  ❌ Subtask not indented: $line"
-            indent_issues=$((indent_issues + 1))
-            issues_found=$((issues_found + 1))
+        # Detect section headers
+        if [[ "$line" == "## Tasks" ]]; then
+            in_tasks=true
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=false
+        elif [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks=false
+            in_recently_completed=true
+            in_deleted=false
+            skip_line=true
+        elif [[ "$line" == "## Deleted Tasks" ]]; then
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=true
+            skip_line=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            # Other section - stop checking
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=true
+        fi
+        
+        # Skip archived and deleted tasks
+        if [[ "$skip_line" == true ]]; then
+            continue
+        fi
+        
+        # Only check tasks in the "Tasks" section
+        if [[ "$in_tasks" == true ]]; then
+            if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
+                echo "  ❌ Subtask not indented: $line"
+                indent_issues=$((indent_issues + 1))
+                issues_found=$((issues_found + 1))
+            fi
         fi
     done < "$TODO_FILE"
     
@@ -3100,14 +3180,52 @@ lint_todo() {
     echo "☑️  Checking checkboxes:"
     local checkbox_issues=0
     
+    # Reset section tracking
+    in_tasks=false
+    in_recently_completed=false
+    in_deleted=false
+    skip_line=false
+    
     # Find malformed checkboxes
     while IFS= read -r line; do
-        if [[ "$line" =~ "^- \[.*\] " || "$line" =~ "^  - \[.*\] " ]]; then
-            # Check for various malformed checkbox patterns
-            if [[ "$line" =~ "\[  \]" || "$line" =~ "\[   \]" || "$line" =~ "\[    \]" || "$line" =~ "\[\]" ]]; then
-                echo "  ❌ Malformed checkbox: $line"
-                checkbox_issues=$((checkbox_issues + 1))
-                issues_found=$((issues_found + 1))
+        # Detect section headers
+        if [[ "$line" == "## Tasks" ]]; then
+            in_tasks=true
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=false
+        elif [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks=false
+            in_recently_completed=true
+            in_deleted=false
+            skip_line=true
+        elif [[ "$line" == "## Deleted Tasks" ]]; then
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=true
+            skip_line=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            # Other section - stop checking
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=true
+        fi
+        
+        # Skip archived and deleted tasks
+        if [[ "$skip_line" == true ]]; then
+            continue
+        fi
+        
+        # Only check tasks in the "Tasks" section
+        if [[ "$in_tasks" == true ]]; then
+            if [[ "$line" =~ "^- \[.*\] " || "$line" =~ "^  - \[.*\] " ]]; then
+                # Check for various malformed checkbox patterns
+                if [[ "$line" =~ "\[  \]" || "$line" =~ "\[   \]" || "$line" =~ "\[    \]" || "$line" =~ "\[\]" ]]; then
+                    echo "  ❌ Malformed checkbox: $line"
+                    checkbox_issues=$((checkbox_issues + 1))
+                    issues_found=$((issues_found + 1))
+                fi
             fi
         fi
     done < "$TODO_FILE"
@@ -3124,26 +3242,99 @@ lint_todo() {
     local orphan_issues=0
     local seen_parents=()
     
-    # First pass: collect all parent task IDs
+    # Reset section tracking
+    in_tasks=false
+    in_recently_completed=false
+    in_deleted=false
+    skip_line=false
+    
+    # First pass: collect all parent task IDs (only in Tasks section)
     while IFS= read -r line; do
-        if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
-            local parent_id=$(echo "$line" | grep -o '#[0-9]\+' | sed 's/#//' | head -1)
-            seen_parents+=("$parent_id")
+        # Detect section headers
+        if [[ "$line" == "## Tasks" ]]; then
+            in_tasks=true
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=false
+        elif [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks=false
+            in_recently_completed=true
+            in_deleted=false
+            skip_line=true
+        elif [[ "$line" == "## Deleted Tasks" ]]; then
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=true
+            skip_line=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            # Other section - stop checking
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=true
+        fi
+        
+        # Only collect parents from Tasks section
+        if [[ "$in_tasks" == true ]]; then
+            if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
+                local parent_id=$(echo "$line" | grep -o '#[a-z0-9-]*[0-9]\+' | sed 's/#//' | head -1)
+                if [[ -n "$parent_id" ]]; then
+                    seen_parents+=("$parent_id")
+                fi
+            fi
         fi
     done < "$TODO_FILE"
     
-    # Second pass: check all subtasks have parents
+    # Reset section tracking for second pass
+    in_tasks=false
+    in_recently_completed=false
+    in_deleted=false
+    skip_line=false
+    
+    # Second pass: check all subtasks have parents (only in Tasks section)
     while IFS= read -r line; do
-        if [[ "$line" =~ '#([0-9]+)\.([0-9]+)' ]]; then
-            local parent_id="${match[1]}"
-            local subtask_id="${match[1]}.${match[2]}"
-            if [[ ! " ${seen_parents[@]} " =~ " ${parent_id} " ]]; then
-                echo "  ❌ Orphaned subtask #$subtask_id (parent #$parent_id not found)"
-                orphan_issues=$((orphan_issues + 1))
-                issues_found=$((issues_found + 1))
+        # Detect section headers
+        if [[ "$line" == "## Tasks" ]]; then
+            in_tasks=true
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=false
+        elif [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks=false
+            in_recently_completed=true
+            in_deleted=false
+            skip_line=true
+        elif [[ "$line" == "## Deleted Tasks" ]]; then
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=true
+            skip_line=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            # Other section - stop checking
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=true
+        fi
+        
+        # Skip archived and deleted tasks
+        if [[ "$skip_line" == true ]]; then
+            continue
+        fi
+        
+        # Only check subtasks in Tasks section
+        if [[ "$in_tasks" == true ]]; then
+            if [[ "$line" =~ '\*\*#([a-z0-9-]*[0-9]+)\.([0-9]+)\*\*' ]]; then
+                local parent_id="${match[1]}"
+                local subtask_id="${match[1]}.${match[2]}"
+                if [[ ! " ${seen_parents[@]} " =~ " ${parent_id} " ]]; then
+                    echo "  ❌ Orphaned subtask #$subtask_id (parent #$parent_id not found)"
+                    orphan_issues=$((orphan_issues + 1))
+                    issues_found=$((issues_found + 1))
+                fi
             fi
         fi
-    done < <(grep "\*\*#[0-9]\+\.[0-9]\+\*\*" "$TODO_FILE")
+    done < "$TODO_FILE"
     
     if [[ $orphan_issues -eq 0 ]]; then
         echo "  ✅ No orphaned subtasks"
@@ -3158,21 +3349,60 @@ lint_todo() {
     local task_ids=()
     local duplicates=()
     
+    # Reset section tracking
+    in_tasks=false
+    in_recently_completed=false
+    in_deleted=false
+    skip_line=false
+    
     while IFS= read -r line; do
-        if [[ "$line" =~ '#([0-9]+\.[0-9]+|[0-9]+)' ]]; then
-            local task_id="${match[1]}"
-            if [[ " ${task_ids[@]} " =~ " ${task_id} " ]]; then
-                if [[ ! " ${duplicates[@]} " =~ " ${task_id} " ]]; then
-                    echo "  ❌ Duplicate task ID: #$task_id"
-                    duplicates+=("$task_id")
-                    duplicate_issues=$((duplicate_issues + 1))
-                    issues_found=$((issues_found + 1))
+        # Detect section headers
+        if [[ "$line" == "## Tasks" ]]; then
+            in_tasks=true
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=false
+        elif [[ "$line" == "## Recently Completed" ]]; then
+            in_tasks=false
+            in_recently_completed=true
+            in_deleted=false
+            skip_line=true
+        elif [[ "$line" == "## Deleted Tasks" ]]; then
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=true
+            skip_line=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            # Other section - stop checking
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=true
+        fi
+        
+        # Skip archived and deleted tasks
+        if [[ "$skip_line" == true ]]; then
+            continue
+        fi
+        
+        # Only check tasks in the "Tasks" section
+        if [[ "$in_tasks" == true ]]; then
+            # Match task IDs: **#task_id** or **#prefix-task_id**
+            if [[ "$line" =~ '\*\*#([a-z0-9-]*[0-9]+(\.[0-9]+)?)\*\*' ]]; then
+                local task_id="${match[1]}"
+                if [[ " ${task_ids[@]} " =~ " ${task_id} " ]]; then
+                    if [[ ! " ${duplicates[@]} " =~ " ${task_id} " ]]; then
+                        echo "  ❌ Duplicate task ID: #$task_id"
+                        duplicates+=("$task_id")
+                        duplicate_issues=$((duplicate_issues + 1))
+                        issues_found=$((issues_found + 1))
+                    fi
+                else
+                    task_ids+=("$task_id")
                 fi
-            else
-                task_ids+=("$task_id")
             fi
         fi
-    done < <(grep "\*\*#[0-9]\|\*\*#[0-9]\+\.[0-9]\+" "$TODO_FILE")
+    done < "$TODO_FILE"
     
     if [[ $duplicate_issues -eq 0 ]]; then
         echo "  ✅ No duplicate task IDs"
@@ -3184,16 +3414,41 @@ lint_todo() {
     # Check for empty lines in task sections
     echo "📄 Checking for problematic empty lines:"
     local empty_line_issues=0
-    local in_tasks=false
+    
+    # Reset section tracking
+    in_tasks=false
+    in_recently_completed=false
+    in_deleted=false
+    skip_line=false
     local line_num=0
     
     while IFS= read -r line; do
         line_num=$((line_num + 1))
-        if [[ "$line" == "## Tasks" ]] || [[ "$line" == "## Deleted Tasks" ]] || [[ "$line" == "## Recently Completed" ]]; then
+        
+        # Detect section headers
+        if [[ "$line" == "## Tasks" ]]; then
             in_tasks=true
-        elif [[ "$line" =~ ^"## " ]]; then
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=false
+        elif [[ "$line" == "## Recently Completed" ]]; then
             in_tasks=false
-        elif [[ $in_tasks == true ]] && [[ -z "$line" ]]; then
+            in_recently_completed=true
+            in_deleted=false
+            skip_line=true
+        elif [[ "$line" == "## Deleted Tasks" ]]; then
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=true
+            skip_line=true
+        elif [[ "$line" =~ ^"## " ]]; then
+            # Other section - stop checking
+            in_tasks=false
+            in_recently_completed=false
+            in_deleted=false
+            skip_line=true
+        elif [[ "$in_tasks" == true ]] && [[ -z "$line" ]]; then
+            # Only check empty lines in Tasks section
             # Check if previous and next lines are both tasks (not blockquotes or other content)
             local prev_line=$(sed -n "$((line_num-1))p" "$TODO_FILE")
             local next_line=$(sed -n "$((line_num+1))p" "$TODO_FILE")

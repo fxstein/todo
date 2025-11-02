@@ -3,16 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#fxstein-3** Test multi-user task B `#test`
-- [ ] **#fxstein-2** Test multi-user task A `#test`
-- [ ] **#59** Test duplicate numbering bug `#test`
-- [ ] **#main-1** Test branch mode task 2 `#test`
-- [ ] **#main-2** Test branch mode task 1 `#test`
-- [ ] **#fxstein-1** Test multi-user mode task 2 `#test`
-- [ ] **#fxstein-4** Test multi-user mode task 1 `#test`
-- [ ] **#57** Test single-user mode task 1 `#test`
-  - [ ] **#57.1** Test subtask `#test`
-- [x] **#58** Test single-user mode task 2 `#test`
 - [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
   - [ ] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
   - [ ] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
@@ -225,6 +215,16 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#59** Test duplicate numbering bug `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#58** Test single-user mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#57** Test single-user mode task 1 `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#main-2** Test branch mode task 1 `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#main-1** Test branch mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-4** Test multi-user mode task 1 `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-3** Test multi-user task B `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-2** Test multi-user task A `#test` (deleted 2025-11-02, expires 2025-12-02)
+- [D] **#fxstein-1** Test multi-user mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2025-11-02, expires 2025-12-02)
@@ -255,7 +255,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 14:19:45 CET 2025
+**Last Updated:** Sun Nov  2 14:31:03 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

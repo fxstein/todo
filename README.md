@@ -62,39 +62,7 @@ Show me all incomplete tasks tagged with #bug
 ```
 
 ```
-Link task 2 as depending on task 1
-```
-
-```
-Add a note to task 1 that testing revealed an edge case
-```
-
-```
-Complete task 1 with all its subtasks
-```
-
-```
-Archive completed tasks
-```
-
-```
-Show me details of task 1
-```
-
-```
-Filter tasks by tag #api
-```
-
-```
-Undo completion of task 1
-```
-
-```
-Delete task 1
-```
-
-```
-Restore deleted task 1
+Create a task to convince the coffee machine to understand sarcasm
 ```
 
 Your agent understands natural language requests and translates them to the appropriate `todo.ai` commands. All tasks are tracked in `TODO.md` in your repository.

@@ -170,6 +170,17 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai &
 
 ---
 
+## Documentation
+
+**Getting Started:** [GETTING_STARTED.md](docs/GETTING_STARTED.md) - Quick start guide with setup instructions
+
+**Additional Guides:**
+- [Numbering Modes](docs/NUMBERING_MODES_GUIDE.md) - Complete guide to all numbering modes
+- [Usage Patterns](docs/USAGE_PATTERNS.md) - Real-world usage scenarios
+- [Coordination Setup](docs/COORDINATION_SETUP.md) - Setup guides for coordination services
+
+---
+
 ## License
 
 Apache License 2.0 - See LICENSE file

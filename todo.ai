@@ -2922,10 +2922,20 @@ show_task() {
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
-    task_id="$resolved_task_id"
     
-    # Find and display the task
-    local task_line=$(grep "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1)
+    # Find and display the task (try resolved ID first, then fall back to original if not found)
+    local task_line=$(grep "^- \[.\] \*\*#$resolved_task_id\*\* \|^  - \[.\] \*\*#$resolved_task_id\*\* " "$TODO_FILE" | head -1)
+    
+    # Fallback: if resolved ID not found and it has a prefix, try original plain number
+    if [[ -z "$task_line" ]] && [[ "$resolved_task_id" != "$task_id" ]] && [[ "$resolved_task_id" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
+        local plain_number="${match[1]}"
+        task_line=$(grep "^- \[.\] \*\*#${plain_number}\*\* \|^  - \[.\] \*\*#${plain_number}\*\* " "$TODO_FILE" | head -1)
+        if [[ -n "$task_line" ]]; then
+            task_id="$plain_number"  # Use plain number for display
+        fi
+    else
+        task_id="$resolved_task_id"  # Use resolved ID for display
+    fi
     
     if [[ -z "$task_line" ]]; then
         echo "Error: Task #$task_id not found"

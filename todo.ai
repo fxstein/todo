@@ -3248,7 +3248,9 @@ resolve_conflicts() {
         line_num=$((line_num + 1))
         # Match task IDs in format: **#task_id** or **#prefix-task_id**
         # Also match prefixed IDs like fxstein-50
-        if [[ "$line" =~ '\*\*#([^ ]+)\*\*' ]]; then
+        # Use unquoted pattern variable for zsh regex compatibility
+        local task_pattern='\*\*#([^ ]+)\*\*'
+        if [[ "$line" =~ $task_pattern ]]; then
             local task_id="${match[1]}"
             
             # Check if this task ID has been seen before
@@ -3304,7 +3306,9 @@ resolve_conflicts() {
         line_num=0
         while IFS= read -r line; do
             line_num=$((line_num + 1))
-            if [[ "$line" =~ '\*\*#'"$dup_id"'\*\*' ]]; then
+            # Use unquoted pattern variable for zsh regex compatibility
+            local dup_pattern="\\*\\*#${dup_id}\\*\\*"
+            if [[ "$line" =~ $dup_pattern ]]; then
                 if [[ -z "$first_line_num" ]]; then
                     first_line_num="$line_num"
                 else
@@ -3394,12 +3398,22 @@ resolve_conflicts() {
     # Step 3: Apply renumbering
     if [[ "$dry_run" == true ]]; then
         echo "📋 Would renumber the following tasks:"
-        for key in "${!id_mapping[@]}"; do
-            IFS='|' read -r line_num old_id <<< "$key"
+        # Use zsh-compatible syntax for associative array keys
+        for key in "${(@k)id_mapping}"; do
+            # Parse key safely: format is "line_num|old_id"
+            # Strip any quotes and whitespace from line_num
+            local line_num=$(echo "$key" | cut -d'|' -f1 | tr -d '"' | tr -d "'" | tr -d '[:space:]')
+            local old_id=$(echo "$key" | cut -d'|' -f2- | tr -d '"' | tr -d "'")
             local new_id="${id_mapping[$key]}"
-            local task_line=$(sed -n "${line_num}p" "$TODO_FILE")
-            echo "  Line $line_num: #$old_id → #$new_id"
-            echo "    $task_line"
+            
+            # Validate line_num is a number
+            if [[ "$line_num" =~ ^[0-9]+$ ]]; then
+                local task_line=$(sed -n "${line_num}p" "$TODO_FILE")
+                echo "  Line $line_num: #$old_id → #$new_id"
+                echo "    $task_line"
+            else
+                echo "  ⚠️  Invalid line number format: '$line_num' (key: '$key')"
+            fi
         done
         echo ""
         echo "💡 Run './todo.ai resolve-conflicts' to apply these changes"
@@ -3417,9 +3431,15 @@ resolve_conflicts() {
             local line_changed=false
             
             # Check if this line needs renumbering
-            for key in "${!id_mapping[@]}"; do
-                IFS='|' read -r dup_line_num old_id <<< "$key"
-                if [[ "$line_num" == "$dup_line_num" ]]; then
+            # Use zsh-compatible syntax for associative array keys
+            for key in "${(@k)id_mapping}"; do
+                # Parse key safely: format is "line_num|old_id"
+                # Strip any quotes and whitespace from dup_line_num
+                local dup_line_num=$(echo "$key" | cut -d'|' -f1 | tr -d '"' | tr -d "'" | tr -d '[:space:]')
+                local old_id=$(echo "$key" | cut -d'|' -f2- | tr -d '"' | tr -d "'")
+                
+                # Validate dup_line_num is a number before comparing
+                if [[ "$dup_line_num" =~ ^[0-9]+$ ]] && [[ "$line_num" == "$dup_line_num" ]]; then
                     local new_id="${id_mapping[$key]}"
                     # Replace task ID in line
                     new_line=$(echo "$new_line" | sed "s/\\*\\*#${old_id}\\*\\*/\\*\\*#${new_id}\\*\\*/g")
@@ -3432,8 +3452,11 @@ resolve_conflicts() {
             
             # Also update references to old IDs in relationships, notes, etc.
             if [[ "$line_changed" == false ]]; then
-                for key in "${!id_mapping[@]}"; do
-                    IFS='|' read -r dup_line_num old_id <<< "$key"
+                # Use zsh-compatible syntax for associative array keys
+                for key in "${(@k)id_mapping}"; do
+                    # Parse key safely: format is "line_num|old_id"
+                    # Strip any quotes from old_id (line_num not needed here)
+                    local old_id=$(echo "$key" | cut -d'|' -f2- | tr -d '"' | tr -d "'")
                     local new_id="${id_mapping[$key]}"
                     # Replace references (e.g., in relationships: #old_id or old_id:)
                     if [[ "$new_line" =~ "#${old_id}" ]] || [[ "$new_line" =~ ":${old_id}" ]] || [[ "$new_line" =~ "${old_id}:" ]]; then

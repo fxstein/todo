@@ -1583,9 +1583,9 @@ delete_task() {
     
     # Automatically include subtasks when deleting parent tasks (tasks without dots)
     # This prevents orphaned subtasks when a parent is deleted
-    local expanded_ids=()
-    for id in "${all_ids[@]}"; do
-        expanded_ids+=("$id")
+        local expanded_ids=()
+        for id in "${all_ids[@]}"; do
+            expanded_ids+=("$id")
         # If this is a parent task (no dots), automatically find all subtasks
         # If --with-subtasks flag is used, also include subtasks for subtasks (but that's unusual)
         if [[ "$id" != *.* ]] || [[ "$with_subtasks" == "true" ]]; then
@@ -1601,8 +1601,8 @@ delete_task() {
                 fi
             done < "$TODO_FILE"
         fi
-    done
-    all_ids=("${expanded_ids[@]}")
+        done
+        all_ids=("${expanded_ids[@]}")
     
     # Delete all tasks
     local deleted_count=0
@@ -2890,12 +2890,9 @@ BUG_REPORT_THRESHOLD="${BUG_REPORT_THRESHOLD:-75}"  # Similarity threshold (%)
 
 # Get GitHub repository URL (sanitized for private repos)
 get_bug_report_repo() {
-    if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
-        local repo_url=$(git remote get-url origin 2>/dev/null | sed 's/\.git$//' | sed 's/git@github\.com:/https:\/\/github.com\//' || echo '')
-        echo "$repo_url"
-    else
-        echo ""
-    fi
+    # Bug reports are always for todo.ai itself, not the repository it's installed in
+    # Always return the todo.ai repository URL
+    echo "https://github.com/fxstein/todo.ai"
 }
 
 # Check if repository is private
@@ -3110,7 +3107,7 @@ check_for_duplicate_issues() {
     local repo_url="$3"
     
     if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
-        echo ""
+                echo ""
         return 1
     fi
     
@@ -3230,11 +3227,11 @@ check_for_duplicate_issues() {
     
     if [[ -n "$duplicates" ]]; then
         echo -e "$duplicates"
-        return 0
-    else
+            return 0
+        else
         echo ""
-        return 1
-    fi
+            return 1
+        fi
 }
 
 # Create new GitHub issue

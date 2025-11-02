@@ -876,12 +876,66 @@ The MAX algorithm provides **minimal practical value**. In a typical development
 
 This happens **frequently** in any active development team, making this approach **not viable** for practical multi-user support.
 
-**Alternative Approaches (Not Implemented):**
-1. **External coordination service**: Use a shared API/service for task number assignment (requires central service)
-2. **UUID-based numbering**: Use UUIDs instead of sequential numbers (breaks simplicity)
-3. **Namespace-based numbering**: Prefix task numbers with branch/fork identifier (e.g., `feature-auth#50`)
-4. **Server-side assignment**: Require a central server for all task management (not distributed)
-5. **Lock-based assignment**: Use Git locks or external locking mechanism (complex, slow)
+**Alternative Approaches:**
+
+#### Option 1: GitHub Issues/Gists as Atomic Coordinator (PROMISING)
+
+**Idea:** Use GitHub Issues or Gists as a coordination mechanism to track the latest task number atomically.
+
+**How it works:**
+- Create a special GitHub Issue (or Gist) that stores the current "next available task number"
+- When assigning a new task number:
+  1. Fetch current number from GitHub Issue/Gist via API
+  2. Increment atomically using GitHub API (with optimistic locking/ETags)
+  3. Update GitHub Issue/Gist with new number
+  4. Use the assigned number for the task
+- GitHub API provides atomic operations, preventing race conditions
+
+**Example Implementation:**
+```bash
+# Fetch current number from GitHub Issue
+current_num=$(gh api repos/:owner/:repo/issues/:issue_number --jq '.body' | grep -oP '\d+')
+
+# Atomically update using GitHub API with ETag/optimistic locking
+new_num=$((current_num + 1))
+gh api -X PATCH repos/:owner/:repo/issues/:issue_number \
+  --field body="Current next task number: $new_num" \
+  --header "If-Match: $etag"
+
+# Use new_num for the task
+```
+
+**Benefits:**
+- ✅ **True atomic assignment**: GitHub API provides atomic operations
+- ✅ **No race conditions**: Concurrent requests are handled by GitHub
+- ✅ **Uses existing infrastructure**: No new services needed
+- ✅ **Works across branches/forks**: Single source of truth
+- ✅ **Simple implementation**: Use GitHub CLI (`gh`)
+
+**Challenges:**
+- ⚠️ **Requires GitHub API access**: Users need GitHub CLI configured
+- ⚠️ **Requires network access**: Cannot work offline
+- ⚠️ **Requires authentication**: GitHub tokens needed
+- ⚠️ **API rate limits**: May hit limits with high usage (but manual confirmation helps)
+- ⚠️ **Single point of coordination**: Issue/Gist becomes critical resource
+
+**Feasibility:** This is **significantly more viable** than Git-based coordination because it provides true atomic assignment.
+
+#### Option 2: UUID-based numbering
+- Use UUIDs instead of sequential numbers (breaks simplicity)
+- No coordination needed, but loses human-readable sequential numbering
+
+#### Option 3: Namespace-based numbering
+- Prefix task numbers with branch/fork identifier (e.g., `feature-auth#50`)
+- No conflicts, but loses sequential numbering across branches
+
+#### Option 4: External coordination service
+- Use a shared API/service for task number assignment (requires separate service)
+- More complex, requires external infrastructure
+
+#### Option 5: Lock-based assignment
+- Use Git locks or external locking mechanism (complex, slow)
+- Doesn't solve the fundamental problem
 
 **Critical Question: Is This Approach Viable?**
 
@@ -1011,11 +1065,21 @@ After thorough analysis, this approach has **significant limitations** that may 
 - ⚠️ **Alternative approaches may be better**: UUIDs, namespaces, or accepting single-user scope
 
 **Recommendation:**
-Before implementing this design, **seriously consider**:
-1. **Is multi-user support necessary?** Maybe todo.ai's strength is in single-user, single-branch scenarios
-2. **Is conflict resolution sufficient?** Can we make resolution seamless enough that conflicts are acceptable?
-3. **Should we explore alternatives?** UUIDs, namespaces, or external coordination services
+Before implementing the Git-based approach, **seriously consider**:
+1. **GitHub Issues/Gists as atomic coordinator**: This approach provides true atomic assignment and may be viable
+2. **Is multi-user support necessary?** Maybe todo.ai's strength is in single-user, single-branch scenarios
+3. **Is conflict resolution sufficient?** Can we make resolution seamless enough that conflicts are acceptable?
 4. **What's the actual use case?** Understanding the real-world scenarios may reveal this design isn't needed
+
+**Key Insight:**
+The **GitHub Issues/Gists approach** (Option 1 above) is significantly more viable than Git-based coordination because:
+- ✅ Provides true atomic assignment via GitHub API
+- ✅ Eliminates race conditions
+- ✅ Works across branches and forks
+- ✅ Uses existing GitHub infrastructure
+- ✅ No fundamental limitations like the Git-based approach
+
+**Consider exploring GitHub Issues/Gists approach before implementing Git-based coordination.**
 
 **This design documents the attempt** and provides a framework for conflict resolution, but **acknowledges it may not be a viable solution** for practical multi-user scenarios with sequential numbering.
 

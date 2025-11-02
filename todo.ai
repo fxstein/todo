@@ -6688,7 +6688,8 @@ init_cursor_rules
 # Display current operating mode (unless it's a command that doesn't need it)
 # Skip for internal operations and help/version commands
 if [[ "${1:-}" != "version" && "${1:-}" != "--version" && "${1:-}" != "-v" && \
-      "${1:-}" != "--help" && "${1:-}" != "help" && "${1:-}" != "-h" ]]; then
+      "${1:-}" != "--help" && "${1:-}" != "help" && "${1:-}" != "-h" && \
+      "${1:-}" != "--info" ]]; then
     local current_mode=$(get_numbering_mode)
     local coord_type=$(get_config_value "coordination.type" "none")
     
@@ -6933,6 +6934,12 @@ case "${1:-}" in
         echo "todo.ai version $VERSION"
         echo "Repository: $REPO_URL"
         echo "Update: ./todo.ai update"
+        ;;
+    "--info")
+        show_usage
+        local config_file=$(get_config_file)
+        echo ""
+        echo "Config file location: $config_file"
         ;;
     "--help"|"help"|"-h")
         show_usage

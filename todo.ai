@@ -44,6 +44,733 @@ SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 TODO_FILE="${TODO_FILE:-$(pwd)/TODO.md}"
 SERIAL_FILE="${TODO_SERIAL:-$(pwd)/.todo.ai/.todo.ai.serial}"
 LOG_FILE="${TODO_LOG:-$(pwd)/.todo.ai/.todo.ai.log}"
+CONFIG_FILE="${TODO_CONFIG:-$(pwd)/.todo.ai/config.yaml}"
+
+# ============================================================================
+# Hybrid Task Numbering System
+# ============================================================================
+
+# Configuration file path
+get_config_file() {
+    echo "$CONFIG_FILE"
+}
+
+# Read YAML config value (supports nested keys like coordination.type)
+get_config_value() {
+    local key="$1"  # e.g., "mode" or "coordination.type"
+    local config_file=$(get_config_file)
+    local default="${2:-}"
+    
+    if [[ ! -f "$config_file" ]]; then
+        echo "$default"
+        return 0
+    fi
+    
+    # Try yq first (best YAML parser)
+    if command -v yq >/dev/null 2>&1; then
+        local value=$(yq eval ".$key" "$config_file" 2>/dev/null || echo "")
+        if [[ -n "$value" ]] && [[ "$value" != "null" ]]; then
+            echo "$value"
+            return 0
+        fi
+    fi
+    
+    # Fallback to Python if available
+    if command -v python3 >/dev/null 2>&1; then
+        local value=$(python3 <<EOF
+import yaml
+import sys
+try:
+    with open('$config_file', 'r') as f:
+        config = yaml.safe_load(f)
+        if config is None:
+            print('')
+            sys.exit(0)
+        # Handle nested keys (e.g., "coordination.type")
+        keys = '$key'.split('.')
+        value = config
+        for k in keys:
+            if isinstance(value, dict) and k in value:
+                value = value[k]
+            else:
+                print('')
+                sys.exit(0)
+        print(str(value) if value is not None else '')
+except Exception as e:
+    print('')
+    sys.exit(1)
+EOF
+)
+        if [[ -n "$value" ]]; then
+            echo "$value"
+            return 0
+        fi
+    fi
+    
+    # Fallback to simple grep/sed for mode (top-level only)
+    if [[ "$key" == "mode" ]]; then
+        local value=$(grep "^mode:" "$config_file" 2>/dev/null | sed 's/^mode:[[:space:]]*//' | sed 's/[[:space:]]*$//' || echo "")
+        if [[ -n "$value" ]]; then
+            echo "$value"
+            return 0
+        fi
+    fi
+    
+    echo "$default"
+}
+
+# Get numbering mode (default: single-user)
+get_numbering_mode() {
+    get_config_value "mode" "single-user"
+}
+
+# Validate configuration
+validate_config() {
+    local config_file=$(get_config_file)
+    
+    if [[ ! -f "$config_file" ]]; then
+        # No config file is valid (defaults to single-user)
+        return 0
+    fi
+    
+    local mode=$(get_numbering_mode)
+    
+    # Check mode is valid
+    case "$mode" in
+        "single-user"|"multi-user"|"branch"|"enhanced")
+            ;;
+        *)
+            echo "ERROR: Invalid mode in config: $mode" >&2
+            echo "Valid modes: single-user, multi-user, branch, enhanced" >&2
+            return 1
+            ;;
+    esac
+    
+    # Validate coordination settings if enhanced mode
+    if [[ "$mode" == "enhanced" ]]; then
+        local coord_type=$(get_config_value "coordination.type" "")
+        case "$coord_type" in
+            "github-issues")
+                local issue_num=$(get_config_value "coordination.issue_number" "")
+                if [[ -z "$issue_num" ]] || ! [[ "$issue_num" =~ ^[0-9]+$ ]]; then
+                    echo "ERROR: Invalid or missing coordination.issue_number for github-issues mode" >&2
+                    return 1
+                fi
+                ;;
+            "counterapi")
+                local namespace=$(get_config_value "coordination.namespace" "")
+                if [[ -z "$namespace" ]]; then
+                    echo "ERROR: Missing coordination.namespace for counterapi mode" >&2
+                    return 1
+                fi
+                ;;
+            "none"|"")
+                # No coordination is valid (will use fallback)
+                ;;
+            *)
+                echo "ERROR: Invalid coordination.type: $coord_type" >&2
+                echo "Valid types: github-issues, counterapi, none" >&2
+                return 1
+                ;;
+        esac
+    fi
+    
+    return 0
+}
+
+# Create backup before mode switching
+create_mode_backup() {
+    local backup_dir="$(pwd)/.todo.ai/backups"
+    local timestamp=$(date +"%Y%m%d%H%M%S")
+    local backup_name="mode-switch-${timestamp}"
+    
+    # Ensure backup directory exists
+    mkdir -p "$backup_dir" 2>/dev/null || return 1
+    
+    # Create backup of TODO.md and config.yaml
+    local backup_todo="${backup_dir}/${backup_name}.TODO.md"
+    local backup_config="${backup_dir}/${backup_name}.config.yaml"
+    local backup_serial="${backup_dir}/${backup_name}.serial"
+    
+    # Copy files
+    if [[ -f "$TODO_FILE" ]]; then
+        cp "$TODO_FILE" "$backup_todo" 2>/dev/null || return 1
+    fi
+    
+    local config_file=$(get_config_file)
+    if [[ -f "$config_file" ]]; then
+        cp "$config_file" "$backup_config" 2>/dev/null || return 1
+    fi
+    
+    if [[ -f "$SERIAL_FILE" ]]; then
+        cp "$SERIAL_FILE" "$backup_serial" 2>/dev/null || return 1
+    fi
+    
+    echo "$backup_name"
+    return 0
+}
+
+# Rollback from backup
+rollback_from_backup() {
+    local backup_name="$1"
+    
+    if [[ -z "$backup_name" ]]; then
+        echo "Error: Please provide backup name"
+        echo "Usage: ./todo.ai rollback-mode <backup-name>"
+        echo "List backups: ./todo.ai list-mode-backups"
+        return 1
+    fi
+    
+    local backup_dir="$(pwd)/.todo.ai/backups"
+    local backup_todo="${backup_dir}/${backup_name}.TODO.md"
+    local backup_config="${backup_dir}/${backup_name}.config.yaml"
+    local backup_serial="${backup_dir}/${backup_name}.serial"
+    
+    # Check if backup exists
+    if [[ ! -f "$backup_todo" ]]; then
+        echo "Error: Backup '$backup_name' not found"
+        return 1
+    fi
+    
+    # Restore files
+    if [[ -f "$backup_todo" ]]; then
+        cp "$backup_todo" "$TODO_FILE" 2>/dev/null || {
+            echo "Error: Could not restore TODO.md"
+            return 1
+        }
+    fi
+    
+    local config_file=$(get_config_file)
+    if [[ -f "$backup_config" ]]; then
+        cp "$backup_config" "$config_file" 2>/dev/null || {
+            echo "Error: Could not restore config.yaml"
+            return 1
+        }
+    elif [[ -f "$config_file" ]]; then
+        # If backup has no config but current has one, remove it
+        rm -f "$config_file" 2>/dev/null || true
+    fi
+    
+    if [[ -f "$backup_serial" ]]; then
+        cp "$backup_serial" "$SERIAL_FILE" 2>/dev/null || {
+            echo "Error: Could not restore serial file"
+            return 1
+        }
+    fi
+    
+    echo "✅ Rollback complete: restored from backup '$backup_name'"
+    return 0
+}
+
+# List mode backups
+list_mode_backups() {
+    local backup_dir="$(pwd)/.todo.ai/backups"
+    
+    if [[ ! -d "$backup_dir" ]]; then
+        echo "No backups found"
+        return 0
+    fi
+    
+    local backups=()
+    for backup_file in "$backup_dir"/mode-switch-*.TODO.md; do
+        if [[ -f "$backup_file" ]]; then
+            local backup_name=$(basename "$backup_file" | sed 's/\.TODO\.md$//')
+            backups+=("$backup_name")
+        fi
+    done
+    
+    if [[ ${#backups[@]} -eq 0 ]]; then
+        echo "No mode switch backups found"
+        return 0
+    fi
+    
+    echo "Mode switch backups:"
+    echo ""
+    for backup in "${backups[@]}"; do
+        local timestamp=$(echo "$backup" | sed 's/mode-switch-//')
+        local date_str=$(echo "$timestamp" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
+        echo "  $backup ($date_str)"
+    done
+}
+
+# Get GitHub user ID (first 7 characters)
+get_github_user_id() {
+    local user_id=""
+    
+    # Try GitHub CLI first
+    if command -v gh >/dev/null 2>&1; then
+        user_id=$(gh api user --jq '.login' 2>/dev/null || echo "")
+    fi
+    
+    # Fallback to Git config
+    if [[ -z "$user_id" ]]; then
+        # Try git config user.name
+        local git_user=$(git config --get user.name 2>/dev/null || echo "")
+        if [[ -n "$git_user" ]]; then
+            # Convert to lowercase, remove non-alphanumeric, take first 7 chars
+            user_id=$(echo "$git_user" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]' | cut -c1-7)
+        fi
+    fi
+    
+    # Final fallback
+    if [[ -z "$user_id" ]]; then
+        # Use system username as last resort
+        local sys_user=$(whoami 2>/dev/null || echo "user")
+        user_id=$(echo "$sys_user" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]' | cut -c1-7)
+    fi
+    
+    # Ensure we have something (at least 1 char)
+    if [[ -z "$user_id" ]]; then
+        user_id="user"
+    fi
+    
+    # Take first 7 characters
+    echo "${user_id:0:7}"
+}
+
+# Get current Git branch name (first 7 characters)
+get_branch_name() {
+    local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+    
+    if [[ -z "$branch" ]] || [[ "$branch" == "HEAD" ]]; then
+        echo "main"  # Default branch name
+        return 0
+    fi
+    
+    # Take first 7 characters, remove non-alphanumeric
+    branch=$(echo "$branch" | tr -cd '[:alnum:]_' | cut -c1-7)
+    
+    # Ensure we have something
+    if [[ -z "$branch" ]]; then
+        branch="main"
+    fi
+    
+    echo "$branch"
+}
+
+# Assign task number based on current mode
+assign_task_number() {
+    local mode=$(get_numbering_mode)
+    
+    case "$mode" in
+        "single-user")
+            # Mode 1: Simple sequential numbering
+            increment_serial
+            ;;
+        "multi-user")
+            # Mode 2: Prefix with GitHub user ID
+            assign_task_number_multi_user
+            ;;
+        "branch")
+            # Mode 3: Prefix with branch name
+            assign_task_number_branch
+            ;;
+        "enhanced")
+            # Mode 4: Enhanced coordination (GitHub Issues or CounterAPI)
+            assign_task_number_enhanced
+            ;;
+        *)
+            # Fallback to single-user
+            increment_serial
+            ;;
+    esac
+}
+
+# Mode 2: Multi-user numbering (user-prefix)
+assign_task_number_multi_user() {
+    local user_prefix=$(get_github_user_id)
+    local todo_file="$TODO_FILE"
+    
+    # Find highest task number for this user prefix
+    local highest=0
+    local pattern="${user_prefix}-([0-9]+)"
+    
+    while IFS= read -r line; do
+        # Match task IDs like fxstein-50 in TODO.md
+        if [[ "$line" =~ \*\*#${user_prefix}-([0-9]+)\*\* ]]; then
+            local num="${match[1]}"
+            if [[ $num -gt $highest ]]; then
+                highest=$num
+            fi
+        fi
+    done < "$todo_file"
+    
+    local next_num=$((highest + 1))
+    echo "${user_prefix}-${next_num}"
+}
+
+# Mode 3: Branch numbering (branch-prefix)
+assign_task_number_branch() {
+    local branch_prefix=$(get_branch_name)
+    local todo_file="$TODO_FILE"
+    
+    # Find highest task number for this branch prefix
+    local highest=0
+    local pattern="${branch_prefix}-([0-9]+)"
+    
+    while IFS= read -r line; do
+        # Match task IDs like feature-50 in TODO.md
+        if [[ "$line" =~ \*\*#${branch_prefix}-([0-9]+)\*\* ]]; then
+            local num="${match[1]}"
+            if [[ $num -gt $highest ]]; then
+                highest=$num
+            fi
+        fi
+    done < "$todo_file"
+    
+    local next_num=$((highest + 1))
+    echo "${branch_prefix}-${next_num}"
+}
+
+# Mode 4: Enhanced multi-user numbering (with coordination)
+assign_task_number_enhanced() {
+    local coord_type=$(get_config_value "coordination.type" "none")
+    local fallback_mode=$(get_config_value "coordination.fallback" "multi-user")
+    
+    case "$coord_type" in
+        "github-issues")
+            assign_task_number_enhanced_github_issues || assign_task_number_enhanced_fallback "$fallback_mode"
+            ;;
+        "counterapi")
+            assign_task_number_enhanced_counterapi || assign_task_number_enhanced_fallback "$fallback_mode"
+            ;;
+        *)
+            # No coordination configured, use fallback
+            assign_task_number_enhanced_fallback "$fallback_mode"
+            ;;
+    esac
+}
+
+# Enhanced mode: GitHub Issues coordination
+assign_task_number_enhanced_github_issues() {
+    local issue_num=$(get_config_value "coordination.issue_number" "")
+    local repo_url=$(git config --get remote.origin.url 2>/dev/null | sed 's/\.git$//' | sed 's/.*github\.com[:/]//' || echo "")
+    
+    if [[ -z "$issue_num" ]] || [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Check GitHub CLI authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Get latest comment from issue
+    local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq '.[0].body' 2>/dev/null || echo "")
+    
+    if [[ -z "$latest_comment" ]]; then
+        # No comments yet, start with 1
+        local new_num=1
+    else
+        # Extract number from comment (format: "Next task number: 123" or just "123")
+        local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
+        if [[ -z "$current_num" ]]; then
+            current_num=0
+        fi
+        local new_num=$((current_num + 1))
+    fi
+    
+    # Append new number as comment (with retry on conflicts)
+    local max_retries=3
+    local retry=0
+    while [[ $retry -lt $max_retries ]]; do
+        # Create comment with new number
+        if gh api -X POST repos/${repo_url}/issues/${issue_num}/comments --field "body=Next task number: $new_num" >/dev/null 2>&1; then
+            # Get user prefix for formatting
+            local user_prefix=$(get_github_user_id)
+            echo "${user_prefix}-${new_num}"
+            return 0
+        fi
+        
+        # Check if number changed (concurrent update)
+        local updated_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq '.[0].body' 2>/dev/null || echo "")
+        local updated_num=$(echo "$updated_comment" | grep -oE '[0-9]+' | tail -1)
+        if [[ -n "$updated_num" ]] && [[ "$updated_num" != "$current_num" ]]; then
+            # Number changed, retry with new number
+            current_num=$updated_num
+            new_num=$((current_num + 1))
+            retry=$((retry + 1))
+        else
+            # Unknown error, fallback
+            return 1
+        fi
+    done
+    
+    # Max retries reached, fallback
+    return 1
+}
+
+# Enhanced mode: CounterAPI coordination
+assign_task_number_enhanced_counterapi() {
+    local namespace=$(get_config_value "coordination.namespace" "")
+    local counter_name="task-counter"
+    
+    if [[ -z "$namespace" ]] || ! command -v curl >/dev/null 2>&1; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Increment atomically via CounterAPI
+    local response=$(curl -s -X POST "https://api.counterapi.dev/v1/${namespace}/${counter_name}/up" 2>/dev/null || echo "")
+    
+    if [[ -z "$response" ]]; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Parse response (expect JSON with "value" field)
+    local new_num=""
+    if command -v jq >/dev/null 2>&1; then
+        new_num=$(echo "$response" | jq -r '.value' 2>/dev/null || echo "")
+    elif command -v python3 >/dev/null 2>&1; then
+        new_num=$(echo "$response" | python3 -c "import sys, json; print(json.load(sys.stdin).get('value', ''))" 2>/dev/null || echo "")
+    fi
+    
+    if [[ -z "$new_num" ]] || ! [[ "$new_num" =~ ^[0-9]+$ ]]; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Get user prefix for formatting
+    local user_prefix=$(get_github_user_id)
+    echo "${user_prefix}-${new_num}"
+    return 0
+}
+
+# Enhanced mode: Fallback to simpler mode
+assign_task_number_enhanced_fallback() {
+    local fallback_mode="$1"
+    
+    case "$fallback_mode" in
+        "multi-user")
+            assign_task_number_multi_user
+            ;;
+        "branch")
+            assign_task_number_branch
+            ;;
+        *)
+            # Default to single-user
+            increment_serial
+            ;;
+    esac
+}
+
+# Resolve task reference (auto-add prefix for number-only references)
+resolve_task_reference() {
+    local input="$1"
+    local mode=$(get_numbering_mode)
+    
+    # If already has prefix (format: prefix-number), use as-is
+    if [[ "$input" =~ ^[a-z0-9]{1,7}-[0-9]+$ ]]; then
+        echo "$input"
+        return 0
+    fi
+    
+    # If just a number, add prefix based on mode
+    if [[ "$input" =~ ^[0-9]+$ ]]; then
+        case "$mode" in
+            "multi-user"|"enhanced")
+                local user_prefix=$(get_github_user_id)
+                echo "${user_prefix}-${input}"
+                return 0
+                ;;
+            "branch")
+                local branch_prefix=$(get_branch_name)
+                echo "${branch_prefix}-${input}"
+                return 0
+                ;;
+            "single-user")
+                # No prefix needed for single-user
+                echo "$input"
+                return 0
+                ;;
+        esac
+    fi
+    
+    # Invalid format
+    echo "ERROR: Invalid task ID format: $input" >&2
+    return 1
+}
+
+# Switch numbering mode
+switch_mode() {
+    local new_mode="$1"
+    local force=false
+    
+    # Parse options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --force|-f)
+                force=true
+                shift
+                ;;
+            *)
+                if [[ -z "$new_mode" ]]; then
+                    new_mode="$1"
+                fi
+                shift
+                ;;
+        esac
+    done
+    
+    if [[ -z "$new_mode" ]]; then
+        echo "Error: Please specify a mode to switch to"
+        echo "Usage: ./todo.ai switch-mode <mode> [--force]"
+        echo "Modes: single-user, multi-user, branch, enhanced"
+        return 1
+    fi
+    
+    # Validate mode
+    case "$new_mode" in
+        "single-user"|"multi-user"|"branch"|"enhanced")
+            ;;
+        *)
+            echo "Error: Invalid mode '$new_mode'"
+            echo "Valid modes: single-user, multi-user, branch, enhanced"
+            return 1
+            ;;
+    esac
+    
+    # Get current mode
+    local current_mode=$(get_numbering_mode)
+    
+    # Check if already in requested mode
+    if [[ "$current_mode" == "$new_mode" ]]; then
+        echo "Already in mode: $new_mode"
+        return 0
+    fi
+    
+    # Create backup before switching
+    echo "Creating backup before mode switch..."
+    local backup_name=$(create_mode_backup)
+    if [[ -z "$backup_name" ]]; then
+        echo "Error: Failed to create backup. Aborting mode switch."
+        return 1
+    fi
+    echo "✅ Backup created: $backup_name"
+    echo ""
+    
+    # Validate configuration for new mode
+    local config_file=$(get_config_file)
+    local config_dir=$(dirname "$config_file")
+    
+    # Ensure config directory exists
+    mkdir -p "$config_dir" 2>/dev/null || return 1
+    
+    # Update or create config file
+    if [[ -f "$config_file" ]]; then
+        # Update existing config file
+        # Try yq first
+        if command -v yq >/dev/null 2>&1; then
+            yq eval ".mode = \"$new_mode\"" -i "$config_file" 2>/dev/null || {
+                # Fallback to Python
+                if command -v python3 >/dev/null 2>&1; then
+                    python3 <<EOF
+import yaml
+import sys
+try:
+    with open('$config_file', 'r') as f:
+        config = yaml.safe_load(f) or {}
+    config['mode'] = '$new_mode'
+    with open('$config_file', 'w') as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+except Exception as e:
+    sys.exit(1)
+EOF
+                    if [[ $? -ne 0 ]]; then
+                        echo "Error: Failed to update config file"
+                        return 1
+                    fi
+                else
+                    # Fallback to sed (simple mode update)
+                    sed_inplace "s/^mode:.*/mode: $new_mode/" "$config_file" || {
+                        # If mode line doesn't exist, add it
+                        if ! grep -q "^mode:" "$config_file"; then
+                            echo "mode: $new_mode" >> "$config_file"
+                        else
+                            echo "Error: Failed to update config file"
+                            return 1
+                        fi
+                    }
+                fi
+            }
+        else
+            # Fallback to Python or sed
+            if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
+                python3 <<EOF
+import yaml
+import sys
+try:
+    with open('$config_file', 'r') as f:
+        config = yaml.safe_load(f) or {}
+    config['mode'] = '$new_mode'
+    with open('$config_file', 'w') as f:
+        yaml.dump(config, f, default_flow_style=False, sort_keys=False)
+except Exception as e:
+    sys.exit(1)
+EOF
+                if [[ $? -ne 0 ]]; then
+                    echo "Error: Failed to update config file"
+                    return 1
+                fi
+            else
+                # Fallback to sed (simple mode update)
+                sed_inplace "s/^mode:.*/mode: $new_mode/" "$config_file" || {
+                    if ! grep -q "^mode:" "$config_file"; then
+                        echo "mode: $new_mode" >> "$config_file"
+                    else
+                        echo "Error: Failed to update config file"
+                        return 1
+                    fi
+                }
+            fi
+        fi
+    else
+        # Create new config file
+        cat > "$config_file" <<EOF
+# todo.ai Configuration File
+# This file configures the task numbering system for this repository
+
+# Mode: single-user | multi-user | branch | enhanced
+mode: $new_mode
+
+# Coordination settings (for enhanced mode)
+coordination:
+  type: none
+  fallback: multi-user
+
+# Conflict resolution settings
+conflict_resolution:
+  enabled: true
+  auto_resolve: true
+  renumber_on_conflict: true
+  notify_on_conflict: false
+
+# Display settings
+display:
+  show_prefix: false
+  user_reference_style: number-only
+EOF
+    fi
+    
+    # Validate new configuration
+    if ! validate_config; then
+        echo "Error: Invalid configuration after mode switch"
+        echo "Attempting to restore from backup..."
+        rollback_from_backup "$backup_name" >/dev/null 2>&1 || true
+        return 1
+    fi
+    
+    # Log the action
+    log_todo_action "MODE_SWITCH" "$current_mode → $new_mode" "Switched from $current_mode to $new_mode"
+    
+    echo "✅ Mode switched: $current_mode → $new_mode"
+    echo ""
+    echo "📝 Note: Existing tasks keep their current IDs"
+    echo "   New tasks will use the $new_mode numbering scheme"
+    echo ""
+    echo "💾 Backup saved as: $backup_name"
+    echo "   To rollback: ./todo.ai rollback-mode $backup_name"
+    
+    return 0
+}
 
 # Function to get next serial number
 increment_serial() {
@@ -511,6 +1238,9 @@ show_usage() {
     echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
     echo "  report-bug \"description\"      Report a bug to GitHub Issues (requires GitHub CLI)"
     echo "  uninstall [--remove-data] [--remove-rules] [--all]  Uninstall todo.ai"
+    echo "  switch-mode <mode> [--force]  Switch numbering mode (single-user, multi-user, branch, enhanced)"
+    echo "  list-mode-backups             List mode switch backups"
+    echo "  rollback-mode <backup-name>   Rollback from mode switch backup"
     echo "  version, -v, --version        Show version information"
     echo ""
     echo ""
@@ -555,6 +1285,10 @@ show_usage() {
     echo "  ./todo.ai report-bug \"Error message\" # Report bug to GitHub Issues"
     echo "  ./todo.ai uninstall                  # Uninstall script only"
     echo "  ./todo.ai uninstall --all             # Uninstall script, data, and rules"
+    echo "  ./todo.ai switch-mode multi-user     # Switch to multi-user numbering mode"
+    echo "  ./todo.ai switch-mode branch          # Switch to branch-based numbering"
+    echo "  ./todo.ai list-mode-backups           # List mode switch backups"
+    echo "  ./todo.ai rollback-mode <backup-name> # Rollback from mode switch"
     echo "  ./todo.ai version                    # Show version"
     echo ""
     echo "Copyright 2025 Oliver Ratzesberger"
@@ -755,11 +1489,16 @@ add_todo() {
         return 1
     fi
     
-    # Get next serial number
-    local serial=$(increment_serial)
+    # Validate configuration before proceeding
+    if ! validate_config; then
+        echo "⚠️  Configuration error detected. Using default mode (single-user)." >&2
+    fi
+    
+    # Get next task number based on current mode
+    local task_id=$(assign_task_number)
     
     # Format the task line with bold task ID
-    local task_line="- [ ] **#$serial** $text"
+    local task_line="- [ ] **#$task_id** $text"
     if [[ -n "$tags" ]]; then
         # Wrap each tag in backticks for code styling
         local styled_tags=""
@@ -792,9 +1531,9 @@ add_todo() {
     update_footer
     
     # Log the action
-    log_todo_action "ADD" "$serial" "$text"
+    log_todo_action "ADD" "$task_id" "$text"
     
-    echo "Added: #$serial $text"
+    echo "Added: #$task_id $text"
 }
 
 # Function to calculate nesting depth from task ID
@@ -4204,6 +4943,17 @@ case "${1:-}" in
     "uninstall")
         shift
         uninstall_tool "$@"
+        ;;
+    "switch-mode")
+        shift
+        switch_mode "$@"
+        ;;
+    "list-mode-backups")
+        list_mode_backups
+        ;;
+    "rollback-mode")
+        shift
+        rollback_from_backup "$1"
         ;;
     "version"|"--version"|"-v")
         echo "todo.ai version $VERSION"

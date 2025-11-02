@@ -188,33 +188,32 @@ validate_config() {
             ;;
     esac
     
-    # Validate coordination settings if enhanced mode
-    if [[ "$mode" == "enhanced" ]]; then
+    # Validate coordination settings if enhanced mode or single-user mode with coordination
+    if [[ "$mode" == "enhanced" ]] || [[ "$mode" == "single-user" ]]; then
         local coord_type=$(get_config_value "coordination.type" "")
-        case "$coord_type" in
-            "github-issues")
-                local issue_num=$(get_config_value "coordination.issue_number" "")
-                if [[ -z "$issue_num" ]] || ! [[ "$issue_num" =~ ^[0-9]+$ ]]; then
-                    echo "ERROR: Invalid or missing coordination.issue_number for github-issues mode" >&2
+        if [[ "$coord_type" != "none" ]] && [[ -n "$coord_type" ]]; then
+            case "$coord_type" in
+                "github-issues")
+                    local issue_num=$(get_config_value "coordination.issue_number" "")
+                    if [[ -z "$issue_num" ]] || ! [[ "$issue_num" =~ ^[0-9]+$ ]]; then
+                        echo "ERROR: Invalid or missing coordination.issue_number for github-issues mode" >&2
+                        return 1
+                    fi
+                    ;;
+                "counterapi")
+                    local namespace=$(get_config_value "coordination.namespace" "")
+                    if [[ -z "$namespace" ]]; then
+                        echo "ERROR: Missing coordination.namespace for counterapi mode" >&2
+                        return 1
+                    fi
+                    ;;
+                *)
+                    echo "ERROR: Invalid coordination.type: $coord_type" >&2
+                    echo "Valid types: github-issues, counterapi, none" >&2
                     return 1
-                fi
-                ;;
-            "counterapi")
-                local namespace=$(get_config_value "coordination.namespace" "")
-                if [[ -z "$namespace" ]]; then
-                    echo "ERROR: Missing coordination.namespace for counterapi mode" >&2
-                    return 1
-                fi
-                ;;
-            "none"|"")
-                # No coordination is valid (will use fallback)
-                ;;
-            *)
-                echo "ERROR: Invalid coordination.type: $coord_type" >&2
-                echo "Valid types: github-issues, counterapi, none" >&2
-                return 1
-                ;;
-        esac
+                    ;;
+            esac
+        fi
     fi
     
     return 0
@@ -396,8 +395,8 @@ assign_task_number() {
     
     case "$mode" in
         "single-user")
-            # Mode 1: Simple sequential numbering
-            increment_serial
+            # Mode 1: Simple sequential numbering (with optional coordination)
+            assign_task_number_single_user
             ;;
         "multi-user")
             # Mode 2: Prefix with GitHub user ID
@@ -416,6 +415,150 @@ assign_task_number() {
             increment_serial
             ;;
     esac
+}
+
+# Mode 1: Single-user numbering (with optional coordination)
+assign_task_number_single_user() {
+    # Check if coordination is configured for single-user mode
+    local coord_type=$(get_config_value "coordination.type" "none")
+    
+    case "$coord_type" in
+        "github-issues")
+            assign_task_number_single_user_github_issues || increment_serial
+            ;;
+        "counterapi")
+            assign_task_number_single_user_counterapi || increment_serial
+            ;;
+        *)
+            # No coordination - use simple serial increment
+            increment_serial
+            ;;
+    esac
+}
+
+# Single-user mode: GitHub Issues coordination (returns plain number)
+assign_task_number_single_user_github_issues() {
+    local issue_num=$(get_config_value "coordination.issue_number" "")
+    local repo_url=$(git config --get remote.origin.url 2>/dev/null | sed 's/\.git$//' | sed 's/.*github\.com[:/]//' || echo "")
+    
+    if [[ -z "$issue_num" ]] || [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Check GitHub CLI authentication
+    if ! gh auth status >/dev/null 2>&1; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Get latest comment from issue
+    local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
+    
+    # Get coordinator value from issue comment
+    local coordinator_value=0
+    if [[ -n "$latest_comment" ]]; then
+        # Extract number from comment (format: "Next task number: 123" or just "123")
+        local extracted_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
+        if [[ -n "$extracted_num" ]] && [[ "$extracted_num" =~ ^[0-9]+$ ]]; then
+            coordinator_value=$extracted_num
+        fi
+    fi
+    
+    # Get highest task number from TODO.md (checks both prefixed and non-prefixed tasks)
+    local highest_task_num=$(get_highest_task_number)
+    
+    # Use max(coordinator_value, highest_task_num) + 1 to ensure no duplicates
+    local max_value=$coordinator_value
+    if [[ $highest_task_num -gt $max_value ]]; then
+        max_value=$highest_task_num
+    fi
+    
+    local new_num=$((max_value + 1))
+    
+    # If coordinator was behind, log a warning
+    if [[ $coordinator_value -lt $highest_task_num ]]; then
+        echo "⚠️  Warning: Coordinator value ($coordinator_value) was behind TODO.md highest ($highest_task_num)" >&2
+        echo "   Using max value: $max_value, next task: $new_num" >&2
+    fi
+    
+    # Append new number as comment (with retry on conflicts)
+    local max_retries=3
+    local retry=0
+    while [[ $retry -lt $max_retries ]]; do
+        # Create comment with new number
+        if gh api -X POST repos/${repo_url}/issues/${issue_num}/comments --field "body=Next task number: $new_num" >/dev/null 2>&1; then
+            # Return plain number (no prefix)
+            echo "$new_num"
+            return 0
+        fi
+        
+        # Check if number changed (concurrent update) - get latest comment by sorting
+        local updated_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
+        local updated_num=$(echo "$updated_comment" | grep -oE '[0-9]+' | tail -1)
+        if [[ -n "$updated_num" ]] && [[ "$updated_num" != "$coordinator_value" ]]; then
+            # Number changed, retry with new number
+            coordinator_value=$updated_num
+            max_value=$coordinator_value
+            if [[ $highest_task_num -gt $max_value ]]; then
+                max_value=$highest_task_num
+            fi
+            new_num=$((max_value + 1))
+            retry=$((retry + 1))
+        else
+            # Unknown error, fallback
+            return 1
+        fi
+    done
+    
+    # Max retries reached, fallback
+    return 1
+}
+
+# Single-user mode: CounterAPI coordination (returns plain number)
+assign_task_number_single_user_counterapi() {
+    local namespace=$(get_config_value "coordination.namespace" "")
+    local counter_name="task-counter"
+    
+    if [[ -z "$namespace" ]] || ! command -v curl >/dev/null 2>&1; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Increment atomically via CounterAPI
+    local response=$(curl -s -X POST "https://api.counterapi.dev/v1/${namespace}/${counter_name}/up" 2>/dev/null || echo "")
+    
+    if [[ -z "$response" ]]; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Parse response (expect JSON with "value" field)
+    local new_num=""
+    if command -v jq >/dev/null 2>&1; then
+        new_num=$(echo "$response" | jq -r '.value' 2>/dev/null || echo "")
+    elif command -v python3 >/dev/null 2>&1; then
+        new_num=$(echo "$response" | python3 -c "import sys, json; print(json.load(sys.stdin).get('value', ''))" 2>/dev/null || echo "")
+    fi
+    
+    if [[ -z "$new_num" ]] || ! [[ "$new_num" =~ ^[0-9]+$ ]]; then
+        return 1  # Trigger fallback
+    fi
+    
+    # Check against TODO.md highest number and use max if needed
+    local highest_task_num=$(get_highest_task_number)
+    if [[ $highest_task_num -gt $new_num ]]; then
+        # CounterAPI value is behind - we need to increment beyond the highest
+        # Note: CounterAPI already incremented, so we use its value
+        # But we should sync it by using max
+        echo "⚠️  Warning: CounterAPI value ($new_num) was behind TODO.md highest ($highest_task_num)" >&2
+        # Use the higher value to ensure no duplicates
+        if [[ $highest_task_num -ge $new_num ]]; then
+            new_num=$((highest_task_num + 1))
+            # Note: CounterAPI has already incremented, so we're using a value ahead
+            # In practice, this is fine since CounterAPI ensures atomicity for concurrent requests
+        fi
+    fi
+    
+    # Return plain number (no prefix)
+    echo "$new_num"
+    return 0
 }
 
 # Mode 2: Multi-user numbering (user-prefix)
@@ -6490,34 +6633,41 @@ if [[ "${1:-}" != "version" && "${1:-}" != "--version" && "${1:-}" != "-v" && \
     local current_mode=$(get_numbering_mode)
     local coord_type=$(get_config_value "coordination.type" "none")
     
-    if [[ "$current_mode" == "enhanced" ]]; then
-        # Show mode and coordinator for enhanced mode
-        case "$coord_type" in
-            "github-issues")
-                local issue_num=$(get_config_value "coordination.issue_number" "")
-                if [[ -n "$issue_num" ]]; then
-                    echo "📋 Mode: $current_mode | Coordinator: GitHub Issues (#$issue_num)" >&2
-                else
-                    echo "📋 Mode: $current_mode | Coordinator: GitHub Issues (not configured)" >&2
-                fi
-                ;;
-            "counterapi")
-                local namespace=$(get_config_value "coordination.namespace" "")
-                if [[ -n "$namespace" ]]; then
-                    echo "📋 Mode: $current_mode | Coordinator: CounterAPI ($namespace)" >&2
-                else
-                    echo "📋 Mode: $current_mode | Coordinator: CounterAPI (not configured)" >&2
-                fi
-                ;;
-            "none"|"")
+    if [[ "$current_mode" == "enhanced" ]] || [[ "$current_mode" == "single-user" ]]; then
+        # Show mode and coordinator if coordination is configured
+        if [[ "$coord_type" != "none" ]] && [[ -n "$coord_type" ]]; then
+            case "$coord_type" in
+                "github-issues")
+                    local issue_num=$(get_config_value "coordination.issue_number" "")
+                    if [[ -n "$issue_num" ]]; then
+                        echo "📋 Mode: $current_mode | Coordinator: GitHub Issues (#$issue_num)" >&2
+                    else
+                        echo "📋 Mode: $current_mode | Coordinator: GitHub Issues (not configured)" >&2
+                    fi
+                    ;;
+                "counterapi")
+                    local namespace=$(get_config_value "coordination.namespace" "")
+                    if [[ -n "$namespace" ]]; then
+                        echo "📋 Mode: $current_mode | Coordinator: CounterAPI ($namespace)" >&2
+                    else
+                        echo "📋 Mode: $current_mode | Coordinator: CounterAPI (not configured)" >&2
+                    fi
+                    ;;
+                *)
+                    echo "📋 Mode: $current_mode | Coordinator: $coord_type" >&2
+                    ;;
+            esac
+        else
+            # No coordination configured
+            if [[ "$current_mode" == "enhanced" ]]; then
                 echo "📋 Mode: $current_mode | Coordinator: none (fallback)" >&2
-                ;;
-            *)
-                echo "📋 Mode: $current_mode | Coordinator: $coord_type" >&2
-                ;;
-        esac
+            else
+                # Simple mode display for single-user without coordination
+                echo "📋 Mode: $current_mode" >&2
+            fi
+        fi
     else
-        # Simple mode display for non-enhanced modes
+        # Simple mode display for other modes
         echo "📋 Mode: $current_mode" >&2
     fi
 fi

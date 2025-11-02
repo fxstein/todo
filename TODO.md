@@ -10,7 +10,7 @@
   - [ ] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
   - [ ] **#52.14** Create user documentation: guide for adopting and switching between numbering modes `#docs`
   - [x] **#52.13** Implement task reference resolution: auto-add user prefix when user references tasks by number only `#code`
-  - [ ] **#52.12** Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs `#code`
+  - [x] **#52.12** Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs `#code`
   - [x] **#52.11** ✅ Implemented Mode 4 (Enhanced Multi-User) - GitHub Issues/CounterAPI coordination `#code`
   - [x] **#52.10** ✅ Implemented Mode 3 (Branch Mode) - branch prefix-based numbering `#code`
   - [x] **#52.9** ✅ Implemented Mode 2 (Multi-User) - prefix-based numbering `#code`
@@ -245,7 +245,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 13:48:25 CET 2025
+**Last Updated:** Sun Nov  2 13:54:04 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

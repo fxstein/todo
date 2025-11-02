@@ -1445,6 +1445,7 @@ show_usage() {
     echo "  restore <id>                  Restore task from Deleted or Recently Completed to active Tasks"
     echo "  --lint                        Identify formatting issues (indentation, checkboxes)"
     echo "  --reformat [--dry-run]        Apply formatting fixes (use --dry-run to preview)"
+    echo "  resolve-conflicts [--dry-run] Detect and resolve duplicate task IDs (optional dry-run)"
     echo "  edit                          Edit todo file in editor"
     echo "  log [--filter <text>] [--lines <n>] View TODO operation log"
     echo "  update                        Update todo.ai to latest version"
@@ -1483,6 +1484,8 @@ show_usage() {
     echo "  ./todo.ai --lint"
     echo "  ./todo.ai --reformat --dry-run"
     echo "  ./todo.ai --reformat"
+    echo "  ./todo.ai resolve-conflicts --dry-run  # Preview conflict resolution"
+    echo "  ./todo.ai resolve-conflicts            # Resolve duplicate task IDs"
     echo "  ./todo.ai list"
     echo "  ./todo.ai list --tag api"
     echo "  ./todo.ai list --incomplete-only     # Show only pending tasks"
@@ -3211,6 +3214,254 @@ lint_todo() {
         echo "⚠️  Found $issues_found total formatting issues"
         echo "💡 Run './todo.ai --reformat --dry-run' to see what would be fixed"
         echo "💡 Run './todo.ai --reformat' to apply fixes"
+    fi
+}
+
+# Function to detect and resolve task ID conflicts
+resolve_conflicts() {
+    local dry_run=false
+    
+    # Check for --dry-run flag
+    if [[ "$1" == "--dry-run" ]]; then
+        dry_run=true
+        echo "🔍 DRY RUN: Showing what would be fixed..."
+    else
+        echo "🔧 Resolving task ID conflicts..."
+    fi
+    echo ""
+    
+    local conflicts_resolved=0
+    
+    # Step 1: Detect duplicate task IDs
+    local task_ids=()
+    local duplicates=()
+    local duplicate_lines=()  # Store line numbers for duplicates
+    
+    local line_num=0
+    while IFS= read -r line; do
+        line_num=$((line_num + 1))
+        # Match task IDs in format: **#task_id** or **#prefix-task_id**
+        # Also match prefixed IDs like fxstein-50
+        if [[ "$line" =~ '\*\*#([^ ]+)\*\*' ]]; then
+            local task_id="${match[1]}"
+            
+            # Check if this task ID has been seen before
+            local found_duplicate=false
+            for existing_id in "${task_ids[@]}"; do
+                if [[ "$existing_id" == "$task_id" ]]; then
+                    found_duplicate=true
+                    # Check if we already recorded this duplicate
+                    local already_recorded=false
+                    for dup_id in "${duplicates[@]}"; do
+                        if [[ "$dup_id" == "$task_id" ]]; then
+                            already_recorded=true
+                            break
+                        fi
+                    done
+                    if [[ "$already_recorded" == false ]]; then
+                        duplicates+=("$task_id")
+                    fi
+                    duplicate_lines+=("$line_num|$task_id")
+                    break
+                fi
+            done
+            
+            # Add to seen IDs
+            if [[ "$found_duplicate" == false ]]; then
+                task_ids+=("$task_id")
+            fi
+        fi
+    done < "$TODO_FILE"
+    
+    if [[ ${#duplicates[@]} -eq 0 ]]; then
+        echo "✅ No duplicate task IDs found"
+        return 0
+    fi
+    
+    echo "📊 Found ${#duplicates[@]} duplicate task ID(s):"
+    for dup_id in "${duplicates[@]}"; do
+        echo "  - #$dup_id"
+    done
+    echo ""
+    
+    # Step 2: Create mapping from old duplicate IDs to new IDs
+    # Strategy: Keep first occurrence, renumber subsequent ones
+    declare -A id_mapping  # old_id -> new_id
+    local mode=$(get_numbering_mode)
+    
+    for dup_id in "${duplicates[@]}"; do
+        # Find all occurrences of this duplicate
+        local occurrences=()
+        local first_line_num=""
+        local occurrence_count=0
+        
+        line_num=0
+        while IFS= read -r line; do
+            line_num=$((line_num + 1))
+            if [[ "$line" =~ '\*\*#'"$dup_id"'\*\*' ]]; then
+                if [[ -z "$first_line_num" ]]; then
+                    first_line_num="$line_num"
+                else
+                    # This is a duplicate - needs renumbering
+                    occurrences+=("$line_num")
+                fi
+                occurrence_count=$((occurrence_count + 1))
+            fi
+        done < "$TODO_FILE"
+        
+        # Renumber each duplicate occurrence (except the first)
+        local occurrence_index=1
+        for dup_line_num in "${occurrences[@]}"; do
+            # Generate new ID based on mode
+            local new_id=""
+            
+            # Extract numeric part and prefix if any
+            local numeric_part=""
+            local prefix_part=""
+            
+            if [[ "$dup_id" =~ ^([a-z0-9]{1,7}-)?([0-9]+)(\.([0-9]+))?$ ]]; then
+                prefix_part="${match[1]}"
+                numeric_part="${match[2]}"
+                if [[ -n "${match[4]}" ]]; then
+                    # Subtask - preserve parent number, only renumber subtask part
+                    local parent_num="$numeric_part"
+                    local subtask_num="${match[4]}"
+                    # Get next available subtask number for this parent
+                    local next_subtask=$((subtask_num + occurrence_index))
+                    new_id="${prefix_part}${parent_num}.${next_subtask}"
+                else
+                    # Main task - get next available number
+                    # Find highest number in TODO.md for this prefix
+                    local highest_num=0
+                    for seen_id in "${task_ids[@]}"; do
+                        if [[ "$seen_id" =~ ^${prefix_part}([0-9]+)(\.([0-9]+))?$ ]]; then
+                            local seen_num="${match[1]}"
+                            if [[ $seen_num -gt $highest_num ]]; then
+                                highest_num=$seen_num
+                            fi
+                        fi
+                    done
+                    local next_num=$((highest_num + occurrence_index))
+                    new_id="${prefix_part}${next_num}"
+                fi
+            else
+                # Fallback: append occurrence index
+                new_id="${dup_id}-dup${occurrence_index}"
+            fi
+            
+            # Make sure new_id doesn't conflict with existing IDs
+            local conflict=true
+            local conflict_index=1
+            while [[ "$conflict" == true ]]; do
+                conflict=false
+                for existing_id in "${task_ids[@]}"; do
+                    if [[ "$existing_id" == "$new_id" ]]; then
+                        conflict=true
+                        # Adjust new_id
+                        if [[ "$dup_id" =~ ^([a-z0-9]{1,7}-)?([0-9]+)(\.([0-9]+))?$ ]]; then
+                            prefix_part="${match[1]}"
+                            numeric_part="${match[2]}"
+                            if [[ -n "${match[4]}" ]]; then
+                                local parent_num="$numeric_part"
+                                local subtask_num="${match[4]}"
+                                local next_subtask=$((subtask_num + occurrence_index + conflict_index))
+                                new_id="${prefix_part}${parent_num}.${next_subtask}"
+                            else
+                                local next_num=$((occurrence_index + conflict_index))
+                                new_id="${prefix_part}${next_num}"
+                            fi
+                        else
+                            new_id="${dup_id}-dup${occurrence_index}-${conflict_index}"
+                        fi
+                        conflict_index=$((conflict_index + 1))
+                        break
+                    fi
+                done
+            done
+            
+            # Add to mapping
+            id_mapping["${dup_line_num}|${dup_id}"]="$new_id"
+            occurrence_index=$((occurrence_index + 1))
+        done
+    done
+    
+    # Step 3: Apply renumbering
+    if [[ "$dry_run" == true ]]; then
+        echo "📋 Would renumber the following tasks:"
+        for key in "${!id_mapping[@]}"; do
+            IFS='|' read -r line_num old_id <<< "$key"
+            local new_id="${id_mapping[$key]}"
+            local task_line=$(sed -n "${line_num}p" "$TODO_FILE")
+            echo "  Line $line_num: #$old_id → #$new_id"
+            echo "    $task_line"
+        done
+        echo ""
+        echo "💡 Run './todo.ai resolve-conflicts' to apply these changes"
+    else
+        # Create backup before making changes
+        local backup_name=$(create_mode_backup 2>/dev/null || echo "")
+        
+        # Apply changes by reading file and replacing IDs
+        local temp_file=$(mktemp)
+        local line_num=0
+        
+        while IFS= read -r line; do
+            line_num=$((line_num + 1))
+            local new_line="$line"
+            local line_changed=false
+            
+            # Check if this line needs renumbering
+            for key in "${!id_mapping[@]}"; do
+                IFS='|' read -r dup_line_num old_id <<< "$key"
+                if [[ "$line_num" == "$dup_line_num" ]]; then
+                    local new_id="${id_mapping[$key]}"
+                    # Replace task ID in line
+                    new_line=$(echo "$new_line" | sed "s/\\*\\*#${old_id}\\*\\*/\\*\\*#${new_id}\\*\\*/g")
+                    line_changed=true
+                    conflicts_resolved=$((conflicts_resolved + 1))
+                    echo "  ✅ Renumbered: Line $line_num: #$old_id → #$new_id"
+                    break
+                fi
+            done
+            
+            # Also update references to old IDs in relationships, notes, etc.
+            if [[ "$line_changed" == false ]]; then
+                for key in "${!id_mapping[@]}"; do
+                    IFS='|' read -r dup_line_num old_id <<< "$key"
+                    local new_id="${id_mapping[$key]}"
+                    # Replace references (e.g., in relationships: #old_id or old_id:)
+                    if [[ "$new_line" =~ "#${old_id}" ]] || [[ "$new_line" =~ ":${old_id}" ]] || [[ "$new_line" =~ "${old_id}:" ]]; then
+                        new_line=$(echo "$new_line" | sed "s/#${old_id}\\([^0-9a-z-]\\|$\\)/#${new_id}\\1/g")
+                        new_line=$(echo "$new_line" | sed "s/:${old_id}\\([^0-9a-z-]\\|$\\)/:${new_id}\\1/g")
+                        new_line=$(echo "$new_line" | sed "s/${old_id}:\\([^0-9a-z-]\\|$\\)/${new_id}:\\1/g")
+                    fi
+                done
+            fi
+            
+            echo "$new_line" >> "$temp_file"
+        done < "$TODO_FILE"
+        
+        # Replace original file
+        mv "$temp_file" "$TODO_FILE"
+        
+        update_footer
+        
+        # Log the action
+        log_todo_action "RESOLVE_CONFLICTS" "${#duplicates[@]}" "Resolved ${#duplicates[@]} duplicate task ID(s)"
+        
+        if [[ -n "$backup_name" ]]; then
+            echo ""
+            echo "💾 Backup created: $backup_name"
+        fi
+    fi
+    
+    echo ""
+    if [[ "$dry_run" == true ]]; then
+        echo "💡 Run './todo.ai resolve-conflicts' to apply these changes"
+    elif [[ $conflicts_resolved -gt 0 ]]; then
+        echo "✅ Resolved $conflicts_resolved conflict(s)"
+    else
+        echo "✅ No conflicts found"
     fi
 }
 
@@ -5196,6 +5447,14 @@ case "${1:-}" in
             reformat_todo "--dry-run"
         else
             reformat_todo
+        fi
+        ;;
+    "resolve-conflicts")
+        shift
+        if [[ "$1" == "--dry-run" ]]; then
+            resolve_conflicts "--dry-run"
+        else
+            resolve_conflicts
         fi
         ;;
     "edit")

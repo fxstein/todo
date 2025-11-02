@@ -2,6 +2,8 @@
 
 ## Overview
 
+> **Related Documentation:** See [Hybrid Task Numbering Design](HYBRID_TASK_NUMBERING_DESIGN.md) for the technical design and implementation details of the task numbering modes described in these patterns.
+
 This document describes various usage patterns and setups for `todo.ai` in different development scenarios. Each pattern addresses specific needs and constraints, from individual developer workflows to team collaboration.
 
 ---
@@ -512,15 +514,13 @@ coordination:
 ```
 
 ### Pattern 3: Team Repo (Enhanced)
-```json
-{
-  "mode": "enhanced",
-  "coordination": {
-    "type": "counterapi",
-    "namespace": "my-project-team",
-    "fallback": "multi-user"
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+mode: enhanced
+coordination:
+  type: counterapi
+  namespace: my-project-team
+  fallback: multi-user
 ```
 
 ### Pattern 3: Developer Repo (Single-User)
@@ -583,8 +583,9 @@ chmod +x todo.ai
 ./todo.ai init
 
 # Configure single-user mode
-cat > .todo.ai/config <<EOF
-MODE=single-user
+cat > .todo.ai/config.yaml <<EOF
+# todo.ai Configuration File
+mode: single-user
 EOF
 
 # Initial commit
@@ -635,7 +636,7 @@ git clone --recurse-submodules https://github.com/org/repo.git
 
 1. **Document Your Pattern:** Add README in `.dev-tasks/` explaining setup
 2. **Team Agreement:** If using Pattern 2 or 3, get team buy-in
-3. **Configuration Sharing:** Commit `.todo.ai/config` for team patterns
+3. **Configuration Sharing:** Commit `.todo.ai/config.yaml` for team patterns
 4. **Ignore Patterns:** Add appropriate `.gitignore` entries
 5. **Regular Commits:** Commit tasks regularly (they're part of workflow)
 6. **Backup Tasks:** If separate repo, push regularly for backup

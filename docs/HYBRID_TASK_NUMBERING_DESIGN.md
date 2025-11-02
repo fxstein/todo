@@ -514,15 +514,13 @@ resolve_multi_user_conflicts() {
 - Preview changes before applying
 
 ### Configuration
-```json
-{
-  "conflict_resolution": {
-    "enabled": true,
-    "auto_resolve": true,
-    "renumber_on_conflict": true,
-    "notify_on_conflict": false
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+conflict_resolution:
+  enabled: true
+  auto_resolve: true
+  renumber_on_conflict: true
+  notify_on_conflict: false
 ```
 
 ---

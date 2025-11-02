@@ -98,10 +98,9 @@ my-project/                    # Main code repository
 ```
 
 ### Configuration
-```json
-{
-  "mode": "single-user"
-}
+```yaml
+# .todo.ai/config.yaml
+mode: single-user
 ```
 
 **No coordination needed - personal tasks only.**
@@ -167,13 +166,11 @@ git commit -m "feat: Add feature X task (fxstein-50)"
 - ⚠️ **Merge conflicts:** Task conflicts possible (handled by conflict resolution)
 
 ### Configuration
-```json
-{
-  "mode": "multi-user",
-  "coordination": {
-    "type": "none"
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+mode: multi-user
+coordination:
+  type: none
 ```
 
 ---
@@ -505,15 +502,13 @@ git push origin fix/authentication-bug
 ```
 
 ### Pattern 2: Enhanced Multi-User Mode
-```json
-{
-  "mode": "enhanced",
-  "coordination": {
-    "type": "github-issues",
-    "issue_number": 123,
-    "fallback": "multi-user"
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+mode: enhanced
+coordination:
+  type: github-issues
+  issue_number: 123
+  fallback: multi-user
 ```
 
 ### Pattern 3: Team Repo (Enhanced)
@@ -529,10 +524,9 @@ git push origin fix/authentication-bug
 ```
 
 ### Pattern 3: Developer Repo (Single-User)
-```json
-{
-  "mode": "single-user"
-}
+```yaml
+# .todo.ai/config.yaml
+mode: single-user
 ```
 
 ---

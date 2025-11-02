@@ -52,45 +52,53 @@ This document designs a hybrid task numbering system for `todo.ai` that supports
 
 ## Configuration System
 
-### Configuration File: `.todo.ai/config`
+### Configuration File: `.todo.ai/config.yaml`
 
-**Location:** `.todo.ai/config` (committed to repository)
+**Location:** `.todo.ai/config.yaml` (committed to repository)
 
-**Format:** JSON or simple key-value pairs
+**Format:** YAML specification
 
 **Structure:**
-```json
-{
-  "mode": "single-user|multi-user|branch|enhanced",
-  "coordination": {
-    "type": "github-issues|counterapi|firebase|none",
-    "issue_number": 123,  // For GitHub Issues mode
-    "namespace": "todo-ai-counter",  // For CounterAPI
-    "fallback": "multi-user"  // Fallback mode if coordination fails
-  },
-  "conflict_resolution": {
-    "enabled": true,
-    "auto_resolve": true,
-    "renumber_on_conflict": true
-  }
-}
-```
+```yaml
+# todo.ai Configuration File
+# This file configures the task numbering system for this repository
 
-**Or simple format:**
-```bash
-# .todo.ai/config
-MODE=multi-user
-COORDINATION_TYPE=github-issues
-COORDINATION_ISSUE=123
-FALLBACK_MODE=multi-user
-CONFLICT_RESOLUTION_ENABLED=true
+# Mode: single-user | multi-user | branch | enhanced
+mode: multi-user
+
+# Coordination settings (for enhanced mode)
+coordination:
+  # Type: github-issues | counterapi | firebase | none
+  type: github-issues
+  
+  # GitHub Issues coordination
+  issue_number: 123  # Issue number for task number coordination
+  
+  # CounterAPI coordination
+  namespace: todo-ai-repo-name  # Namespace for counter
+  
+  # Fallback mode if coordination fails
+  fallback: multi-user
+
+# Conflict resolution settings
+conflict_resolution:
+  enabled: true
+  auto_resolve: true
+  renumber_on_conflict: true
+  notify_on_conflict: false
+
+# Display settings
+display:
+  show_prefix: false  # Show prefix in output (users can still use numbers)
+  user_reference_style: number-only  # number-only | full-id
 ```
 
 **Configuration Setup:**
-- Repository owner/initial user creates `.todo.ai/config`
-- Tool reads config on startup
+- Repository owner/initial user creates `.todo.ai/config.yaml`
+- Tool reads config on startup using YAML parser
 - Config is committed to repository (shared across team)
 - Tool validates config and falls back to defaults if invalid
+- YAML format is human-readable and easy to edit
 
 ---
 
@@ -109,10 +117,9 @@ CONFLICT_RESOLUTION_ENABLED=true
 - Update `.todo.ai/.todo.ai.serial`
 
 ### Configuration
-```json
-{
-  "mode": "single-user"
-}
+```yaml
+# .todo.ai/config.yaml
+mode: single-user
 ```
 
 **This is the default mode - no coordination needed.**
@@ -199,13 +206,11 @@ resolve_task_id() {
 ```
 
 ### Configuration
-```json
-{
-  "mode": "multi-user",
-  "coordination": {
-    "type": "none"
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+mode: multi-user
+coordination:
+  type: none
 ```
 
 ### Benefits
@@ -250,13 +255,11 @@ get_branch_name() {
 - Each branch maintains its own number sequence
 
 ### Configuration
-```json
-{
-  "mode": "branch",
-  "coordination": {
-    "type": "none"
-  }
-}
+```yaml
+# .todo.ai/config.yaml
+mode: branch
+coordination:
+  type: none
 ```
 
 ### Benefits

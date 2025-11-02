@@ -589,16 +589,208 @@ resolve_task_reference() {
     return 1
 }
 
+# Extract numeric part from task ID (removes prefix if present)
+extract_task_number() {
+    local task_id="$1"
+    
+    # If has prefix (format: prefix-number), extract number
+    if [[ "$task_id" =~ ^[a-z0-9]{1,7}-([0-9]+)$ ]]; then
+        echo "${match[1]}"
+        return 0
+    fi
+    
+    # If has subtask format (prefix-number.subtask), extract both parts
+    if [[ "$task_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)$ ]]; then
+        echo "${match[1]}.${match[2]}"
+        return 0
+    fi
+    
+    # If just number or number.subtask, return as-is
+    if [[ "$task_id" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        echo "$task_id"
+        return 0
+    fi
+    
+    # Invalid format
+    return 1
+}
+
+# Generate new task ID based on mode and numeric part
+generate_new_task_id() {
+    local numeric_part="$1"
+    local mode="$2"
+    
+    # Extract parent and subtask numbers if present
+    local parent_num=""
+    local subtask_num=""
+    if [[ "$numeric_part" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
+        parent_num="${match[1]}"
+        subtask_num="${match[2]}"
+    elif [[ "$numeric_part" =~ ^([0-9]+)$ ]]; then
+        parent_num="${match[1]}"
+    else
+        return 1
+    fi
+    
+    # Generate prefix based on mode
+    local prefix=""
+    case "$mode" in
+        "multi-user"|"enhanced")
+            prefix=$(get_github_user_id)
+            ;;
+        "branch")
+            prefix=$(get_branch_name)
+            ;;
+        "single-user")
+            prefix=""  # No prefix
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+    
+    # Build new ID
+    if [[ -z "$prefix" ]]; then
+        # Single-user: no prefix
+        if [[ -n "$subtask_num" ]]; then
+            echo "${parent_num}.${subtask_num}"
+        else
+            echo "${parent_num}"
+        fi
+    else
+        # Multi-user/branch: with prefix
+        if [[ -n "$subtask_num" ]]; then
+            echo "${prefix}-${parent_num}.${subtask_num}"
+        else
+            echo "${prefix}-${parent_num}"
+        fi
+    fi
+}
+
+# Renumber tasks when switching modes
+renumber_tasks_for_mode() {
+    local old_mode="$1"
+    local new_mode="$2"
+    
+    if [[ ! -f "$TODO_FILE" ]]; then
+        return 1
+    fi
+    
+    # Build ID mapping: old_id -> new_id
+    declare -A id_mapping
+    
+    # Collect all task IDs from TODO.md
+    local temp_file=$(mktemp)
+    local tasks_found=0
+    
+    # Find all task IDs in TODO.md (handle both prefixed and non-prefixed formats)
+    while IFS= read -r line; do
+        # Match task IDs in format: **#task_id** or **#prefix-task_id**
+        # Handle both main tasks and subtasks
+        if [[ "$line" =~ \*\*#([0-9a-z.\-]+)\*\* ]]; then
+            local full_task_id="${match[1]}"
+            
+            # Extract numeric part (removes prefix if present)
+            local numeric_part=$(extract_task_number "$full_task_id" 2>/dev/null)
+            if [[ -z "$numeric_part" ]]; then
+                continue
+            fi
+            
+            # Generate new ID based on new mode
+            local new_id=$(generate_new_task_id "$numeric_part" "$new_mode" 2>/dev/null)
+            if [[ -z "$new_id" ]]; then
+                continue
+            fi
+            
+            # Add to mapping if IDs differ
+            if [[ "$full_task_id" != "$new_id" ]]; then
+                id_mapping["$full_task_id"]="$new_id"
+                tasks_found=$((tasks_found + 1))
+            fi
+        fi
+    done < "$TODO_FILE"
+    
+    if [[ $tasks_found -eq 0 ]]; then
+        rm -f "$temp_file"
+        return 0  # No tasks to renumber
+    fi
+    
+    # Create new TODO.md with renumbered tasks
+    local new_file=$(mktemp)
+    local renumbered_count=0
+    
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        local new_line="$line"
+        local line_changed=false
+        
+        # Skip empty lines
+        if [[ -z "$new_line" ]]; then
+            echo "" >> "$new_file"
+            continue
+        fi
+        
+        # Replace task IDs in task lines (**#task_id**)
+        for old_id in "${!id_mapping[@]}"; do
+            local new_id="${id_mapping[$old_id]}"
+            
+            # Escape old_id for sed (escape special regex characters)
+            local escaped_old_id=$(echo "$old_id" | sed 's/[[\.*^$()+?{|]/\\&/g')
+            
+            # Replace in task definition: **#old_id**
+            if echo "$new_line" | grep -q "\*\*#${escaped_old_id}\*\*"; then
+                new_line=$(echo "$new_line" | sed "s/\*\*#${escaped_old_id}\*\*/\*\*#${new_id}\*\*/g")
+                line_changed=true
+            fi
+            
+            # Replace in relationships and notes (plain text references)
+            # Match: #old_id (standalone or in lists)
+            if echo "$new_line" | grep -q "#${escaped_old_id}\([^0-9a-z-]\|$\)"; then
+                new_line=$(echo "$new_line" | sed "s/#${escaped_old_id}\([^0-9a-z-]\|$\)/#${new_id}\1/g")
+                line_changed=true
+            fi
+            
+            # Replace in relationship comments (HTML comments)
+            if echo "$new_line" | grep -q "${escaped_old_id}:"; then
+                new_line=$(echo "$new_line" | sed "s/${escaped_old_id}:/${new_id}:/g")
+                line_changed=true
+            fi
+        done
+        
+        if [[ "$line_changed" == true ]]; then
+            renumbered_count=$((renumbered_count + 1))
+        fi
+        
+        echo "$new_line" >> "$new_file"
+    done < "$TODO_FILE"
+    
+    # Replace original file
+    mv "$new_file" "$TODO_FILE"
+    rm -f "$temp_file"
+    
+    if [[ $renumbered_count -gt 0 ]]; then
+        update_footer
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Switch numbering mode
 switch_mode() {
     local new_mode="$1"
     local force=false
+    local renumber=false
+    local original_args=("$@")
     
     # Parse options
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --force|-f)
                 force=true
+                shift
+                ;;
+            --renumber)
+                renumber=true
                 shift
                 ;;
             *)
@@ -612,8 +804,11 @@ switch_mode() {
     
     if [[ -z "$new_mode" ]]; then
         echo "Error: Please specify a mode to switch to"
-        echo "Usage: ./todo.ai switch-mode <mode> [--force]"
+        echo "Usage: ./todo.ai switch-mode <mode> [--force] [--renumber]"
         echo "Modes: single-user, multi-user, branch, enhanced"
+        echo "Options:"
+        echo "  --force      Force mode switch (skip validation)"
+        echo "  --renumber   Renumber existing tasks to match new mode"
         return 1
     fi
     
@@ -758,13 +953,32 @@ EOF
         return 1
     fi
     
+    # Optionally renumber tasks
+    if [[ "$renumber" == true ]]; then
+        echo ""
+        echo "🔄 Renumbering tasks to match new mode..."
+        if ! renumber_tasks_for_mode "$current_mode" "$new_mode"; then
+            echo "⚠️  Warning: Task renumbering encountered issues"
+            echo "   Some tasks may not have been renumbered correctly"
+            echo "   Backup available: $backup_name"
+        else
+            echo "✅ Tasks renumbered successfully"
+        fi
+        echo ""
+    fi
+    
     # Log the action
     log_todo_action "MODE_SWITCH" "$current_mode → $new_mode" "Switched from $current_mode to $new_mode"
     
     echo "✅ Mode switched: $current_mode → $new_mode"
     echo ""
-    echo "📝 Note: Existing tasks keep their current IDs"
-    echo "   New tasks will use the $new_mode numbering scheme"
+    if [[ "$renumber" == false ]]; then
+        echo "📝 Note: Existing tasks keep their current IDs"
+        echo "   New tasks will use the $new_mode numbering scheme"
+        echo "   Use --renumber flag to renumber existing tasks"
+    else
+        echo "📝 All tasks have been renumbered to match $new_mode numbering scheme"
+    fi
     echo ""
     echo "💾 Backup saved as: $backup_name"
     echo "   To rollback: ./todo.ai rollback-mode $backup_name"
@@ -1238,7 +1452,7 @@ show_usage() {
     echo "  rollback [index|timestamp]    Rollback to previous version (default: latest backup)"
     echo "  report-bug \"description\"      Report a bug to GitHub Issues (requires GitHub CLI)"
     echo "  uninstall [--remove-data] [--remove-rules] [--all]  Uninstall todo.ai"
-    echo "  switch-mode <mode> [--force]  Switch numbering mode (single-user, multi-user, branch, enhanced)"
+    echo "  switch-mode <mode> [--force] [--renumber]  Switch numbering mode (single-user, multi-user, branch, enhanced)"
     echo "  list-mode-backups             List mode switch backups"
     echo "  rollback-mode <backup-name>   Rollback from mode switch backup"
     echo "  version, -v, --version        Show version information"
@@ -1286,6 +1500,7 @@ show_usage() {
     echo "  ./todo.ai uninstall                  # Uninstall script only"
     echo "  ./todo.ai uninstall --all             # Uninstall script, data, and rules"
     echo "  ./todo.ai switch-mode multi-user     # Switch to multi-user numbering mode"
+    echo "  ./todo.ai switch-mode multi-user --renumber  # Switch and renumber existing tasks"
     echo "  ./todo.ai switch-mode branch          # Switch to branch-based numbering"
     echo "  ./todo.ai list-mode-backups           # List mode switch backups"
     echo "  ./todo.ai rollback-mode <backup-name> # Rollback from mode switch"

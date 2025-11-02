@@ -2,6 +2,25 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 02:50:37 | fxstein | RELEASE COMPLETE | Release 1.6.4 published successfully! - Tag: v1.6.4 - URL: https://github.com/fxstein/todo.ai/releases/tag/v1.6.4 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
+2025-11-02 02:50:36 | fxstein | GITHUB RELEASE CREATED | GitHub release created successfully for v1.6.4 Output: https://github.com/fxstein/todo.ai/releases/tag/v1.6.4
+2025-11-02 02:50:35 | fxstein | CREATE GITHUB RELEASE | Creating GitHub release for tag v1.6.4
+2025-11-02 02:50:34 | fxstein | PUSH TAG | Pushing tag v1.6.4 to origin
+2025-11-02 02:50:32 | fxstein | PUSH MAIN | Pushing main branch to origin
+2025-11-02 02:50:32 | fxstein | TAG CREATED | Git tag v1.6.4 created successfully at commit 0e81e6ef4fbd21fe29693a5aa044c923db62538c
+2025-11-02 02:50:31 | fxstein | CREATE TAG | Creating git tag: v1.6.4 pointing to commit 0e81e6ef4fbd21fe29693a5aa044c923db62538c
+2025-11-02 02:50:31 | fxstein | VERSION COMMITTED | Version change committed: 🔍 Running pre-commit validations... 📝 Validating Markdown files... markdownlint-cli2 v0.18.1 (markdownlint v0.38.0) Finding: release/RELEASE_SUMMARY.md Linting: 1 file(s) Summary: 0 error(s) [0;32m✅ Markdown validation passed[0m [0;32m✅ All validations passed[0m [main 0e81e6e] Bump version to 1.6.4 2 files changed, 36 insertions(+), 6 deletions(-)
+2025-11-02 02:50:30 | fxstein | COMMIT SUMMARY | Adding release summary file to commit: release/RELEASE_SUMMARY.md
+2025-11-02 02:50:29 | fxstein | COMMIT VERSION | Committing version change to git
+2025-11-02 02:50:29 | fxstein | VERSION UPDATED | Version updated successfully in todo.ai
+2025-11-02 02:50:28 | fxstein | UPDATE VERSION | Updating version in todo.ai from 1.6.3 to 1.6.4
+2025-11-02 02:50:28 | fxstein | CONFIRMED | Release confirmed by user
+2025-11-02 02:50:27 | fxstein | RELEASE START | Starting release process: - Current version: 1.6.3 - Proposed version: 1.6.4 - Bump type: patch - Last tag: v1.6.3 - Summary file: release/RELEASE_SUMMARY.md
+2025-11-02 02:50:27 | fxstein | SUMMARY DETECTED | Found uncommitted summary file: release/RELEASE_SUMMARY.md - will commit as part of release
+2025-11-02 02:50:23 | fxstein | RELEASE START | Starting release process: - Current version: 1.6.3 - Proposed version: 1.6.4 - Bump type: patch - Last tag: v1.6.3 - Summary file: release/RELEASE_SUMMARY.md
+2025-11-02 02:50:22 | fxstein | SUMMARY DETECTED | Found uncommitted summary file: release/RELEASE_SUMMARY.md - will commit as part of release
+2025-11-02 02:50:08 | fxstein | ERROR - Uncommitted Changes | Release aborted due to uncommitted changes: M release/release.sh
+2025-11-02 02:50:08 | fxstein | SUMMARY DETECTED | Found uncommitted summary file: release/RELEASE_SUMMARY.md - will commit as part of release
 2025-11-02 02:27:48 | fxstein | RELEASE START | Starting release process: - Current version: 1.6.2 - Proposed version: 1.7.0 - Bump type: minor - Last tag: v1.6.2 - Summary file: release/RELEASE_SUMMARY.md
 2025-11-02 02:27:41 | fxstein | RELEASE START | Starting release process: - Current version: 1.6.2 - Proposed version: 1.7.0 - Bump type: minor - Last tag: v1.6.2 - Summary file: release/RELEASE_SUMMARY.md
 2025-11-02 02:27:32 | fxstein | ERROR - Uncommitted Changes | Release aborted due to uncommitted changes: M .todo.ai/.todo.ai.log M .todo.ai/.todo.ai.serial

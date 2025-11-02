@@ -1,12 +1,12 @@
 # Release Summary
 
-This release addresses a critical bug fix for the delete command section placement, ensuring that deleted tasks are properly organized in TODO.md files.
+This release includes several improvements focused on usability and developer workflow enhancements.
 
-The main fix resolves issue #25 where the Deleted Tasks section could be incorrectly placed after the footer instead of before it. The updated `ensure_deleted_section()` function now properly checks for the footer boundary (`---`) before inserting or moving the Deleted Tasks section, guaranteeing the correct section order: Tasks → Recently Completed → Deleted Tasks → Footer. This fix also includes logic to automatically correct any existing incorrectly-positioned Deleted Tasks sections when they're detected.
+The main feature addition is the enhancement of the `--info` command output, which now displays the configuration file location. This makes it easier for users to locate and understand where todo.ai stores its configuration, especially helpful when working with multiple projects or troubleshooting setup issues. The config file location is shown at the end of the `--info` output for quick reference.
 
-Additionally, this release includes a new Cursor rule for bug review workflow, providing AI agents with clear guidelines on how to review GitHub bugs, create tasks with issue numbers, and format commits with both task and issue references. This improves the development workflow and ensures consistent bug tracking and resolution.
+Additionally, this release includes documentation improvements that streamline the user experience. The README has been refined with a more concise examples section, reducing from 13 examples to just 5 carefully selected ones that cover the most common use cases while adding a touch of humor. The bug review workflow Cursor rule has also been updated to use zsh syntax (matching the tool's actual implementation) and includes comprehensive guidance on closing bug issues with proper release references.
 
 **Key improvements:**
-- Fixed Deleted Tasks section placement bug (issue #25)
-- Added automatic correction for incorrectly-positioned sections
-- Added bug-review-workflow.mdc Cursor rule for standardized bug review process
+- Added config file location to `--info` output for better visibility
+- Streamlined README examples (5 essential examples instead of 13)
+- Updated bug-review-workflow Cursor rule with zsh syntax and issue closing guidance

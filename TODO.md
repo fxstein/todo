@@ -3,6 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
+  - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
+  - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
+  - [ ] **#125.3** Improve bug report formatting with better markdown structure `#bug`
+  - [ ] **#125.2** Update bug report template for better readability and structure `#bug`
+  - [ ] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug`
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
   - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
@@ -302,6 +308,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 19:56:49 CET 2025
+**Last Updated:** Sun Nov  2 20:30:07 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -3,11 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#55** Fix update command when installed to system directory in PATH (GitHub issue #17) `#bug`
-  - [ ] **#55.4** Close GitHub issue #17 when fix has been confirmed `close-issue`
-  - [ ] **#55.3** Test update command from system-wide installation location `#test`
-  - [x] **#55.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code`
-  - [x] **#55.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research`
 - [ ] **#53** Fix bug reporting: reports to wrong repository (customer repo instead of todo.ai repo) `#bug`
   - [ ] **#53.1** Test bug reporting from a different repository to verify it reports to todo.ai repo
 - [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
@@ -64,6 +59,11 @@
 ------------------
 
 ## Recently Completed
+- [x] **#55** Fix update command when installed to system directory in PATH (GitHub issue #17) `#bug` (2025-11-02)
+  - [x] **#55.4** Close GitHub issue #17 when fix has been confirmed `close-issue` (2025-11-02)
+  - [x] **#55.3** Test update command from system-wide installation location `#test` (2025-11-02)
+  - [x] **#55.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2025-11-02)
+  - [x] **#55.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2025-11-02)
 - [x] **#56** Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check `#bug` (2025-11-02)
 - [x] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug` (2025-11-02)
   - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs` (2025-11-02)
@@ -234,7 +234,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 02:49:04 CET 2025
+**Last Updated:** Sun Nov  2 02:53:47 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

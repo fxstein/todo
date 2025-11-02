@@ -165,8 +165,8 @@ if [[ -n "$md_files" ]]; then
     fi
 fi
 
-# Validate YAML files
-yaml_files=$(echo "$staged_files" | grep -E '\.(yml|yaml)$' || true)
+# Validate YAML files (exclude backup files)
+yaml_files=$(echo "$staged_files" | grep -E '\.(yml|yaml)$' | grep -v '/backups/' || true)
 if [[ -n "$yaml_files" ]]; then
     echo "📄 Validating YAML files..."
     if ! validate_yaml "$yaml_files"; then

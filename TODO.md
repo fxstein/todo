@@ -3,11 +3,18 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#main-1** Test branch mode task 2 `#test`
+- [ ] **#main-1** Test branch mode task 1 `#test`
+- [ ] **#fxstein-1** Test multi-user mode task 2 `#test`
+- [ ] **#fxstein-1** Test multi-user mode task 1 `#test`
+- [x] **#58** Test single-user mode task 2 `#test`
+- [ ] **#57** Test single-user mode task 1 `#test`
+  - [ ] **#57.1** Test subtask `#test`
 - [ ] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature`
   - [ ] **#52.18** Test fallback scenarios: verify graceful degradation when coordination services are unavailable `#test`
   - [ ] **#52.17** Test conflict resolution: verify automatic detection and renumbering of duplicate task IDs `#test`
   - [ ] **#52.16** Test mode switching: verify migration, backup creation, and rollback functionality `#test`
-  - [ ] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
+  - [x] **#52.15** Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling `#test`
   - [x] **#52.14** Create user documentation: guide for adopting and switching between numbering modes `#docs`
   - [x] **#52.13** Implement task reference resolution: auto-add user prefix when user references tasks by number only `#code`
   - [x] **#52.12** Implement conflict resolution system: automatic detection and renumbering of duplicate task IDs `#code`
@@ -245,7 +252,9 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 13:57:51 CET 2025
+**Last Updated:** Sun Nov  2 14:01:22 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 
+- [ ] **#100** Duplicate test task 1
+- [ ] **#100** Duplicate test task 2

@@ -1,0 +1,23 @@
+---
+# todo.ai Configuration File
+# This file configures the task numbering system for this repository
+
+# Mode: single-user | multi-user | branch | enhanced
+mode: single-user
+
+# Coordination settings (for enhanced mode)
+coordination:
+  type: none
+  fallback: multi-user
+
+# Conflict resolution settings
+conflict_resolution:
+  enabled: true
+  auto_resolve: true
+  renumber_on_conflict: true
+  notify_on_conflict: false
+
+# Display settings
+display:
+  show_prefix: false
+  user_reference_style: number-only

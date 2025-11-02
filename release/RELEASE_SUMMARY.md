@@ -1,7 +1,7 @@
 # Release Summary
 
-This release includes a significant simplification of the release numbering logic, making it easier to understand and maintain. The core change is that the system now uses a default-to-PATCH approach: commits are only explicitly checked for MAJOR (breaking changes) or MINOR (user-facing features), and everything else automatically defaults to PATCH. This eliminates the need for explicit PATCH prefix checks while maintaining the same classification accuracy.
+This release fixes a critical bug in the bug reporting feature where bug reports were being created in the customer's repository instead of the todo.ai repository. This fix ensures that when users report bugs about todo.ai, the issues are correctly created in the todo.ai repository at https://github.com/fxstein/todo.ai/issues, regardless of where the tool is installed.
 
-The release also includes comprehensive documentation in the form of a new mapping document that clearly explains how commit prefixes, keywords, and file changes are classified. This document provides developers and AI agents with a clear reference for understanding release numbering decisions, complete with examples and a priority matrix.
+The release also includes documentation improvements with the addition of a comprehensive multi-user/multi-branch conflict analysis document. This document identifies and analyzes eight different conflict scenarios that can occur when using todo.ai in collaborative environments, providing a foundation for future multi-user support features.
 
-These improvements make the release process more maintainable and transparent, ensuring that version bumps are correctly determined while reducing code complexity.
+These improvements ensure that bug reports reach the correct destination and lay the groundwork for understanding and addressing task numbering conflicts in multi-user scenarios.

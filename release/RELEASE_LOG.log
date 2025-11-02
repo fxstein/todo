@@ -2,6 +2,23 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-02 19:58:50 | fxstein | RELEASE COMPLETE | Release 2.0.1 published successfully! - Tag: v2.0.1 - URL: https://github.com/fxstein/todo.ai/releases/tag/v2.0.1 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
+2025-11-02 19:58:50 | fxstein | GITHUB RELEASE CREATED | GitHub release created successfully for v2.0.1 Output: https://github.com/fxstein/todo.ai/releases/tag/v2.0.1
+2025-11-02 19:58:48 | fxstein | CREATE GITHUB RELEASE | Creating GitHub release for tag v2.0.1
+2025-11-02 19:58:47 | fxstein | PUSH TAG | Pushing tag v2.0.1 to origin
+2025-11-02 19:58:45 | fxstein | PUSH MAIN | Pushing main branch to origin
+2025-11-02 19:58:45 | fxstein | TAG CREATED | Git tag v2.0.1 created successfully at commit bca59d44a880231c8aadbb314e316682d28a4df8
+2025-11-02 19:58:44 | fxstein | CREATE TAG | Creating git tag: v2.0.1 pointing to commit bca59d44a880231c8aadbb314e316682d28a4df8
+2025-11-02 19:58:44 | fxstein | VERSION COMMITTED | Version change committed: 🔍 Running pre-commit validations... 📝 Validating Markdown files... markdownlint-cli2 v0.18.1 (markdownlint v0.38.0) Finding: release/RELEASE_SUMMARY.md Linting: 1 file(s) Summary: 0 error(s) [0;32m✅ Markdown validation passed[0m [0;32m✅ All validations passed[0m [main bca59d4] Bump version to 2.0.1 2 files changed, 9 insertions(+), 15 deletions(-)
+2025-11-02 19:58:43 | fxstein | COMMIT SUMMARY | Adding release summary file to commit: release/RELEASE_SUMMARY.md
+2025-11-02 19:58:42 | fxstein | COMMIT VERSION | Committing version change to git
+2025-11-02 19:58:42 | fxstein | VERSION UPDATED | Version updated successfully in todo.ai
+2025-11-02 19:58:41 | fxstein | UPDATE VERSION | Updating version in todo.ai from 2.0.0 to 2.0.1
+2025-11-02 19:58:41 | fxstein | CONFIRMED | Release confirmed by user
+2025-11-02 19:58:40 | fxstein | RELEASE START | Starting release process: - Current version: 2.0.0 - Proposed version: 2.0.1 - Bump type: patch - Last tag: v2.0.0 - Summary file: release/RELEASE_SUMMARY.md
+2025-11-02 19:58:40 | fxstein | SUMMARY DETECTED | Found uncommitted summary file: release/RELEASE_SUMMARY.md - will commit as part of release
+2025-11-02 19:58:35 | fxstein | RELEASE START | Starting release process: - Current version: 2.0.0 - Proposed version: 2.0.1 - Bump type: patch - Last tag: v2.0.0 - Summary file: release/RELEASE_SUMMARY.md
+2025-11-02 19:58:35 | fxstein | SUMMARY DETECTED | Found uncommitted summary file: release/RELEASE_SUMMARY.md - will commit as part of release
 2025-11-02 19:18:56 | fxstein | RELEASE COMPLETE | Release 2.0.0 published successfully! - Tag: v2.0.0 - URL: https://github.com/fxstein/todo.ai/releases/tag/v2.0.0 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
 2025-11-02 19:18:55 | fxstein | GITHUB RELEASE CREATED | GitHub release created successfully for v2.0.0 Output: https://github.com/fxstein/todo.ai/releases/tag/v2.0.0
 2025-11-02 19:18:53 | fxstein | CREATE GITHUB RELEASE | Creating GitHub release for tag v2.0.0

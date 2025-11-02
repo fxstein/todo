@@ -15,7 +15,7 @@
   - [ ] **#52.10** Implement Mode 3 (Branch Mode): branch prefix-based numbering `#code`
   - [ ] **#52.9** Implement Mode 2 (Multi-User): prefix-based numbering with GitHub user ID detection `#code`
   - [ ] **#52.8** Implement Mode 1 (Single-User): ensure backward compatibility with existing behavior `#code`
-  - [   ] **#52.7** Implement and test configuration system: YAML config file reading, validation, and mode detection `#code` `#test`
+  - [ ] **#52.7** Implement and test configuration system: YAML config file reading, validation, and mode detection `#code` `#test`
   - [ ] **#52.6** Implement automatic migration path between numbering modes: renumber tasks when switching modes `#code`
   - [ ] **#52.5** Implement mode switching command: allow users to switch between numbering modes (single-user, multi-user, branch, enhanced) `#code`
   - [ ] **#52.4** Implement backup and rollback system for mode switching `#code` `#safety`

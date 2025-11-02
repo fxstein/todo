@@ -22,13 +22,6 @@
   - [ ] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code`
   - [ ] **#47.2** Implement feature request command handler and template generation `#code`
   - [ ] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs`
-- [ ] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug`
-  - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs`
-  - [ ] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test`
-  - [x] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code`
-  - [x] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code`
-  - [x] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs`
-  - [x] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research`
 - [ ] **#45** Enhance release process with pre-release support for beta/testing versions `#release`
   - [ ] **#45.8** Test pre-release creation and promotion workflow `#test`
   - [ ] **#45.7** Update release process documentation with pre-release workflow `#docs`
@@ -54,6 +47,13 @@
 ------------------
 
 ## Recently Completed
+- [x] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug` (2025-11-02)
+  - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs` (2025-11-02)
+  - [x] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test` (2025-11-02)
+  - [x] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code` (2025-11-02)
+  - [x] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code` (2025-11-02)
+  - [x] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs` (2025-11-02)
+  - [x] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research` (2025-11-02)
 - [x] **#50** Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages `#research` (2025-11-02)
   - [x] **#50.4** Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them `#code` (2025-11-02)
   - [x] **#50.3** Propose solution: design numbering schema or commit message format to avoid conflicts `#docs` (2025-11-02)
@@ -212,7 +212,7 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 01:20:40 CET 2025
+**Last Updated:** Sun Nov  2 01:40:14 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only
 

@@ -3,17 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug`
-  > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
-  - [x] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug`
-  - [x] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug`
-  - [x] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug`
-  - [x] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug`
-  - [x] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug`
-  - [x] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug`
-  - [x] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug`
-  - [x] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug`
-  - [x] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug`
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
     > Compare bash vs zsh syntax differences, evaluate portability benefits (works on more platforms), analyze if simpler syntax reduces file size. Current tool is zsh-specific with features like [[ ]], read patterns, arrays.
@@ -74,6 +63,17 @@
 ------------------
 
 ## Recently Completed
+- [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
+  > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
+  - [x] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (2025-11-09)
+  - [x] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (2025-11-09)
+  - [x] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (2025-11-09)
+  - [x] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug` (2025-11-09)
+  - [x] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug` (2025-11-09)
+  - [x] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug` (2025-11-09)
+  - [x] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (2025-11-09)
+  - [x] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (2025-11-09)
+  - [x] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (2025-11-09)
 - [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
   > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
   - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test` (2025-11-09)
@@ -369,6 +369,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  9 22:26:22 CET 2025
+**Last Updated:** Sun Nov  9 22:26:41 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

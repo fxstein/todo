@@ -3,17 +3,17 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug`
+- [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug`
   > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
-  - [ ] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug`
-  - [ ] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug`
-  - [ ] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug`
-  - [ ] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug`
-  - [ ] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug`
-  - [ ] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug`
-  - [ ] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug`
-  - [ ] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug`
-  - [ ] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug`
+  - [x] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug`
+  - [x] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug`
+  - [x] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug`
+  - [x] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug`
+  - [x] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug`
+  - [x] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug`
+  - [x] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug`
+  - [x] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug`
+  - [x] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug`
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
     > Compare bash vs zsh syntax differences, evaluate portability benefits (works on more platforms), analyze if simpler syntax reduces file size. Current tool is zsh-specific with features like [[ ]], read patterns, arrays.
@@ -224,6 +224,12 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+    - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
+  - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
+  - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
+- [D] **#138** Test fix: task with note `#test` (deleted 2025-11-09, expires 2025-12-09)
+  - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
+- [D] **#137** Test bug reproduction `#test` (deleted 2025-11-09, expires 2025-12-09)
 - [D] **#124** Convince the coffee machine to understand sarcasm `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [  D] **#123.1** Investigate delete command placement logic for Deleted Tasks section (completed - found footer boundary check missing) `#bug`
   - [  D] **#123.2** Verify expected section order: Tasks -> Recently Completed -> Deleted Tasks -> Footer (verified - order is now correct) `#bug`
@@ -363,6 +369,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  9 22:23:18 CET 2025
+**Last Updated:** Sun Nov  9 22:26:22 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

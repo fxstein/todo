@@ -2,6 +2,32 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-09 22:26:22 | fxstein | DELETE | 138.1.1 | Nested sub-subtask
+2025-11-09 22:26:22 | fxstein | DELETE | 138.1 | First subtask after fix
+2025-11-09 22:26:22 | fxstein | DELETE | 138.2 | Second subtask after multiple notes
+2025-11-09 22:26:22 | fxstein | DELETE | 138 | Test fix: task with note
+2025-11-09 22:26:21 | fxstein | COMPLETE | 136 | Fix bug: Adding subtask splits task notes - subtask inserts between task and note
+2025-11-09 22:26:21 | fxstein | COMPLETE | 136.9 | Verify note positioning remains correct after multiple subtask additions
+2025-11-09 22:26:02 | fxstein | ADD_SUBTASK | 138.1.1 | Nested sub-subtask (parent: #138.1)
+2025-11-09 22:26:01 | fxstein | NOTE | 138.1 | Note on subtask 138.1
+2025-11-09 22:26:00 | fxstein | COMPLETE | 136.8 | Test: add second subtask when first subtask already exists with notes
+2025-11-09 22:26:00 | fxstein | COMPLETE | 136.7 | Test: task with multiple notes + add subtask (all notes stay with parent)
+2025-11-09 22:25:45 | fxstein | ADD_SUBTASK | 138.2 | Second subtask after multiple notes (parent: #138)
+2025-11-09 22:25:44 | fxstein | NOTE | 138 | Second note line for testing multiple notes
+2025-11-09 22:25:43 | fxstein | COMPLETE | 136.6 | Test: task with note + add first subtask (note should stay with parent)
+2025-11-09 22:25:27 | fxstein | ADD_SUBTASK | 138.1 | First subtask after fix (parent: #138)
+2025-11-09 22:25:26 | fxstein | NOTE | 138 | This note should stay directly after task 138
+2025-11-09 22:25:25 | fxstein | ADD | 138 | Test fix: task with note
+2025-11-09 22:25:15 | fxstein | DELETE | 137.1 | First subtask
+2025-11-09 22:25:15 | fxstein | DELETE | 137 | Test bug reproduction
+2025-11-09 22:25:14 | fxstein | COMPLETE | 136.5 | Implement fix: modify add_subtask to skip over blockquotes before insertion
+2025-11-09 22:24:52 | fxstein | COMPLETE | 136.4 | Design solution: insert subtasks after task AND any following notes
+2025-11-09 22:24:52 | fxstein | COMPLETE | 136.3 | Analyze note detection: how to identify and skip over notes when inserting subtasks
+2025-11-09 22:24:52 | fxstein | COMPLETE | 136.2 | Investigate add_subtask function: find where subtask insertion occurs
+2025-11-09 22:24:34 | fxstein | COMPLETE | 136.1 | Reproduce bug: create task with note, add subtask, verify note is split
+2025-11-09 22:24:19 | fxstein | ADD_SUBTASK | 137.1 | First subtask (parent: #137)
+2025-11-09 22:24:18 | fxstein | NOTE | 137 | This note should stay with task 137
+2025-11-09 22:24:11 | fxstein | ADD | 137 | Test bug reproduction
 2025-11-09 22:23:18 | fxstein | NOTE | 136 | Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
 2025-11-09 22:22:09 | fxstein | ADD_SUBTASK | 136.9 | Verify note positioning remains correct after multiple subtask additions (parent: #136)
 2025-11-09 22:22:08 | fxstein | ADD_SUBTASK | 136.8 | Test: add second subtask when first subtask already exists with notes (parent: #136)

@@ -2125,8 +2125,25 @@ add_subtask() {
     
     # Find the parent task line and add subtask after it (newest first)
     if [[ -n "$parent_line_num" ]]; then
-        # Insert right after the parent line (newest subtasks appear first)
+        # Insert right after the parent line AND any notes (newest subtasks appear first)
+        # Skip over any blockquote notes following the parent task
         local insert_line=$((parent_line_num + 1))
+        local check_line=$insert_line
+        while true; do
+            local line_content=$(sed -n "${check_line}p" "$TODO_FILE")
+            # Check if line is a blockquote at the expected indentation level
+            # Parent notes: "  > " (2 spaces), subtask notes: "    > " (4 spaces)
+            local note_pattern="^${parent_indent}> "
+            if [[ "$line_content" =~ $note_pattern ]]; then
+                # This is a note for the parent, skip over it
+                insert_line=$((check_line + 1))
+                check_line=$((check_line + 1))
+            else
+                # Not a note, stop here
+                break
+            fi
+        done
+        
         local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
         
         if [[ "$(uname)" == "Darwin" ]]; then

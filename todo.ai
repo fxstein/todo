@@ -1349,6 +1349,7 @@ init_cursor_rules() {
     local bug_reporting_file="${rules_dir}/todo.ai-bug-reporting.mdc"
     local uninstall_file="${rules_dir}/todo.ai-uninstall.mdc"
     local commit_format_file="${rules_dir}/todo.ai-commit-format.mdc"
+    local task_notes_file="${rules_dir}/todo.ai-task-notes.mdc"
     
     # Task Management rule content
     local task_mgmt_content="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
@@ -1446,6 +1447,19 @@ $todo_ai_path uninstall --all           # Remove everything (script + data + rul
 - Task numbers like \`#15\` conflict with GitHub issue numbers
 - Using \`task#15\` prevents auto-linking and eliminates confusion
 - Keeps commit history clear and accurate"
+    
+    # Task Notes rule content (with detected path)
+    local task_notes_content="When creating or working with todo.ai tasks, add notes to provide implementation context.
+
+**Command:** \`$todo_ai_path note <task-id> \"Your note here\"\`
+
+**Examples:**
+- ✅ \`$todo_ai_path note 42 \"Modify archive_task() lines 2600-2850. Pattern from delete_task() lines 2926-2935\"\`
+- ✅ \`$todo_ai_path note 42.1 \"Depends on task#42 completing first - needs collect_notes() function\"\`
+- ✅ \`$todo_ai_path note 50 \"See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for migration cleanup details\"\`
+- ❌ \`$todo_ai_path note 42 \"Fix it\"\` - Too vague, no actionable context
+
+Notes appear as blockquotes (>) and move with tasks when archived."
     
     # Create or update Task Management rule
     if [[ ! -f "$task_mgmt_file" ]]; then
@@ -1567,6 +1581,31 @@ description: "Commit message format rules for todo.ai task references"
 alwaysApply: true
 ---
 $commit_format_content
+EOF
+            rules_updated=$((rules_updated + 1))
+        fi
+    fi
+    
+    # Create or update Task Notes rule
+    if [[ ! -f "$task_notes_file" ]]; then
+        cat > "$task_notes_file" << EOF
+---
+description: "Guidelines for using notes with todo.ai tasks"
+alwaysApply: true
+---
+$task_notes_content
+EOF
+        rules_created=$((rules_created + 1))
+    else
+        # Check if rule is up to date (contains key indicators)
+        if ! grep -q "add notes to provide implementation context" "$task_notes_file" || ! grep -q "note <task-id>" "$task_notes_file"; then
+            # Update existing file
+            cat > "$task_notes_file" << EOF
+---
+description: "Guidelines for using notes with todo.ai tasks"
+alwaysApply: true
+---
+$task_notes_content
 EOF
             rules_updated=$((rules_updated + 1))
         fi

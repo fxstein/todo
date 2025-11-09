@@ -2,6 +2,7 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-09 21:58:51 | fxstein | COMPLETE | 132.2 | Remove old migration logic: keep migration shell but eliminate version-specific migration code
 2025-11-09 21:54:40 | fxstein | ARCHIVE | 131 | Create Cursor rule encouraging agents to use notes for task implementation details (with 5 subtasks)
 2025-11-09 21:54:02 | fxstein | COMPLETE | 131 | Create Cursor rule encouraging agents to use notes for task implementation details
 2025-11-09 21:54:02 | fxstein | COMPLETE | 131.5 | Test rule installation and verify agents follow note-adding guidelines

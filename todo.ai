@@ -5539,9 +5539,13 @@ update_tool() {
 
 # Migration registry
 # Format: "VERSION|MIGRATION_ID|DESCRIPTION|FUNCTION_NAME"
+# Note: Old migrations (v1.3.5 section order fix, v1.6.0 cursor rules migration) have been removed
+# to reduce code size. These migrations are no longer needed for current installations.
+# If you need to run old migrations on a legacy install, see git history:
+#   - v1.3.5 section order fix: commit bd028a2 and earlier
+#   - v1.6.0 cursor rules migration: commit bd028a2 and earlier
 declare -a MIGRATIONS=(
-    "1.3.5|section_order_fix|Fix TODO.md section order|migrate_section_order"
-    "1.6.0|cursor_rules_to_mdc|Convert .cursorrules to .cursor/rules/ directory structure|migrate_cursor_rules_to_mdc"
+    # Add new migrations here in format: "VERSION|ID|DESCRIPTION|FUNCTION_NAME"
 )
 
 # Function to compare semantic versions
@@ -6433,371 +6437,33 @@ uninstall_tool() {
 }
 
 # Migration: Fix section order in TODO.md
-migrate_section_order() {
-    local migration_id="section_order_fix"
-    local migrations_dir="$(pwd)/.todo.ai/migrations"
-    local migration_file="${migrations_dir}/v1.3.5_${migration_id}.migrated"
-    
-    # Check if already migrated
-    if [[ -f "$migration_file" ]]; then
-        return 0
-    fi
-    
-    # Check prerequisites
-    if [[ ! -f "$TODO_FILE" ]]; then
-        return 1
-    fi
-    
-    # Check if sections are in wrong order (Deleted Tasks before Recently Completed)
-    local deleted_line=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1 | head -1)
-    local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
-    
-    # If both exist and Deleted is before Recently Completed, fix it
-    if [[ -n "$deleted_line" ]] && [[ -n "$recently_completed_line" ]] && [[ $deleted_line -lt $recently_completed_line ]]; then
-        # Extract sections
-        local temp_file=$(mktemp)
-        
-        # Find where Recently Completed section ends (next section header or end of file)
-        local next_section_line=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
-        local recently_completed_end
-        if [[ -z "$next_section_line" ]]; then
-            # No next section, Recently Completed is at end of file
-            recently_completed_end=$(wc -l < "$TODO_FILE" | tr -d ' ')
-        else
-            recently_completed_end=$((next_section_line - 1))
-        fi
-        
-        # Find where Deleted Tasks section ends
-        local deleted_end
-        if [[ -z "$next_section_line" ]]; then
-            # If Deleted was the last section before Recently Completed
-            deleted_end=$((recently_completed_line - 1))
-        else
-            # Find next section after Deleted
-            local deleted_next_section=$(awk "NR > $deleted_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
-            if [[ -n "$deleted_next_section" ]]; then
-                deleted_end=$((deleted_next_section - 1))
-            else
-                deleted_end=$(wc -l < "$TODO_FILE" | tr -d ' ')
-            fi
-        fi
-        
-        # Extract Deleted Tasks section (including header)
-        local deleted_section=$(sed -n "${deleted_line},${deleted_end}p" "$TODO_FILE")
-        
-        # Remove Deleted Tasks section from original file
-        sed_inplace "${deleted_line},${deleted_end}d" "$TODO_FILE"
-        
-        # Recalculate line numbers after deletion
-        recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
-        if [[ -n "$recently_completed_line" ]]; then
-            # Find where Recently Completed section ends now
-            local new_next_section=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
-            local insert_line
-            if [[ -z "$new_next_section" ]]; then
-                # No next section, insert at end
-                insert_line=$(wc -l < "$TODO_FILE" | tr -d ' ')
-            else
-                # Insert before next section
-                insert_line=$((new_next_section - 1))
-            fi
-            
-            # Insert Deleted Tasks section after Recently Completed
-            if [[ "$(uname)" == "Darwin" ]]; then
-                # macOS approach: use temporary file
-                head -n "$insert_line" "$TODO_FILE" > "$temp_file"
-                echo "" >> "$temp_file"
-                echo "$deleted_section" >> "$temp_file"
-                tail -n +$((insert_line + 1)) "$TODO_FILE" >> "$temp_file" 2>/dev/null || true
-                mv "$temp_file" "$TODO_FILE"
-            else
-                # Linux approach: use sed
-                echo "$deleted_section" > "$temp_file"
-                sed_inplace "${insert_line}r $temp_file" "$TODO_FILE"
-                rm -f "$temp_file"
-            fi
-            
-            echo "✓ Migration: Fixed TODO.md section order" >&2
-        fi
-    fi
-    
-    # Mark as complete
-    mkdir -p "$migrations_dir" 2>/dev/null || return 1
-    touch "$migration_file" 2>/dev/null || return 1
-    
-    return 0
-}
+# Old migration functions removed to reduce code size (~363 lines saved)
+# Legacy migrations (v1.3.5, v1.6.0) are no longer needed for current installations
+# For old installations needing these migrations, see git history commit bd028a2 and earlier
 
-# Migration: Convert .cursorrules to .cursor/rules/ directory structure
-migrate_cursor_rules_to_mdc() {
-    local migration_id="cursor_rules_to_mdc"
-    local migrations_dir="$(pwd)/.todo.ai/migrations"
-    local migration_file="${migrations_dir}/v1.6.0_${migration_id}.migrated"
-    
-    # Check if already migrated
-    if [[ -f "$migration_file" ]]; then
-        return 0
-    fi
-    
-    # Check prerequisites: .cursorrules must exist
-    local cursorrules_file="$(pwd)/.cursorrules"
-    if [[ ! -f "$cursorrules_file" ]]; then
-        # No .cursorrules file, nothing to migrate
-        return 0
-    fi
-    
-    # Create .cursor/rules/ directory
-    local rules_dir="$(pwd)/.cursor/rules"
-    mkdir -p "$rules_dir" 2>/dev/null || return 1
-    
-    # Mapping of section names to .mdc filenames
-    # Format: "Section Name|filename|description|is_end_user_rule"
-    declare -a section_mappings=(
-        "Task Management|todo.ai-task-management|Task management rules for todo.ai|true"
-        "Installation|todo.ai-installation|Installation instructions for todo.ai|true"
-        "Bug Reporting|todo.ai-bug-reporting|Bug reporting rules for todo.ai|true"
-        "Uninstall|todo.ai-uninstall|Uninstall rules for todo.ai|true"
-        "Releases|releases|Release process for todo.ai development|false"
-        "Commit Message Prefixes for Release Numbering|commit-prefixes|Commit message prefix guidelines for release numbering|false"
-    )
-    
-    # Extract all sections from .cursorrules
-    local section_count=0
-    local current_section=""
-    local current_section_content=""
-    local temp_content=$(mktemp)
-    
-    # Parse .cursorrules file section by section
-    while IFS= read -r line; do
-        # Check if this is a section header
-        if [[ "$line" =~ ^##[[:space:]] ]]; then
-            # Save previous section if exists
-            if [[ -n "$current_section" ]] && [[ -n "$current_section_content" ]]; then
-                # Find mapping for this section
-                local section_found=false
-                for mapping in "${section_mappings[@]}"; do
-                    IFS='|' read -r section_name filename description is_end_user <<< "$mapping"
-                    if [[ "$current_section" == "$section_name" ]]; then
-                        section_found=true
-                        
-                        # Create .mdc file with YAML front matter
-                        local mdc_file="${rules_dir}/${filename}.mdc"
-                        
-                        # Write YAML front matter
-                        cat > "$mdc_file" << EOF
----
-description: "$description"
-alwaysApply: true
----
-EOF
-                        # Write section content (strip the ## header, keep rest)
-                        echo "$current_section_content" | sed '1d' | sed 's/^[[:space:]]*$//' >> "$mdc_file"
-                        
-                        section_count=$((section_count + 1))
-                        break
-                    fi
-                done
-                
-                # If section not found in mapping, skip it (user custom content)
-                if [[ "$section_found" == false ]]; then
-                    echo "⚠️  Skipping unmapped section: $current_section" >&2
-                fi
-            fi
-            
-            # Start new section (extract section name using sed)
-            current_section=$(echo "$line" | sed 's/^##[[:space:]]*//')
-            current_section_content="$line"
-        else
-            # Add line to current section content
-            if [[ -n "$current_section" ]]; then
-                current_section_content="$current_section_content
-$line"
-            fi
-        fi
-    done < "$cursorrules_file"
-    
-    # Don't forget the last section
-    if [[ -n "$current_section" ]] && [[ -n "$current_section_content" ]]; then
-        local section_found=false
-        for mapping in "${section_mappings[@]}"; do
-            IFS='|' read -r section_name filename description is_end_user <<< "$mapping"
-            if [[ "$current_section" == "$section_name" ]]; then
-                section_found=true
-                
-                local mdc_file="${rules_dir}/${filename}.mdc"
-                
-                cat > "$mdc_file" << EOF
----
-description: "$description"
-alwaysApply: true
----
-EOF
-                echo "$current_section_content" | sed '1d' | sed 's/^[[:space:]]*$//' >> "$mdc_file"
-                
-                section_count=$((section_count + 1))
-                break
-            fi
-        done
-        
-        if [[ "$section_found" == false ]]; then
-            echo "⚠️  Skipping unmapped section: $current_section" >&2
-        fi
-    fi
-    
-    rm -f "$temp_content"
-    
-    if [[ $section_count -gt 0 ]]; then
-        echo "✓ Migration: Converted $section_count section(s) from .cursorrules to .cursor/rules/" >&2
-        echo "   📝 Migrated to .cursor/rules/ directory structure" >&2
-        echo "   🔄 ACTION REQUIRED: Cursor rules migrated to new format!" >&2
-        echo "" >&2
-        echo "   For Humans:" >&2
-        echo "   → Please start a new chat session in Cursor" >&2
-        echo "   → The old .cursorrules file can be removed if migration succeeded" >&2
-        echo "" >&2
-        echo "   For AI Agents:" >&2
-        echo "   → Inform the user that cursor rules have been migrated" >&2
-        echo "   → Request that the user start a new chat session" >&2
-        
-        # Cleanup: Remove todo.ai references from .cursorrules after successful migration
-        # Create timestamped backup before making any edits
-        local timestamp=$(date +"%Y%m%d%H%M%S")
-        local backup_file="${cursorrules_file}.backup.${timestamp}"
-        
-        if cp "$cursorrules_file" "$backup_file" 2>/dev/null; then
-            echo "   💾 Created backup: $(basename "$backup_file")" >&2
-            
-            # Create temporary file for cleaned content
-            local cleaned_file=$(mktemp)
-            local in_todo_ai_section=false
-            local current_section_name=""
-            
-            # Parse .cursorrules and remove todo.ai-specific sections and paragraphs
-            local paragraph_buffer=""
-            local in_paragraph=false
-            
-            while IFS= read -r line || [[ -n "$line" ]]; do
-                # Check if this is a section header
-                if [[ "$line" =~ ^##[[:space:]] ]]; then
-                    # Save previous section if we were in one
-                    if [[ "$in_todo_ai_section" == true ]]; then
-                        # Skip this section - don't write it
-                        in_todo_ai_section=false
-                    fi
-                    
-                    # Write accumulated paragraph buffer if it's not todo.ai-specific
-                    if [[ -n "$paragraph_buffer" ]] && [[ "$in_paragraph" == true ]]; then
-                        # Check if paragraph references todo.ai
-                        local paragraph_lower=$(echo "$paragraph_buffer" | tr '[:upper:]' '[:lower:]')
-                        if [[ ! "$paragraph_lower" =~ (todo\.ai|todo-ai) ]]; then
-                            echo "$paragraph_buffer" >> "$cleaned_file"
-                        fi
-                        paragraph_buffer=""
-                        in_paragraph=false
-                    fi
-                    
-                    # Extract section name
-                    current_section_name=$(echo "$line" | sed 's/^##[[:space:]]*//')
-                    
-                    # Check if this section is in our mapping (todo.ai-specific)
-                    in_todo_ai_section=false
-                    for mapping in "${section_mappings[@]}"; do
-                        IFS='|' read -r section_name filename description is_end_user <<< "$mapping"
-                        if [[ "$current_section_name" == "$section_name" ]]; then
-                            in_todo_ai_section=true
-                            break
-                        fi
-                    done
-                    
-                    # Write section header only if not todo.ai-specific
-                    if [[ "$in_todo_ai_section" == false ]]; then
-                        echo "$line" >> "$cleaned_file"
-                    fi
-                elif [[ -z "$line" ]] || [[ "$line" =~ ^[[:space:]]*$ ]]; then
-                    # Empty line - end of paragraph
-                    if [[ -n "$paragraph_buffer" ]] && [[ "$in_paragraph" == true ]]; then
-                        # Check if paragraph references todo.ai
-                        local paragraph_lower=$(echo "$paragraph_buffer" | tr '[:upper:]' '[:lower:]')
-                        if [[ ! "$paragraph_lower" =~ (todo\.ai|todo-ai) ]]; then
-                            echo "$paragraph_buffer" >> "$cleaned_file"
-                        fi
-                        paragraph_buffer=""
-                        in_paragraph=false
-                    fi
-                    # Write empty line only if not in todo.ai section
-                    if [[ "$in_todo_ai_section" == false ]]; then
-                        echo "$line" >> "$cleaned_file"
-                    fi
-                else
-                    # Regular line - check if it's part of a paragraph
-                    if [[ "$in_todo_ai_section" == false ]]; then
-                        # Check if line references todo.ai directly
-                        local line_lower=$(echo "$line" | tr '[:upper:]' '[:lower:]')
-                        if [[ "$line_lower" =~ (todo\.ai|todo-ai) ]]; then
-                            # Skip this line - it references todo.ai
-                            continue
-                        fi
-                        
-                        # Add to paragraph buffer or write directly
-                        if [[ "$line" =~ ^[[:space:]]*- ]] || [[ "$line" =~ ^[[:space:]]*\* ]] || [[ "$line" =~ ^[[:space:]]*[0-9]+\. ]]; then
-                            # List item - write directly (not part of a paragraph)
-                            echo "$line" >> "$cleaned_file"
-                        else
-                            # Regular text - accumulate in paragraph buffer
-                            if [[ -z "$paragraph_buffer" ]]; then
-                                paragraph_buffer="$line"
-                            else
-                                paragraph_buffer="${paragraph_buffer}
-${line}"
-                            fi
-                            in_paragraph=true
-                        fi
-                    fi
-                fi
-            done < "$cursorrules_file"
-            
-            # Write any remaining paragraph buffer
-            if [[ -n "$paragraph_buffer" ]] && [[ "$in_paragraph" == true ]]; then
-                local paragraph_lower=$(echo "$paragraph_buffer" | tr '[:upper:]' '[:lower:]')
-                if [[ ! "$paragraph_lower" =~ (todo\.ai|todo-ai) ]]; then
-                    echo "$paragraph_buffer" >> "$cleaned_file"
-                fi
-            fi
-            
-            # Check if cleaned file has any content (not just whitespace)
-            local has_content=false
-            if [[ -s "$cleaned_file" ]] && grep -q "[^[:space:]]" "$cleaned_file" 2>/dev/null; then
-                has_content=true
-            fi
-            
-            if [[ "$has_content" == true ]]; then
-                # Replace original file with cleaned content
-                mv "$cleaned_file" "$cursorrules_file" 2>/dev/null || {
-                    echo "⚠️  Warning: Could not update .cursorrules file" >&2
-                    rm -f "$cleaned_file"
-                    return 1
-                }
-                echo "   🧹 Cleaned .cursorrules: Removed todo.ai-specific sections" >&2
-                echo "   💾 Backup saved as: $(basename "$backup_file")" >&2
-            else
-                # File is empty after cleanup - remove it entirely
-                rm -f "$cleaned_file"
-                rm -f "$cursorrules_file"
-                echo "   🗑️  Removed .cursorrules: No remaining content after removing todo.ai sections" >&2
-                echo "   💾 Backup saved as: $(basename "$backup_file")" >&2
-            fi
-        else
-            echo "⚠️  Warning: Could not create backup of .cursorrules" >&2
-            # Still proceed with migration, but skip cleanup
-        fi
-    fi
-    
-    # Mark as complete
-    mkdir -p "$migrations_dir" 2>/dev/null || return 1
-    touch "$migration_file" 2>/dev/null || return 1
-    
-    return 0
-}
+# Placeholder for future migration functions
+# Example format:
+# migrate_example_v2_2_0() {
+#     local migration_id="example_fix"
+#     local migrations_dir="$(pwd)/.todo.ai/migrations"
+#     local migration_file="${migrations_dir}/v2.2.0_${migration_id}.migrated"
+#     
+#     if [[ -f "$migration_file" ]]; then
+#         return 0
+#     fi
+#     
+#     # ... migration logic here ...
+#     
+#     mkdir -p "$migrations_dir" 2>/dev/null || return 1
+#     touch "$migration_file" 2>/dev/null || return 1
+#     return 0
+# }
+
+# End of migration functions placeholder
+
+# ============================================================================
+# Script Initialization
+# ============================================================================
 
 # Initialize log file
 init_log_file

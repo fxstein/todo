@@ -2,7 +2,7 @@
 description: "Guidelines for using notes with todo.ai tasks"
 alwaysApply: true
 ---
-When creating or working with todo.ai tasks, add notes to provide implementation context.
+When creating or working with todo.ai tasks, add notes to provide implementation context. Do not use notes for status updates on parent tasks.
 
 **Command:** `./todo.ai note <task-id> "Your note here"`
 

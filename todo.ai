@@ -1449,7 +1449,7 @@ $todo_ai_path uninstall --all           # Remove everything (script + data + rul
 - Keeps commit history clear and accurate"
     
     # Task Notes rule content (with detected path)
-    local task_notes_content="When creating or working with todo.ai tasks, add notes to provide implementation context.
+    local task_notes_content="When creating or working with todo.ai tasks, add notes to provide implementation context. Do not use notes for status updates on parent tasks.
 
 **Command:** \`$todo_ai_path note <task-id> \"Your note here\"\`
 

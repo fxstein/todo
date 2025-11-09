@@ -2597,6 +2597,61 @@ modify_todo() {
 }
 
 # Function to archive a completed task and its subtasks
+# Helper function to collect notes (blockquotes) for a task
+# Returns notes as a newline-separated string
+collect_task_notes() {
+    local task_id="$1"
+    local notes=()
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    
+    # Find the task line number
+    local task_line_num=$(grep -n "^- \[.\] \*\*#${escaped_task_id}\*\* \|^  - \[.\] \*\*#${escaped_task_id}\*\* \|^    - \[.\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    
+    if [[ -n "$task_line_num" ]]; then
+        # Collect blockquote notes following the task
+        local current_line=$((task_line_num + 1))
+        while true; do
+            local line=$(sed -n "${current_line}p" "$TODO_FILE")
+            # Check for blockquotes at different indentation levels
+            if [[ "$line" =~ ^"  > " ]] || [[ "$line" =~ ^"    > " ]] || [[ "$line" =~ ^"      > " ]]; then
+                notes+=("$line")
+                current_line=$((current_line + 1))
+            else
+                break
+            fi
+        done
+    fi
+    
+    # Return notes as newline-separated string
+    if [[ ${#notes[@]} -gt 0 ]]; then
+        printf '%s\n' "${notes[@]}"
+    fi
+}
+
+# Helper function to remove notes (blockquotes) for a task
+remove_task_notes() {
+    local task_id="$1"
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    
+    # Find the task line number
+    local task_line_num=$(grep -n "^- \[.\] \*\*#${escaped_task_id}\*\* \|^  - \[.\] \*\*#${escaped_task_id}\*\* \|^    - \[.\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    
+    if [[ -n "$task_line_num" ]]; then
+        # Remove the task line first
+        sed_inplace "${task_line_num}d" "$TODO_FILE"
+        
+        # Remove following blockquote notes (line number doesn't change after deletion)
+        while true; do
+            local next_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
+            if [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]] || [[ "$next_line" =~ ^"      > " ]]; then
+                sed_inplace "${task_line_num}d" "$TODO_FILE"
+            else
+                break
+            fi
+        done
+    fi
+}
+
 archive_task() {
     local task_id=""
     local reason=""
@@ -2698,36 +2753,66 @@ archive_task() {
         task_line="$task_line${status_note} ($archive_date)"
     fi
     
-    # Collect all subtasks and nested subtasks (completed or not)
-    local subtasks=()
+    # Collect notes for the main task
+    local main_task_notes=$(collect_task_notes "$task_id")
+    
+    # Collect all subtasks and nested subtasks (completed or not) WITH their notes
+    local subtasks_with_notes=()
     # Escape task_id for regex matching (escape dots)
     local escaped_task_id_regex=$(echo "$task_id" | sed 's/\./\\./g')
     while IFS= read -r line; do
         # Match subtasks at any nesting level: #task_id.1, #task_id.1.1, etc.
         # Use grep pattern instead of regex to avoid issues with asterisks
         if echo "$line" | grep -q "\*\*#${escaped_task_id_regex}\."; then
+            # Extract subtask ID from the line
+            local subtask_id=$(echo "$line" | grep -o "#${escaped_task_id_regex}\.[0-9.]*" | sed 's/^#//')
+            
             # Add completion date if not already present
             if [[ ! "$line" =~ "\([0-9]{4}-[0-9]{2}-[0-9]{2}\)" ]]; then
                 line="$line ($archive_date)"
             fi
-            subtasks+=("$line")
+            subtasks_with_notes+=("$line")
+            
+            # Collect notes for this subtask
+            local subtask_notes=$(collect_task_notes "$subtask_id")
+            if [[ -n "$subtask_notes" ]]; then
+                # Add each note line to the array
+                while IFS= read -r note_line; do
+                    subtasks_with_notes+=("$note_line")
+                done <<< "$subtask_notes"
+            fi
         fi
     done < "$TODO_FILE"
     
-    # Remove from Tasks section (main task and all subtasks at any nesting level)
-    # Handle both completed [x] and incomplete [ ] tasks
-    # Escape task_id for use in sed pattern
-    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
-    sed_inplace "/^- \[[x ]\] \*\*#${escaped_task_id}\*\* /d" "$TODO_FILE"
-    # Remove subtasks (2 spaces) and sub-subtasks (4 spaces)
-    sed_inplace "/^  - \[.*\] \*\*#${escaped_task_id}\\./d" "$TODO_FILE"
-    sed_inplace "/^    - \[.*\] \*\*#${escaped_task_id}\\./d" "$TODO_FILE"
+    # Remove from Tasks section (main task and all subtasks at any nesting level) WITH notes
+    # Use the helper function to remove task and its notes
+    remove_task_notes "$task_id"
     
-    # Create a complete block with main task and subtasks
+    # Remove subtasks (2 spaces) and sub-subtasks (4 spaces) WITH their notes
+    # Need to collect all subtask IDs first to avoid line number issues
+    local subtask_ids=()
+    while IFS= read -r line; do
+        if echo "$line" | grep -q "\*\*#${escaped_task_id_regex}\."; then
+            local subtask_id=$(echo "$line" | grep -o "#${escaped_task_id_regex}\.[0-9.]*" | sed 's/^#//')
+            subtask_ids+=("$subtask_id")
+        fi
+    done < "$TODO_FILE"
+    
+    # Remove each subtask with its notes
+    for subtask_id in "${subtask_ids[@]}"; do
+        remove_task_notes "$subtask_id"
+    done
+    
+    # Create a complete block with main task, its notes, subtasks, and their notes
     local complete_block="$task_line"
-    if [[ ${#subtasks[@]} -gt 0 ]]; then
-        # Join subtasks with newlines
-        local subtasks_text=$(printf '%s\n' "${subtasks[@]}")
+    if [[ -n "$main_task_notes" ]]; then
+        complete_block="$complete_block
+$main_task_notes"
+    fi
+    
+    if [[ ${#subtasks_with_notes[@]} -gt 0 ]]; then
+        # Join subtasks and their notes with newlines
+        local subtasks_text=$(printf '%s\n' "${subtasks_with_notes[@]}")
         complete_block="$complete_block
 $subtasks_text"
     fi
@@ -2750,7 +2835,7 @@ $subtasks_text"
     fi
     
     # Count subtasks for reporting
-    local subtask_count=${#subtasks[@]}
+    local subtask_count=${#subtask_ids[@]}
     update_footer
     
     # Get task description for logging

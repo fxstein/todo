@@ -4,7 +4,6 @@
 
 ## Tasks
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
-  > Task 132.2 completed: Removed 333 net lines of old migration code (368 removed, 35 added). File size reduced from ~7037 to 6741 lines. Migration infrastructure kept intact for future use.
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [x] **#132.2** Remove old migration logic: keep migration shell but eliminate version-specific migration code `#refactor`
     > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for details.

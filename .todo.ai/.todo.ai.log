@@ -2,6 +2,7 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-09 22:23:18 | fxstein | NOTE | 136 | Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
 2025-11-09 22:22:09 | fxstein | ADD_SUBTASK | 136.9 | Verify note positioning remains correct after multiple subtask additions (parent: #136)
 2025-11-09 22:22:08 | fxstein | ADD_SUBTASK | 136.8 | Test: add second subtask when first subtask already exists with notes (parent: #136)
 2025-11-09 22:22:07 | fxstein | ADD_SUBTASK | 136.7 | Test: task with multiple notes + add subtask (all notes stay with parent) (parent: #136)

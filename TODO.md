@@ -4,6 +4,7 @@
 
 ## Tasks
 - [ ] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug`
+  > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
   - [ ] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug`
   - [ ] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug`
   - [ ] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug`
@@ -362,6 +363,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  9 22:22:09 CET 2025
+**Last Updated:** Sun Nov  9 22:23:18 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

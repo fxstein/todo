@@ -2,6 +2,31 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-09 21:36:20 | fxstein | NOTE | 132 | Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
+2025-11-09 21:36:13 | fxstein | COMPLETE | 132.1 | Create code size analysis document documenting current state and optimization opportunities
+2025-11-09 21:36:12 | fxstein | NOTE | 132.2 | Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
+2025-11-09 21:36:09 | fxstein | NOTE | 132.1 | Analysis document created at docs/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
+2025-11-09 21:36:02 | fxstein | ADD_SUBTASK | 132.2 | Remove old migration logic: keep migration shell but eliminate version-specific migration code (parent: #132)
+2025-11-09 21:36:01 | fxstein | ADD_SUBTASK | 132.1 | Create code size analysis document documenting current state and optimization opportunities (parent: #132)
+2025-11-09 21:35:54 | fxstein | ADD | 132 | Optimize todo.ai codebase: reduce size and complexity
+2025-11-09 21:30:39 | fxstein | NOTE | 131 | Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
+2025-11-09 21:30:32 | fxstein | ADD_SUBTASK | 131.5 | Test rule installation and verify agents follow note-adding guidelines (parent: #131)
+2025-11-09 21:30:31 | fxstein | ADD_SUBTASK | 131.4 | Add rule to init_cursor_rules() function in todo.ai script (parent: #131)
+2025-11-09 21:30:30 | fxstein | ADD_SUBTASK | 131.3 | Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples (parent: #131)
+2025-11-09 21:30:28 | fxstein | ADD_SUBTASK | 131.2 | Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) (parent: #131)
+2025-11-09 21:30:27 | fxstein | ADD_SUBTASK | 131.1 | Research current note usage patterns: when and how notes are used in TODO.md (parent: #131)
+2025-11-09 21:30:20 | fxstein | ADD | 131 | Create Cursor rule encouraging agents to use notes for task implementation details
+2025-11-09 21:28:58 | fxstein | ADD_SUBTASK | 130.10 | Verify no orphaned notes remain in active section after archiving (parent: #130)
+2025-11-09 21:28:57 | fxstein | ADD_SUBTASK | 130.9 | Test with nested subtasks (2 levels) with notes at each level (parent: #130)
+2025-11-09 21:28:56 | fxstein | ADD_SUBTASK | 130.8 | Test with parent task and subtasks with notes (verify all notes move) (parent: #130)
+2025-11-09 21:28:54 | fxstein | ADD_SUBTASK | 130.7 | Test with single task with note (verify note moves with task) (parent: #130)
+2025-11-09 21:28:53 | fxstein | ADD_SUBTASK | 130.6 | Implement note insertion: include notes in archived block with proper structure (parent: #130)
+2025-11-09 21:28:52 | fxstein | ADD_SUBTASK | 130.5 | Implement note removal: remove blockquotes from active section when archiving (parent: #130)
+2025-11-09 21:28:51 | fxstein | ADD_SUBTASK | 130.4 | Implement note collection: gather blockquotes after main task and each subtask (parent: #130)
+2025-11-09 21:28:50 | fxstein | ADD_SUBTASK | 130.3 | Design solution: create function to collect notes for a task and all its subtasks (parent: #130)
+2025-11-09 21:28:49 | fxstein | ADD_SUBTASK | 130.2 | Analyze delete_task function: study how it properly removes notes (lines 2926-2935) (parent: #130)
+2025-11-09 21:28:48 | fxstein | ADD_SUBTASK | 130.1 | Investigate archive_task function: how notes are currently handled (or not handled) (parent: #130)
+2025-11-09 21:28:42 | fxstein | ADD | 130 | Fix issue#32: Archive command doesn't move task notes with the task
 2025-11-02 23:29:46 | fxstein | ARCHIVE | 126 | Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (with 4 subtasks)
 2025-11-02 23:29:45 | fxstein | COMPLETE | 126 | Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode)
 2025-11-02 23:26:37 | fxstein | COMPLETE | 126.3 | Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode)

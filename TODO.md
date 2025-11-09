@@ -3,6 +3,30 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
+  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
+  - [ ] **#132.2** Remove old migration logic: keep migration shell but eliminate version-specific migration code `#refactor`
+    > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
+  - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs`
+    > Analysis document created at docs/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
+- [ ] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature`
+  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
+  - [ ] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test`
+  - [ ] **#131.4** Add rule to init_cursor_rules() function in todo.ai script `#code`
+  - [ ] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code`
+  - [ ] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs`
+  - [ ] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research`
+- [ ] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug`
+  - [ ] **#130.10** Verify no orphaned notes remain in active section after archiving `#bug`
+  - [ ] **#130.9** Test with nested subtasks (2 levels) with notes at each level `#bug`
+  - [ ] **#130.8** Test with parent task and subtasks with notes (verify all notes move) `#bug`
+  - [ ] **#130.7** Test with single task with note (verify note moves with task) `#bug`
+  - [ ] **#130.6** Implement note insertion: include notes in archived block with proper structure `#bug`
+  - [ ] **#130.5** Implement note removal: remove blockquotes from active section when archiving `#bug`
+  - [ ] **#130.4** Implement note collection: gather blockquotes after main task and each subtask `#bug`
+  - [ ] **#130.3** Design solution: create function to collect notes for a task and all its subtasks `#bug`
+  - [ ] **#130.2** Analyze delete_task function: study how it properly removes notes (lines 2926-2935) `#bug`
+  - [ ] **#130.1** Investigate archive_task function: how notes are currently handled (or not handled) `#bug`
 - [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
   - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
@@ -313,6 +337,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  2 23:29:46 CET 2025
+**Last Updated:** Sun Nov  9 21:36:20 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

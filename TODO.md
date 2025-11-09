@@ -16,17 +16,6 @@
   - [ ] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code`
   - [ ] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs`
   - [ ] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research`
-- [x] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug`
-  - [x] **#130.10** Verify no orphaned notes remain in active section after archiving `#bug`
-  - [x] **#130.9** Test with nested subtasks (2 levels) with notes at each level `#bug`
-  - [x] **#130.8** Test with parent task and subtasks with notes (verify all notes move) `#bug`
-  - [x] **#130.7** Test with single task with note (verify note moves with task) `#bug`
-  - [x] **#130.6** Implement note insertion: include notes in archived block with proper structure `#bug`
-  - [x] **#130.5** Implement note removal: remove blockquotes from active section when archiving `#bug`
-  - [x] **#130.4** Implement note collection: gather blockquotes after main task and each subtask `#bug`
-  - [x] **#130.3** Design solution: create function to collect notes for a task and all its subtasks `#bug`
-  - [x] **#130.2** Analyze delete_task function: study how it properly removes notes (lines 2926-2935) `#bug`
-  - [x] **#130.1** Investigate archive_task function: how notes are currently handled (or not handled) `#bug`
 - [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
   - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
@@ -79,6 +68,17 @@
 ------------------
 
 ## Recently Completed
+- [x] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug` (2025-11-09)
+  - [x] **#130.10** Verify no orphaned notes remain in active section after archiving `#bug` (2025-11-09)
+  - [x] **#130.9** Test with nested subtasks (2 levels) with notes at each level `#bug` (2025-11-09)
+  - [x] **#130.8** Test with parent task and subtasks with notes (verify all notes move) `#bug` (2025-11-09)
+  - [x] **#130.7** Test with single task with note (verify note moves with task) `#bug` (2025-11-09)
+  - [x] **#130.6** Implement note insertion: include notes in archived block with proper structure `#bug` (2025-11-09)
+  - [x] **#130.5** Implement note removal: remove blockquotes from active section when archiving `#bug` (2025-11-09)
+  - [x] **#130.4** Implement note collection: gather blockquotes after main task and each subtask `#bug` (2025-11-09)
+  - [x] **#130.3** Design solution: create function to collect notes for a task and all its subtasks `#bug` (2025-11-09)
+  - [x] **#130.2** Analyze delete_task function: study how it properly removes notes (lines 2926-2935) `#bug` (2025-11-09)
+  - [x] **#130.1** Investigate archive_task function: how notes are currently handled (or not handled) `#bug` (2025-11-09)
 - [x] **#135** Test nested subtasks with notes `#test` (2025-11-09)
   - [x] **#135.1** Level 1 subtask `#test` (2025-11-09)
     - [x] **#135.1.1** Level 2 subtask `#test` (2025-11-09)
@@ -350,6 +350,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  9 21:45:49 CET 2025
+**Last Updated:** Sun Nov  9 21:46:52 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

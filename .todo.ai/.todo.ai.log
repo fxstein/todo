@@ -2,6 +2,7 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-09 21:46:52 | fxstein | ARCHIVE | 130 | Fix issue#32: Archive command doesn't move task notes with the task (with 10 subtasks)
 2025-11-09 21:45:49 | fxstein | COMPLETE | 130 | Fix issue#32: Archive command doesn't move task notes with the task
 2025-11-09 21:45:48 | fxstein | COMPLETE | 130.10 | Verify no orphaned notes remain in active section after archiving
 2025-11-09 21:45:48 | fxstein | COMPLETE | 130.9 | Test with nested subtasks (2 levels) with notes at each level

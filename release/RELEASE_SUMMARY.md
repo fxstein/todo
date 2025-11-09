@@ -1,23 +1,16 @@
 # Release Summary
 
-This release focuses on improving code quality, fixing a critical bug, and enhancing developer experience with better task documentation practices.
+This patch release fixes a bug discovered shortly after v2.2.0 where adding subtasks to tasks with notes would incorrectly split the notes from their parent tasks.
 
-## Key Improvements
+## Bug Fix
 
-**Bug Fix - Task Notes Now Move with Archived Tasks**
+**Add_subtask No Longer Splits Task Notes**
 
-Fixed a significant bug ([#32](https://github.com/fxstein/todo.ai/issues/32)) where task notes (blockquotes) were not moved when archiving tasks. Notes would remain in the active section and become orphaned, attaching to unrelated tasks. The archive function now properly collects and moves all notes with their parent tasks and subtasks, ensuring data integrity and preventing confusion. This fix includes comprehensive test coverage for single tasks, tasks with subtasks, and nested subtasks with notes at multiple levels ([70c9123](https://github.com/fxstein/todo.ai/commit/70c9123)).
+Fixed a bug where adding a subtask to a task that has notes (blockquotes) would insert the subtask between the task line and its notes, separating them. The `add_subtask()` function now correctly skips over all blockquote notes following the parent task before inserting the new subtask. This ensures notes remain directly attached to their parent tasks where they belong ([a81da43](https://github.com/fxstein/todo.ai/commit/a81da43)).
 
-**New Feature - Task Notes Cursor Rule**
-
-Added a new Cursor rule (`todo.ai-task-notes.mdc`) that encourages AI agents to add implementation notes to tasks. The rule provides clear examples of good notes (specific file locations, dependencies, technical context) versus vague notes, promoting better task documentation and making it easier for developers to understand implementation details. Notes should be used for actionable context, not status updates on parent tasks ([b195b08](https://github.com/fxstein/todo.ai/commit/b195b08)).
-
-**Code Optimization - Migration Cleanup**
-
-Removed 333 lines of obsolete migration code (v1.3.5 section order fix and v1.6.0 cursor rules migration) that are no longer needed for current installations. The migration framework infrastructure remains intact for future use. This cleanup reduces file size by 4.2% while maintaining full functionality. Legacy installations requiring old migrations can reference git history at commit bd028a2 and earlier ([0200788](https://github.com/fxstein/todo.ai/commit/0200788)).
+**Testing:** Verified with single notes, multiple notes, and nested subtasks at various levels. All note positioning scenarios now work correctly.
 
 ## Additional Changes
 
-- Added comprehensive code size analysis documentation analyzing the 6,741-line codebase and identifying optimization opportunities
-- Updated README to remove outdated single-user mode limitations
-- Improved task management practices by discouraging redundant status notes on parent tasks
+- Added exploratory subtask to investigate bash version for improved portability and potential size reduction
+- Note positioning automatically corrected for existing tasks affected by the bug

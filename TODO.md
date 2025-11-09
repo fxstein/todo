@@ -9,13 +9,6 @@
     > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
   - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs`
     > Analysis document created at docs/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
-- [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature`
-  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
-  - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test`
-  - [x] **#131.4** Add rule to init_cursor_rules() function in todo.ai script `#code`
-  - [x] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code`
-  - [x] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs`
-  - [x] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research`
 - [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
   - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
@@ -68,6 +61,13 @@
 ------------------
 
 ## Recently Completed
+- [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
+  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
+  - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test` (2025-11-09)
+  - [x] **#131.4** Add rule to init_cursor_rules() function in todo.ai script `#code` (2025-11-09)
+  - [x] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code` (2025-11-09)
+  - [x] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs` (2025-11-09)
+  - [x] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research` (2025-11-09)
 - [x] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug` (2025-11-09)
   - [x] **#130.10** Verify no orphaned notes remain in active section after archiving `#bug` (2025-11-09)
   - [x] **#130.9** Test with nested subtasks (2 levels) with notes at each level `#bug` (2025-11-09)
@@ -350,6 +350,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  9 21:54:02 CET 2025
+**Last Updated:** Sun Nov  9 21:54:40 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -776,11 +776,19 @@ execute_release() {
         fi
     fi
     
-    local commit_msg="Bump version to $NEW_VERSION"
-    if [[ "$summary_needs_commit" == true ]]; then
-        commit_msg="${commit_msg}
+    # Create commit message with required GitHub issue reference for pre-commit hook
+    local commit_msg="release: Version $NEW_VERSION
 
-Includes release summary from ${SUMMARY_FILE}"
+Release $BUMP_TYPE version.
+
+(refs #142)"
+    if [[ "$summary_needs_commit" == true ]]; then
+        commit_msg="release: Version $NEW_VERSION
+
+Release $BUMP_TYPE version.
+Includes release summary from ${SUMMARY_FILE}
+
+(refs #142)"
     fi
     
     # Try to commit

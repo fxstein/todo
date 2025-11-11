@@ -4299,8 +4299,8 @@ add_note() {
     fi
     task_id="$resolved_task_id"
     
-    # Verify task exists
-    local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Verify task exists (check main task, subtask, and sub-subtask patterns)
+    local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* \|^    - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     if [[ -z "$task_line_num" ]]; then
         echo "Error: Task #$task_id not found"
@@ -4310,8 +4310,11 @@ add_note() {
     # Format note as blockquote with proper indentation
     local indent=""
     local task_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
-    if [[ "$task_line" =~ ^"  - " ]]; then
-        # This is a subtask, needs extra indentation
+    if [[ "$task_line" =~ ^"    - " ]]; then
+        # This is a sub-subtask (4 spaces), needs 4 spaces indentation
+        indent="    "
+    elif [[ "$task_line" =~ ^"  - " ]]; then
+        # This is a subtask (2 spaces), needs 2 spaces indentation
         indent="  "
     fi
     

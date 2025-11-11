@@ -3,14 +3,13 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#140** Fix bug: Note command doesn't work for nested sub-subtasks (4-space indentation) `#bug`
-  > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
 - [ ] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature`
   > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
   - [ ] **#139.7** Test: verify nested subtask notes displayed correctly `#test`
   - [ ] **#139.6** Test: verify subtask notes displayed for all subtasks `#test`
     > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
+      > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
   - [ ] **#139.5** Test: verify parent task note displayed `#test`
   - [ ] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code`
     > Modify show_task() to call collect_task_notes() for each displayed task/subtask. Display notes immediately after each task line.
@@ -78,6 +77,8 @@
 ------------------
 
 ## Recently Completed
+- [x] **#140** Fix bug: Note command doesn't work for nested sub-subtasks (4-space indentation) `#bug` (2025-11-11)
+  > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
 - [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
   > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
   - [x] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (2025-11-09)
@@ -384,6 +385,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 19:26:13 CET 2025
+**Last Updated:** Tue Nov 11 19:27:58 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

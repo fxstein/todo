@@ -2,6 +2,13 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 21:06:27 | fxstein | NOTE | 143 | Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
+2025-11-11 21:06:25 | fxstein | ADD_SUBTASK | 143.5 | Test: Verify detection works with old and new summary files (parent: #143)
+2025-11-11 21:06:24 | fxstein | ADD_SUBTASK | 143.4 | Option: Prompt to continue or abort if stale summary detected (parent: #143)
+2025-11-11 21:06:23 | fxstein | ADD_SUBTASK | 143.3 | Add warning if summary appears stale (older than last release) (parent: #143)
+2025-11-11 21:06:22 | fxstein | ADD_SUBTASK | 143.2 | Add validation: Compare summary file mtime with last release tag date (parent: #143)
+2025-11-11 21:06:21 | fxstein | ADD_SUBTASK | 143.1 | Investigate: How to detect if summary file is stale (parent: #143)
+2025-11-11 21:06:14 | fxstein | ADD | 143 | Prevent stale release summaries from being used in releases
 2025-11-11 20:58:15 | fxstein | COMPLETE | 142 | Fix release script bug: version verification fails when version already updated in working directory
 2025-11-11 20:58:15 | fxstein | COMPLETE | 142.4 | Test: Verify execute works after failed/aborted release attempt
 2025-11-11 20:50:46 | fxstein | COMPLETE | 142.3 | Fix: Get correct commit hash when 'no commit needed' returned

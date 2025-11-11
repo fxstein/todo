@@ -3,6 +3,13 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#143** Prevent stale release summaries from being used in releases `#bug`
+  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
+  - [ ] **#143.5** Test: Verify detection works with old and new summary files `#bug`
+  - [ ] **#143.4** Option: Prompt to continue or abort if stale summary detected `#bug`
+  - [ ] **#143.3** Add warning if summary appears stale (older than last release) `#bug`
+  - [ ] **#143.2** Add validation: Compare summary file mtime with last release tag date `#bug`
+  - [ ] **#143.1** Investigate: How to detect if summary file is stale `#bug`
 - [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug`
   > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
   - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test`
@@ -405,6 +412,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 20:58:15 CET 2025
+**Last Updated:** Tue Nov 11 21:06:27 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

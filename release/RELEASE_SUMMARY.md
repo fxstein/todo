@@ -1,16 +1,36 @@
 # Release Summary
 
-This patch release fixes a bug discovered shortly after v2.2.0 where adding subtasks to tasks with notes would incorrectly split the notes from their parent tasks.
+This release brings significant improvements to the release workflow and task management features, making todo.ai more robust and AI-agent friendly.
 
-## Bug Fix
+## Major Features
 
-**Add_subtask No Longer Splits Task Notes**
+**Redesigned Release Workflow**
 
-Fixed a bug where adding a subtask to a task that has notes (blockquotes) would insert the subtask between the task line and its notes, separating them. The `add_subtask()` function now correctly skips over all blockquote notes following the parent task before inserting the new subtask. This ensures notes remain directly attached to their parent tasks where they belong ([a81da43](https://github.com/fxstein/todo.ai/commit/a81da43)).
+The release process has been completely redesigned with a two-step prepare/execute workflow that eliminates all interactive prompts ([a5315cf](https://github.com/fxstein/todo.ai/commit/a5315cf)). The new workflow is fully automated and suitable for AI agents:
+- **Prepare step** (default): Analyzes commits, determines version bump type, generates release notes, and saves state
+- **Execute step**: Updates version, commits, tags, pushes to GitHub, and creates the release without any prompts
+- No more manual confirmations or input required during release execution
 
-**Testing:** Verified with single notes, multiple notes, and nested subtasks at various levels. All note positioning scenarios now work correctly.
+**Enhanced Show Command**
 
-## Additional Changes
+The `show` command now provides complete context by displaying notes for parent tasks, all subtasks, and all sub-subtasks ([6024770](https://github.com/fxstein/todo.ai/commit/6024770)). This makes it much easier to understand task implementation details at a glance.
 
-- Added exploratory subtask to investigate bash version for improved portability and potential size reduction
-- Note positioning automatically corrected for existing tasks affected by the bug
+**Improved Note Command**
+
+Fixed the `note` command to work correctly with nested sub-subtasks ([28a7fad](https://github.com/fxstein/todo.ai/commit/28a7fad)), ensuring notes can be added at any nesting level.
+
+## Bug Fixes
+
+**Release Script Robustness**
+
+Multiple fixes to the release execution process ensure reliable automated releases:
+- Fixed version verification when version already updated from failed attempts
+- Added proper error handling for commit status detection
+- Added GitHub issue references to version bump commits to pass pre-commit validation
+- Improved state management between prepare and execute steps
+
+## Additional Improvements
+
+- Added `.prepare_state` to gitignore for cleaner git status
+- Documented new release workflow in Cursor rules
+- Enhanced release logging and error messages

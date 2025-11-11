@@ -3,9 +3,9 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug`
+- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug`
   > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
-  - [ ] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test`
+  - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test`
   - [x] **#142.3** Fix: Get correct commit hash when 'no commit needed' returned `#code`
   - [x] **#142.2** Fix: Handle case where version already correct in working directory `#code`
   - [x] **#142.1** Investigate execute_release: why version verification fails `#bug`
@@ -405,6 +405,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 20:50:46 CET 2025
+**Last Updated:** Tue Nov 11 20:58:15 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

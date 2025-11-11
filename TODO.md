@@ -3,6 +3,15 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature`
+  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
+  - [ ] **#139.7** Test: verify nested subtask notes displayed correctly `#test`
+  - [ ] **#139.6** Test: verify subtask notes displayed for all subtasks `#test`
+  - [ ] **#139.5** Test: verify parent task note displayed `#test`
+  - [ ] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code`
+  - [ ] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design`
+  - [ ] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug`
+  - [ ] **#139.1** Investigate show_task function: find where notes are displayed `#research`
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
@@ -369,6 +378,6 @@
 
 ---
 
-**Last Updated:** Sun Nov  9 22:26:41 CET 2025
+**Last Updated:** Tue Nov 11 19:22:56 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

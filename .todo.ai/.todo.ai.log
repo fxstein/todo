@@ -2,6 +2,15 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 19:22:56 | fxstein | NOTE | 139 | Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
+2025-11-11 19:22:46 | fxstein | ADD_SUBTASK | 139.7 | Test: verify nested subtask notes displayed correctly (parent: #139)
+2025-11-11 19:22:45 | fxstein | ADD_SUBTASK | 139.6 | Test: verify subtask notes displayed for all subtasks (parent: #139)
+2025-11-11 19:22:44 | fxstein | ADD_SUBTASK | 139.5 | Test: verify parent task note displayed (parent: #139)
+2025-11-11 19:22:43 | fxstein | ADD_SUBTASK | 139.4 | Implement fix: modify show_task to display notes after each task/subtask line (parent: #139)
+2025-11-11 19:22:41 | fxstein | ADD_SUBTASK | 139.3 | Design solution: show notes for parent task and all displayed subtasks (parent: #139)
+2025-11-11 19:22:40 | fxstein | ADD_SUBTASK | 139.2 | Verify current behavior: confirm only parent notes shown, subtask notes missing (parent: #139)
+2025-11-11 19:22:39 | fxstein | ADD_SUBTASK | 139.1 | Investigate show_task function: find where notes are displayed (parent: #139)
+2025-11-11 19:22:31 | fxstein | ADD | 139 | Enhance show command to display notes for subtasks, not just parent task
 2025-11-09 22:26:41 | fxstein | ARCHIVE | 136 | Fix bug: Adding subtask splits task notes - subtask inserts between task and note (with 9 subtasks)
 2025-11-09 22:26:22 | fxstein | DELETE | 138.1.1 | Nested sub-subtask
 2025-11-09 22:26:22 | fxstein | DELETE | 138.1 | First subtask after fix

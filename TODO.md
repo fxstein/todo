@@ -3,19 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
-  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
-  - [x] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
-    > Smart installer created: install.sh detects OS/shell and installs optimal version. See docs/design/SMART_INSTALLER_DESIGN.md for full design. One-liner: curl -fsSL .../install.sh | sh maintains simplicity while adding intelligence.
-    > Compare bash vs zsh syntax differences, evaluate portability benefits (works on more platforms), analyze if simpler syntax reduces file size. Current tool is zsh-specific with features like [[ ]], read patterns, arrays.
-    - [x] **#132.3.4** Create bash vs zsh analysis document - document pros/cons, recommendation, and migration considerations `#research`
-    - [x] **#132.3.3** Compare bash vs zsh versions - file size, performance, syntax complexity, and platform compatibility `#research`
-    - [x] **#132.3.2** Test bash version functionality - verify all commands work correctly and produce identical output `#research`
-    - [x] **#132.3.1** Create bash version of todo.ai (todo.bash) - convert zsh-specific syntax to bash-compatible equivalents `#research`
-  - [x] **#132.2** Remove old migration logic: keep migration shell but eliminate version-specific migration code `#refactor`
-    > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
-  - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs`
-    > Analysis document created at docs/analysis/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
 - [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
   - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
@@ -68,6 +55,19 @@
 ------------------
 
 ## Recently Completed
+- [x] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization` (2025-11-12)
+  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
+  - [x] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research` (2025-11-12)
+    > Smart installer created: install.sh detects OS/shell and installs optimal version. See docs/design/SMART_INSTALLER_DESIGN.md for full design. One-liner: curl -fsSL .../install.sh | sh maintains simplicity while adding intelligence.
+    > Compare bash vs zsh syntax differences, evaluate portability benefits (works on more platforms), analyze if simpler syntax reduces file size. Current tool is zsh-specific with features like [[ ]], read patterns, arrays.
+    - [x] **#132.3.4** Create bash vs zsh analysis document - document pros/cons, recommendation, and migration considerations `#research` (2025-11-12)
+    - [x] **#132.3.3** Compare bash vs zsh versions - file size, performance, syntax complexity, and platform compatibility `#research` (2025-11-12)
+    - [x] **#132.3.2** Test bash version functionality - verify all commands work correctly and produce identical output `#research` (2025-11-12)
+    - [x] **#132.3.1** Create bash version of todo.ai (todo.bash) - convert zsh-specific syntax to bash-compatible equivalents `#research` (2025-11-12)
+  - [x] **#132.2** Remove old migration logic: keep migration shell but eliminate version-specific migration code `#refactor` (2025-11-12)
+    > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
+  - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs` (2025-11-12)
+    > Analysis document created at docs/analysis/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
 - [x] **#146** Test task#144 implementation before release `#test` (2025-11-12)
   > Validate all task#144 features before creating release: bash conversion, smart installer, release assets. All tests passed successfully. Release v2.4.0 is LIVE with smart installer, bash version, and automated conversion workflow.
   - [x] **#146.7** Clean up pre-release and verify ready for production release `#test` (2025-11-12)
@@ -465,6 +465,6 @@
 
 ---
 
-**Last Updated:** Wed Nov 12 00:17:00 CET 2025
+**Last Updated:** Wed Nov 12 00:19:19 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

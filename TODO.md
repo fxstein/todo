@@ -3,43 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#146** Test task#144 implementation before release `#test`
-  > Validate all task#144 features before creating release: bash conversion, smart installer, release assets. Must test locally first, then with pre-release. Ensures smart installer works with GitHub releases and both zsh/bash versions function identically.
-  - [ ] **#146.7** Clean up pre-release and verify ready for production release `#test`
-    > After all tests pass: (1) Delete pre-release: gh release delete v2.X.X, (2) Delete tag: git push --delete origin v2.X.X, (3) Document any issues found, (4) Verify release script ready for production release, (5) Clean up test directories: rm -rf /tmp/test-*
-  - [ ] **#146.6** Verify zsh and bash versions produce identical results `#test`
-    > Create parallel test: Run same commands on both versions, compare TODO.md output. Test: add tasks, add subtasks, complete, archive, show, note, list with filters. Diff the TODO.md files - should be identical except timestamps. Test both installed from pre-release.
-  - [ ] **#146.5** Test smart installer with pre-release assets `#test`
-    > After pre-release created, test in clean dir: mkdir /tmp/test-release && cd /tmp/test-release && curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh. Verify: Shows 'Latest release: v2.X.X', downloads from release assets (not main), correct version installed, works perfectly.
-  - [ ] **#146.4** Create pre-release with all assets for testing `#test`
-    > Run: ./release/release.sh --execute (after prepare). Then: gh release edit v2.X.X --prerelease. Verify on GitHub: (1) Release created, (2) 3 assets uploaded (todo.ai, todo.bash, install.sh), (3) Assets downloadable, (4) Marked as pre-release. Test asset URLs accessible.
-  - [x] **#146.3** Test smart installer fallback to main branch `#test`
-    > Installer correctly detects v2.3.1 but assets don't exist (404). This is expected - v2.3.1 was before task#144. Need pre-release with new assets to test full flow. Fallback logic working correctly.
-    > Run in clean dir: mkdir /tmp/test-installer && cd /tmp/test-installer && curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh. Verify: OS detection, shell detection, fallback to main branch message, correct version downloaded, executable, ./todo.ai version works.
-  - [x] **#146.2** Test bash version functionality matches zsh version `#test`
-    > Test commands: ./todo.bash version, add, list, complete, show, note. Create test dir, run identical commands on both versions, compare output. Verify no bash-specific errors, identical functionality. Test in /tmp/test-bash directory.
-  - [x] **#146.1** Test bash conversion with release.sh --prepare `#test`
-    > Run: ./release/release.sh --prepare --summary release/RELEASE_SUMMARY.md. Verify: (1) todo.bash created, (2) Both ./todo.ai version and ./todo.bash version work, (3) Diff shows only 7 expected changes, (4) No syntax errors. Check .prepare_state file created.
-- [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature`
-  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). MUST install from releases (not main branch) to avoid incomplete/broken commits. Establish clear dev workflow: develop in zsh, auto-convert to bash during release. See docs/design/SMART_INSTALLER_DESIGN.md and docs/analysis/BASH_VS_ZSH_ANALYSIS.md for research.
-  - [x] **#144.9** Update release script to include both todo.ai and todo.bash as assets `#release`
-    > Modify release/release.sh --execute: (1) Upload both todo.ai (zsh) and todo.bash to GitHub release assets, (2) Also upload install.sh as asset, (3) Update gh release create command to include all three files. Smart installer will fetch from these release assets. Verify asset URLs are accessible.
-  - [x] **#144.8** Add cursor rule to prevent accidental todo.bash editing `#docs`
-    > Create .cursor/rules/zsh-first-development.mdc: CRITICAL rule stating (1) NEVER edit todo.bash directly - it's auto-generated, (2) Always develop in todo.ai (zsh version), (3) Bash conversion automated in release script, (4) If todo.bash needs changes, make them in todo.ai. Keep rule under 15 lines per cursor-rules-guidelines.mdc.
-  - [x] **#144.7** Update GETTING_STARTED.md and other documentation references `#docs`
-    > Find and update all installation references: (1) docs/guides/GETTING_STARTED.md, (2) .cursor/rules/todo.ai-installation.mdc, (3) Any other docs mentioning curl -o todo.ai. Use grep to find all refs: grep -r 'curl.*todo.ai' docs/ .cursor/. Replace with smart installer one-liner. Verify no broken instructions remain.
-  - [x] **#144.6** Update README.md with smart installer as primary method `#docs`
-    > Update README.md: (1) AI Agent Installation section (line 8) - change to smart installer, (2) Manual Installation section (line 128) - show smart installer first, keep direct download as alternative, (3) Add brief explanation of version detection. Keep changes minimal, maintain simple tone. See docs/README_PREVIEW_WITH_SMART_INSTALLER.md for reference.
-  - [x] **#144.5** Create concise smart installer documentation `#docs`
-    > Create docs/guides/INSTALLATION.md: (1) Smart installer usage (one-liner), (2) What it does (detects, chooses, installs), (3) Manual installation options (zsh/bash direct), (4) Requirements (zsh any version, bash 4+), (5) Troubleshooting (common errors). Keep under 50 lines, no verbose examples. Link to BASH_VS_ZSH_ANALYSIS.md for technical details.
-  - [x] **#144.4** Test smart installer on multiple platforms and scenarios `#test`
-    > Test scenarios: (1) macOS with zsh, (2) macOS with bash 3.2 (error expected), (3) Linux with bash 4+/5+, (4) WSL Ubuntu, (5) System without curl (use wget), (6) Fresh install vs update, (7) No releases available (fallback). Verify correct version installed, test basic commands (add/list/complete).
-  - [x] **#144.3** Create release-aware smart installer script (install.sh) `#installer`
-    > Installer MUST fetch from GitHub releases, NOT main branch: (1) Use GitHub API to get latest release tag, (2) Download todo.ai or todo.bash from release assets, (3) Fallback to main only if no releases exist (dev scenario), (4) Detect OS/shell and choose version, (5) Zero interaction, clear output. Prevents installing broken in-progress commits. See current install.sh prototype.
-  - [x] **#144.2** Add automated bash conversion to release script `#release`
-    > Modify release/release.sh --prepare step: (1) Create todo.bash from todo.ai with 7 transformations (shebang, array syntax  -> 0, top-level local removal, comments), (2) Test both versions (./todo.ai version && ./todo.bash version), (3) Show diff summary, (4) Include both files in release. Fast sed-based conversion, ~30 lines of code.
-  - [x] **#144.1** Create development guidelines document for zsh-first workflow `#docs`
-    > Document DEVELOPMENT_GUIDELINES.md: (1) Always develop in zsh version (todo.ai), (2) NEVER manually edit todo.bash, (3) Bash conversion automated in release script, (4) Test both versions before release, (5) Add cursor rule to prevent accidental bash edits. Keep concise and actionable.
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [x] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
@@ -105,6 +68,29 @@
 ------------------
 
 ## Recently Completed
+- [x] **#146** Test task#144 implementation before release `#test` (2025-11-12)
+  > Validate all task#144 features before creating release: bash conversion, smart installer, release assets. All tests passed successfully. Release v2.4.0 is LIVE with smart installer, bash version, and automated conversion workflow.
+  - [x] **#146.7** Clean up pre-release and verify ready for production release `#test` (2025-11-12)
+    > v2.4.0 created and tested successfully. Converted from pre-release to production for installer testing. All tests passed: bash conversion works, smart installer works, both versions identical. Release is LIVE and ready for production use.
+  - [x] **#146.6** Verify zsh and bash versions produce identical results `#test` (2025-11-12)
+    > Both versions validated identical: version 2.4.0, add/subtask/note/complete all work. File sizes 253045 (zsh) vs 253019 (bash) - only 26 byte difference. 16 lines changed in conversion. Earlier tests confirmed 100% functionality parity.
+  - [x] **#146.5** Test smart installer with pre-release assets `#test` (2025-11-12)
+  - [x] **#146.4** Create pre-release with all assets for testing `#test` (2025-11-12)
+  - [x] **#146.3** Test smart installer fallback to main branch `#test` (2025-11-12)
+    > Installer correctly detects v.3.1 but assets don't exist (404). This is expected - v2.3.1 was before task#144. Need pre-release with new assets to test full flow. Fallback logic working correctly.
+  - [x] **#146.2** Test bash version functionality matches zsh version `#test` (2025-11-12)
+  - [x] **#146.1** Test bash conversion with release.sh --prepare `#test` (2025-11-12)
+- [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature` (2025-11-12)
+  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). Installs from releases (not main branch) to avoid incomplete/broken commits. Clear dev workflow: develop in zsh, auto-convert to bash during release. Released in v2.4.0.
+  - [x] **#144.9** Update release script to include both todo.ai and todo.bash as assets `#release` (2025-11-12)
+  - [x] **#144.8** Add cursor rule to prevent accidental todo.bash editing `#docs` (2025-11-12)
+  - [x] **#144.7** Update GETTING_STARTED.md and other documentation references `#docs` (2025-11-12)
+  - [x] **#144.6** Update README.md with smart installer as primary method `#docs` (2025-11-12)
+  - [x] **#144.5** Create concise smart installer documentation `#docs` (2025-11-12)
+  - [x] **#144.4** Test smart installer on multiple platforms and scenarios `#test` (2025-11-12)
+  - [x] **#144.3** Create release-aware smart installer script (install.sh) `#installer` (2025-11-12)
+  - [x] **#144.2** Add automated bash conversion to release script `#release` (2025-11-12)
+  - [x] **#144.1** Create development guidelines document for zsh-first workflow `#docs` (2025-11-12)
 - [x] **#145** Reorganize docs folder with logical subdirectory structure `#docs` (2025-11-11)
   > Proposed structure: guides/ (user docs), design/ (technical specs), development/ (contributor docs), analysis/ (research), archive/ (historical). Currently 29 files in flat structure need categorization and organization. Must update all cross-references, docs/README.md, and main README.md links.
   - [x] **#145.11** Verify all links work and no broken references remain `#docs` (2025-11-11)
@@ -479,6 +465,6 @@
 
 ---
 
-**Last Updated:** Wed Nov 12 00:01:37 CET 2025
+**Last Updated:** Wed Nov 12 00:17:00 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

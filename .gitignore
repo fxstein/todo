@@ -29,3 +29,4 @@ RELEASE_SUMMARY.md
 # Backup files created by various tools (sed, etc.)
 *.bak
 *.bak*
+release/.prepare_state

@@ -3,20 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature`
-  > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
-  - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs`
-  - [x] **#141.8** Test execute mode: verify release completes without any prompts `#test`
-  - [x] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test`
-  - [x] **#141.6** Add highlighted execution command at end of prepare step output `#code`
-    > Display: 'To execute this release, run: ./release/release.sh --execute' in green/highlighted text at end of prepare output.
-  - [x] **#141.5** Remove all interactive prompts from both modes `#code`
-  - [x] **#141.4** Implement --execute mode: perform release without prompts (version, tag, push, GitHub) `#code`
-    > Read prepared release data from temp/cache. Update version, commit, tag, push to GitHub, create release. Exit with error if prepare not run first.
-  - [x] **#141.3** Implement --prepare mode (default): analyze commits, generate notes, show preview only `#code`
-    > Default behavior when called without --execute. Generate preview, save to temp file, display release notes. End with highlighted command to execute.
-  - [x] **#141.2** Design new workflow: prepare (default) vs execute modes `#design`
-  - [x] **#141.1** Analyze current release.sh: identify all prompts and manual confirmation points `#research`
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
@@ -77,6 +63,20 @@
 ------------------
 
 ## Recently Completed
+- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature` (2025-11-11)
+  > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
+  - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs` (2025-11-11)
+  - [x] **#141.8** Test execute mode: verify release completes without any prompts `#test` (2025-11-11)
+  - [x] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test` (2025-11-11)
+  - [x] **#141.6** Add highlighted execution command at end of prepare step output `#code` (2025-11-11)
+    > Display: 'To execute this release, run: ./release/release.sh --execute' in green/highlighted text at end of prepare output.
+  - [x] **#141.5** Remove all interactive prompts from both modes `#code` (2025-11-11)
+  - [x] **#141.4** Implement --execute mode: perform release without prompts (version, tag, push, GitHub) `#code` (2025-11-11)
+    > Read prepared release data from temp/cache. Update version, commit, tag, push to GitHub, create release. Exit with error if prepare not run first.
+  - [x] **#141.3** Implement --prepare mode (default): analyze commits, generate notes, show preview only `#code` (2025-11-11)
+    > Default behavior when called without --execute. Generate preview, save to temp file, display release notes. End with highlighted command to execute.
+  - [x] **#141.2** Design new workflow: prepare (default) vs execute modes `#design` (2025-11-11)
+  - [x] **#141.1** Analyze current release.sh: identify all prompts and manual confirmation points `#research` (2025-11-11)
 - [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature` (2025-11-11)
   > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
   - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test` (2025-11-11)
@@ -399,6 +399,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 20:38:32 CET 2025
+**Last Updated:** Tue Nov 11 20:38:49 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

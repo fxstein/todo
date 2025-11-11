@@ -3,11 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature`
+- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature`
   > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
-  - [ ] **#141.9** Update release documentation and Cursor rules with new workflow `#docs`
-  - [ ] **#141.8** Test execute mode: verify release completes without any prompts `#test`
-  - [ ] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test`
+  - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs`
+  - [x] **#141.8** Test execute mode: verify release completes without any prompts `#test`
+  - [x] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test`
   - [x] **#141.6** Add highlighted execution command at end of prepare step output `#code`
     > Display: 'To execute this release, run: ./release/release.sh --execute' in green/highlighted text at end of prepare output.
   - [x] **#141.5** Remove all interactive prompts from both modes `#code`
@@ -399,6 +399,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 20:37:10 CET 2025
+**Last Updated:** Tue Nov 11 20:38:32 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

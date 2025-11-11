@@ -783,21 +783,16 @@ execute_release() {
 Includes release summary from ${SUMMARY_FILE}"
     fi
     
-    local version_commit=$(git commit -m "$commit_msg" 2>&1 || echo "no commit needed")
+    # Try to commit
+    set +e  # Disable exit on error temporarily
+    local version_commit=$(git commit -m "$commit_msg" 2>&1)
+    local commit_status=$?
+    set -e
     
-    # Get the commit hash - if commit succeeded, use HEAD; if no commit needed, verify working directory
+    # Get the commit hash - handle both success and "nothing to commit" cases
     local version_commit_hash
-    if [[ "$version_commit" == "no commit needed" ]]; then
-        log_release_step "VERSION ALREADY SET" "Version already set to ${NEW_VERSION} in working directory"
-        # Verify version is correct in working directory
-        if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai; then
-            echo -e "${RED}❌ Error: Version mismatch in working directory${NC}"
-            echo "Expected VERSION=\"${NEW_VERSION}\" but found VERSION=\"$(grep '^VERSION=' todo.ai | cut -d'"' -f2)\""
-            log_release_step "VERIFY ERROR" "Version mismatch in working directory"
-            exit 1
-        fi
-        version_commit_hash=$(git rev-parse HEAD)
-    else
+    if [[ $commit_status -eq 0 ]]; then
+        # Commit succeeded
         log_release_step "VERSION COMMITTED" "Version change committed: ${version_commit}"
         version_commit_hash=$(git rev-parse HEAD)
         
@@ -808,6 +803,20 @@ Includes release summary from ${SUMMARY_FILE}"
             log_release_step "VERIFY ERROR" "Version verification failed - commit ${version_commit_hash} doesn't have VERSION=${NEW_VERSION}"
             exit 1
         fi
+    else
+        # Commit failed (likely nothing to commit) - verify version in working directory
+        log_release_step "VERSION ALREADY SET" "Version already set to ${NEW_VERSION}, using current HEAD"
+        
+        # Verify version is correct in working directory
+        if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai; then
+            echo -e "${RED}❌ Error: Version mismatch${NC}"
+            echo "Expected VERSION=\"${NEW_VERSION}\" but found VERSION=\"$(grep '^VERSION=' todo.ai | cut -d'"' -f2)\""
+            log_release_step "VERIFY ERROR" "Version mismatch in working directory"
+            exit 1
+        fi
+        
+        # Use current HEAD (version is in working directory, will be committed with next change)
+        version_commit_hash=$(git rev-parse HEAD)
     fi
     
     # Create and push tag

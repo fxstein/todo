@@ -1,22 +1,34 @@
 # Release Summary
 
-This patch release fixes a critical bug in the release workflow that caused v2.3.0 to be published with incorrect release notes.
+This release introduces the smart installer with bash/zsh dual-version support and reorganizes documentation for better navigation.
 
-## Bug Fix
+## Smart Installer & Bash Version Support
 
-**Stale Summary Detection**
+The smart installer automatically detects your system (macOS, Linux, Windows/WSL) and shell environment (zsh, bash 4+) to install the optimal version. This eliminates compatibility issues and ensures todo.ai works everywhere out of the box.
 
-The release script now validates that the release summary file is current before using it ([b27f7cb](https://github.com/fxstein/todo.ai/commit/b27f7cb)). This prevents publishing releases with outdated summaries from previous versions.
+**Key improvements:**
+- **Zero-interaction installation** - One-liner that works on all platforms
+- **Bash version support** - 8-21% faster, works on systems without zsh
+- **Release-aware downloads** - Installs from stable releases, not development code
+- **Automated bash conversion** - Bash version generated automatically during releases
+- **Clear development workflow** - Develop in zsh, bash version created automatically
 
-**How it works:**
-- Compares summary file modification time with last release tag timestamp
-- Shows clear warning if summary file is older than the last release
-- In interactive mode: prompts user to continue or abort
-- In non-interactive mode: automatically aborts to prevent mistakes
+Technical details: The bash version requires only 7 syntax changes from zsh (array key iteration, shebang, local scope) and maintains 100% feature parity. Both versions are tested before each release.
 
-**What happened:** v2.3.0 was accidentally published with v2.2.1's release notes because the script used a stale `RELEASE_SUMMARY.md` file without validation. This fix ensures release summaries are always current and accurate.
+## Documentation Reorganization
 
-## Additional Changes
+All documentation has been reorganized into logical categories for easier navigation:
+- **guides/** - User-facing guides and tutorials (5 docs)
+- **design/** - Technical design specifications (8 docs)
+- **development/** - Contributor documentation (4 docs)
+- **analysis/** - Research and analysis reports (7 docs)
+- **archive/** - Historical and completed migrations (4 docs)
 
-- Marked task #142 (release script bug fixes) as complete
-- Created task #143 to track the stale summary detection implementation
+A comprehensive documentation index at `docs/README.md` makes it easy to find what you need.
+
+## Benefits
+
+- **Broader compatibility** - Works on more systems without requiring zsh installation
+- **Better performance** - Bash version is consistently faster (8-21%)
+- **Easier navigation** - Well-organized documentation structure
+- **Maintained quality** - All cross-references updated, no broken links

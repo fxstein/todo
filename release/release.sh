@@ -541,6 +541,59 @@ main() {
         SUMMARY_FILE=""
     fi
     
+    # Validate summary file is not stale (newer than last release)
+    if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
+        # Get the last release tag
+        local last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+        
+        if [[ -n "$last_tag" ]]; then
+            # Get timestamp of last release tag (seconds since epoch)
+            local tag_timestamp=$(git log -1 --format=%ct "$last_tag" 2>/dev/null || echo "0")
+            
+            # Get modification time of summary file (seconds since epoch)
+            if [[ "$(uname)" == "Darwin" ]]; then
+                # macOS stat command
+                local summary_mtime=$(stat -f %m "$SUMMARY_FILE" 2>/dev/null || echo "0")
+            else
+                # Linux stat command
+                local summary_mtime=$(stat -c %Y "$SUMMARY_FILE" 2>/dev/null || echo "0")
+            fi
+            
+            # Compare timestamps
+            if [[ "$summary_mtime" -lt "$tag_timestamp" ]]; then
+                echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo -e "${RED}⚠️  STALE SUMMARY FILE DETECTED${NC}"
+                echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo ""
+                echo -e "${YELLOW}The release summary file is older than the last release:${NC}"
+                echo -e "  Summary file: ${SUMMARY_FILE}"
+                echo -e "  Last release: ${last_tag} ($(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S' "$last_tag"))"
+                echo -e "  File modified: $(date -r "$summary_mtime" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -d "@$summary_mtime" '+%Y-%m-%d %H:%M:%S')"
+                echo ""
+                echo -e "${YELLOW}This suggests the summary may be from a previous release.${NC}"
+                echo -e "${YELLOW}You should update the summary file for this release.${NC}"
+                echo ""
+                
+                # Check if we're in interactive mode
+                if [[ -t 0 ]]; then
+                    read -p "Continue anyway? (y/N): " -n 1 -r
+                    echo
+                    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                        echo -e "${BLUE}Release aborted. Please update the summary file.${NC}"
+                        exit 1
+                    fi
+                    echo -e "${YELLOW}⚠️  Proceeding with potentially stale summary...${NC}"
+                    echo ""
+                else
+                    # Non-interactive mode: abort by default
+                    echo -e "${RED}Running in non-interactive mode - aborting.${NC}"
+                    echo -e "${BLUE}Please update the summary file and try again.${NC}"
+                    exit 1
+                fi
+            fi
+        fi
+    fi
+    
     # Verify prerequisites
     if ! command -v gh &> /dev/null; then
         echo -e "${RED}❌ Error: GitHub CLI (gh) is not installed${NC}"

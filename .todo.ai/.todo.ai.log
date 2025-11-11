@@ -2,6 +2,13 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 22:00:35 | fxstein | NOTE | 143 | Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
+2025-11-11 22:00:33 | fxstein | COMPLETE | 143 | Prevent stale release summaries from being used in releases
+2025-11-11 22:00:33 | fxstein | COMPLETE | 143.5 | Test: Verify detection works with old and new summary files
+2025-11-11 21:59:57 | fxstein | COMPLETE | 143.4 | Option: Prompt to continue or abort if stale summary detected
+2025-11-11 21:59:57 | fxstein | COMPLETE | 143.3 | Add warning if summary appears stale (older than last release)
+2025-11-11 21:59:57 | fxstein | COMPLETE | 143.2 | Add validation: Compare summary file mtime with last release tag date
+2025-11-11 21:59:30 | fxstein | COMPLETE | 143.1 | Investigate: How to detect if summary file is stale
 2025-11-11 21:06:27 | fxstein | NOTE | 143 | Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
 2025-11-11 21:06:25 | fxstein | ADD_SUBTASK | 143.5 | Test: Verify detection works with old and new summary files (parent: #143)
 2025-11-11 21:06:24 | fxstein | ADD_SUBTASK | 143.4 | Option: Prompt to continue or abort if stale summary detected (parent: #143)

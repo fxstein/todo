@@ -3,6 +3,8 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug`
+  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
@@ -399,6 +401,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 20:38:49 CET 2025
+**Last Updated:** Tue Nov 11 20:48:28 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

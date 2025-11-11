@@ -790,11 +790,11 @@ Includes release summary from ${SUMMARY_FILE}"
     set -e
     
     # Get the commit hash - handle both success and "nothing to commit" cases
-    local version_commit_hash
+    local version_commit_hash=$(git rev-parse HEAD)
+    
     if [[ $commit_status -eq 0 ]]; then
         # Commit succeeded
         log_release_step "VERSION COMMITTED" "Version change committed: ${version_commit}"
-        version_commit_hash=$(git rev-parse HEAD)
         
         # Verify the version was actually updated in the commit
         if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
@@ -815,8 +815,11 @@ Includes release summary from ${SUMMARY_FILE}"
             exit 1
         fi
         
-        # Use current HEAD (version is in working directory, will be committed with next change)
-        version_commit_hash=$(git rev-parse HEAD)
+        # For "nothing to commit", verify HEAD has the correct version
+        if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
+            echo -e "${YELLOW}⚠️  Note: Version in working directory but not yet committed${NC}"
+            echo -e "${YELLOW}   This is expected if version was updated in a previous failed attempt${NC}"
+        fi
     fi
     
     # Create and push tag

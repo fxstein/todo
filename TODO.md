@@ -3,20 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#143** Prevent stale release summaries from being used in releases `#bug`
-  > Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
-  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
-  - [x] **#143.5** Test: Verify detection works with old and new summary files `#bug`
-  - [x] **#143.4** Option: Prompt to continue or abort if stale summary detected `#bug`
-  - [x] **#143.3** Add warning if summary appears stale (older than last release) `#bug`
-  - [x] **#143.2** Add validation: Compare summary file mtime with last release tag date `#bug`
-  - [x] **#143.1** Investigate: How to detect if summary file is stale `#bug`
-- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug`
-  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
-  - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test`
-  - [x] **#142.3** Fix: Get correct commit hash when 'no commit needed' returned `#code`
-  - [x] **#142.2** Fix: Handle case where version already correct in working directory `#code`
-  - [x] **#142.1** Investigate execute_release: why version verification fails `#bug`
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
@@ -77,6 +63,20 @@
 ------------------
 
 ## Recently Completed
+- [x] **#143** Prevent stale release summaries from being used in releases `#bug` (2025-11-11)
+  > Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
+  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
+  - [x] **#143.5** Test: Verify detection works with old and new summary files `#bug` (2025-11-11)
+  - [x] **#143.4** Option: Prompt to continue or abort if stale summary detected `#bug` (2025-11-11)
+  - [x] **#143.3** Add warning if summary appears stale (older than last release) `#bug` (2025-11-11)
+  - [x] **#143.2** Add validation: Compare summary file mtime with last release tag date `#bug` (2025-11-11)
+  - [x] **#143.1** Investigate: How to detect if summary file is stale `#bug` (2025-11-11)
+- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug` (2025-11-11)
+  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
+  - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test` (2025-11-11)
+  - [x] **#142.3** Fix: Get correct commit hash when 'no commit needed' returned `#code` (2025-11-11)
+  - [x] **#142.2** Fix: Handle case where version already correct in working directory `#code` (2025-11-11)
+  - [x] **#142.1** Investigate execute_release: why version verification fails `#bug` (2025-11-11)
 - [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature` (2025-11-11)
   > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
   - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs` (2025-11-11)
@@ -413,6 +413,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 22:00:35 CET 2025
+**Last Updated:** Tue Nov 11 22:07:31 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

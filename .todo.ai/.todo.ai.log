@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 22:07:31 | fxstein | ARCHIVE | 143 | Prevent stale release summaries from being used in releases (with 5 subtasks)
+2025-11-11 22:07:29 | fxstein | ARCHIVE | 142 | Fix release script bug: version verification fails when version already updated in working directory (with 4 subtasks)
 2025-11-11 22:00:35 | fxstein | NOTE | 143 | Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
 2025-11-11 22:00:33 | fxstein | COMPLETE | 143 | Prevent stale release summaries from being used in releases
 2025-11-11 22:00:33 | fxstein | COMPLETE | 143.5 | Test: Verify detection works with old and new summary files

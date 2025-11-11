@@ -4174,10 +4174,38 @@ show_task() {
         done
     fi
     
-    # Find and display subtasks if this is a parent
+    # Find and display subtasks with their notes if this is a parent
     if [[ "$task_id" != *.* ]]; then
-        grep "^  - \[.\] \*\*#$task_id\." "$TODO_FILE" | while read -r subtask; do
-            echo "$subtask"
+        # First, collect all subtasks
+        local subtask_lines=()
+        while IFS= read -r subtask; do
+            subtask_lines+=("$subtask")
+        done < <(grep "^  - \[.\] \*\*#$task_id\." "$TODO_FILE")
+        
+        # Display each subtask with its notes and sub-subtasks
+        for subtask_line in "${subtask_lines[@]}"; do
+            echo "$subtask_line"
+            
+            # Extract subtask ID from the line
+            local subtask_id=$(echo "$subtask_line" | grep -o "#${task_id}\.[0-9.]*" | sed 's/^#//')
+            
+            # Display notes for this subtask
+            local subtask_notes=$(collect_task_notes "$subtask_id")
+            if [[ -n "$subtask_notes" ]]; then
+                echo "$subtask_notes"
+            fi
+            
+            # Display sub-subtasks for this subtask
+            while IFS= read -r subsubtask; do
+                echo "$subsubtask"
+                
+                # Extract sub-subtask ID and display its notes
+                local subsubtask_id=$(echo "$subsubtask" | grep -o "#${subtask_id}\.[0-9.]*" | sed 's/^#//')
+                local subsubtask_notes=$(collect_task_notes "$subsubtask_id")
+                if [[ -n "$subsubtask_notes" ]]; then
+                    echo "$subsubtask_notes"
+                fi
+            done < <(grep "^    - \[.\] \*\*#${subtask_id}\." "$TODO_FILE")
         done
     fi
     

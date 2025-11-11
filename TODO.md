@@ -3,19 +3,19 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature`
+- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature`
   > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
-  - [ ] **#139.7** Test: verify nested subtask notes displayed correctly `#test`
-  - [ ] **#139.6** Test: verify subtask notes displayed for all subtasks `#test`
+  - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test`
+  - [x] **#139.6** Test: verify subtask notes displayed for all subtasks `#test`
     > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
-  - [ ] **#139.5** Test: verify parent task note displayed `#test`
-  - [ ] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code`
+  - [x] **#139.5** Test: verify parent task note displayed `#test`
+  - [x] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code`
     > Modify show_task() to call collect_task_notes() for each displayed task/subtask. Display notes immediately after each task line.
-  - [ ] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design`
-  - [ ] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug`
-  - [ ] **#139.1** Investigate show_task function: find where notes are displayed `#research`
+  - [x] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design`
+  - [x] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug`
+  - [x] **#139.1** Investigate show_task function: find where notes are displayed `#research`
     > Find show_task() function in todo.ai script. Look for note display logic around lines 4000-4100.
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
@@ -385,6 +385,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 19:27:58 CET 2025
+**Last Updated:** Tue Nov 11 19:39:44 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

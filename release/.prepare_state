@@ -1,7 +1,0 @@
-NEW_VERSION=2.3.0
-BUMP_TYPE=minor
-CURRENT_VERSION=2.2.1
-LAST_TAG=v2.2.1
-SUMMARY_FILE=release/RELEASE_SUMMARY.md
-RELEASE_NOTES_FILE=/var/folders/66/t_z5kqt11pvg7z0y3462m0740000gn/T/tmp.SttSWGOBeg
-summary_needs_commit=false

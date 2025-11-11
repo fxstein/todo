@@ -14,9 +14,10 @@ This guide will help you install and configure `todo.ai` for your development wo
 ### Installation
 
 ```bash
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai
-chmod +x todo.ai
+curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
 ```
+
+This smart installer auto-detects your system and installs the optimal version (zsh or bash 4+).
 
 ### Initialize
 
@@ -153,8 +154,7 @@ If coordination is unavailable or not needed, enhanced mode falls back to multi-
 
 **Setup:**
 ```bash
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai
-chmod +x todo.ai
+curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
 ./todo.ai init
 ```
 
@@ -174,8 +174,7 @@ Default mode: Single-user (no configuration needed)
 **Setup:**
 ```bash
 # Install todo.ai in repository
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai
-chmod +x todo.ai
+curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
 ./todo.ai init
 
 # Configure multi-user mode
@@ -203,8 +202,7 @@ Each team member gets their own prefix:
 **Setup:**
 ```bash
 # Install and initialize
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai
-chmod +x todo.ai
+curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
 ./todo.ai init
 
 # Use interactive wizard (recommended)

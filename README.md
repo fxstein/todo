@@ -6,7 +6,9 @@
 
 ```
 Adopt todo.ai for task tracking. Install using:
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
+curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
+
+This smart installer auto-detects your system and installs the optimal version.
 
 Then create a task "Implement user authentication" with subtasks:
 - Design database schema
@@ -125,15 +127,50 @@ Perfect for AI agents - just works.
 
 ---
 
-## Manual Installation
+## Installation
 
+### Smart Installer (Recommended)
+
+Automatically detects your system and installs the best version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
+```
+
+The installer will:
+- ✅ Detect your OS (macOS, Linux, Windows/WSL)
+- ✅ Check shell availability (zsh, bash 4+)
+- ✅ Fetch latest release from GitHub (not main branch)
+- ✅ Install the optimal version for your system
+
+### Manual Installation
+
+If you prefer to choose the version manually:
+
+**Zsh version** (recommended for macOS):
 ```bash
 curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
 ```
 
-**To update:** Re-run the curl command, or use `./todo.ai update`
+**Bash version** (recommended for Linux, requires bash 4+):
+```bash
+curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash && chmod +x todo.ai
+```
 
-**To uninstall:** Run `./todo.ai uninstall` (removes script only) or `./todo.ai uninstall --all` (removes script, data, and rules)
+> **Note:** The bash version requires bash 4.0+ for associative arrays. macOS ships with bash 3.2, so use the zsh version on macOS or upgrade bash via homebrew.
+
+### Update
+
+```bash
+./todo.ai update
+```
+
+### Uninstall
+
+```bash
+./todo.ai uninstall              # Remove script only
+./todo.ai uninstall --all        # Remove script, data, and rules
+```
 
 ---
 

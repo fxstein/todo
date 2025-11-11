@@ -492,6 +492,85 @@ update_version() {
     fi
 }
 
+# Convert todo.ai (zsh) to todo.bash (bash 4+)
+convert_to_bash() {
+    echo -e "${BLUE}🔄 Converting zsh version to bash...${NC}"
+    
+    # Copy todo.ai to todo.bash
+    cp todo.ai todo.bash
+    
+    # Apply 7 transformations for bash compatibility
+    
+    # 1. Change shebang
+    sed -i.bak '1s|^#!/bin/zsh|#!/bin/bash|' todo.bash
+    
+    # 2. Update description comment
+    sed -i.bak '2s|TODO List Tracker$|TODO List Tracker (Bash Version)|' todo.bash
+    
+    # 3. Convert zsh array key syntax to bash: ${(@k)array} -> ${!array[@]}
+    sed -i.bak 's/\${\(@k\)\([^}]*\)}/\${\!\2[@]}/g' todo.bash
+    
+    # 4. Update comments referring to zsh syntax
+    sed -i.bak 's/zsh-compatible syntax/bash syntax/g' todo.bash
+    sed -i.bak 's/Use zsh/Use bash/g' todo.bash
+    
+    # 5. Remove top-level 'local' declarations (bash requires local only in functions)
+    # Lines 6533-6534 in original (inside if statement but outside function)
+    sed -i.bak '/if \[\[ "\${1:-}" != "version"/,/fi/ {
+        s/^    local current_mode=/    current_mode=/
+        s/^    local coord_type=/    coord_type=/
+    }' todo.bash
+    
+    # Clean up backup files
+    rm -f todo.bash.bak
+    
+    # Make executable
+    chmod +x todo.bash
+    
+    # Test both versions
+    echo -e "${BLUE}🧪 Testing both versions...${NC}"
+    
+    local zsh_version=$(./todo.ai version 2>&1 | head -1 | grep -o '[0-9.]*' || echo "ERROR")
+    local bash_version=$(./todo.bash version 2>&1 | head -1 | grep -o '[0-9.]*' || echo "ERROR")
+    
+    if [[ "$zsh_version" == "ERROR" ]]; then
+        echo -e "${RED}❌ Error: Zsh version test failed${NC}"
+        return 1
+    fi
+    
+    if [[ "$bash_version" == "ERROR" ]]; then
+        echo -e "${RED}❌ Error: Bash version test failed${NC}"
+        echo -e "${YELLOW}Bash version output:${NC}"
+        ./todo.bash version 2>&1 || true
+        return 1
+    fi
+    
+    if [[ "$zsh_version" != "$bash_version" ]]; then
+        echo -e "${RED}❌ Error: Version mismatch${NC}"
+        echo -e "  Zsh version:  $zsh_version"
+        echo -e "  Bash version: $bash_version"
+        return 1
+    fi
+    
+    echo -e "${GREEN}✓ Zsh version:  ${zsh_version}${NC}"
+    echo -e "${GREEN}✓ Bash version: ${bash_version}${NC}"
+    
+    # Show diff summary
+    echo ""
+    echo -e "${BLUE}📊 Conversion summary:${NC}"
+    local diff_lines=$(diff -u todo.ai todo.bash | wc -l | tr -d ' ')
+    local changes=$(diff -u todo.ai todo.bash | grep -c '^[-+]' | tr -d ' ')
+    echo -e "  ${GREEN}Lines changed: ~${changes}${NC}"
+    echo -e "  ${GREEN}File sizes:${NC}"
+    echo -e "    todo.ai:   $(wc -c < todo.ai | tr -d ' ') bytes (zsh)"
+    echo -e "    todo.bash: $(wc -c < todo.bash | tr -d ' ') bytes (bash)"
+    echo ""
+    echo -e "${GREEN}✅ Bash version created successfully${NC}"
+    echo ""
+    
+    return 0
+}
+
 # Main release process
 main() {
     local SUMMARY_FILE=""
@@ -755,6 +834,14 @@ main() {
         echo ""
     fi
     
+    # Convert to bash version
+    if ! convert_to_bash; then
+        echo -e "${RED}❌ Error: Bash conversion failed${NC}"
+        log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
+        exit 1
+    fi
+    log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash"
+    
     # Save prepare state for execute mode
     cat > "$PREPARE_STATE_FILE" << EOF
 NEW_VERSION=$NEW_VERSION
@@ -906,15 +993,36 @@ Includes release summary from ${SUMMARY_FILE}
     log_release_step "PUSH TAG" "Pushing tag ${TAG} to origin"
     git push origin "$TAG" > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push tag ${TAG}"
     
-    # Create GitHub release
-    echo -e "${BLUE}📦 Creating GitHub release...${NC}"
-    log_release_step "CREATE GITHUB RELEASE" "Creating GitHub release for tag ${TAG}"
+    # Create GitHub release with assets
+    echo -e "${BLUE}📦 Creating GitHub release with assets...${NC}"
+    log_release_step "CREATE GITHUB RELEASE" "Creating GitHub release for tag ${TAG} with assets: todo.ai, todo.bash, install.sh"
+    
+    # Verify assets exist
+    if [[ ! -f "todo.ai" ]]; then
+        echo -e "${RED}❌ Error: todo.ai not found${NC}"
+        exit 1
+    fi
+    if [[ ! -f "todo.bash" ]]; then
+        echo -e "${RED}❌ Error: todo.bash not found (should have been created by prepare step)${NC}"
+        exit 1
+    fi
+    if [[ ! -f "install.sh" ]]; then
+        echo -e "${RED}❌ Error: install.sh not found${NC}"
+        exit 1
+    fi
+    
+    echo -e "  ${GREEN}✓ todo.ai (zsh version)${NC}"
+    echo -e "  ${GREEN}✓ todo.bash (bash version)${NC}"
+    echo -e "  ${GREEN}✓ install.sh (smart installer)${NC}"
     
     # Temporarily disable set -e to capture error
     set +e
     local release_output=$(gh release create "$TAG" \
         --title "$NEW_VERSION" \
-        --notes-file "$RELEASE_NOTES_FILE" 2>&1)
+        --notes-file "$RELEASE_NOTES_FILE" \
+        todo.ai \
+        todo.bash \
+        install.sh 2>&1)
     local release_status=$?
     set -e
     

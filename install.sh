@@ -6,10 +6,10 @@
 
 set -e
 
-# GitHub repository URLs
-REPO_BASE="https://raw.githubusercontent.com/fxstein/todo.ai/main"
-ZSH_URL="${REPO_BASE}/todo.ai"
-BASH_URL="${REPO_BASE}/todo.bash"
+# GitHub repository information
+REPO_OWNER="fxstein"
+REPO_NAME="todo.ai"
+GITHUB_API="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}"
 
 # Colors for output (if terminal supports it)
 if [ -t 1 ]; then
@@ -17,7 +17,7 @@ if [ -t 1 ]; then
     GREEN='\033[0;32m'
     YELLOW='\033[1;33m'
     BLUE='\033[0;34m'
-    NC='\033[0m' # No Color
+    NC='\033[0;m' # No Color
 else
     RED=''
     GREEN=''
@@ -25,6 +25,42 @@ else
     BLUE=''
     NC=''
 fi
+
+# Get latest release tag from GitHub API
+get_latest_release() {
+    # Try to get latest release from GitHub API
+    if command -v curl >/dev/null 2>&1; then
+        local release_info=$(curl -fsSL "${GITHUB_API}/releases/latest" 2>/dev/null || echo "")
+        if [ -n "$release_info" ]; then
+            # Extract tag_name from JSON (simple grep/sed, no jq required)
+            echo "$release_info" | grep '"tag_name"' | sed -E 's/.*"tag_name": "([^"]+)".*/\1/' | head -1
+            return 0
+        fi
+    elif command -v wget >/dev/null 2>&1; then
+        local release_info=$(wget -qO- "${GITHUB_API}/releases/latest" 2>/dev/null || echo "")
+        if [ -n "$release_info" ]; then
+            echo "$release_info" | grep '"tag_name"' | sed -E 's/.*"tag_name": "([^"]+)".*/\1/' | head -1
+            return 0
+        fi
+    fi
+    
+    # No release found
+    echo ""
+    return 1
+}
+
+# Construct download URL for release asset
+get_release_asset_url() {
+    local tag="$1"
+    local filename="$2"
+    echo "https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${tag}/${filename}"
+}
+
+# Fallback to main branch (for development or if no releases exist)
+get_main_branch_url() {
+    local filename="$1"
+    echo "https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${filename}"
+}
 
 echo "${BLUE}todo.ai Smart Installer${NC}"
 echo "========================"
@@ -119,17 +155,38 @@ else
     fi
 fi
 
-echo "📦 Installing: ${GREEN}${INSTALL_VERSION} version${NC}"
+# Determine which file to download based on version
+if [ "$INSTALL_VERSION" = "zsh" ]; then
+    INSTALL_FILENAME="todo.ai"
+else
+    INSTALL_FILENAME="todo.bash"
+fi
+
+echo "📦 Installing: ${GREEN}${INSTALL_VERSION} version${NC} (${INSTALL_FILENAME})"
 echo "   Reason: ${INSTALL_REASON}"
 echo ""
 
+# Get latest release tag
+echo "🔍 Checking for latest release..."
+LATEST_TAG=$(get_latest_release)
+
+if [ -n "$LATEST_TAG" ]; then
+    INSTALL_URL=$(get_release_asset_url "$LATEST_TAG" "$INSTALL_FILENAME")
+    echo "${GREEN}✓${NC} Latest release: ${LATEST_TAG}"
+    echo "📥 Downloading from release..."
+else
+    echo "${YELLOW}⚠${NC}  No releases found, using main branch (development version)"
+    INSTALL_URL=$(get_main_branch_url "$INSTALL_FILENAME")
+    echo "📥 Downloading from main branch..."
+fi
+
 # Download the appropriate version
-echo "⬇️  Downloading from GitHub..."
 if command -v curl >/dev/null 2>&1; then
     if curl -fsSL -o todo.ai "$INSTALL_URL"; then
         echo "${GREEN}✓${NC} Downloaded successfully"
     else
         echo "${RED}✗ Download failed${NC}"
+        echo "   URL: $INSTALL_URL"
         exit 1
     fi
 elif command -v wget >/dev/null 2>&1; then
@@ -137,6 +194,7 @@ elif command -v wget >/dev/null 2>&1; then
         echo "${GREEN}✓${NC} Downloaded successfully"
     else
         echo "${RED}✗ Download failed${NC}"
+        echo "   URL: $INSTALL_URL"
         exit 1
     fi
 else

@@ -2,6 +2,16 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 23:03:08 | fxstein | COMPLETE | 144 | Implement release-aware smart installer with bash/zsh dual-version support
+2025-11-11 23:03:01 | fxstein | COMPLETE | 144.9 | Update release script to include both todo.ai and todo.bash as assets
+2025-11-11 23:03:01 | fxstein | COMPLETE | 144.8 | Add cursor rule to prevent accidental todo.bash editing
+2025-11-11 23:02:43 | fxstein | COMPLETE | 144.7 | Update GETTING_STARTED.md and other documentation references
+2025-11-11 23:01:26 | fxstein | COMPLETE | 144.6 | Update README.md with smart installer as primary method
+2025-11-11 23:00:58 | fxstein | COMPLETE | 144.5 | Create concise smart installer documentation
+2025-11-11 23:00:58 | fxstein | COMPLETE | 144.4 | Test smart installer on multiple platforms and scenarios
+2025-11-11 23:00:32 | fxstein | COMPLETE | 144.3 | Create release-aware smart installer script (install.sh)
+2025-11-11 22:59:45 | fxstein | COMPLETE | 144.2 | Add automated bash conversion to release script
+2025-11-11 22:58:09 | fxstein | COMPLETE | 144.1 | Create development guidelines document for zsh-first workflow
 2025-11-11 22:44:50 | fxstein | NOTE | 144.9 | Modify release/release.sh --execute: (1) Upload both todo.ai (zsh) and todo.bash to GitHub release assets, (2) Also upload install.sh as asset, (3) Update gh release create command to include all three files. Smart installer will fetch from these release assets. Verify asset URLs are accessible.
 2025-11-11 22:44:44 | fxstein | ADD_SUBTASK | 144.9 | Update release script to include both todo.ai and todo.bash as assets (parent: #144)
 2025-11-11 22:44:39 | fxstein | NOTE | 144.8 | Create .cursor/rules/zsh-first-development.mdc: CRITICAL rule stating (1) NEVER edit todo.bash directly - it's auto-generated, (2) Always develop in todo.ai (zsh version), (3) Bash conversion automated in release script, (4) If todo.bash needs changes, make them in todo.ai. Keep rule under 15 lines per cursor-rules-guidelines.mdc.

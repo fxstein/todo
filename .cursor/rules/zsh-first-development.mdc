@@ -1,0 +1,18 @@
+---
+description: "Zsh-first development workflow for todo.ai"
+alwaysApply: true
+---
+
+**CRITICAL: NEVER edit `todo.bash` directly**
+
+- `todo.bash` is auto-generated during releases
+- All development MUST be done in `todo.ai` (zsh version)
+- Bash conversion is automated in `release/release.sh`
+- Manual edits to `todo.bash` will be overwritten
+
+**If todo.bash needs changes:**
+1. Make the change in `todo.ai`
+2. Release script will convert it automatically
+3. Both versions are tested before release
+
+See `docs/DEVELOPMENT_GUIDELINES.md` for complete workflow.

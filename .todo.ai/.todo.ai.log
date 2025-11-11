@@ -2,6 +2,22 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 23:58:41 | fxstein | NOTE | 146.7 | After all tests pass: (1) Delete pre-release: gh release delete v2.X.X, (2) Delete tag: git push --delete origin v2.X.X, (3) Document any issues found, (4) Verify release script ready for production release, (5) Clean up test directories: rm -rf /tmp/test-*
+2025-11-11 23:58:31 | fxstein | ADD_SUBTASK | 146.7 | Clean up pre-release and verify ready for production release (parent: #146)
+2025-11-11 23:58:22 | fxstein | NOTE | 146.6 | Create parallel test: Run same commands on both versions, compare TODO.md output. Test: add tasks, add subtasks, complete, archive, show, note, list with filters. Diff the TODO.md files - should be identical except timestamps. Test both installed from pre-release.
+2025-11-11 23:58:11 | fxstein | ADD_SUBTASK | 146.6 | Verify zsh and bash versions produce identical results (parent: #146)
+2025-11-11 23:58:03 | fxstein | NOTE | 146.5 | After pre-release created, test in clean dir: mkdir /tmp/test-release && cd /tmp/test-release && curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh. Verify: Shows 'Latest release: v2.X.X', downloads from release assets (not main), correct version installed, works perfectly.
+2025-11-11 23:57:53 | fxstein | ADD_SUBTASK | 146.5 | Test smart installer with pre-release assets (parent: #146)
+2025-11-11 23:57:45 | fxstein | NOTE | 146.4 | Run: ./release/release.sh --execute (after prepare). Then: gh release edit v2.X.X --prerelease. Verify on GitHub: (1) Release created, (2) 3 assets uploaded (todo.ai, todo.bash, install.sh), (3) Assets downloadable, (4) Marked as pre-release. Test asset URLs accessible.
+2025-11-11 23:57:35 | fxstein | ADD_SUBTASK | 146.4 | Create pre-release with all assets for testing (parent: #146)
+2025-11-11 23:57:22 | fxstein | NOTE | 146.3 | Run in clean dir: mkdir /tmp/test-installer && cd /tmp/test-installer && curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh. Verify: OS detection, shell detection, fallback to main branch message, correct version downloaded, executable, ./todo.ai version works.
+2025-11-11 23:57:12 | fxstein | ADD_SUBTASK | 146.3 | Test smart installer fallback to main branch (parent: #146)
+2025-11-11 23:57:03 | fxstein | NOTE | 146.2 | Test commands: ./todo.bash version, add, list, complete, show, note. Create test dir, run identical commands on both versions, compare output. Verify no bash-specific errors, identical functionality. Test in /tmp/test-bash directory.
+2025-11-11 23:56:54 | fxstein | ADD_SUBTASK | 146.2 | Test bash version functionality matches zsh version (parent: #146)
+2025-11-11 23:56:47 | fxstein | NOTE | 146.1 | Run: ./release/release.sh --prepare --summary release/RELEASE_SUMMARY.md. Verify: (1) todo.bash created, (2) Both ./todo.ai version and ./todo.bash version work, (3) Diff shows only 7 expected changes, (4) No syntax errors. Check .prepare_state file created.
+2025-11-11 23:56:38 | fxstein | ADD_SUBTASK | 146.1 | Test bash conversion with release.sh --prepare (parent: #146)
+2025-11-11 23:56:30 | fxstein | NOTE | 146 | Validate all task#144 features before creating release: bash conversion, smart installer, release assets. Must test locally first, then with pre-release. Ensures smart installer works with GitHub releases and both zsh/bash versions function identically.
+2025-11-11 23:56:20 | fxstein | ADD | 146 | Test task#144 implementation before release
 2025-11-11 23:54:15 | fxstein | ARCHIVE | 145 | Reorganize docs folder with logical subdirectory structure (with 11 subtasks)
 2025-11-11 23:35:37 | fxstein | COMPLETE | 145 | Reorganize docs folder with logical subdirectory structure
 2025-11-11 23:35:37 | fxstein | COMPLETE | 145.11 | Verify all links work and no broken references remain

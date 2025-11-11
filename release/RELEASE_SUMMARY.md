@@ -1,36 +1,22 @@
 # Release Summary
 
-This release brings significant improvements to the release workflow and task management features, making todo.ai more robust and AI-agent friendly.
+This patch release fixes a critical bug in the release workflow that caused v2.3.0 to be published with incorrect release notes.
 
-## Major Features
+## Bug Fix
 
-**Redesigned Release Workflow**
+**Stale Summary Detection**
 
-The release process has been completely redesigned with a two-step prepare/execute workflow that eliminates all interactive prompts ([a5315cf](https://github.com/fxstein/todo.ai/commit/a5315cf)). The new workflow is fully automated and suitable for AI agents:
-- **Prepare step** (default): Analyzes commits, determines version bump type, generates release notes, and saves state
-- **Execute step**: Updates version, commits, tags, pushes to GitHub, and creates the release without any prompts
-- No more manual confirmations or input required during release execution
+The release script now validates that the release summary file is current before using it ([b27f7cb](https://github.com/fxstein/todo.ai/commit/b27f7cb)). This prevents publishing releases with outdated summaries from previous versions.
 
-**Enhanced Show Command**
+**How it works:**
+- Compares summary file modification time with last release tag timestamp
+- Shows clear warning if summary file is older than the last release
+- In interactive mode: prompts user to continue or abort
+- In non-interactive mode: automatically aborts to prevent mistakes
 
-The `show` command now provides complete context by displaying notes for parent tasks, all subtasks, and all sub-subtasks ([6024770](https://github.com/fxstein/todo.ai/commit/6024770)). This makes it much easier to understand task implementation details at a glance.
+**What happened:** v2.3.0 was accidentally published with v2.2.1's release notes because the script used a stale `RELEASE_SUMMARY.md` file without validation. This fix ensures release summaries are always current and accurate.
 
-**Improved Note Command**
+## Additional Changes
 
-Fixed the `note` command to work correctly with nested sub-subtasks ([28a7fad](https://github.com/fxstein/todo.ai/commit/28a7fad)), ensuring notes can be added at any nesting level.
-
-## Bug Fixes
-
-**Release Script Robustness**
-
-Multiple fixes to the release execution process ensure reliable automated releases:
-- Fixed version verification when version already updated from failed attempts
-- Added proper error handling for commit status detection
-- Added GitHub issue references to version bump commits to pass pre-commit validation
-- Improved state management between prepare and execute steps
-
-## Additional Improvements
-
-- Added `.prepare_state` to gitignore for cleaner git status
-- Documented new release workflow in Cursor rules
-- Enhanced release logging and error messages
+- Marked task #142 (release script bug fixes) as complete
+- Created task #143 to track the stale summary detection implementation

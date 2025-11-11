@@ -2,6 +2,10 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 20:49:21 | fxstein | ADD_SUBTASK | 142.4 | Test: Verify execute works after failed/aborted release attempt (parent: #142)
+2025-11-11 20:49:20 | fxstein | ADD_SUBTASK | 142.3 | Fix: Get correct commit hash when 'no commit needed' returned (parent: #142)
+2025-11-11 20:49:19 | fxstein | ADD_SUBTASK | 142.2 | Fix: Handle case where version already correct in working directory (parent: #142)
+2025-11-11 20:49:18 | fxstein | ADD_SUBTASK | 142.1 | Investigate execute_release: why version verification fails (parent: #142)
 2025-11-11 20:48:28 | fxstein | NOTE | 142 | Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
 2025-11-11 20:48:27 | fxstein | ADD | 142 | Fix release script bug: version verification fails when version already updated in working directory
 2025-11-11 20:38:49 | fxstein | ARCHIVE | 141 | Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts (with 9 subtasks)

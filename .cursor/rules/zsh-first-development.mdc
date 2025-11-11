@@ -15,4 +15,4 @@ alwaysApply: true
 2. Release script will convert it automatically
 3. Both versions are tested before release
 
-See `docs/DEVELOPMENT_GUIDELINES.md` for complete workflow.
+See `docs/development/DEVELOPMENT_GUIDELINES.md` for complete workflow.

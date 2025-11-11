@@ -74,7 +74,7 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash
 
 ## Technical Details
 
-See [BASH_VS_ZSH_ANALYSIS.md](BASH_VS_ZSH_ANALYSIS.md) for:
+See [BASH_VS_ZSH_ANALYSIS.md](../analysis/BASH_VS_ZSH_ANALYSIS.md) for:
 - Performance comparison (bash 8-21% faster)
 - Compatibility analysis
 - Conversion details (only 7 changes needed)

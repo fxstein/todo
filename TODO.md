@@ -3,42 +3,42 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#145** Reorganize docs folder with logical subdirectory structure `#docs`
+- [x] **#145** Reorganize docs folder with logical subdirectory structure `#docs`
   > Proposed structure: guides/ (user docs), design/ (technical specs), development/ (contributor docs), analysis/ (research), archive/ (historical). Currently 29 files in flat structure need categorization and organization. Must update all cross-references, docs/README.md, and main README.md links.
-  - [ ] **#145.11** Verify all links work and no broken references remain `#docs`
+  - [x] **#145.11** Verify all links work and no broken references remain `#docs`
     > Test: (1) Click through all links in README.md, (2) Check docs/README.md links, (3) Verify cross-references between docs, (4) Check .cursor/rules references, (5) Test any links in todo.ai script itself. Use grep to find any remaining old paths that weren't updated.
-  - [ ] **#145.10** Update main README.md documentation links `#docs`
+  - [x] **#145.10** Update main README.md documentation links `#docs`
     > Update Documentation section in main README.md (around line 177): Update paths to GETTING_STARTED, NUMBERING_MODES_GUIDE, USAGE_PATTERNS, COORDINATION_SETUP. Add link to docs/README.md for full documentation index.
-  - [ ] **#145.9** Update docs/README.md with new structure overview `#docs`
+  - [x] **#145.9** Update docs/README.md with new structure overview `#docs`
     > Rewrite docs/README.md as index: (1) Overview of documentation structure, (2) Quick links to key guides, (3) Directory descriptions (guides/, design/, development/, analysis/, archive/), (4) How to contribute/where to add new docs. Keep concise, scannable.
-  - [ ] **#145.8** Update all cross-references in documentation files `#docs`
+  - [x] **#145.8** Update all cross-references in documentation files `#docs`
     > Find all doc links: grep -r 'docs/.*\.md' . --include='*.md' --include='*.mdc'. Update relative paths to new structure (e.g., docs/INSTALLATION.md -> docs/guides/INSTALLATION.md). Check todo.ai script, .cursor/rules/, README.md, all docs/*.md files.
-  - [ ] **#145.7** Move historical/migration docs to docs/archive/ `#docs`
+  - [x] **#145.7** Move historical/migration docs to docs/archive/ `#docs`
     > Move to archive/: COMMIT_FORMAT_MIGRATION.md, CURSOR_RULES_MIGRATION.md, RELEASE_NUMBERING_MAPPING.md, README_PREVIEW_WITH_SMART_INSTALLER.md (4 files - historical/completed migrations). Use git mv.
-  - [ ] **#145.6** Move analysis/research docs to docs/analysis/ `#docs`
+  - [x] **#145.6** Move analysis/research docs to docs/analysis/ `#docs`
     > Move to analysis/: BASH_VS_ZSH_ANALYSIS.md, CODE_SIZE_ANALYSIS.md, GITHUB_API_COORDINATION_ANALYSIS.md, IMPLEMENTATION_ALTERNATIVES_ANALYSIS.md, MULTI_USER_CONFLICT_ANALYSIS.md, MULTI_USER_TOOL_RESEARCH.md, TASK_NUMBERING_SCHEMA_ANALYSIS.md (7 files). Use git mv.
-  - [ ] **#145.5** Move development/contributor docs to docs/development/ `#docs`
+  - [x] **#145.5** Move development/contributor docs to docs/development/ `#docs`
     > Move to development/: DEVELOPMENT_GUIDELINES.md, MIGRATION_GUIDE.md, NUMBERING_MODES_TEST_PLAN.md, TODO_TOOL_IMPROVEMENTS.md (4 files). Use git mv.
-  - [ ] **#145.4** Move design documents to docs/design/ `#docs`
+  - [x] **#145.4** Move design documents to docs/design/ `#docs`
     > Move to design/: BUG_REPORTING_DESIGN.md, GIT_HOOKS_DESIGN.md, HYBRID_TASK_NUMBERING_DESIGN.md, MIGRATION_SYSTEM_DESIGN.md, MULTI_USER_DESIGN.md, SMART_INSTALLER_DESIGN.md, TODO_TAGGING_SYSTEM_DESIGN.md, UNINSTALL_DESIGN.md (8 files). Use git mv.
-  - [ ] **#145.3** Move user guide files to docs/guides/ `#docs`
+  - [x] **#145.3** Move user guide files to docs/guides/ `#docs`
     > Move to guides/: GETTING_STARTED.md, INSTALLATION.md, USAGE_PATTERNS.md, NUMBERING_MODES_GUIDE.md, COORDINATION_SETUP.md (5 files). Use git mv to preserve history.
-  - [ ] **#145.2** Create subdirectory structure in docs folder `#docs`
+  - [x] **#145.2** Create subdirectory structure in docs folder `#docs`
     > Create directories: mkdir -p docs/{guides,design,development,analysis,archive}. Verify structure with tree or ls. Do not move files yet - that's next step.
-  - [ ] **#145.1** Define and document docs folder structure with categories `#docs`
+  - [x] **#145.1** Define and document docs folder structure with categories `#docs`
     > Create docs/STRUCTURE.md documenting: guides/ (GETTING_STARTED, INSTALLATION, USAGE_PATTERNS, NUMBERING_MODES_GUIDE, COORDINATION_SETUP), design/ (8 design docs), development/ (DEVELOPMENT_GUIDELINES, MIGRATION_GUIDE, test plans), analysis/ (7 analysis/research docs), archive/ (migration/historical docs). Keep README.md at root with overview.
 - [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature`
-  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). MUST install from releases (not main branch) to avoid incomplete/broken commits. Establish clear dev workflow: develop in zsh, auto-convert to bash during release. See docs/SMART_INSTALLER_DESIGN.md and docs/BASH_VS_ZSH_ANALYSIS.md for research.
+  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). MUST install from releases (not main branch) to avoid incomplete/broken commits. Establish clear dev workflow: develop in zsh, auto-convert to bash during release. See docs/design/SMART_INSTALLER_DESIGN.md and docs/analysis/BASH_VS_ZSH_ANALYSIS.md for research.
   - [x] **#144.9** Update release script to include both todo.ai and todo.bash as assets `#release`
     > Modify release/release.sh --execute: (1) Upload both todo.ai (zsh) and todo.bash to GitHub release assets, (2) Also upload install.sh as asset, (3) Update gh release create command to include all three files. Smart installer will fetch from these release assets. Verify asset URLs are accessible.
   - [x] **#144.8** Add cursor rule to prevent accidental todo.bash editing `#docs`
     > Create .cursor/rules/zsh-first-development.mdc: CRITICAL rule stating (1) NEVER edit todo.bash directly - it's auto-generated, (2) Always develop in todo.ai (zsh version), (3) Bash conversion automated in release script, (4) If todo.bash needs changes, make them in todo.ai. Keep rule under 15 lines per cursor-rules-guidelines.mdc.
   - [x] **#144.7** Update GETTING_STARTED.md and other documentation references `#docs`
-    > Find and update all installation references: (1) docs/GETTING_STARTED.md, (2) .cursor/rules/todo.ai-installation.mdc, (3) Any other docs mentioning curl -o todo.ai. Use grep to find all refs: grep -r 'curl.*todo.ai' docs/ .cursor/. Replace with smart installer one-liner. Verify no broken instructions remain.
+    > Find and update all installation references: (1) docs/guides/GETTING_STARTED.md, (2) .cursor/rules/todo.ai-installation.mdc, (3) Any other docs mentioning curl -o todo.ai. Use grep to find all refs: grep -r 'curl.*todo.ai' docs/ .cursor/. Replace with smart installer one-liner. Verify no broken instructions remain.
   - [x] **#144.6** Update README.md with smart installer as primary method `#docs`
     > Update README.md: (1) AI Agent Installation section (line 8) - change to smart installer, (2) Manual Installation section (line 128) - show smart installer first, keep direct download as alternative, (3) Add brief explanation of version detection. Keep changes minimal, maintain simple tone. See docs/README_PREVIEW_WITH_SMART_INSTALLER.md for reference.
   - [x] **#144.5** Create concise smart installer documentation `#docs`
-    > Create docs/INSTALLATION.md: (1) Smart installer usage (one-liner), (2) What it does (detects, chooses, installs), (3) Manual installation options (zsh/bash direct), (4) Requirements (zsh any version, bash 4+), (5) Troubleshooting (common errors). Keep under 50 lines, no verbose examples. Link to BASH_VS_ZSH_ANALYSIS.md for technical details.
+    > Create docs/guides/INSTALLATION.md: (1) Smart installer usage (one-liner), (2) What it does (detects, chooses, installs), (3) Manual installation options (zsh/bash direct), (4) Requirements (zsh any version, bash 4+), (5) Troubleshooting (common errors). Keep under 50 lines, no verbose examples. Link to BASH_VS_ZSH_ANALYSIS.md for technical details.
   - [x] **#144.4** Test smart installer on multiple platforms and scenarios `#test`
     > Test scenarios: (1) macOS with zsh, (2) macOS with bash 3.2 (error expected), (3) Linux with bash 4+/5+, (4) WSL Ubuntu, (5) System without curl (use wget), (6) Fresh install vs update, (7) No releases available (fallback). Verify correct version installed, test basic commands (add/list/complete).
   - [x] **#144.3** Create release-aware smart installer script (install.sh) `#installer`
@@ -48,18 +48,18 @@
   - [x] **#144.1** Create development guidelines document for zsh-first workflow `#docs`
     > Document DEVELOPMENT_GUIDELINES.md: (1) Always develop in zsh version (todo.ai), (2) NEVER manually edit todo.bash, (3) Bash conversion automated in release script, (4) Test both versions before release, (5) Add cursor rule to prevent accidental bash edits. Keep concise and actionable.
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
-  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
+  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [x] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
-    > Smart installer created: install.sh detects OS/shell and installs optimal version. See docs/SMART_INSTALLER_DESIGN.md for full design. One-liner: curl -fsSL .../install.sh | sh maintains simplicity while adding intelligence.
+    > Smart installer created: install.sh detects OS/shell and installs optimal version. See docs/design/SMART_INSTALLER_DESIGN.md for full design. One-liner: curl -fsSL .../install.sh | sh maintains simplicity while adding intelligence.
     > Compare bash vs zsh syntax differences, evaluate portability benefits (works on more platforms), analyze if simpler syntax reduces file size. Current tool is zsh-specific with features like [[ ]], read patterns, arrays.
     - [x] **#132.3.4** Create bash vs zsh analysis document - document pros/cons, recommendation, and migration considerations `#research`
     - [x] **#132.3.3** Compare bash vs zsh versions - file size, performance, syntax complexity, and platform compatibility `#research`
     - [x] **#132.3.2** Test bash version functionality - verify all commands work correctly and produce identical output `#research`
     - [x] **#132.3.1** Create bash version of todo.ai (todo.bash) - convert zsh-specific syntax to bash-compatible equivalents `#research`
   - [x] **#132.2** Remove old migration logic: keep migration shell but eliminate version-specific migration code `#refactor`
-    > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
+    > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
   - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs`
-    > Analysis document created at docs/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
+    > Analysis document created at docs/analysis/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
 - [ ] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   - [ ] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test`
   - [ ] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug`
@@ -462,6 +462,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 23:21:57 CET 2025
+**Last Updated:** Tue Nov 11 23:35:37 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

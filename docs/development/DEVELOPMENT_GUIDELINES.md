@@ -76,6 +76,6 @@ git commit -m "feat: add new feature"
 ### See Also
 
 - `.cursor/rules/zsh-first-development.mdc` - Cursor rule enforcing this workflow
-- `docs/BASH_VS_ZSH_ANALYSIS.md` - Why we support both versions
+- `docs/analysis/BASH_VS_ZSH_ANALYSIS.md` - Why we support both versions
 - `release/release.sh` - Automated conversion logic
 

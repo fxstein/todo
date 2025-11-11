@@ -9,7 +9,7 @@ When creating or working with todo.ai tasks, add notes to provide implementation
 **Examples:**
 - ✅ `./todo.ai note 42 "Modify archive_task() lines 2600-2850. Pattern from delete_task() lines 2926-2935"`
 - ✅ `./todo.ai note 42.1 "Depends on task#42 completing first - needs collect_notes() function"`
-- ✅ `./todo.ai note 50 "See docs/CODE_SIZE_ANALYSIS.md lines 66-67 for migration cleanup details"`
+- ✅ `./todo.ai note 50 "See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for migration cleanup details"`
 - ❌ `./todo.ai note 42 "Fix it"` - Too vague, no actionable context
 
 Notes appear as blockquotes (>) and move with tasks when archived.

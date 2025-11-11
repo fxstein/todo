@@ -619,7 +619,7 @@ The script will:
 - Install git hooks via scripts/setup-git-hooks.sh
 - Show installation summary
 
-If manual installation is needed, see docs/GIT_HOOKS_DESIGN.md for detailed instructions.
+If manual installation is needed, see docs/design/GIT_HOOKS_DESIGN.md for detailed instructions.
 ```
 
 **Manual Installation (Alternative):**

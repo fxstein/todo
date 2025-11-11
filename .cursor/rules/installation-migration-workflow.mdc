@@ -11,7 +11,7 @@ When creating functionality that requires installation or migration steps, **MUS
 
 **Migration Steps (fixes existing installs, format changes):**
 - Add to `MIGRATIONS` array: `"VERSION|ID|DESCRIPTION|FUNCTION_NAME"`
-- Create migration function following pattern in `docs/MIGRATION_GUIDE.md`
+- Create migration function following pattern in `docs/development/MIGRATION_GUIDE.md`
 - Test idempotency and verify version matches release
 
 **Cursor Rules (new agent instructions):**

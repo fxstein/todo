@@ -2,6 +2,18 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 23:35:37 | fxstein | COMPLETE | 145 | Reorganize docs folder with logical subdirectory structure
+2025-11-11 23:35:37 | fxstein | COMPLETE | 145.11 | Verify all links work and no broken references remain
+2025-11-11 23:33:56 | fxstein | COMPLETE | 145.10 | Update main README.md documentation links
+2025-11-11 23:33:56 | fxstein | COMPLETE | 145.9 | Update docs/README.md with new structure overview
+2025-11-11 23:33:11 | fxstein | COMPLETE | 145.8 | Update all cross-references in documentation files
+2025-11-11 23:31:31 | fxstein | COMPLETE | 145.7 | Move historical/migration docs to docs/archive/
+2025-11-11 23:31:17 | fxstein | COMPLETE | 145.6 | Move analysis/research docs to docs/analysis/
+2025-11-11 23:31:01 | fxstein | COMPLETE | 145.5 | Move development/contributor docs to docs/development/
+2025-11-11 23:30:47 | fxstein | COMPLETE | 145.4 | Move design documents to docs/design/
+2025-11-11 23:30:33 | fxstein | COMPLETE | 145.3 | Move user guide files to docs/guides/
+2025-11-11 23:30:17 | fxstein | COMPLETE | 145.2 | Create subdirectory structure in docs folder
+2025-11-11 23:30:02 | fxstein | COMPLETE | 145.1 | Define and document docs folder structure with categories
 2025-11-11 23:21:57 | fxstein | NOTE | 145.11 | Test: (1) Click through all links in README.md, (2) Check docs/README.md links, (3) Verify cross-references between docs, (4) Check .cursor/rules references, (5) Test any links in todo.ai script itself. Use grep to find any remaining old paths that weren't updated.
 2025-11-11 23:21:48 | fxstein | ADD_SUBTASK | 145.11 | Verify all links work and no broken references remain (parent: #145)
 2025-11-11 23:21:42 | fxstein | NOTE | 145.10 | Update Documentation section in main README.md (around line 177): Update paths to GETTING_STARTED, NUMBERING_MODES_GUIDE, USAGE_PATTERNS, COORDINATION_SETUP. Add link to docs/README.md for full documentation index.

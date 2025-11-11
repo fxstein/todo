@@ -174,12 +174,14 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash
 
 ## Documentation
 
-**Getting Started:** [GETTING_STARTED.md](docs/GETTING_STARTED.md) - Quick start guide with setup instructions
+**Getting Started:** [GETTING_STARTED.md](docs/guides/GETTING_STARTED.md) - Quick start guide with setup instructions
 
 **Additional Guides:**
-- [Numbering Modes](docs/NUMBERING_MODES_GUIDE.md) - Complete guide to all numbering modes
-- [Usage Patterns](docs/USAGE_PATTERNS.md) - Real-world usage scenarios
-- [Coordination Setup](docs/COORDINATION_SETUP.md) - Setup guides for coordination services
+- [Numbering Modes](docs/guides/NUMBERING_MODES_GUIDE.md) - Complete guide to all numbering modes
+- [Usage Patterns](docs/guides/USAGE_PATTERNS.md) - Real-world usage scenarios
+- [Coordination Setup](docs/guides/COORDINATION_SETUP.md) - Setup guides for coordination services
+
+**Full Documentation Index:** [docs/README.md](docs/README.md) - Complete documentation navigation
 
 ---
 

@@ -299,7 +299,7 @@ This release includes automatic migrations:
 
 ## References
 
-- **Design Document:** `docs/MIGRATION_SYSTEM_DESIGN.md`
+- **Design Document:** `docs/design/MIGRATION_SYSTEM_DESIGN.md`
 - **Release Process:** `release/RELEASE_PROCESS.md`
 - **Task #37:** Build release migration and cleanup system
 

@@ -414,7 +414,7 @@ Before creating a release, ensure:
 
 1. **During Development:**
    - Identify migration needs (e.g., structural fixes, format changes)
-   - Write migration function following the pattern in `docs/MIGRATION_GUIDE.md`
+   - Write migration function following the pattern in `docs/development/MIGRATION_GUIDE.md`
    - Add migration to the `MIGRATIONS` registry with target version
    - Test migration locally
 
@@ -492,8 +492,8 @@ Before including migrations in a release:
 ### Documentation
 
 For detailed migration creation instructions, see:
-- **Migration Guide:** `docs/MIGRATION_GUIDE.md`
-- **Design Document:** `docs/MIGRATION_SYSTEM_DESIGN.md`
+- **Migration Guide:** `docs/development/MIGRATION_GUIDE.md`
+- **Design Document:** `docs/design/MIGRATION_SYSTEM_DESIGN.md`
 
 ### Example Migration Workflow
 

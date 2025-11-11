@@ -495,6 +495,8 @@ update_version() {
 # Main release process
 main() {
     local SUMMARY_FILE=""
+    local MODE="prepare"  # Default mode
+    local PREPARE_STATE_FILE="release/.prepare_state"
     
     # Parse command-line arguments
     while [[ $# -gt 0 ]]; do
@@ -503,25 +505,39 @@ main() {
                 SUMMARY_FILE="$2"
                 shift 2
                 ;;
+            --prepare)
+                MODE="prepare"
+                shift
+                ;;
+            --execute)
+                MODE="execute"
+                shift
+                ;;
             *)
                 echo -e "${RED}Unknown option: $1${NC}"
-                echo "Usage: $0 [--summary <file>]"
+                echo "Usage: $0 [--prepare|--execute] [--summary <file>]"
+                echo ""
+                echo "Modes:"
+                echo "  --prepare  Analyze commits and generate release preview (default)"
+                echo "  --execute  Execute prepared release (no prompts)"
                 exit 1
                 ;;
         esac
     done
     
-    echo -e "${BLUE}🚀 Starting intelligent release process...${NC}"
+    # Execute mode: load state and perform release
+    if [[ "$MODE" == "execute" ]]; then
+        execute_release
+        return $?
+    fi
+    
+    # Prepare mode (default): analyze and preview
+    echo -e "${BLUE}🚀 Preparing release preview...${NC}"
     echo ""
     
-    # Check if summary file exists if provided
+    # Check if summary file exists if provided (no prompt, just warn)
     if [[ -n "$SUMMARY_FILE" ]] && [[ ! -f "$SUMMARY_FILE" ]]; then
-        echo -e "${YELLOW}⚠️  Warning: Summary file not found: $SUMMARY_FILE${NC}"
-        printf "Continue without summary? (y/N) "
-        read -r reply
-        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-            exit 0
-        fi
+        echo -e "${YELLOW}⚠️  Warning: Summary file not found: $SUMMARY_FILE (continuing without it)${NC}"
         SUMMARY_FILE=""
     fi
     
@@ -532,15 +548,12 @@ main() {
         exit 1
     fi
     
-    # Verify we're on main branch
+    # Verify we're on main branch (no prompt, just warn)
     CURRENT_BRANCH=$(git branch --show-current)
     if [[ "$CURRENT_BRANCH" != "main" ]]; then
         echo -e "${YELLOW}⚠️  Warning: Not on main branch (current: $CURRENT_BRANCH)${NC}"
-        read "?Continue anyway? (y/N) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            exit 1
-        fi
+        echo -e "${YELLOW}   Releases should be created from main branch${NC}"
+        echo ""
     fi
     
     # Check for uncommitted changes (filter out weird backup files)
@@ -671,7 +684,7 @@ main() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
     
-    # Ask for human review if major release or many commits
+    # Show review recommendation if major or large release
     local last_tag_for_count=$(get_last_tag)
     local commit_range_for_count
     if [[ -z "$last_tag_for_count" ]] || [[ ! "$last_tag_for_count" =~ ^v ]]; then
@@ -680,42 +693,60 @@ main() {
         commit_range_for_count="${last_tag_for_count}..HEAD"
     fi
     local commit_count=$(git log "$commit_range_for_count" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
-    local needs_review=false
     
     if [[ "$BUMP_TYPE" == "major" ]]; then
-        echo -e "${YELLOW}⚠️  Major release detected - human review recommended${NC}"
-        needs_review=true
+        echo -e "${YELLOW}⚠️  Major release detected - please review carefully before executing${NC}"
+        echo ""
     elif [[ $commit_count -gt 10 ]]; then
-        echo -e "${YELLOW}⚠️  Large release ($commit_count commits) - human review recommended${NC}"
-        needs_review=true
+        echo -e "${YELLOW}⚠️  Large release ($commit_count commits) - please review carefully before executing${NC}"
+        echo ""
     fi
     
-    if [[ "$needs_review" == true ]]; then
-        echo ""
-        echo "Please review the release notes above."
-        printf "Proceed with release? (y/N) "
-        read -r reply
-        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-            echo -e "${YELLOW}Release cancelled by user${NC}"
-            log_release_step "CANCELLED" "Release cancelled by user at review stage"
-            rm -f "$RELEASE_NOTES_FILE"
-            exit 0
-        fi
-        log_release_step "REVIEW" "Human review requested and approved for ${NEW_VERSION}"
-    else
-        printf "Proceed with release? (y/N) "
-        read -r reply
-        if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-            echo -e "${YELLOW}Release cancelled by user${NC}"
-            log_release_step "CANCELLED" "Release cancelled by user at confirmation stage"
-            rm -f "$RELEASE_NOTES_FILE"
-            exit 0
-        fi
-        log_release_step "CONFIRMED" "Release confirmed by user"
+    # Save prepare state for execute mode
+    cat > "$PREPARE_STATE_FILE" << EOF
+NEW_VERSION=$NEW_VERSION
+BUMP_TYPE=$BUMP_TYPE
+CURRENT_VERSION=$CURRENT_VERSION
+LAST_TAG=$LAST_TAG
+SUMMARY_FILE=$SUMMARY_FILE
+RELEASE_NOTES_FILE=$RELEASE_NOTES_FILE
+summary_needs_commit=$summary_needs_commit
+EOF
+    log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION}"
+    
+    # Display execution command
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}✅ Release preview prepared successfully!${NC}"
+    echo ""
+    echo -e "${GREEN}📋 Version: ${CURRENT_VERSION} → ${NEW_VERSION}${NC}"
+    echo -e "${GREEN}📋 Type: ${BUMP_TYPE} release${NC}"
+    echo -e "${GREEN}📋 Commits: ${commit_count}${NC}"
+    echo ""
+    echo -e "${GREEN}To execute this release, run:${NC}"
+    echo -e "${GREEN}  ./release/release.sh --execute${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    return 0
+}
+
+# Execute prepared release
+execute_release() {
+    local PREPARE_STATE_FILE="release/.prepare_state"
+    
+    # Check if prepare was run
+    if [[ ! -f "$PREPARE_STATE_FILE" ]]; then
+        echo -e "${RED}❌ Error: Release not prepared${NC}"
+        echo "Please run: ./release/release.sh --prepare [--summary <file>]"
+        exit 1
     fi
+    
+    # Load prepared state
+    source "$PREPARE_STATE_FILE"
+    
+    echo -e "${BLUE}🚀 Executing release ${NEW_VERSION}...${NC}"
+    echo ""
     
     # Update version
-    echo ""
     echo -e "${BLUE}📝 Updating version in todo.ai...${NC}"
     log_release_step "UPDATE VERSION" "Updating version in todo.ai from ${CURRENT_VERSION} to ${NEW_VERSION}"
     update_version "$NEW_VERSION"

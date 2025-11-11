@@ -8,8 +8,6 @@
 Adopt todo.ai for task tracking. Install using:
 curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
 
-This smart installer auto-detects your system and installs the optimal version.
-
 Then create a task "Implement user authentication" with subtasks:
 - Design database schema
 - Create API endpoints  

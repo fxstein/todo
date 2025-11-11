@@ -2,6 +2,30 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-11 23:21:57 | fxstein | NOTE | 145.11 | Test: (1) Click through all links in README.md, (2) Check docs/README.md links, (3) Verify cross-references between docs, (4) Check .cursor/rules references, (5) Test any links in todo.ai script itself. Use grep to find any remaining old paths that weren't updated.
+2025-11-11 23:21:48 | fxstein | ADD_SUBTASK | 145.11 | Verify all links work and no broken references remain (parent: #145)
+2025-11-11 23:21:42 | fxstein | NOTE | 145.10 | Update Documentation section in main README.md (around line 177): Update paths to GETTING_STARTED, NUMBERING_MODES_GUIDE, USAGE_PATTERNS, COORDINATION_SETUP. Add link to docs/README.md for full documentation index.
+2025-11-11 23:21:34 | fxstein | ADD_SUBTASK | 145.10 | Update main README.md documentation links (parent: #145)
+2025-11-11 23:21:27 | fxstein | NOTE | 145.9 | Rewrite docs/README.md as index: (1) Overview of documentation structure, (2) Quick links to key guides, (3) Directory descriptions (guides/, design/, development/, analysis/, archive/), (4) How to contribute/where to add new docs. Keep concise, scannable.
+2025-11-11 23:21:19 | fxstein | ADD_SUBTASK | 145.9 | Update docs/README.md with new structure overview (parent: #145)
+2025-11-11 23:21:13 | fxstein | NOTE | 145.8 | Find all doc links: grep -r 'docs/.*\.md' . --include='*.md' --include='*.mdc'. Update relative paths to new structure (e.g., docs/INSTALLATION.md -> docs/guides/INSTALLATION.md). Check todo.ai script, .cursor/rules/, README.md, all docs/*.md files.
+2025-11-11 23:21:04 | fxstein | ADD_SUBTASK | 145.8 | Update all cross-references in documentation files (parent: #145)
+2025-11-11 23:20:57 | fxstein | NOTE | 145.7 | Move to archive/: COMMIT_FORMAT_MIGRATION.md, CURSOR_RULES_MIGRATION.md, RELEASE_NUMBERING_MAPPING.md, README_PREVIEW_WITH_SMART_INSTALLER.md (4 files - historical/completed migrations). Use git mv.
+2025-11-11 23:20:50 | fxstein | ADD_SUBTASK | 145.7 | Move historical/migration docs to docs/archive/ (parent: #145)
+2025-11-11 23:20:43 | fxstein | NOTE | 145.6 | Move to analysis/: BASH_VS_ZSH_ANALYSIS.md, CODE_SIZE_ANALYSIS.md, GITHUB_API_COORDINATION_ANALYSIS.md, IMPLEMENTATION_ALTERNATIVES_ANALYSIS.md, MULTI_USER_CONFLICT_ANALYSIS.md, MULTI_USER_TOOL_RESEARCH.md, TASK_NUMBERING_SCHEMA_ANALYSIS.md (7 files). Use git mv.
+2025-11-11 23:20:36 | fxstein | ADD_SUBTASK | 145.6 | Move analysis/research docs to docs/analysis/ (parent: #145)
+2025-11-11 23:20:31 | fxstein | NOTE | 145.5 | Move to development/: DEVELOPMENT_GUIDELINES.md, MIGRATION_GUIDE.md, NUMBERING_MODES_TEST_PLAN.md, TODO_TOOL_IMPROVEMENTS.md (4 files). Use git mv.
+2025-11-11 23:20:25 | fxstein | ADD_SUBTASK | 145.5 | Move development/contributor docs to docs/development/ (parent: #145)
+2025-11-11 23:20:19 | fxstein | NOTE | 145.4 | Move to design/: BUG_REPORTING_DESIGN.md, GIT_HOOKS_DESIGN.md, HYBRID_TASK_NUMBERING_DESIGN.md, MIGRATION_SYSTEM_DESIGN.md, MULTI_USER_DESIGN.md, SMART_INSTALLER_DESIGN.md, TODO_TAGGING_SYSTEM_DESIGN.md, UNINSTALL_DESIGN.md (8 files). Use git mv.
+2025-11-11 23:20:13 | fxstein | ADD_SUBTASK | 145.4 | Move design documents to docs/design/ (parent: #145)
+2025-11-11 23:20:06 | fxstein | NOTE | 145.3 | Move to guides/: GETTING_STARTED.md, INSTALLATION.md, USAGE_PATTERNS.md, NUMBERING_MODES_GUIDE.md, COORDINATION_SETUP.md (5 files). Use git mv to preserve history.
+2025-11-11 23:19:59 | fxstein | ADD_SUBTASK | 145.3 | Move user guide files to docs/guides/ (parent: #145)
+2025-11-11 23:19:53 | fxstein | NOTE | 145.2 | Create directories: mkdir -p docs/{guides,design,development,analysis,archive}. Verify structure with tree or ls. Do not move files yet - that's next step.
+2025-11-11 23:19:46 | fxstein | ADD_SUBTASK | 145.2 | Create subdirectory structure in docs folder (parent: #145)
+2025-11-11 23:19:40 | fxstein | NOTE | 145.1 | Create docs/STRUCTURE.md documenting: guides/ (GETTING_STARTED, INSTALLATION, USAGE_PATTERNS, NUMBERING_MODES_GUIDE, COORDINATION_SETUP), design/ (8 design docs), development/ (DEVELOPMENT_GUIDELINES, MIGRATION_GUIDE, test plans), analysis/ (7 analysis/research docs), archive/ (migration/historical docs). Keep README.md at root with overview.
+2025-11-11 23:19:32 | fxstein | ADD_SUBTASK | 145.1 | Define and document docs folder structure with categories (parent: #145)
+2025-11-11 23:19:26 | fxstein | NOTE | 145 | Proposed structure: guides/ (user docs), design/ (technical specs), development/ (contributor docs), analysis/ (research), archive/ (historical). Currently 29 files in flat structure need categorization and organization. Must update all cross-references, docs/README.md, and main README.md links.
+2025-11-11 23:19:18 | fxstein | ADD | 145 | Reorganize docs folder with logical subdirectory structure
 2025-11-11 23:03:08 | fxstein | COMPLETE | 144 | Implement release-aware smart installer with bash/zsh dual-version support
 2025-11-11 23:03:01 | fxstein | COMPLETE | 144.9 | Update release script to include both todo.ai and todo.bash as assets
 2025-11-11 23:03:01 | fxstein | COMPLETE | 144.8 | Add cursor rule to prevent accidental todo.bash editing

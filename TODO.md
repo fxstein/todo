@@ -3,20 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature`
-  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
-  - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test`
-  - [x] **#139.6** Test: verify subtask notes displayed for all subtasks `#test`
-    > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
-    - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
-      > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
-  - [x] **#139.5** Test: verify parent task note displayed `#test`
-  - [x] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code`
-    > Modify show_task() to call collect_task_notes() for each displayed task/subtask. Display notes immediately after each task line.
-  - [x] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design`
-  - [x] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug`
-  - [x] **#139.1** Investigate show_task function: find where notes are displayed `#research`
-    > Find show_task() function in todo.ai script. Look for note display logic around lines 4000-4100.
 - [ ] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization`
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [ ] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research`
@@ -77,6 +63,20 @@
 ------------------
 
 ## Recently Completed
+- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature` (2025-11-11)
+  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
+  - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test` (2025-11-11)
+  - [x] **#139.6** Test: verify subtask notes displayed for all subtasks `#test` (2025-11-11)
+    > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
+    - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test` (2025-11-11)
+      > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
+  - [x] **#139.5** Test: verify parent task note displayed `#test` (2025-11-11)
+  - [x] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code` (2025-11-11)
+    > Modify show_task() to call collect_task_notes() for each displayed task/subtask. Display notes immediately after each task line.
+  - [x] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design` (2025-11-11)
+  - [x] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug` (2025-11-11)
+  - [x] **#139.1** Investigate show_task function: find where notes are displayed `#research` (2025-11-11)
+    > Find show_task() function in todo.ai script. Look for note display logic around lines 4000-4100.
 - [x] **#140** Fix bug: Note command doesn't work for nested sub-subtasks (4-space indentation) `#bug` (2025-11-11)
   > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
 - [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
@@ -385,6 +385,6 @@
 
 ---
 
-**Last Updated:** Tue Nov 11 19:39:44 CET 2025
+**Last Updated:** Tue Nov 11 19:39:59 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -2,7 +2,12 @@
 
 ## Overview
 
-The bug reporting feature enables `todo.ai` to detect errors and suggest reporting bugs to GitHub Issues. The system always requires explicit user confirmation before sending any reports. This allows users to create detailed bug reports with logs, context, and relevant data, improving the feedback loop between users and developers while maintaining full user control.
+The bug reporting feature enables `todo.ai` to detect errors and suggest reporting bugs to GitHub Issues. The system intelligently detects whether it's running in an AI agent context or being used by a human, adjusting the workflow accordingly:
+
+- **AI Agents**: Auto-submit bug reports after a 2-second preview (detects `CURSOR_AI`, `AI_AGENT`, `GITHUB_ACTIONS` env vars)
+- **Humans**: Always require explicit confirmation before submission
+
+Bug reports include rich context (git status, recent commands, TODO.md state, environment), professional markdown formatting with GitHub callout blocks, and intelligent error categorization with suggested labels.
 
 ## Problem Statement
 
@@ -18,11 +23,137 @@ This process is time-consuming and often results in incomplete bug reports or du
 ## Goals
 
 1. **Error Detection**: Detect errors and unexpected behavior during script execution
-2. **Reporting Suggestion**: Suggest creating GitHub Issues when errors occur (never automatic)
-3. **User Control**: Always require explicit user confirmation before any GitHub API calls
-4. **Duplicate Prevention**: Check for existing similar issues before creating new ones (with user confirmation)
-5. **Context Preservation**: Include logs, error details, and relevant data in reports
-6. **Privacy Protection**: For private repos, hide repository identifiers, only include todo.ai-specific info
+2. **Smart Reporting**: Auto-submit for AI agents, confirm for humans
+3. **Rich Context**: Git status, recent commands, TODO.md state, environment variables
+4. **Professional Formatting**: GitHub callout blocks, tables, collapsible sections
+5. **Intelligent Categorization**: Auto-detect error type and suggest appropriate labels
+6. **Duplicate Prevention**: Check for existing similar issues before creating new ones
+7. **Privacy Protection**: For private repos, hide repository identifiers, only include todo.ai-specific info
+
+## Enhanced Features (v2.4.0+)
+
+### GitHub Issue Template
+
+Located at `.github/ISSUE_TEMPLATE/bug_report.yml`, this provides a structured form for manual bug reports with fields:
+- Error Description (textarea, required)
+- Command Used (input, required)
+- Error Context (textarea with shell rendering)
+- Steps to Reproduce
+- Expected/Actual Behavior
+- Recent Logs
+- OS/Shell dropdowns (required)
+- Version input (required)
+- Additional Context
+
+This template serves as a reference for the automated bug report generation.
+
+### GitHub Markdown Features
+
+Bug reports now use rich GitHub markdown:
+
+**Callout Blocks:**
+```markdown
+> [!WARNING]
+> **Error Occurred**: 2025-11-12 12:30:00
+
+> [!NOTE]
+> Environment details collected automatically
+```
+
+**Tables for System Information:**
+| Component | Details |
+|-----------|---------|
+| **OS** | macOS 14.6.0 Darwin |
+| **Shell** | zsh 5.9 |
+| **Version** | 2.4.0 |
+
+**Collapsible Sections:**
+```html
+<details>
+<summary><strong>📊 Additional Context</strong></summary>
+
+#### Git Status
+```
+Branch: main | Status: clean | Commit: a1b2c3d
+```
+
+</details>
+```
+
+### AI Agent Detection
+
+The system automatically detects AI agent contexts:
+
+```zsh
+# Detect if running in AI agent context
+local is_ai_agent=false
+if [[ -n "$CURSOR_AI" ]] || [[ -n "$AI_AGENT" ]] || [[ -n "$GITHUB_ACTIONS" ]]; then
+    is_ai_agent=true
+fi
+```
+
+**Agent Workflow:**
+1. Show condensed preview (first 30 lines)
+2. Display suggested labels
+3. Show "Auto-submitting in 2 seconds..." message
+4. Proceed automatically without prompt
+
+**Human Workflow:**
+1. Show full preview
+2. Display suggested labels
+3. Ask for confirmation: "Report this bug? (y/N)"
+4. Require explicit approval
+
+### Enhanced Context Collection
+
+`collect_error_context()` now gathers extensive information:
+
+**Git Information:**
+- Branch name
+- Dirty status (number of changed files)
+- Latest commit hash
+
+**TODO.md State:**
+- Active task count
+- Operating mode (single-user, multi-user, etc.)
+- Coordination type (github-issues, counterapi, none)
+
+**Environment Variables:**
+- TERM (terminal type)
+- EDITOR (default editor)
+- LANG (language/locale)
+
+**Recent Commands:**
+- Last 5 commands from `.todo.ai/.todo.ai.log`
+- Sanitized to remove sensitive information
+
+### Intelligent Error Categorization
+
+`categorize_error()` analyzes error messages and suggests appropriate labels:
+
+**Error Type Labels:**
+- `crash` - segfault, core dump, signal 11
+- `performance` - timeout, slow operations
+- `data-loss` - file corruption, missing data
+- `coordination` - GitHub API, gh CLI issues
+
+**OS-Specific Labels:**
+- `macos` - Darwin systems
+- `linux` - Linux systems
+- `wsl` - Windows Subsystem for Linux
+
+**Shell-Specific Labels:**
+- `zsh` - zsh shell
+- `bash` - bash shell
+
+**Label Application:**
+```zsh
+# Example categorization
+local error="segmentation fault in task parsing"
+# Returns: "bug,crash,macos,zsh,auto-reported"
+```
+
+Labels are passed to `gh issue create --label` command with fallback to basic "bug" label if specific labels don't exist in the repository.
 
 ## Architecture
 

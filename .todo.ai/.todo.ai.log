@@ -2,6 +2,15 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-12 01:43:09 | fxstein | COMPLETE | 125 | Overhaul bug reporting feature: eliminate prompts and improve formatting
+2025-11-12 01:43:02 | fxstein | NOTE | 125.12 | Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
+2025-11-12 01:42:53 | fxstein | COMPLETE | 125.13 | Update bug reporting design document with new implementation details
+2025-11-12 01:41:59 | fxstein | COMPLETE | 125.11 | Update cursor rules to reflect new agent-friendly bug reporting workflow
+2025-11-12 01:41:32 | fxstein | COMPLETE | 125.10 | Add intelligent error categorization and suggested labels
+2025-11-12 01:41:32 | fxstein | COMPLETE | 125.9 | Enhance context auto-collection: add git status, recent commands, TODO.md state
+2025-11-12 01:41:32 | fxstein | COMPLETE | 125.8 | Remove prompts from suggest_bug_report() - make fully automated for AI agents
+2025-11-12 01:41:32 | fxstein | COMPLETE | 125.7 | Rewrite generate_bug_report() to use GitHub callout blocks and better markdown structure
+2025-11-12 01:38:49 | fxstein | COMPLETE | 125.6 | Create GitHub issue template for bug reports (.github/ISSUE_TEMPLATE/bug_report.yml)
 2025-11-12 00:43:18 | fxstein | NOTE | 125.13 | Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
 2025-11-12 00:43:11 | fxstein | ADD_SUBTASK | 125.13 | Update bug reporting design document with new implementation details (parent: #125)
 2025-11-12 00:43:06 | fxstein | NOTE | 125.12 | Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.

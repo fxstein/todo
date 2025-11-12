@@ -1,0 +1,129 @@
+name: Bug Report
+description: Report a bug to help us improve todo.ai
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the information below to help us diagnose and fix the issue.
+
+  - type: textarea
+    id: error-description
+    attributes:
+      label: Error Description
+      description: What error occurred? Please provide a clear and concise description.
+      placeholder: Describe the error you encountered
+    validations:
+      required: true
+
+  - type: input
+    id: command
+    attributes:
+      label: Command Used
+      description: What command were you running when the error occurred?
+      placeholder: "e.g., ./todo.ai add 'New task' '#tag'"
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-context
+    attributes:
+      label: Error Context
+      description: Any additional error messages, stack traces, or context
+      placeholder: Paste any error messages or relevant output here
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Run command '...'
+        2. See error '...'
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe what you expected
+    validations:
+      required: false
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what actually happened
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Recent Logs
+      description: Output from `.todo.ai/.todo.ai.log` (last 50 lines if available)
+      placeholder: Paste recent log entries here
+      render: shell
+    validations:
+      required: false
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What OS are you using?
+      options:
+        - macOS
+        - Linux
+        - Windows (WSL)
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: shell
+    attributes:
+      label: Shell
+      description: What shell are you using?
+      options:
+        - zsh
+        - bash
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: todo.ai Version
+      description: Output of `./todo.ai version`
+      placeholder: "e.g., 2.4.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information that might be helpful
+      placeholder: Add any other context about the problem here
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://github.com/fxstein/todo.ai/blob/main/CODE_OF_CONDUCT.md)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true
+

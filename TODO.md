@@ -3,6 +3,17 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug`
+  > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
+  - [ ] **#147.8** Commit fix and close issue#36 with release reference `#bug`
+  - [ ] **#147.7** Update documentation if nesting limitations exist `#bug`
+  - [ ] **#147.6** Verify show, modify, note, complete, delete commands work on deep tasks `#bug`
+  - [ ] **#147.5** Test with 3, 4, and 5 level nested subtasks `#bug`
+  - [ ] **#147.4** Fix task ID resolution to support arbitrary nesting depth `#bug`
+  - [ ] **#147.3** Identify where show/modify/note commands fail for deep nesting `#bug`
+  - [ ] **#147.2** Reproduce the bug with 3-level nested subtasks (1.2.1 pattern) `#bug`
+  - [ ] **#147.1** Investigate task ID parsing logic for nested subtasks `#bug`
+    > Search for functions: find_task_by_id(), get_task_by_id(), parse_task_id(), or similar. Look in action handlers for 'show', 'modify', 'note' commands. Check how task IDs are split (1.2.1 -> [1,2,1]) and how TODO.md is traversed. Likely issue: regex pattern or nesting loop only handles 2 levels.
 - [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
   - [x] **#125.13** Update bug reporting design document with new implementation details `#docs`
@@ -483,6 +494,6 @@
 
 ---
 
-**Last Updated:** Wed Nov 12 01:43:09 CET 2025
+**Last Updated:** Sat Nov 15 12:41:28 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

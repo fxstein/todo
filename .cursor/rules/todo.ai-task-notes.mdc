@@ -2,14 +2,27 @@
 description: "Guidelines for using notes with todo.ai tasks"
 alwaysApply: true
 ---
-When creating or working with todo.ai tasks, add notes to provide implementation context. Do not use notes for status updates on parent tasks.
+When creating or working with todo.ai tasks, add notes to provide implementation context. **NEVER use notes for status updates or completion summaries on parent tasks.**
 
 **Command:** `./todo.ai note <task-id> "Your note here"`
+
+**What to put in notes:**
+- Implementation details (file paths, line numbers, function names)
+- Dependencies between tasks
+- References to documentation or code
+- Technical decisions or approach
+
+**What NOT to put in notes:**
+- ❌ Status updates ("✅ Task X completed")
+- ❌ Completion summaries listing what subtasks are done
+- ❌ Progress reports ("3 of 5 subtasks complete")
+- ❌ Duplicates of subtask information that's already visible
 
 **Examples:**
 - ✅ `./todo.ai note 42 "Modify archive_task() lines 2600-2850. Pattern from delete_task() lines 2926-2935"`
 - ✅ `./todo.ai note 42.1 "Depends on task#42 completing first - needs collect_notes() function"`
 - ✅ `./todo.ai note 50 "See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for migration cleanup details"`
 - ❌ `./todo.ai note 42 "Fix it"` - Too vague, no actionable context
+- ❌ `./todo.ai note 42 "✅ #42.1 done, ✅ #42.2 done, ✅ #42.3 done"` - Status updates belong in subtasks, not notes
 
-Notes appear as blockquotes (>) and move with tasks when archived.
+**The subtasks show completion status - don't duplicate it in notes!**

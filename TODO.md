@@ -4,18 +4,6 @@
 
 ## Tasks
 - [x] **#152** Test bug reporting feature before v2.5.0 release `#testing`
-  > Bug reporting tests completed successfully:
-  > 
-  > ✅ #152.1: Bug report generation works - creates proper markdown with callout blocks
-  > ✅ #152.2: Context collection verified - git, TODO.md, env vars, commands all collected
-  > ✅ #152.3: AI agent detection works - CURSOR_AI env var triggers auto-submission
-  > ✅ #152.5: Markdown formatting correct - callout blocks, tables, collapsible sections
-  > ✅ #152.6: Label categorization works - correctly identifies bug, OS, shell labels
-  > ✅ #152.7: GitHub issue template is valid YAML structure
-  > 
-  > ⚠️ Note: Test issues show 'Bug report created successfully' but may not appear in issue list immediately due to rate limiting or test mode. The important thing is the generation and submission logic works correctly.
-  > 
-  > Ready for release!
   - [x] **#152.7** Verify GitHub issue template structure `#testing`
   - [x] **#152.6** Test label categorization for different error types `#testing`
   - [x] **#152.5** Verify markdown formatting (callout blocks, tables, collapsible) `#testing`

@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 13:48:21 | fxstein | COMPLETE | 153 | Add note management: update and delete note commands
+2025-11-15 13:48:14 | fxstein | COMPLETE | 155 | Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array)
 2025-11-15 13:40:09 | fxstein | DELETE | 136.1 | Reproduce bug: create task with note, add subtask, verify note is split
 2025-11-15 13:40:09 | fxstein | DELETE | 136.2 | Investigate add_subtask function: find where subtask insertion occurs
 2025-11-15 13:40:09 | fxstein | DELETE | 136.3 | Analyze note detection: how to identify and skip over notes when inserting subtasks

@@ -235,9 +235,13 @@ is_backend_only_release() {
 analyze_commits() {
     local commit_range="$1"
     
-    # If commit_range is empty or doesn't contain "..", use HEAD
-    if [[ -z "$commit_range" ]] || [[ ! "$commit_range" =~ \.\. ]]; then
+    # If commit_range is empty, use HEAD (all commits)
+    # If it doesn't contain ".." (range separator), convert to tag..HEAD
+    if [[ -z "$commit_range" ]]; then
         commit_range="HEAD"
+    elif [[ "$commit_range" != *".."* ]]; then
+        # Tag provided without range separator - analyze commits since that tag
+        commit_range="${commit_range}..HEAD"
     fi
     
     local highest_level="patch"

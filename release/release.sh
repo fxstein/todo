@@ -76,9 +76,71 @@ EOF
     mv "$temp_log" "$RELEASE_LOG"
 }
 
-# Get current version from todo.ai
-get_current_version() {
+# Get version from todo.ai file (secondary source - for validation only)
+get_file_version() {
     grep '^VERSION=' todo.ai | sed 's/VERSION="\([^"]*\)"/\1/'
+}
+
+# Get latest release version from GitHub (PRIMARY source of truth)
+get_github_version() {
+    # Query GitHub for the latest release tag
+    local latest_tag=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+    
+    if [[ -z "$latest_tag" ]]; then
+        # No releases found on GitHub
+        echo ""
+        return 1
+    fi
+    
+    # Remove 'v' prefix from tag (e.g., v2.5.0 -> 2.5.0)
+    echo "${latest_tag#v}"
+}
+
+# Get current version (PRIMARY: from GitHub, FALLBACK: from file if no GitHub releases)
+get_current_version() {
+    local github_version=$(get_github_version 2>/dev/null)
+    
+    if [[ -n "$github_version" ]]; then
+        # GitHub version exists - use it as source of truth
+        echo "$github_version"
+    else
+        # No GitHub releases yet - fall back to file version
+        # This only happens for the very first release
+        local file_version=$(get_file_version)
+        if [[ -z "$file_version" ]]; then
+            # No version in file either - default to 0.0.0
+            echo "0.0.0"
+        else
+            echo "$file_version"
+        fi
+    fi
+}
+
+# Validate that file version matches GitHub version
+validate_version_consistency() {
+    local github_version=$(get_github_version 2>/dev/null)
+    local file_version=$(get_file_version)
+    
+    # If no GitHub releases exist yet, skip validation
+    if [[ -z "$github_version" ]]; then
+        return 0
+    fi
+    
+    # Compare versions
+    if [[ "$file_version" != "$github_version" ]]; then
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${YELLOW}⚠️  VERSION MISMATCH DETECTED${NC}"
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        echo -e "${YELLOW}The VERSION variable in todo.ai does not match the latest GitHub release:${NC}"
+        echo -e "  ${RED}File version (todo.ai):    ${file_version}${NC}"
+        echo -e "  ${GREEN}GitHub version (releases): ${github_version}${NC}"
+        echo ""
+        echo -e "${YELLOW}GitHub releases are the source of truth for versioning.${NC}"
+        echo -e "${YELLOW}The file version will be updated during the release process.${NC}"
+        echo ""
+        log_release_step "VERSION MISMATCH" "File version (${file_version}) does not match GitHub version (${github_version})"
+    fi
 }
 
 # Get last tag or initial commit
@@ -148,55 +210,35 @@ is_backend_only_release() {
         
         # Check if frontend (user-facing docs)
         if [[ "$file" == "README.md" ]] || [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
-            # Exclude backend docs
             if [[ "$file" != "docs/TEST_PLAN.md" ]]; then
                 has_frontend=true
             fi
         fi
         
-        # Check if backend
-        for pattern in "${backend_patterns[@]}"; do
-            if [[ "$file" =~ $pattern ]]; then
-                has_backend=true
-                break
-            fi
-        done
+        # Check if backend (infrastructure)
+        if [[ "$file" =~ ^(release/release\.sh|\.cursor/rules/|\.todo\.ai/|tests/|release/RELEASE_SUMMARY\.md|release/RELEASE_LOG\.log|release/RELEASE_PROCESS\.md|docs/TEST_PLAN\.md|release/RELEASE_NUMBERING_ANALYSIS\.md)$ ]] ||
+           [[ "$file" =~ ^release/ ]] || [[ "$file" =~ ^\.cursor/rules/ ]] ||
+           [[ "$file" =~ ^\.todo\.ai/ ]] || [[ "$file" =~ ^tests/ ]]; then
+            has_backend=true
+        fi
     done <<< "$changed_files"
     
-    # If only backend files changed (no frontend), it's a backend-only release
+    # Return true if only backend files changed
     if [[ "$has_backend" == true ]] && [[ "$has_frontend" == false ]]; then
-        return 0  # Backend only
+        return 0  # Backend-only
+    else
+        return 1  # Mixed or frontend
     fi
-    
-    return 1  # Has frontend or mixed
 }
 
-# Analyze commits to determine version bump type
+# Analyze commits to determine version bump (major/minor/patch)
 analyze_commits() {
-    local last_tag="$1"
-    local commit_range
+    local commit_range="$1"
     
-    if [[ -z "$last_tag" ]] || [[ ! "$last_tag" =~ ^v ]]; then
-        # No previous tag or not a version tag - analyze all commits
+    # If commit_range is empty or doesn't contain "..", use HEAD
+    if [[ -z "$commit_range" ]] || [[ ! "$commit_range" =~ \.\. ]]; then
         commit_range="HEAD"
-    else
-        # Previous tag exists - analyze commits since that tag
-        commit_range="${last_tag}..HEAD"
     fi
-    
-    local commits
-    commits=$(git log "$commit_range" --pretty=format:"%s" --no-merges 2>/dev/null) || commits=""
-    
-    if [[ -z "$commits" ]]; then
-        echo "patch"
-        return
-    fi
-    
-    # Scan all commits and classify each by release level
-    # We step down from highest to lowest: MAJOR > MINOR > PATCH
-    # A single MAJOR commit makes the entire release MAJOR
-    # A single MINOR commit (with no MAJOR) makes the entire release MINOR
-    # Otherwise, it's PATCH
     
     local highest_level="patch"
     
@@ -397,75 +439,73 @@ generate_release_notes() {
     
     # Categorize commits
     local breaking_commits=()
-    local added_commits=()
-    local changed_commits=()
-    local fixed_commits=()
+    local feature_commits=()
+    local fix_commits=()
     local other_commits=()
     
-    while IFS= read -r commit; do
-        local commit_short=$(echo "$commit" | cut -d'|' -f1)
-        local commit_full=$(git rev-parse "$commit_short" 2>/dev/null || echo "$commit_short")
-        local commit_msg=$(echo "$commit" | cut -d'|' -f2- | sed 's/^ *//')
-        local lower_msg=$(echo "$commit_msg" | tr '[:upper:]' '[:lower:]')
-        local commit_link="([${commit_short}](${repo_url}/commit/${commit_full}))"
+    local commits
+    if [[ "$commit_range" == "HEAD" ]]; then
+        commits=$(git log "$commit_range" --pretty=format:"%H|%s" --no-merges 2>/dev/null || echo "")
+    else
+        commits=$(git log "$commit_range" --pretty=format:"%H|%s" --no-merges 2>/dev/null || echo "")
+    fi
+    
+    while IFS='|' read -r hash message || [[ -n "$message" ]]; do
+        [[ -z "$message" ]] && continue
         
-        # Skip version bumps
-        if [[ "$lower_msg" =~ ^bump.*version ]]; then
+        # Skip version bump commits
+        if [[ "$message" =~ ^(release:|Bump version to) ]]; then
             continue
         fi
         
-        # Check for MAJOR - Breaking changes (must contain #MAJOR as a tag, not as part of "tag" or "detection")
-        if (echo "$commit_msg" | grep -qi "#MAJOR" && ! echo "$commit_msg" | grep -qiE "MAJOR tag|tag.*MAJOR|MAJOR.*detection|detection.*MAJOR") ||
-           [[ "$lower_msg" =~ (breaking|break|!:) ]] || 
-           [[ "$lower_msg" =~ ^(feat|fix|refactor|perf)!: ]]; then
-            breaking_commits+=("- ${commit_msg} ${commit_link}")
-        elif [[ "$lower_msg" =~ ^(feat|feature): ]] || 
-             [[ "$lower_msg" =~ (add|new|implement|create|support) ]]; then
-            added_commits+=("- ${commit_msg} ${commit_link}")
-        elif [[ "$lower_msg" =~ (change|update|refactor|improve|enhance|modify) ]]; then
-            changed_commits+=("- ${commit_msg} ${commit_link}")
-        elif [[ "$lower_msg" =~ ^(fix|bugfix|patch): ]] || 
-             [[ "$lower_msg" =~ (fix|bug|patch|hotfix|correct) ]]; then
-            fixed_commits+=("- ${commit_msg} ${commit_link}")
-        else
-            other_commits+=("- ${commit_msg} ${commit_link}")
+        # Skip release log commits
+        if [[ "$message" =~ ^(Add release log for) ]]; then
+            continue
         fi
-    done < <(git log "$commit_range" --pretty=format:"%h|%s" --no-merges 2>/dev/null || echo "")
+        
+        # Create commit link
+        local commit_link="([${hash:0:7}](${repo_url}/commit/${hash}))"
+        
+        # Categorize
+        if [[ "$message" =~ ^(feat|fix|refactor|perf)!: ]] || [[ "$message" =~ (breaking|BREAKING) ]]; then
+            breaking_commits+=("- ${message} ${commit_link}")
+        elif [[ "$message" =~ ^feat: ]] || [[ "$message" =~ ^feature: ]]; then
+            feature_commits+=("- ${message#feat: } ${commit_link}")
+        elif [[ "$message" =~ ^fix: ]]; then
+            fix_commits+=("- ${message#fix: } ${commit_link}")
+        else
+            other_commits+=("- ${message} ${commit_link}")
+        fi
+    done <<< "$commits"
     
-    # Write sections
+    # Write categorized commits
     if [[ ${#breaking_commits[@]} -gt 0 ]]; then
-        echo "### Breaking Changes" >> "$temp_notes"
+        echo "### 🔴 Breaking Changes" >> "$temp_notes"
+        echo "" >> "$temp_notes"
         printf '%s\n' "${breaking_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
     
-    if [[ ${#added_commits[@]} -gt 0 ]]; then
-        echo "### Added" >> "$temp_notes"
-        printf '%s\n' "${added_commits[@]}" >> "$temp_notes"
+    if [[ ${#feature_commits[@]} -gt 0 ]]; then
+        echo "### ✨ Features" >> "$temp_notes"
+        echo "" >> "$temp_notes"
+        printf '%s\n' "${feature_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
     
-    if [[ ${#changed_commits[@]} -gt 0 ]]; then
-        echo "### Changed" >> "$temp_notes"
-        printf '%s\n' "${changed_commits[@]}" >> "$temp_notes"
+    if [[ ${#fix_commits[@]} -gt 0 ]]; then
+        echo "### 🐛 Bug Fixes" >> "$temp_notes"
         echo "" >> "$temp_notes"
-    fi
-    
-    if [[ ${#fixed_commits[@]} -gt 0 ]]; then
-        echo "### Fixed" >> "$temp_notes"
-        printf '%s\n' "${fixed_commits[@]}" >> "$temp_notes"
+        printf '%s\n' "${fix_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
     
     if [[ ${#other_commits[@]} -gt 0 ]]; then
-        echo "### Other" >> "$temp_notes"
+        echo "### 🔧 Other Changes" >> "$temp_notes"
+        echo "" >> "$temp_notes"
         printf '%s\n' "${other_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
-    
-    # Count commits
-    local total_commits=$(git log "$commit_range" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
-    echo "*Total commits: ${total_commits}*" >> "$temp_notes"
     
     echo "$temp_notes"
 }
@@ -474,96 +514,54 @@ generate_release_notes() {
 update_version() {
     local new_version="$1"
     
-    # Update VERSION variable (line starting with VERSION=)
-    if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i '' "s/^VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
+    # Use sed_inplace function if available, otherwise use direct sed
+    if command -v sed_inplace &> /dev/null; then
+        sed_inplace "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
+        sed_inplace "s/^# Version: .*/# Version: ${new_version}/" todo.ai
     else
-        sed -i "s/^VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
-    fi
-    # Update Version comment (line starting with # Version:)
-    if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i '' "s/^# Version: [0-9.]*/# Version: $new_version/" todo.ai
-    else
-        sed -i "s/^# Version: [0-9.]*/# Version: $new_version/" todo.ai
-    fi
-    
-    # Verify
-    if ! grep -q "^VERSION=\"$new_version\"" todo.ai; then
-        echo -e "${RED}❌ Error: Version update failed${NC}"
-        exit 1
+        # macOS or Linux compatible
+        if [[ "$(uname)" == "Darwin" ]]; then
+            sed -i '' "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
+            sed -i '' "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+        else
+            sed -i "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
+            sed -i "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+        fi
     fi
 }
 
-# Convert todo.ai (zsh) to todo.bash (bash 4+)
+# Convert zsh version to bash version
 convert_to_bash() {
-    echo -e "${BLUE}🔄 Converting zsh version to bash...${NC}"
+    local converter_script="release/convert_zsh_to_bash.sh"
     
-    # Use the universal converter script
-    if [[ ! -f "release/convert_zsh_to_bash.sh" ]]; then
-        echo -e "${RED}❌ Error: Converter script not found${NC}"
+    if [[ ! -f "$converter_script" ]]; then
+        echo -e "${RED}❌ Error: Converter script not found: $converter_script${NC}"
         return 1
     fi
     
-    # Run the converter
-    if ! ./release/convert_zsh_to_bash.sh todo.ai todo.bash; then
+    # Run converter
+    if ! bash "$converter_script"; then
         echo -e "${RED}❌ Error: Conversion failed${NC}"
         return 1
     fi
     
-    # Test both versions
-    echo -e "${BLUE}🧪 Testing both versions...${NC}"
-    
-    local zsh_version=$(./todo.ai version 2>&1 | head -1 | grep -o '[0-9.]*' || echo "ERROR")
-    local bash_version=$(./todo.bash version 2>&1 | head -1 | grep -o '[0-9.]*' || echo "ERROR")
-    
-    if [[ "$zsh_version" == "ERROR" ]]; then
-        echo -e "${RED}❌ Error: Zsh version test failed${NC}"
-        return 1
-    fi
-    
-    if [[ "$bash_version" == "ERROR" ]]; then
-        echo -e "${RED}❌ Error: Bash version test failed${NC}"
-        echo -e "${YELLOW}Bash version output:${NC}"
-        ./todo.bash version 2>&1 || true
-        return 1
-    fi
-    
-    if [[ "$zsh_version" != "$bash_version" ]]; then
-        echo -e "${RED}❌ Error: Version mismatch${NC}"
-        echo -e "  Zsh version:  $zsh_version"
-        echo -e "  Bash version: $bash_version"
-        return 1
-    fi
-    
-    echo -e "${GREEN}✓ Zsh version:  ${zsh_version}${NC}"
-    echo -e "${GREEN}✓ Bash version: ${bash_version}${NC}"
-    
-    # Show diff summary
-    echo ""
-    echo -e "${BLUE}📊 Conversion summary:${NC}"
-    local diff_lines=$(diff -u todo.ai todo.bash | wc -l | tr -d ' ')
-    local changes=$(diff -u todo.ai todo.bash | grep -c '^[-+]' | tr -d ' ')
-    echo -e "  ${GREEN}Lines changed: ~${changes}${NC}"
-    echo -e "  ${GREEN}File sizes:${NC}"
-    echo -e "    todo.ai:   $(wc -c < todo.ai | tr -d ' ') bytes (zsh)"
-    echo -e "    todo.bash: $(wc -c < todo.bash | tr -d ' ') bytes (bash)"
-    echo ""
-    echo -e "${GREEN}✅ Bash version created successfully${NC}"
-    echo ""
-    
     return 0
 }
 
-# Main release process
+# Main function
 main() {
+    local MODE="prepare"  # Default to prepare mode
     local SUMMARY_FILE=""
-    local MODE="prepare"  # Default mode
     local PREPARE_STATE_FILE="release/.prepare_state"
     
-    # Parse command-line arguments
+    # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
-            --summary|-s)
+            --summary)
+                if [[ -z "$2" ]] || [[ "$2" == --* ]]; then
+                    echo -e "${RED}Error: --summary requires a file path${NC}"
+                    exit 1
+                fi
                 SUMMARY_FILE="$2"
                 shift 2
                 ;;
@@ -743,9 +741,19 @@ main() {
         echo ""
     fi
     
-    # Get current version
+    # Validate version consistency between file and GitHub
+    validate_version_consistency
+    
+    # Get current version from GitHub (source of truth)
     CURRENT_VERSION=$(get_current_version)
-    echo -e "${GREEN}📌 Current version: ${CURRENT_VERSION}${NC}"
+    local file_version=$(get_file_version)
+    
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}📌 Version Information${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}Current version (GitHub):  ${CURRENT_VERSION} ✓${NC}"
+    echo -e "${BLUE}File version (todo.ai):     ${file_version}${NC}"
+    echo ""
     
     # Get last tag
     LAST_TAG=$(get_last_tag)
@@ -779,7 +787,8 @@ main() {
     
     # Log release start with all details
     log_release_step "RELEASE START" "Starting release process:
-- Current version: ${CURRENT_VERSION}
+- Current version (GitHub): ${CURRENT_VERSION}
+- File version (todo.ai): ${file_version}
 - Proposed version: ${NEW_VERSION}
 - Bump type: ${BUMP_TYPE}
 - Last tag: ${LAST_TAG}
@@ -899,54 +908,28 @@ execute_release() {
         fi
     fi
     
-    # Create commit message with required GitHub issue reference for pre-commit hook
-    local commit_msg="release: Version $NEW_VERSION
-
-Release $BUMP_TYPE version.
-
-(refs #142)"
-    if [[ "$summary_needs_commit" == true ]]; then
-        commit_msg="release: Version $NEW_VERSION
-
-Release $BUMP_TYPE version.
-Includes release summary from ${SUMMARY_FILE}
-
-(refs #142)"
+    # Add todo.bash if it was converted (should always be the case after prepare)
+    if [[ -f "todo.bash" ]]; then
+        git add todo.bash
     fi
     
-    # Try to commit
-    set +e  # Disable exit on error temporarily
-    local version_commit=$(git commit -m "$commit_msg" 2>&1)
-    local commit_status=$?
-    set -e
+    # Create version commit message
+    local commit_message="release: Version ${NEW_VERSION}"
+    if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]] && [[ "$summary_needs_commit" == true ]]; then
+        commit_message="${commit_message}
+
+Includes release summary from ${SUMMARY_FILE}"
+    fi
     
-    # Get the commit hash - handle both success and "nothing to commit" cases
-    local version_commit_hash=$(git rev-parse HEAD)
+    # Commit the version change
+    local commit_output=$(git commit -m "$commit_message" 2>&1 || echo "no commit needed")
+    log_release_step "VERSION COMMITTED" "Version change committed: ${commit_output}"
     
-    if [[ $commit_status -eq 0 ]]; then
-        # Commit succeeded
-        log_release_step "VERSION COMMITTED" "Version change committed: ${version_commit}"
-        
-        # Verify the version was actually updated in the commit
-        if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
-            echo -e "${RED}❌ Error: Version verification failed${NC}"
-            echo "Tag would point to commit that doesn't have correct version"
-            log_release_step "VERIFY ERROR" "Version verification failed - commit ${version_commit_hash} doesn't have VERSION=${NEW_VERSION}"
-            exit 1
-        fi
-    else
-        # Commit failed (likely nothing to commit) - verify version in working directory
-        log_release_step "VERSION ALREADY SET" "Version already set to ${NEW_VERSION}, using current HEAD"
-        
-        # Verify version is correct in working directory
-        if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai; then
-            echo -e "${RED}❌ Error: Version mismatch${NC}"
-            echo "Expected VERSION=\"${NEW_VERSION}\" but found VERSION=\"$(grep '^VERSION=' todo.ai | cut -d'"' -f2)\""
-            log_release_step "VERIFY ERROR" "Version mismatch in working directory"
-            exit 1
-        fi
-        
-        # For "nothing to commit", verify HEAD has the correct version
+    # Get the commit hash for the version change
+    local version_commit_hash=$(git rev-parse HEAD 2>/dev/null || echo "")
+    
+    # Verify version was actually updated in the commit
+    if [[ -n "$version_commit_hash" ]]; then
         if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
             echo -e "${YELLOW}⚠️  Note: Version in working directory but not yet committed${NC}"
             echo -e "${YELLOW}   This is expected if version was updated in a previous failed attempt${NC}"

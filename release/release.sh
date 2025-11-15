@@ -515,11 +515,9 @@ convert_to_bash() {
     sed -i.bak 's/Use zsh/Use bash/g' todo.bash
     
     # 5. Remove top-level 'local' declarations (bash requires local only in functions)
-    # Lines 6533-6534 in original (inside if statement but outside function)
-    sed -i.bak '/if \[\[ "\${1:-}" != "version"/,/fi/ {
-        s/^    local current_mode=/    current_mode=/
-        s/^    local coord_type=/    coord_type=/
-    }' todo.bash
+    # The mode display code (lines ~6900-6940) has several local declarations outside functions
+    # Use global replacement to catch all instances regardless of indentation
+    sed -i.bak 's/local current_mode=/current_mode=/g; s/local coord_type=/coord_type=/g; s/local issue_num=/issue_num=/g; s/local namespace=/namespace=/g' todo.bash
     
     # Clean up backup files
     rm -f todo.bash.bak

@@ -3,6 +3,9 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#136** Global fix test `#test`
+- [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug`
+  > Fixed 3 critical $match[] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[] for bash or $match[] for zsh.
 - [x] **#153** Add note management: update and delete note commands `#feature`
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
@@ -699,6 +702,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 13:18:05 CET 2025
+**Last Updated:** Sat Nov 15 13:34:24 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

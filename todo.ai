@@ -117,8 +117,14 @@ EOF
     
     # Fallback to sed for nested keys (e.g., coordination.type, coordination.issue_number)
     if [[ "$key" =~ ^([^.]+)\.(.+)$ ]]; then
-        local parent_key="${match[1]}"
-        local child_key="${match[2]}"
+        # Handle bash vs zsh regex match arrays
+        if [[ -n "${BASH_VERSION:-}" ]]; then
+            local parent_key="${BASH_REMATCH[1]}"
+            local child_key="${BASH_REMATCH[2]}"
+        else
+            local parent_key="${match[1]}"
+            local child_key="${match[2]}"
+        fi
         
         # Find the parent section (e.g., "coordination:")
         local in_section=false
@@ -136,7 +142,12 @@ EOF
             
             # If we're in the section, look for the child key
             if [[ "$in_section" == true ]] && [[ "$line" =~ ^[[:space:]]+${child_key}:[[:space:]]*(.+)$ ]]; then
-                local value="${match[1]}"
+                # Handle bash vs zsh regex match arrays
+                if [[ -n "${BASH_VERSION:-}" ]]; then
+                    local value="${BASH_REMATCH[1]}"
+                else
+                    local value="${match[1]}"
+                fi
                 # Remove quotes if present
                 value=$(echo "$value" | sed 's/^"\(.*\)"$/\1/' | sed "s/^'\(.*\)'$/\1/" | sed 's/[[:space:]]*$//')
                 if [[ -n "$value" ]] && [[ "$value" != "null" ]]; then
@@ -3651,16 +3662,29 @@ get_highest_task_number() {
         # Use unquoted pattern variable for zsh regex compatibility
         local task_pattern='\*\*#([0-9a-z.\-]+)\*\*'
         if [[ "$line" =~ $task_pattern ]]; then
-            local full_task_id="${match[1]}"
+            # Handle bash vs zsh regex match arrays
+            if [[ -n "${BASH_VERSION:-}" ]]; then
+                local full_task_id="${BASH_REMATCH[1]}"
+            else
+                local full_task_id="${match[1]}"
+            fi
             
             # Extract numeric part (removes prefix if present, ignores subtasks)
             local numeric_part=$(extract_task_number "$full_task_id" 2>/dev/null)
             if [[ -z "$numeric_part" ]]; then
                 # Try extracting just the main number (not subtask)
                 if [[ "$full_task_id" =~ ^([0-9]+)(\.[0-9]+)?$ ]]; then
-                    numeric_part="${match[1]}"
+                    if [[ -n "${BASH_VERSION:-}" ]]; then
+                        numeric_part="${BASH_REMATCH[1]}"
+                    else
+                        numeric_part="${match[1]}"
+                    fi
                 elif [[ "$full_task_id" =~ ^[a-z0-9]{1,7}-([0-9]+)(\.[0-9]+)?$ ]]; then
-                    numeric_part="${match[1]}"
+                    if [[ -n "${BASH_VERSION:-}" ]]; then
+                        numeric_part="${BASH_REMATCH[1]}"
+                    else
+                        numeric_part="${match[1]}"
+                    fi
                 fi
             fi
             

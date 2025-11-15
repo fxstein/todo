@@ -510,11 +510,15 @@ convert_to_bash() {
     # 3. Convert zsh array key syntax to bash: ${(@k)array} -> ${!array[@]}
     sed -i.bak 's/\${\(@k\)\([^}]*\)}/\${\!\2[@]}/g' todo.bash
     
-    # 4. Update comments referring to zsh syntax
+    # 4. Convert zsh regex match arrays to bash: ${match[N]} -> ${BASH_REMATCH[N]}
+    # Lines marked with "# BASH_CONVERT: BASH_REMATCH[N]" get converted
+    sed -i.bak 's/\${match\[\([0-9]\)\]}\([^#]*\)# BASH_CONVERT: BASH_REMATCH\[\1\]/${BASH_REMATCH[\1]}\2/g' todo.bash
+    
+    # 5. Update comments referring to zsh syntax
     sed -i.bak 's/zsh-compatible syntax/bash syntax/g' todo.bash
     sed -i.bak 's/Use zsh/Use bash/g' todo.bash
     
-    # 5. Remove top-level 'local' declarations (bash requires local only in functions)
+    # 6. Remove top-level 'local' declarations (bash requires local only in functions)
     # The mode display code (lines ~6900-6940) has several local declarations outside functions
     # Use global replacement to catch all instances regardless of indentation
     sed -i.bak 's/local current_mode=/current_mode=/g; s/local coord_type=/coord_type=/g; s/local issue_num=/issue_num=/g; s/local namespace=/namespace=/g' todo.bash

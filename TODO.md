@@ -3,9 +3,8 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#136** Global fix test `#test`
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug`
-  > Fixed 3 critical $match[] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[] for bash or $match[] for zsh.
+  > Fixed 3 critical $match[ ] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[ ] for bash or $match[ ] for zsh.
 - [x] **#153** Add note management: update and delete note commands `#feature`
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
@@ -380,15 +379,6 @@
   > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
 - [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
   > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
-  - [x] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (2025-11-09)
-  - [x] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (2025-11-09)
-  - [x] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (2025-11-09)
-  - [x] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug` (2025-11-09)
-  - [x] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug` (2025-11-09)
-  - [x] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug` (2025-11-09)
-  - [x] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (2025-11-09)
-  - [x] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (2025-11-09)
-  - [x] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (2025-11-09)
 - [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
   > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
   - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test` (2025-11-09)
@@ -539,6 +529,17 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
+- [D] **#136** Global fix test `#test` (deleted 2025-11-15, expires 2025-12-15)
+- [D] **#156** Clean bash test `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#154** Test note management commands `#testing` (deleted 2025-11-15, expires 2025-12-15)
@@ -702,6 +703,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 13:34:24 CET 2025
+**Last Updated:** Sat Nov 15 13:40:09 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

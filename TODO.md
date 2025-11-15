@@ -1,7 +1,4 @@
 # todo.ai ToDo List
-# todo.ai ToDo List  > This is a test note
-# todo.ai ToDo List  > Line 2 of test note
-# todo.ai ToDo List  > Line 3 of test note
 
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 

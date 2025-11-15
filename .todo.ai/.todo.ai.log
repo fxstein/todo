@@ -2,6 +2,14 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 21:49:06 | fxstein | NOTE | 157.3 | Bash conversion markers (# BASH_CONVERT) are NOT the cause. They're just comments and don't affect zsh execution.
+2025-11-15 21:49:05 | fxstein | NOTE | 157.2 | Test confirmed: New task assigned #158 (correct, not duplicate). Coordinator warning normal (behind by ~22 due to local development).
+2025-11-15 21:49:03 | fxstein | NOTE | 157.1 | Root cause: get_highest_task_number() was scanning ALL lines including blockquote examples (e.g., line 77 with example #42.1). Function lines 3650-3659.
+2025-11-15 21:48:56 | fxstein | COMPLETE | 157.3 | Review impact of bash conversion markers on regex captures
+2025-11-15 21:48:56 | fxstein | COMPLETE | 157.2 | Test ID assignment with completed tasks in TODO.md
+2025-11-15 21:48:56 | fxstein | COMPLETE | 157.1 | Investigate get_highest_task_number() function for ID extraction bugs
+2025-11-15 21:48:55 | fxstein | DELETE | 158 | Test task for ID tracking bug fix
+2025-11-15 21:48:45 | fxstein | ADD | 158 | Test task for ID tracking bug fix
 2025-11-15 21:46:27 | fxstein | NOTE | 157 | Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
 2025-11-15 21:46:20 | fxstein | NOTE | 157.7 | Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
 2025-11-15 21:46:19 | fxstein | NOTE | 157.3 | Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.

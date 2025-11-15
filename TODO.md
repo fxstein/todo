@@ -11,10 +11,13 @@
   - [ ] **#157.6** Verify fix with both zsh and bash versions `#bug`
   - [ ] **#157.5** Add test cases for ID collision detection `#bug`
   - [ ] **#157.4** Fix task ID tracking logic to prevent duplicates `#bug`
-  - [ ] **#157.3** Review impact of bash conversion markers on regex captures `#bug`
+  - [x] **#157.3** Review impact of bash conversion markers on regex captures `#bug`
+    > Bash conversion markers (# BASH_CONVERT) are NOT the cause. They're just comments and don't affect zsh execution.
     > Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.
-  - [ ] **#157.2** Test ID assignment with completed tasks in TODO.md `#bug`
-  - [ ] **#157.1** Investigate get_highest_task_number() function for ID extraction bugs `#bug`
+  - [x] **#157.2** Test ID assignment with completed tasks in TODO.md `#bug`
+    > Test confirmed: New task assigned #158 (correct, not duplicate). Coordinator warning normal (behind by ~22 due to local development).
+  - [x] **#157.1** Investigate get_highest_task_number() function for ID extraction bugs `#bug`
+    > Root cause: get_highest_task_number() was scanning ALL lines including blockquote examples (e.g., line 77 with example #42.1). Function lines 3650-3659.
     > Focus on lines ~2500-2600 in todo.ai. Check regex pattern for extracting task IDs, especially handling of BASH_CONVERT markers and  usage. Verify it correctly reads all task IDs including completed ones.
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug`
   > Fixed 3 critical $match[ ] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[ ] for bash or $match[ ] for zsh.
@@ -542,6 +545,7 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] **#158** Test task for ID tracking bug fix (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
@@ -716,6 +720,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 21:46:27 CET 2025
+**Last Updated:** Sat Nov 15 21:49:06 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

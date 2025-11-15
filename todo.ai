@@ -3646,7 +3646,18 @@ get_highest_task_number() {
     fi
     
     # Scan all task IDs in TODO.md (handle both prefixed and non-prefixed formats)
+    # ONLY scan actual task lines, not examples in notes/blockquotes
     while IFS= read -r line; do
+        # Skip blockquote lines (notes/examples) - they start with '>'
+        if [[ "$line" =~ ^[[:space:]]*\> ]]; then
+            continue
+        fi
+        
+        # Skip lines that don't contain task checkbox pattern
+        if [[ ! "$line" =~ ^[[:space:]]*- ]]; then
+            continue
+        fi
+        
         # Match task IDs in format: **#task_id** or **#prefix-task_id**
         # Use unquoted pattern variable for zsh regex compatibility
         local task_pattern='\*\*#([0-9a-z.\-]+)\*\*'

@@ -2,19 +2,69 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 13:00:25 | fxstein | COMPLETE | 149 | Fix multi-line note indentation bug in add_note() function
+2025-11-15 13:00:25 | fxstein | COMPLETE | 149.7 | Commit fix and verify TODO.md structure is valid
+2025-11-15 13:00:24 | fxstein | COMPLETE | 149.6 | Manually fix broken notes in TODO.md (tasks 147.3-147.6)
+2025-11-15 12:57:43 | fxstein | NOTE | 149.5 | Tested multi-line notes at all 3 nesting levels:
+Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
+Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
+Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
+All lines properly formatted with indent + '  > ' prefix. Fix verified!
+2025-11-15 12:57:43 | fxstein | COMPLETE | 149.5 | Test fix with multi-line notes at different nesting levels
+2025-11-15 12:57:42 | fxstein | DELETE | 151.1.1 | Level 2 sub-subtask
+2025-11-15 12:57:42 | fxstein | DELETE | 151.1 | Level 1 subtask
+2025-11-15 12:57:42 | fxstein | DELETE | 151 | Test fix level 0
+2025-11-15 12:57:20 | fxstein | NOTE | 151.1.1 | Sub-subtask multi-line
+Line 2 sub-subtask
+Line 3 sub-subtask
+2025-11-15 12:57:19 | fxstein | NOTE | 151.1 | Subtask multi-line
+Line 2 subtask
+Line 3 subtask
+2025-11-15 12:57:19 | fxstein | NOTE | 151 | Main task multi-line
+Line 2 main
+Line 3 main
+2025-11-15 12:57:18 | fxstein | ADD_SUBTASK | 151.1.1 | Level 2 sub-subtask (parent: #151.1)
+2025-11-15 12:57:18 | fxstein | ADD_SUBTASK | 151.1 | Level 1 subtask (parent: #151)
+2025-11-15 12:57:16 | fxstein | ADD | 151 | Test fix level 0
+2025-11-15 12:57:12 | fxstein | DELETE | 150.1.1 | Test level 2 sub-subtask
+2025-11-15 12:57:12 | fxstein | DELETE | 150.1 | Test level 1 subtask
+2025-11-15 12:57:12 | fxstein | DELETE | 150 | Test main task (level 0)
+2025-11-15 12:56:34 | fxstein | NOTE | 150.1.1 | Multi-line note on level 2 sub-subtask
+Line 2 deeply nested
+Line 3 deeply nested
+2025-11-15 12:56:33 | fxstein | ADD_SUBTASK | 150.1.1 | Test level 2 sub-subtask (parent: #150.1)
+2025-11-15 12:56:33 | fxstein | NOTE | 150.1 | Multi-line note on level 1 subtask
+Line 2 with proper indent
+Line 3 with proper indent
+2025-11-15 12:56:32 | fxstein | ADD_SUBTASK | 150.1 | Test level 1 subtask (parent: #150)
+2025-11-15 12:56:25 | fxstein | NOTE | 150 | Multi-line note on main task
+Line 2 of main task note
+Line 3 of main task note
+2025-11-15 12:56:23 | fxstein | ADD | 150 | Test main task (level 0)
+2025-11-15 12:56:01 | fxstein | NOTE | 149.4 | Fixed add_note() function with 3 key changes:
+Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
+Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces  
+Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
+This note itself tests the fix - all lines should have proper blockquote markers!
+2025-11-15 12:56:00 | fxstein | COMPLETE | 149.4 | Fix add_note() to properly indent all lines with blockquote markers
+2025-11-15 12:55:20 | fxstein | NOTE | 149.3 | Bug located at line 4355 in add_note() function:
+local note_line="${indent}  > ${note_text}"
+This creates a single line by concatenating indent + '  > ' + entire note_text.
+When note_text contains newlines, they're inserted as raw text without formatting.
+Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
+2025-11-15 12:55:20 | fxstein | COMPLETE | 149.3 | Identify how note lines are processed and where indentation fails
+2025-11-15 12:55:20 | fxstein | COMPLETE | 149.2 | Find and analyze the add_note() function
+2025-11-15 12:54:53 | fxstein | COMPLETE | 149.1 | Document the multi-line note formatting bug with examples
 2025-11-15 12:54:04 | fxstein | NOTE | 149.6 | Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
-
 **Original broken notes (from bug #36 work):**
 - Task 147.3: Lines 36-45 need '  > ' prefix
 - Task 147.4: Lines 27-32 need '  > ' prefix  
 - Task 147.5: Lines 21-23 need '  > ' prefix
 - Task 147.6: Lines 14-18 need '  > ' prefix
-
 **Newly broken notes (from creating task #149):**
 - Task 149: Main task note (multi-line, needs '  > ' prefix)
 - Task 149.1: Multi-line note about expected vs current behavior
 - Task 149.6: This very note! (multi-line, needs '  > ' prefix)
-
 After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
 2025-11-15 12:52:35 | fxstein | NOTE | 149.6 | Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
 - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)

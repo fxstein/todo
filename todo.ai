@@ -4332,8 +4332,8 @@ add_note() {
     fi
     task_id="$resolved_task_id"
     
-    # Verify task exists (check main task, subtask, and sub-subtask patterns)
-    local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* \|^    - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Verify task exists (support arbitrary nesting depth)
+    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     if [[ -z "$task_line_num" ]]; then
         echo "Error: Task #$task_id not found"
@@ -4341,28 +4341,33 @@ add_note() {
     fi
     
     # Format note as blockquote with proper indentation
-    local indent=""
+    # Detect indentation from task line to support arbitrary nesting depth
     local task_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
-    if [[ "$task_line" =~ ^"    - " ]]; then
-        # This is a sub-subtask (4 spaces), needs 4 spaces indentation
-        indent="    "
-    elif [[ "$task_line" =~ ^"  - " ]]; then
-        # This is a subtask (2 spaces), needs 2 spaces indentation
-        indent="  "
-    fi
+    local indent=""
+    # Extract leading spaces before the dash
+    indent=$(echo "$task_line" | sed 's/^\([[:space:]]*\)-.*/\1/')
     
-    # Create blockquote note
-    local note_line="${indent}  > ${note_text}"
+    # Create blockquote note with proper formatting for multi-line text
+    # Split note_text by newlines and add indent + "> " to each line
+    local formatted_note=""
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ -n "$formatted_note" ]]; then
+            formatted_note="${formatted_note}"$'\n'
+        fi
+        formatted_note="${formatted_note}${indent}  > ${line}"
+    done <<< "$note_text"
     
     # Insert note after the task line
     if [[ "$(uname)" == "Darwin" ]]; then
         local temp_file=$(mktemp)
         head -n "$task_line_num" "$TODO_FILE" > "$temp_file"
-        echo "$note_line" >> "$temp_file"
+        echo "$formatted_note" >> "$temp_file"
         tail -n +$((task_line_num + 1)) "$TODO_FILE" >> "$temp_file"
         mv "$temp_file" "$TODO_FILE"
     else
-        sed_inplace "${task_line_num}a\\$note_line" "$TODO_FILE"
+        # For Linux, need to escape newlines for sed
+        local escaped_note=$(echo "$formatted_note" | sed ':a;N;$!ba;s/\n/\\n/g')
+        sed_inplace "${task_line_num}a\\${escaped_note}" "$TODO_FILE"
     fi
     
     update_footer

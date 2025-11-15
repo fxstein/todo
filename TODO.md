@@ -3,49 +3,71 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#149** Fix multi-line note indentation bug in add_note() function `#bug`
+- [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug`
   > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
-  - [ ] **#149.7** Commit fix and verify TODO.md structure is valid `#bug`
-  - [ ] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug`
+  - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug`
+  - [x] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug`
     > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
-
-**Original broken notes (from bug #36 work):**
-- Task 147.3: Lines 36-45 need '  > ' prefix
-- Task 147.4: Lines 27-32 need '  > ' prefix  
-- Task 147.5: Lines 21-23 need '  > ' prefix
-- Task 147.6: Lines 14-18 need '  > ' prefix
-
-**Newly broken notes (from creating task #149):**
-- Task 149: Main task note (multi-line, needs '  > ' prefix)
-- Task 149.1: Multi-line note about expected vs current behavior
-- Task 149.6: This very note! (multi-line, needs '  > ' prefix)
-
-After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
+    >
+    > **Original broken notes (from bug #36 work):**
+    > - Task 147.3: Lines 36-45 need '  > ' prefix
+    > - Task 147.4: Lines 27-32 need '  > ' prefix  
+    > - Task 147.5: Lines 21-23 need '  > ' prefix
+    > - Task 147.6: Lines 14-18 need '  > ' prefix
+    >
+    > **Newly broken notes (from creating task #149):**
+    > - Task 149: Main task note (multi-line, needs '  > ' prefix)
+    > - Task 149.1: Multi-line note about expected vs current behavior
+    > - Task 149.6: This very note! (multi-line, needs '  > ' prefix)
+    >
+    > After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
     > Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
-- Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
-- Task 147.4: Lines 27-32 need '  > ' prefix
-- Task 147.5: Lines 21-23 need '  > ' prefix
-- Task 147.6: Lines 14-18 need '  > ' prefix
-After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
-  - [ ] **#149.5** Test fix with multi-line notes at different nesting levels `#bug`
-  - [ ] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug`
-  - [ ] **#149.3** Identify how note lines are processed and where indentation fails `#bug`
-  - [ ] **#149.2** Find and analyze the add_note() function `#bug`
+    > - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
+    > - Task 147.4: Lines 27-32 need '  > ' prefix
+    > - Task 147.5: Lines 21-23 need '  > ' prefix
+    > - Task 147.6: Lines 14-18 need '  > ' prefix
+    > After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
+  - [x] **#149.5** Test fix with multi-line notes at different nesting levels `#bug`
+    > Tested multi-line notes at all 3 nesting levels:
+    > 
+    > Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
+    > Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
+    > Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
+    > 
+    > All lines properly formatted with indent + '  > ' prefix. Fix verified!
+  - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug`
+  > Fixed add_note() function with 3 key changes:
+  > 
+  > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
+  > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces  
+  > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
+  > 
+  > This note itself tests the fix - all lines should have proper blockquote markers!
+  - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug`
+    > Bug located at line 4355 in add_note() function:
+    >
+    > local note_line="${indent}  > ${note_text}"
+    >
+    > This creates a single line by concatenating indent + '  > ' + entire note_text.
+    > When note_text contains newlines, they're inserted as raw text without formatting.
+    >
+    > Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
+  - [x] **#149.2** Find and analyze the add_note() function `#bug`
     > Search for 'add_note()' or '^add_note\(' function in todo.ai. Check how it processes note text, especially when note contains newlines. Look for where indentation prefix is calculated and where blockquote marker (>) is added. Likely splits note on newlines but only formats first line correctly.
-  - [ ] **#149.1** Document the multi-line note formatting bug with examples `#bug`
+  - [x] **#149.1** Document the multi-line note formatting bug with examples `#bug`
     > Current behavior vs expected:
-
-CURRENT (broken):
-  > First line of note
-Line 2 without marker
-Line 3 without marker
-
-EXPECTED (correct):
-  > First line of note
-  > Line 2 with marker
-  > Line 3 with marker
-
-All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
+    >
+    > CURRENT (broken):
+    >   > First line of note
+    > Line 2 without marker
+    > Line 3 without marker
+    >
+    > EXPECTED (correct):
+    >   > First line of note
+    >   > Line 2 with marker
+    >   > Line 3 with marker
+    >
+    > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
 - [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug`
   > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
   - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug`
@@ -54,38 +76,38 @@ All note lines must have proper indentation (matching task depth) AND blockquote
     > Nesting limit (2 levels) is enforced by add-subtask command with clear error message: 'Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)'. This serves as documentation. No README update needed. Fix supports arbitrary depth if limit is ever increased.
   - [x] **#147.6** Verify show, modify, note, complete, delete commands work on deep tasks `#bug`
     > Verified all commands work on 3-level deep tasks (148.1.1):
-- show: ✓ Works (displays task + notes correctly)
-- note: ✓ Works (added note successfully)
-- modify: ✓ Works (changed description)
-- complete: Testing now...
-- delete: Will test after complete
+    > - show: ✓ Works (displays task + notes correctly)
+    > - note: ✓ Works (added note successfully)
+    > - modify: ✓ Works (changed description)
+    > - complete: Testing now...
+    > - delete: Will test after complete
   - [x] **#147.5** Test with 3, 4, and 5 level nested subtasks `#bug`
     > System enforces maximum nesting depth of 2 levels (main → subtask → sub-subtask). Cannot test 4-5 levels as add-subtask rejects deeper nesting. Fix supports arbitrary depth in case limit is increased. Tested successfully:
-- Level 0: Task #148 ✓
-- Level 1: Task #148.1 ✓
-- Level 2: Task #148.1.1 ✓ (was failing, now fixed)
+    > - Level 0: Task #148 ✓
+    > - Level 1: Task #148.1 ✓
+    > - Level 2: Task #148.1.1 ✓ (was failing, now fixed)
   - [x] **#147.4** Fix task ID resolution to support arbitrary nesting depth `#bug`
     > Fixed show_task() function in todo.ai:
-
-Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
-Line 4150: Same fix for fallback search
-Line 4168: Same fix for note line number search  
-Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
-
-All changes support arbitrary nesting depth and handle malformed checkboxes.
+    >
+    > Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
+    > Line 4150: Same fix for fallback search
+    > Line 4168: Same fix for note line number search  
+    > Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
+    >
+    > All changes support arbitrary nesting depth and handle malformed checkboxes.
   - [x] **#147.3** Identify where show/modify/note commands fail for deep nesting `#bug`
     > Affected locations in show_task() function:
-
-Line 4143: Main task search - missing 4+ space patterns
-Line 4148: Fallback search - missing 4+ space patterns  
-Line 4164: Note line number search - missing 4+ space patterns
-
-For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
-- Lines 2559, 2664, 2693: Task operations
-- Lines 3035, 3040, 3061: More operations
-- Line 4331: Another operation
-
-Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation depth
+    >
+    > Line 4143: Main task search - missing 4+ space patterns
+    > Line 4148: Fallback search - missing 4+ space patterns  
+    > Line 4164: Note line number search - missing 4+ space patterns
+    >
+    > For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
+    > - Lines 2559, 2664, 2693: Task operations
+    > - Lines 3035, 3040, 3061: More operations
+    > - Line 4331: Another operation
+    >
+    > Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation depth
   - [x] **#147.2** Reproduce the bug with 3-level nested subtasks (1.2.1 pattern) `#bug`
     > Bug confirmed: Task #148.1.1 exists in TODO.md with 4-space indentation but 'show 148.1.1' returns 'Task not found'. Tasks #148 (0 spaces) and #148.1 (2 spaces) work correctly.
   - [x] **#147.1** Investigate task ID parsing logic for nested subtasks `#bug`
@@ -420,6 +442,12 @@ Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation dep
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+    - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+- [D] **#151** Test fix level 0 `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#150.1.1** Test level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#150.1** Test level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+- [D] **#150** Test main task (level 0) `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#148.1.2** Test delete on level 2 `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#148.1.1** Level 2 sub-subtask (MODIFIED to verify fix works) `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#148.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
@@ -574,6 +602,6 @@ Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation dep
 
 ---
 
-**Last Updated:** Sat Nov 15 12:54:04 CET 2025
+**Last Updated:** Sat Nov 15 13:00:25 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

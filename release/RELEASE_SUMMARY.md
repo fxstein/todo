@@ -1,34 +1,11 @@
-# Release Summary
+# todo.ai v2.5.0 Release Summary
 
-This release introduces the smart installer with bash/zsh dual-version support and reorganizes documentation for better navigation.
+This release brings powerful note management capabilities, enhanced bug reporting for AI agents, and critical bash compatibility fixes. The focus is on improving developer experience while maintaining code quality and shell compatibility.
 
-## Smart Installer & Bash Version Support
+**Note Management System ([3e09a60](https://github.com/fxstein/todo.ai/commit/3e09a60))** adds `delete-note` and `update-note` commands, completing the note lifecycle. Previously notes could only be added but never modified or removed. Both commands work at all nesting levels with confirmation prompts for safety. The implementation reuses existing logic for consistency and properly handles multi-line notes with correct indentation.
 
-The smart installer automatically detects your system (macOS, Linux, Windows/WSL) and shell environment (zsh, bash 4+) to install the optimal version. This eliminates compatibility issues and ensures todo.ai works everywhere out of the box.
+**AI-Friendly Bug Reporting ([6691864](https://github.com/fxstein/todo.ai/commit/6691864))** redesigns the bug reporting workflow to detect AI agents (CURSOR_AI, AI_AGENT env vars) and auto-submit after preview, eliminating friction while maintaining user control for humans. Reports now use GitHub callout blocks, structured markdown with tables and collapsible sections, and intelligent error categorization with auto-suggested labels. Rich context collection includes git status, TODO.md state, environment variables, and recent commands.
 
-**Key improvements:**
-- **Zero-interaction installation** - One-liner that works on all platforms
-- **Bash version support** - 8-21% faster, works on systems without zsh
-- **Release-aware downloads** - Installs from stable releases, not development code
-- **Automated bash conversion** - Bash version generated automatically during releases
-- **Clear development workflow** - Develop in zsh, bash version created automatically
+**Critical Bash Compatibility Fix ([62fff75](https://github.com/fxstein/todo.ai/commit/62fff75), [da00320](https://github.com/fxstein/todo.ai/commit/da00320))** resolves a fundamental incompatibility where bash couldn't read coordination config when yq/python-yaml were unavailable. The sed-based fallback used zsh's `${match[]}` instead of bash's `${BASH_REMATCH[]}`, causing silent failures and wrong task IDs. Solution uses conversion markers in zsh code with automatic sed transformation during bash generation—zero runtime overhead, zero code bloat, clean separation.
 
-Technical details: The bash version requires only 7 syntax changes from zsh (array key iteration, shebang, local scope) and maintains 100% feature parity. Both versions are tested before each release.
-
-## Documentation Reorganization
-
-All documentation has been reorganized into logical categories for easier navigation:
-- **guides/** - User-facing guides and tutorials (5 docs)
-- **design/** - Technical design specifications (8 docs)
-- **development/** - Contributor documentation (4 docs)
-- **analysis/** - Research and analysis reports (7 docs)
-- **archive/** - Historical and completed migrations (4 docs)
-
-A comprehensive documentation index at `docs/README.md` makes it easy to find what you need.
-
-## Benefits
-
-- **Broader compatibility** - Works on more systems without requiring zsh installation
-- **Better performance** - Bash version is consistently faster (8-21%)
-- **Easier navigation** - Well-organized documentation structure
-- **Maintained quality** - All cross-references updated, no broken links
+Additional fixes include deeply nested subtask support (issue#36, [06f6c14](https://github.com/fxstein/todo.ai/commit/06f6c14)) where `show` command failed for 3+ nesting levels, and multi-line note indentation ([b6a1221](https://github.com/fxstein/todo.ai/commit/b6a1221)) where only the first line received proper formatting. Documentation updates include GETTING_STARTED.md examples, bug reporting design docs, and strengthened cursor rules for note usage.

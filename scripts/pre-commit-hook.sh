@@ -13,6 +13,49 @@ errors=0
 
 echo "🔍 Running pre-commit validations..."
 
+# Check for suspicious files with quotes or spaces in the name
+# This usually indicates a shell quoting issue in a script or command
+suspicious_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E "(todo\.ai[[:space:]]|'|\")")
+
+if [[ -n "$suspicious_files" ]]; then
+    echo -e "${RED}❌ Pre-commit check failed!${NC}"
+    echo ""
+    echo -e "${YELLOW}Found suspicious file(s) with quotes or spaces in the name:${NC}"
+    echo "$suspicious_files"
+    echo ""
+    echo "This usually indicates a shell quoting issue in a script or command."
+    echo ""
+    echo -e "${YELLOW}Action required:${NC}"
+    echo "  1. Remove the suspicious file(s): rm -f \"filename\""
+    echo "  2. Investigate the root cause (check recent commands, scripts, release process)"
+    echo "  3. Fix any unquoted variables or command substitutions"
+    echo "  4. Try committing again"
+    echo ""
+    exit 1
+fi
+
+# Check for actual files in working directory (not just staged)
+actual_suspicious=$(ls -1 | grep -E "^todo\.ai[[:space:]]" 2>/dev/null)
+
+if [[ -n "$actual_suspicious" ]]; then
+    echo -e "${RED}❌ Pre-commit check failed!${NC}"
+    echo ""
+    echo -e "${YELLOW}Found suspicious file(s) in working directory:${NC}"
+    echo "$actual_suspicious"
+    echo ""
+    echo "File exists but is not staged. This indicates a quoting/escaping issue."
+    echo ""
+    echo -e "${YELLOW}Action required:${NC}"
+    echo "  1. Delete the file: rm -f \"$actual_suspicious\""
+    echo "  2. Investigate which command created it (check:"
+    echo "     - Release script (release/release.sh)"
+    echo "     - Any cp/mv commands with unquoted variables)"
+    echo "     - Command history for 'todo.ai' operations)"
+    echo "  3. Fix the root cause before committing"
+    echo ""
+    exit 1
+fi
+
 # Get staged files
 staged_files=$(git diff --cached --name-only --diff-filter=ACM)
 

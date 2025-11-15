@@ -1,17 +1,7 @@
-# todo.ai v2.5.1 Hotfix Release
+# todo.ai v2.7.1 - Critical Release Infrastructure Fixes
 
-## Critical Bug Fix
+This patch release resolves two critical bugs in the release infrastructure discovered during the v2.7.0 release cycle. The first issue involved version detection relying on a mutable file variable, which allowed manual edits to create "phantom versions" that didn't exist in GitHub releases. This led to version numbering inconsistencies and incorrect release proposals. The fix makes GitHub releases the primary source of truth for version detection, with the file VERSION becoming a placeholder automatically updated during releases. This change provides immutable version history, self-healing behavior, and prevents automated agents from accidentally corrupting version information.
 
-This hotfix addresses a critical data integrity bug discovered in v2.4.0 and v2.5.0 where duplicate task IDs could be assigned in single-user mode.
+The second issue was a regex pattern bug in the commit range analyzer that caused it to analyze the entire repository history instead of just commits since the last release. This resulted in detecting outdated breaking change markers and incorrectly proposing major version bumps when only patch fixes were present. The fix corrects the pattern matching logic to properly isolate commits between releases, ensuring accurate version bump classification based on recent changes only.
 
-**Issue Fixed:** get_highest_task_number() was incorrectly scanning ALL lines in TODO.md, including documentation examples in blockquote notes. This caused the function to find task IDs that weren't real tasks, leading to potential duplicate ID assignments.
-
-**Example:** A documentation note containing `> **#42.1** Example task` would be counted as a real task, interfering with ID assignment logic.
-
-**Solution:** Updated get_highest_task_number() to skip blockquote lines (starting with `>`), ensuring only actual task lines are scanned for ID extraction.
-
-## Additional Improvements
-
-**Universal Zsh-to-Bash Converter:** Created a dedicated conversion script (`release/convert_zsh_to_bash.sh`) that handles all bash compatibility transformations systematically. This improves reliability and makes the conversion process reusable for development and testing.
-
-**Impact:** Users who experienced duplicate task ID assignments should see this issue completely resolved. The fix has been tested in both zsh and bash versions.
+A comprehensive incident analysis document has been added at `docs/analysis/VERSION_2.6.0_INCIDENT_ANALYSIS.md` detailing the root cause, timeline, and lessons learned from these issues. These fixes are transparent infrastructure improvements requiring no user action - the next update will automatically benefit from the enhanced version detection and release classification.

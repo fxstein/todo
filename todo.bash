@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 2.5.0
+# Version: 2.7.0
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -35,7 +35,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="2.5.0"
+VERSION="2.7.0"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -1201,15 +1201,24 @@ increment_serial() {
         mkdir -p "$serial_dir" 2>/dev/null || return 1
     fi
     
+    # Get current value from serial file
+    local serial_value=0
     if [[ -f "$SERIAL_FILE" ]]; then
-        local current=$(cat "$SERIAL_FILE")
-        local next=$((current + 1))
-        echo "$next" > "$SERIAL_FILE"
-        echo "$next"
-    else
-        echo "1" > "$SERIAL_FILE"
-        echo "1"
+        serial_value=$(cat "$SERIAL_FILE")
     fi
+    
+    # Get highest ID from TODO.md (handles actual tasks, ignoring examples in notes)
+    local todo_highest=$(get_highest_task_number)
+    
+    # Use the maximum of serial file and TODO.md, then increment
+    local max_id=$serial_value
+    if [[ $todo_highest -gt $max_id ]]; then
+        max_id=$todo_highest
+    fi
+    
+    local next=$((max_id + 1))
+    echo "$next" > "$SERIAL_FILE"
+    echo "$next"
 }
 
 # Function to update the Last Updated date in the footer

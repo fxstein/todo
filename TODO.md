@@ -3,13 +3,14 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug`
+- [x] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug`
   > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
   - [x] **#157.9** Fix increment_serial() to check TODO.md for highest ID `#bug`
     > Fixed and tested. In no-coordination mode with serial=65, correctly assigned #159 (using TODO.md highest of 158).
     > Function increment_serial() (lines 1197-1213) blindly increments serial file without checking TODO.md. In no-coordination mode, assigned #65 when TODO.md highest was #158. Fix: Use MAX(serial_file, get_highest_task_number()) + 1. This is likely the actual root cause of issue#38.
-  - [ ] **#157.8** Close issue#38 with release reference `#bug`
-  - [ ] **#157.7** Prepare and release hotfix v2.5.1 `#bug`
+  - [x] **#157.8** Close issue#38 with release reference `#bug`
+  - [x] **#157.7** Prepare and release hotfix v2.5.1 `#bug`
+    > Released as v2.7.0 with complete fix for issue#38.
     > Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
   - [x] **#157.6** Verify fix with both zsh and bash versions `#bug`
     > Created universal converter script (release/convert_zsh_to_bash.sh). Updated release.sh to use it. Tested: bash version correctly detects highest ID (158) and ignores blockquote examples.
@@ -727,6 +728,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 22:08:24 CET 2025
+**Last Updated:** Sat Nov 15 22:18:35 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

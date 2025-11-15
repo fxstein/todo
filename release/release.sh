@@ -473,17 +473,19 @@ generate_release_notes() {
 # Update version in todo.ai
 update_version() {
     local new_version="$1"
-    local sed_flag
-    if [[ "$(uname)" == "Darwin" ]]; then
-        sed_flag="-i ''"
-    else
-        sed_flag="-i"
-    fi
     
     # Update VERSION variable (line starting with VERSION=)
-    sed $sed_flag "s/^VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' "s/^VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
+    else
+        sed -i "s/^VERSION=\"[^\"]*\"/VERSION=\"$new_version\"/" todo.ai
+    fi
     # Update Version comment (line starting with # Version:)
-    sed $sed_flag "s/^# Version: [0-9.]*/# Version: $new_version/" todo.ai
+    if [[ "$(uname)" == "Darwin" ]]; then
+        sed -i '' "s/^# Version: [0-9.]*/# Version: $new_version/" todo.ai
+    else
+        sed -i "s/^# Version: [0-9.]*/# Version: $new_version/" todo.ai
+    fi
     
     # Verify
     if ! grep -q "^VERSION=\"$new_version\"" todo.ai; then

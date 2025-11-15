@@ -4140,12 +4140,14 @@ show_task() {
     fi
     
     # Find and display the task (try resolved ID first, then fall back to original if not found)
-    local task_line=$(grep "^- \[.\] \*\*#$resolved_task_id\*\* \|^  - \[.\] \*\*#$resolved_task_id\*\* " "$TODO_FILE" | head -1)
+    # Support arbitrary nesting depth by matching any amount of leading spaces
+    # Use [.*] instead of [.] to handle checkbox variations (including malformed ones)
+    local task_line=$(grep "^[ ]*- \[.*\] \*\*#$resolved_task_id\*\* " "$TODO_FILE" | head -1)
     
     # Fallback: if resolved ID not found and it has a prefix, try original plain number
     if [[ -z "$task_line" ]] && [[ "$resolved_task_id" != "$task_id" ]] && [[ "$resolved_task_id" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
         local plain_number="${match[1]}"
-        task_line=$(grep "^- \[.\] \*\*#${plain_number}\*\* \|^  - \[.\] \*\*#${plain_number}\*\* " "$TODO_FILE" | head -1)
+        task_line=$(grep "^[ ]*- \[.*\] \*\*#${plain_number}\*\* " "$TODO_FILE" | head -1)
         if [[ -n "$task_line" ]]; then
             task_id="$plain_number"  # Use plain number for display
         fi
@@ -4161,13 +4163,16 @@ show_task() {
     echo "$task_line"
     
     # Get line number for note detection
-    local task_line_num=$(grep -n "^- \[.\] \*\*#$task_id\*\* \|^  - \[.\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Support arbitrary nesting depth by matching any amount of leading spaces
+    # Use [.*] instead of [.] to handle checkbox variations (including malformed ones)
+    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     # Display notes if they exist (blockquotes immediately after task)
+    # Support arbitrary nesting depth by matching any amount of leading spaces
     if [[ -n "$task_line_num" ]]; then
         local next_line_num=$((task_line_num + 1))
         local next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
-        while [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]]; do
+        while [[ "$next_line" =~ ^[[:space:]]*\>  ]]; do
             echo "$next_line"
             next_line_num=$((next_line_num + 1))
             next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")

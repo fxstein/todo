@@ -496,38 +496,17 @@ update_version() {
 convert_to_bash() {
     echo -e "${BLUE}🔄 Converting zsh version to bash...${NC}"
     
-    # Copy todo.ai to todo.bash
-    cp todo.ai todo.bash
+    # Use the universal converter script
+    if [[ ! -f "release/convert_zsh_to_bash.sh" ]]; then
+        echo -e "${RED}❌ Error: Converter script not found${NC}"
+        return 1
+    fi
     
-    # Apply 7 transformations for bash compatibility
-    
-    # 1. Change shebang
-    sed -i.bak '1s|^#!/bin/zsh|#!/bin/bash|' todo.bash
-    
-    # 2. Update description comment
-    sed -i.bak '2s|TODO List Tracker$|TODO List Tracker (Bash Version)|' todo.bash
-    
-    # 3. Convert zsh array key syntax to bash: ${(@k)array} -> ${!array[@]}
-    sed -i.bak 's/\${\(@k\)\([^}]*\)}/\${\!\2[@]}/g' todo.bash
-    
-    # 4. Convert zsh regex match arrays to bash: ${match[N]} -> ${BASH_REMATCH[N]}
-    # Lines marked with "# BASH_CONVERT: BASH_REMATCH[N]" get converted
-    sed -i.bak 's/\${match\[\([0-9]\)\]}\([^#]*\)# BASH_CONVERT: BASH_REMATCH\[\1\]/${BASH_REMATCH[\1]}\2/g' todo.bash
-    
-    # 5. Update comments referring to zsh syntax
-    sed -i.bak 's/zsh-compatible syntax/bash syntax/g' todo.bash
-    sed -i.bak 's/Use zsh/Use bash/g' todo.bash
-    
-    # 6. Remove top-level 'local' declarations (bash requires local only in functions)
-    # The mode display code (lines ~6900-6940) has several local declarations outside functions
-    # Use global replacement to catch all instances regardless of indentation
-    sed -i.bak 's/local current_mode=/current_mode=/g; s/local coord_type=/coord_type=/g; s/local issue_num=/issue_num=/g; s/local namespace=/namespace=/g' todo.bash
-    
-    # Clean up backup files
-    rm -f todo.bash.bak
-    
-    # Make executable
-    chmod +x todo.bash
+    # Run the converter
+    if ! ./release/convert_zsh_to_bash.sh todo.ai todo.bash; then
+        echo -e "${RED}❌ Error: Conversion failed${NC}"
+        return 1
+    fi
     
     # Test both versions
     echo -e "${BLUE}🧪 Testing both versions...${NC}"

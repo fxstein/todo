@@ -8,9 +8,11 @@
   - [ ] **#157.8** Close issue#38 with release reference `#bug`
   - [ ] **#157.7** Prepare and release hotfix v2.5.1 `#bug`
     > Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
-  - [ ] **#157.6** Verify fix with both zsh and bash versions `#bug`
-  - [ ] **#157.5** Add test cases for ID collision detection `#bug`
-  - [ ] **#157.4** Fix task ID tracking logic to prevent duplicates `#bug`
+  - [x] **#157.6** Verify fix with both zsh and bash versions `#bug`
+    > Created universal converter script (release/convert_zsh_to_bash.sh). Updated release.sh to use it. Tested: bash version correctly detects highest ID (158) and ignores blockquote examples.
+  - [x] **#157.5** Add test cases for ID collision detection `#bug`
+    > Created test_id_tracking.sh with 2 test cases. Both pass: (1) identifies highest ID from TODO.md, (2) ignores blockquote examples.
+  - [x] **#157.4** Fix task ID tracking logic to prevent duplicates `#bug`
   - [x] **#157.3** Review impact of bash conversion markers on regex captures `#bug`
     > Bash conversion markers (# BASH_CONVERT) are NOT the cause. They're just comments and don't affect zsh execution.
     > Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.
@@ -720,6 +722,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 21:49:06 CET 2025
+**Last Updated:** Sat Nov 15 21:55:37 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

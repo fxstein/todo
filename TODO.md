@@ -7,6 +7,20 @@
   > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
   - [ ] **#149.7** Commit fix and verify TODO.md structure is valid `#bug`
   - [ ] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug`
+    > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
+
+**Original broken notes (from bug #36 work):**
+- Task 147.3: Lines 36-45 need '  > ' prefix
+- Task 147.4: Lines 27-32 need '  > ' prefix  
+- Task 147.5: Lines 21-23 need '  > ' prefix
+- Task 147.6: Lines 14-18 need '  > ' prefix
+
+**Newly broken notes (from creating task #149):**
+- Task 149: Main task note (multi-line, needs '  > ' prefix)
+- Task 149.1: Multi-line note about expected vs current behavior
+- Task 149.6: This very note! (multi-line, needs '  > ' prefix)
+
+After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
     > Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
 - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
 - Task 147.4: Lines 27-32 need '  > ' prefix
@@ -560,6 +574,6 @@ Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation dep
 
 ---
 
-**Last Updated:** Sat Nov 15 12:52:35 CET 2025
+**Last Updated:** Sat Nov 15 12:54:04 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

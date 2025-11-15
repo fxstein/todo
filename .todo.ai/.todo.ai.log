@@ -2,6 +2,20 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 12:54:04 | fxstein | NOTE | 149.6 | Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
+
+**Original broken notes (from bug #36 work):**
+- Task 147.3: Lines 36-45 need '  > ' prefix
+- Task 147.4: Lines 27-32 need '  > ' prefix  
+- Task 147.5: Lines 21-23 need '  > ' prefix
+- Task 147.6: Lines 14-18 need '  > ' prefix
+
+**Newly broken notes (from creating task #149):**
+- Task 149: Main task note (multi-line, needs '  > ' prefix)
+- Task 149.1: Multi-line note about expected vs current behavior
+- Task 149.6: This very note! (multi-line, needs '  > ' prefix)
+
+After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
 2025-11-15 12:52:35 | fxstein | NOTE | 149.6 | Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
 - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
 - Task 147.4: Lines 27-32 need '  > ' prefix

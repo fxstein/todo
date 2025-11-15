@@ -3,6 +3,83 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#153** Add note management: update and delete note commands `#feature`
+  > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
+  > - delete-note: Remove all notes from a task
+  > - update-note: Replace existing notes with new text
+  > 
+  > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
+  - [ ] **#153.8** Update GETTING_STARTED.md with note management examples `#feature`
+  - [ ] **#153.7** Add commands to help text and usage documentation `#feature`
+  - [ ] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature`
+    > Test scenarios:
+    > 
+    > 1. delete-note on task with single-line note
+    > 2. delete-note on task with multi-line note
+    > 3. delete-note on task with no notes (should error)
+    > 4. update-note: single-line to single-line
+    > 5. update-note: single-line to multi-line
+    > 6. update-note: multi-line to single-line
+    > 7. update-note: multi-line to multi-line
+    > 8. Test at level 0 (main task), level 1 (subtask), level 2 (sub-subtask)
+    > 9. Verify indentation correct after update
+    > 10. Verify show command displays updated notes correctly
+  - [ ] **#153.5** Handle multi-line notes correctly in both commands `#feature`
+  - [ ] **#153.4** Implement update-note command to replace existing notes `#feature`
+    > Implementation approach for update-note:
+    > 
+    > 1. Call delete-note logic to remove existing notes
+    > 2. Call add_note() logic to add new notes
+    > 3. Essentially: delete + add in one operation
+    > 4. Ensures proper formatting via existing add_note()
+    > 
+    > Could be wrapper function:
+    > update_note() {
+    >   delete_note_internal $task_id  # No prompt version
+    >   add_note $task_id $new_text
+    > }
+    > 
+    > Reuse existing add_note() multi-line formatting logic from fix #149.
+  - [ ] **#153.3** Implement delete-note command to remove all notes from a task `#feature`
+    > Implementation approach for delete-note:
+    > 
+    > 1. Find task line number (reuse logic from show_task)
+    > 2. Find all consecutive blockquote lines after task
+    > 3. Use sed or temp file to delete those lines
+    > 4. Update footer timestamp
+    > 5. Log the action
+    > 
+    > Reference collect_task_notes() function if it exists - may already have note detection logic. Similar pattern to delete_task() but only removes note lines, not the task itself.
+  - [ ] **#153.2** Analyze current note storage format in TODO.md `#feature`
+    > Notes in TODO.md format:
+    > - Appear as blockquotes immediately after task line
+    > - Indentation matches task level + 2 spaces
+    > - Each line starts with '  >' (indent + > + space)
+    > - Can span multiple lines
+    > - Ends when next non-blockquote line encountered
+    > 
+    > Example level-1 subtask:
+    >   - [ ] **#42.1** Task description
+    >     > Note line 1
+    >     > Note line 2
+    >     > Note line 3
+    > 
+    > Need to identify all note lines for delete/update operations.
+  - [ ] **#153.1** Design command syntax for update-note and delete-note `#feature`
+    > Proposed command syntax:
+    > 
+    > ./todo.ai delete-note <task-id>
+    >   - Removes ALL notes from specified task
+    >   - Confirmation prompt: 'Delete all notes from task #X? (y/N)'
+    >   - Returns error if task has no notes
+    > 
+    > ./todo.ai update-note <task-id> "new note text"
+    >   - Replaces ALL existing notes with new text
+    >   - Supports multi-line notes (like add note)
+    >   - Shows preview: 'Replace N lines with M lines?'
+    >   - Returns error if task has no notes to update
+    > 
+    > Alternative: Could add --force to skip confirmations for both commands.
 - [x] **#152** Test bug reporting feature before v2.5.0 release `#testing`
   - [x] **#152.7** Verify GitHub issue template structure `#testing`
   - [x] **#152.6** Test label categorization for different error types `#testing`
@@ -619,6 +696,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 13:05:05 CET 2025
+**Last Updated:** Sat Nov 15 13:10:44 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

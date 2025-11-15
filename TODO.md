@@ -5,6 +5,9 @@
 ## Tasks
 - [ ] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug`
   > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
+  - [x] **#157.9** Fix increment_serial() to check TODO.md for highest ID `#bug`
+    > Fixed and tested. In no-coordination mode with serial=65, correctly assigned #159 (using TODO.md highest of 158).
+    > Function increment_serial() (lines 1197-1213) blindly increments serial file without checking TODO.md. In no-coordination mode, assigned #65 when TODO.md highest was #158. Fix: Use MAX(serial_file, get_highest_task_number()) + 1. This is likely the actual root cause of issue#38.
   - [ ] **#157.8** Close issue#38 with release reference `#bug`
   - [ ] **#157.7** Prepare and release hotfix v2.5.1 `#bug`
     > Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
@@ -547,6 +550,8 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] **#159** Test task with fixed serial logic (deleted 2025-11-15, expires 2025-12-15)
+- [D] **#65** Test task for no-coordination mode (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#158** Test task for ID tracking bug fix (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
@@ -722,6 +727,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 21:55:37 CET 2025
+**Last Updated:** Sat Nov 15 22:08:24 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -1,11 +1,17 @@
-# todo.ai v2.5.0 Release Summary
+# todo.ai v2.5.1 Hotfix Release
 
-This release brings powerful note management capabilities, enhanced bug reporting for AI agents, and critical bash compatibility fixes. The focus is on improving developer experience while maintaining code quality and shell compatibility.
+## Critical Bug Fix
 
-**Note Management System ([3e09a60](https://github.com/fxstein/todo.ai/commit/3e09a60))** adds `delete-note` and `update-note` commands, completing the note lifecycle. Previously notes could only be added but never modified or removed. Both commands work at all nesting levels with confirmation prompts for safety. The implementation reuses existing logic for consistency and properly handles multi-line notes with correct indentation.
+This hotfix addresses a critical data integrity bug discovered in v2.4.0 and v2.5.0 where duplicate task IDs could be assigned in single-user mode.
 
-**AI-Friendly Bug Reporting ([6691864](https://github.com/fxstein/todo.ai/commit/6691864))** redesigns the bug reporting workflow to detect AI agents (CURSOR_AI, AI_AGENT env vars) and auto-submit after preview, eliminating friction while maintaining user control for humans. Reports now use GitHub callout blocks, structured markdown with tables and collapsible sections, and intelligent error categorization with auto-suggested labels. Rich context collection includes git status, TODO.md state, environment variables, and recent commands.
+**Issue Fixed:** get_highest_task_number() was incorrectly scanning ALL lines in TODO.md, including documentation examples in blockquote notes. This caused the function to find task IDs that weren't real tasks, leading to potential duplicate ID assignments.
 
-**Critical Bash Compatibility Fix ([62fff75](https://github.com/fxstein/todo.ai/commit/62fff75), [da00320](https://github.com/fxstein/todo.ai/commit/da00320))** resolves a fundamental incompatibility where bash couldn't read coordination config when yq/python-yaml were unavailable. The sed-based fallback used zsh's `${match[]}` instead of bash's `${BASH_REMATCH[]}`, causing silent failures and wrong task IDs. Solution uses conversion markers in zsh code with automatic sed transformation during bash generation—zero runtime overhead, zero code bloat, clean separation.
+**Example:** A documentation note containing `> **#42.1** Example task` would be counted as a real task, interfering with ID assignment logic.
 
-Additional fixes include deeply nested subtask support (issue#36, [06f6c14](https://github.com/fxstein/todo.ai/commit/06f6c14)) where `show` command failed for 3+ nesting levels, and multi-line note indentation ([b6a1221](https://github.com/fxstein/todo.ai/commit/b6a1221)) where only the first line received proper formatting. Documentation updates include GETTING_STARTED.md examples, bug reporting design docs, and strengthened cursor rules for note usage.
+**Solution:** Updated get_highest_task_number() to skip blockquote lines (starting with `>`), ensuring only actual task lines are scanned for ID extraction.
+
+## Additional Improvements
+
+**Universal Zsh-to-Bash Converter:** Created a dedicated conversion script (`release/convert_zsh_to_bash.sh`) that handles all bash compatibility transformations systematically. This improves reliability and makes the conversion process reusable for development and testing.
+
+**Impact:** Users who experienced duplicate task ID assignments should see this issue completely resolved. The fix has been tested in both zsh and bash versions.

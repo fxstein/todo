@@ -2,8 +2,40 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 13:18:05 | fxstein | COMPLETE | 153 | Add note management: update and delete note commands
+2025-11-15 13:18:05 | fxstein | COMPLETE | 153.8 | Update GETTING_STARTED.md with note management examples
+2025-11-15 13:17:30 | fxstein | DELETE | 154.1.1 | Level 2 sub-subtask
+2025-11-15 13:17:30 | fxstein | DELETE | 154.1 | Level 1 subtask
+2025-11-15 13:17:30 | fxstein | DELETE | 154 | Test note management commands
+2025-11-15 13:17:30 | fxstein | COMPLETE | 153.6 | Test note management at all nesting levels (0, 1, 2)
+2025-11-15 13:17:23 | fxstein | DELETE_NOTE | 154.1.1 | Deleted 3 line(s) of notes
+2025-11-15 13:17:22 | fxstein | UPDATE_NOTE | 154.1 | Updated note (was 2 lines, now        1 lines)
+2025-11-15 13:17:11 | fxstein | NOTE | 154.1.1 | Level 2 note
+With multiple
+Lines here
+2025-11-15 13:17:11 | fxstein | NOTE | 154.1 | Level 1 note line 1
+Level 1 note line 2
+2025-11-15 13:17:05 | fxstein | ADD_SUBTASK | 154.1.1 | Level 2 sub-subtask (parent: #154.1)
+2025-11-15 13:17:04 | fxstein | ADD_SUBTASK | 154.1 | Level 1 subtask (parent: #154)
+2025-11-15 13:16:54 | fxstein | UPDATE_NOTE | 154 | Updated note (was 2 lines, now        4 lines)
+2025-11-15 13:16:48 | fxstein | NOTE | 154 | Original note
+Line 2
+2025-11-15 13:16:32 | fxstein | DELETE_NOTE | 154 | Deleted 3 line(s) of notes
+2025-11-15 13:16:23 | fxstein | NOTE | 154 | This is a test note with multiple lines
+Line 2 of the test note
+Line 3 of the test note
+2025-11-15 13:15:44 | fxstein | NOTE | 154
+153 | This is a test note
+Line 2 of test note
+Line 3 of test note
+2025-11-15 13:15:42 | fxstein | ADD | 154 | Test note management commands
+2025-11-15 13:15:31 | fxstein | COMPLETE | 153.7 | Add commands to help text and usage documentation
+2025-11-15 13:15:31 | fxstein | COMPLETE | 153.5 | Handle multi-line notes correctly in both commands
+2025-11-15 13:15:31 | fxstein | COMPLETE | 153.4 | Implement update-note command to replace existing notes
+2025-11-15 13:15:31 | fxstein | COMPLETE | 153.3 | Implement delete-note command to remove all notes from a task
+2025-11-15 13:12:18 | fxstein | COMPLETE | 153.2 | Analyze current note storage format in TODO.md
+2025-11-15 13:12:18 | fxstein | COMPLETE | 153.1 | Design command syntax for update-note and delete-note
 2025-11-15 13:10:44 | fxstein | NOTE | 153.6 | Test scenarios:
-
 1. delete-note on task with single-line note
 2. delete-note on task with multi-line note
 3. delete-note on task with no notes (should error)

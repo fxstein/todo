@@ -1687,6 +1687,8 @@ show_usage() {
     echo "  archive <id> [<id>...] [--reason <reason>]  Move task(s) to Recently Completed (reason for incomplete tasks)"
     echo "  relate <id> --<type> <targets>  Add task relationship (completed-by, depends-on, blocks, related-to, duplicate-of)"
     echo "  note <id> <text>              Add note to task (blockquote format)"
+    echo "  delete-note <id>              Delete all notes from a task"
+    echo "  update-note <id> <text>       Replace existing notes with new text"
     echo "  show <id>                     Show task with subtasks, relationships, and notes"
     echo "  restore <id>                  Restore task from Deleted or Recently Completed to active Tasks"
     echo "  --lint                        Identify formatting issues (indentation, checkboxes)"
@@ -1729,6 +1731,8 @@ show_usage() {
     echo "  ./todo.ai relate 110 --depends-on 104  # Add dependency"
     echo "  ./todo.ai relate 104 --completed-by '107,108'"
     echo "  ./todo.ai note 110 'Testing shows issues'  # Add note"
+    echo "  ./todo.ai delete-note 110             # Delete all notes from task #110"
+    echo "  ./todo.ai update-note 110 'Updated information'  # Replace notes"
     echo "  ./todo.ai show 110                    # Show task with relationships & notes"
     echo "  ./todo.ai restore 1"
     echo "  ./todo.ai --lint"
@@ -1895,6 +1899,30 @@ validate_command_args() {
                 if [[ "$arg" =~ ^-- ]]; then
                     echo "Error: Invalid option '$arg' for 'note' command"
                     echo "The 'note' command only accepts task ID and note text"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "delete-note")
+            # delete-note <id> - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'delete-note' command"
+                    echo "The 'delete-note' command only accepts a task ID"
+                    echo ""
+                    show_usage
+                    return 1
+                fi
+            done
+            ;;
+        "update-note")
+            # update-note <id> <text> - no additional options allowed
+            for arg in "${args[@]}"; do
+                if [[ "$arg" =~ ^-- ]]; then
+                    echo "Error: Invalid option '$arg' for 'update-note' command"
+                    echo "The 'update-note' command only accepts task ID and note text"
                     echo ""
                     show_usage
                     return 1
@@ -2660,16 +2688,16 @@ collect_task_notes() {
     local notes=()
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
     
-    # Find the task line number
-    local task_line_num=$(grep -n "^- \[.\] \*\*#${escaped_task_id}\*\* \|^  - \[.\] \*\*#${escaped_task_id}\*\* \|^    - \[.\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Find the task line number (support arbitrary nesting depth)
+    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     if [[ -n "$task_line_num" ]]; then
         # Collect blockquote notes following the task
         local current_line=$((task_line_num + 1))
         while true; do
             local line=$(sed -n "${current_line}p" "$TODO_FILE")
-            # Check for blockquotes at different indentation levels
-            if [[ "$line" =~ ^"  > " ]] || [[ "$line" =~ ^"    > " ]] || [[ "$line" =~ ^"      > " ]]; then
+            # Check for blockquotes at any indentation level
+            if [[ "$line" =~ ^[[:space:]]*\>  ]]; then
                 notes+=("$line")
                 current_line=$((current_line + 1))
             else
@@ -2685,12 +2713,13 @@ collect_task_notes() {
 }
 
 # Helper function to remove notes (blockquotes) for a task
+# This removes the task line AND its notes (used in delete operations)
 remove_task_notes() {
     local task_id="$1"
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
     
-    # Find the task line number
-    local task_line_num=$(grep -n "^- \[.\] \*\*#${escaped_task_id}\*\* \|^  - \[.\] \*\*#${escaped_task_id}\*\* \|^    - \[.\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Find the task line number (support arbitrary nesting depth)
+    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     if [[ -n "$task_line_num" ]]; then
         # Remove the task line first
@@ -2699,13 +2728,45 @@ remove_task_notes() {
         # Remove following blockquote notes (line number doesn't change after deletion)
         while true; do
             local next_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
-            if [[ "$next_line" =~ ^"  > " ]] || [[ "$next_line" =~ ^"    > " ]] || [[ "$next_line" =~ ^"      > " ]]; then
+            # Check for blockquotes at any indentation level
+            if [[ "$next_line" =~ ^[[:space:]]*\>  ]]; then
                 sed_inplace "${task_line_num}d" "$TODO_FILE"
             else
                 break
             fi
         done
     fi
+}
+
+# Helper function to delete ONLY notes from a task (keeps the task line)
+delete_notes_only() {
+    local task_id="$1"
+    local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
+    
+    # Find the task line number (support arbitrary nesting depth)
+    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    
+    if [[ -z "$task_line_num" ]]; then
+        return 1  # Task not found
+    fi
+    
+    # Count and remove following blockquote notes
+    local note_count=0
+    local next_line_num=$((task_line_num + 1))
+    
+    while true; do
+        local next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
+        # Check for blockquotes at any indentation level
+        if [[ "$next_line" =~ ^[[:space:]]*\>  ]]; then
+            # Delete this note line (line number stays same after each deletion)
+            sed_inplace "${next_line_num}d" "$TODO_FILE"
+            note_count=$((note_count + 1))
+        else
+            break
+        fi
+    done
+    
+    return 0
 }
 
 archive_task() {
@@ -4376,6 +4437,143 @@ add_note() {
     log_todo_action "NOTE" "$task_id" "$note_text"
     
     echo "Added note to task #$task_id"
+}
+
+# Delete all notes from a task
+delete_note() {
+    local task_id="$1"
+    
+    if [[ -z "$task_id" ]]; then
+        echo "Error: Please provide task ID"
+        echo "Usage: ./todo.ai delete-note <id>"
+        return 1
+    fi
+    
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
+    
+    # Check if task exists and has notes
+    local notes=$(collect_task_notes "$task_id")
+    if [[ -z "$notes" ]]; then
+        echo "Error: Task #$task_id has no notes to delete"
+        return 1
+    fi
+    
+    # Count note lines
+    local note_count=$(echo "$notes" | wc -l | tr -d ' ')
+    
+    # Show confirmation prompt
+    echo "Task #$task_id has $note_count line(s) of notes."
+    printf "Delete all notes from task #$task_id? (y/N) "
+    read -r reply
+    
+    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+        echo "Cancelled - notes not deleted"
+        return 0
+    fi
+    
+    # Delete the notes
+    delete_notes_only "$task_id"
+    
+    update_footer
+    
+    # Log the action
+    log_todo_action "DELETE_NOTE" "$task_id" "Deleted $note_count line(s) of notes"
+    
+    echo "Deleted notes from task #$task_id"
+}
+
+# Update/replace all notes for a task
+update_note() {
+    local task_id="$1"
+    local new_note_text="$2"
+    
+    if [[ -z "$task_id" ]] || [[ -z "$new_note_text" ]]; then
+        echo "Error: Please provide task ID and new note text"
+        echo "Usage: ./todo.ai update-note <id> <new-note-text>"
+        return 1
+    fi
+    
+    # Resolve task reference (auto-add prefix for number-only references)
+    local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
+    if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
+        resolved_task_id="$task_id"
+    fi
+    task_id="$resolved_task_id"
+    
+    # Check if task exists and has notes
+    local old_notes=$(collect_task_notes "$task_id")
+    if [[ -z "$old_notes" ]]; then
+        echo "Error: Task #$task_id has no notes to update"
+        echo "Hint: Use './todo.ai note $task_id \"text\"' to add notes"
+        return 1
+    fi
+    
+    # Count old and new note lines
+    local old_count=$(echo "$old_notes" | wc -l | tr -d ' ')
+    local new_count=$(echo "$new_note_text" | wc -l)
+    
+    # Show preview
+    echo "Task #$task_id currently has $old_count line(s) of notes."
+    echo "New note will have $new_count line(s)."
+    printf "Replace notes for task #$task_id? (y/N) "
+    read -r reply
+    
+    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+        echo "Cancelled - notes not updated"
+        return 0
+    fi
+    
+    # Delete old notes (without confirmation since we already confirmed)
+    delete_notes_only "$task_id"
+    
+    # Add new notes using existing add_note logic
+    # We need to manually do what add_note does but without the existence check
+    
+    # Find task and get indentation
+    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    
+    if [[ -z "$task_line_num" ]]; then
+        echo "Error: Task #$task_id not found"
+        return 1
+    fi
+    
+    local task_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
+    local indent=""
+    indent=$(echo "$task_line" | sed 's/^\([[:space:]]*\)-.*/\1/')
+    
+    # Format new note with proper multi-line handling
+    local formatted_note=""
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        if [[ -n "$formatted_note" ]]; then
+            formatted_note="${formatted_note}"$'\n'
+        fi
+        formatted_note="${formatted_note}${indent}  > ${line}"
+    done <<< "$new_note_text"
+    
+    # Insert new note after the task line
+    if [[ "$(uname)" == "Darwin" ]]; then
+        local temp_file=$(mktemp)
+        head -n "$task_line_num" "$TODO_FILE" > "$temp_file"
+        echo "$formatted_note" >> "$temp_file"
+        tail -n +$((task_line_num + 1)) "$TODO_FILE" >> "$temp_file"
+        mv "$temp_file" "$TODO_FILE"
+    else
+        # For Linux, need to escape newlines for sed
+        local escaped_note=$(echo "$formatted_note" | sed ':a;N;$!ba;s/\n/\\n/g')
+        sed_inplace "${task_line_num}a\\${escaped_note}" "$TODO_FILE"
+    fi
+    
+    update_footer
+    
+    # Log the action
+    log_todo_action "UPDATE_NOTE" "$task_id" "Updated note (was $old_count lines, now $new_count lines)"
+    
+    echo "Updated note for task #$task_id"
 }
 
 # Function to lint (identify) formatting issues
@@ -6845,6 +7043,22 @@ case "${1:-}" in
             exit 1
         fi
         add_note "$1" "$2"
+        ;;
+    "delete-note")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "delete-note" "$@"; then
+            exit 1
+        fi
+        delete_note "$1"
+        ;;
+    "update-note")
+        # Validate arguments before proceeding
+        shift
+        if ! validate_command_args "update-note" "$@"; then
+            exit 1
+        fi
+        update_note "$1" "$2"
         ;;
     "show")
         # Validate arguments before proceeding

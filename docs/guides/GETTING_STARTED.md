@@ -408,6 +408,9 @@ Re-run setup:
 ./todo.ai list --tag "#tag"
 ./todo.ai show 1
 ./todo.ai modify 1 "Updated description"
+./todo.ai note 1 "Add implementation notes"
+./todo.ai update-note 1 "Replace existing notes"
+./todo.ai delete-note 1
 ./todo.ai delete 1
 ./todo.ai archive 1
 ```

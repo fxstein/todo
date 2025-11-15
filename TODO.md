@@ -1,17 +1,20 @@
 # todo.ai ToDo List
+# todo.ai ToDo List  > This is a test note
+# todo.ai ToDo List  > Line 2 of test note
+# todo.ai ToDo List  > Line 3 of test note
 
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#153** Add note management: update and delete note commands `#feature`
+- [x] **#153** Add note management: update and delete note commands `#feature`
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
   > - update-note: Replace existing notes with new text
   > 
   > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
-  - [ ] **#153.8** Update GETTING_STARTED.md with note management examples `#feature`
-  - [ ] **#153.7** Add commands to help text and usage documentation `#feature`
-  - [ ] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature`
+  - [x] **#153.8** Update GETTING_STARTED.md with note management examples `#feature`
+  - [x] **#153.7** Add commands to help text and usage documentation `#feature`
+  - [x] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature`
     > Test scenarios:
     > 
     > 1. delete-note on task with single-line note
@@ -24,8 +27,8 @@
     > 8. Test at level 0 (main task), level 1 (subtask), level 2 (sub-subtask)
     > 9. Verify indentation correct after update
     > 10. Verify show command displays updated notes correctly
-  - [ ] **#153.5** Handle multi-line notes correctly in both commands `#feature`
-  - [ ] **#153.4** Implement update-note command to replace existing notes `#feature`
+  - [x] **#153.5** Handle multi-line notes correctly in both commands `#feature`
+  - [x] **#153.4** Implement update-note command to replace existing notes `#feature`
     > Implementation approach for update-note:
     > 
     > 1. Call delete-note logic to remove existing notes
@@ -40,7 +43,7 @@
     > }
     > 
     > Reuse existing add_note() multi-line formatting logic from fix #149.
-  - [ ] **#153.3** Implement delete-note command to remove all notes from a task `#feature`
+  - [x] **#153.3** Implement delete-note command to remove all notes from a task `#feature`
     > Implementation approach for delete-note:
     > 
     > 1. Find task line number (reuse logic from show_task)
@@ -50,7 +53,7 @@
     > 5. Log the action
     > 
     > Reference collect_task_notes() function if it exists - may already have note detection logic. Similar pattern to delete_task() but only removes note lines, not the task itself.
-  - [ ] **#153.2** Analyze current note storage format in TODO.md `#feature`
+  - [x] **#153.2** Analyze current note storage format in TODO.md `#feature`
     > Notes in TODO.md format:
     > - Appear as blockquotes immediately after task line
     > - Indentation matches task level + 2 spaces
@@ -65,7 +68,7 @@
     >     > Note line 3
     > 
     > Need to identify all note lines for delete/update operations.
-  - [ ] **#153.1** Design command syntax for update-note and delete-note `#feature`
+  - [x] **#153.1** Design command syntax for update-note and delete-note `#feature`
     > Proposed command syntax:
     > 
     > ./todo.ai delete-note <task-id>
@@ -536,6 +539,9 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+    - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+- [D] **#154** Test note management commands `#testing` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#151** Test fix level 0 `#test` (deleted 2025-11-15, expires 2025-12-15)
@@ -696,6 +702,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 13:10:44 CET 2025
+**Last Updated:** Sat Nov 15 13:18:05 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

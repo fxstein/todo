@@ -798,19 +798,22 @@ main() {
 - Last tag: ${LAST_TAG}
 - Summary file: ${SUMMARY_FILE:-none}"
     
-    # Generate release notes
-    echo -e "${BLUE}📝 Generating release notes...${NC}"
+    # Generate release notes for preview
+    echo -e "${BLUE}📝 Generating release notes preview...${NC}"
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
         echo -e "${GREEN}📄 Including AI-generated summary from: $SUMMARY_FILE${NC}"
     fi
-    RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
+    local preview_notes_file=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
     
     # Show release notes preview
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    cat "$RELEASE_NOTES_FILE"
+    cat "$preview_notes_file"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
+    
+    # Clean up preview file
+    rm -f "$preview_notes_file"
     
     # Show review recommendation if major or large release
     local last_tag_for_count=$(get_last_tag)
@@ -839,13 +842,14 @@ main() {
     log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash"
     
     # Save prepare state for execute mode
+    # Note: RELEASE_NOTES_FILE is NOT saved - it will be regenerated during execute
+    # to ensure RELEASE_SUMMARY.md is the single source of truth
     cat > "$PREPARE_STATE_FILE" << EOF
 NEW_VERSION=$NEW_VERSION
 BUMP_TYPE=$BUMP_TYPE
 CURRENT_VERSION=$CURRENT_VERSION
 LAST_TAG=$LAST_TAG
 SUMMARY_FILE=$SUMMARY_FILE
-RELEASE_NOTES_FILE=$RELEASE_NOTES_FILE
 summary_needs_commit=$summary_needs_commit
 EOF
     log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION}"
@@ -880,6 +884,13 @@ execute_release() {
     source "$PREPARE_STATE_FILE"
     
     echo -e "${BLUE}🚀 Executing release ${NEW_VERSION}...${NC}"
+    echo ""
+    
+    # Regenerate release notes from RELEASE_SUMMARY.md (single source of truth)
+    # This ensures any updates to the summary after prepare are included
+    echo -e "${BLUE}📝 Generating release notes from ${SUMMARY_FILE:-commits}...${NC}"
+    RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
+    echo -e "${GREEN}✓ Release notes generated${NC}"
     echo ""
     
     # Update version

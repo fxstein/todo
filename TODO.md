@@ -3,6 +3,19 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug`
+  > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
+  - [ ] **#157.8** Close issue#38 with release reference `#bug`
+  - [ ] **#157.7** Prepare and release hotfix v2.5.1 `#bug`
+    > Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
+  - [ ] **#157.6** Verify fix with both zsh and bash versions `#bug`
+  - [ ] **#157.5** Add test cases for ID collision detection `#bug`
+  - [ ] **#157.4** Fix task ID tracking logic to prevent duplicates `#bug`
+  - [ ] **#157.3** Review impact of bash conversion markers on regex captures `#bug`
+    > Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.
+  - [ ] **#157.2** Test ID assignment with completed tasks in TODO.md `#bug`
+  - [ ] **#157.1** Investigate get_highest_task_number() function for ID extraction bugs `#bug`
+    > Focus on lines ~2500-2600 in todo.ai. Check regex pattern for extracting task IDs, especially handling of BASH_CONVERT markers and  usage. Verify it correctly reads all task IDs including completed ones.
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug`
   > Fixed 3 critical $match[ ] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[ ] for bash or $match[ ] for zsh.
 - [x] **#153** Add note management: update and delete note commands `#feature`
@@ -703,6 +716,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 13:48:21 CET 2025
+**Last Updated:** Sat Nov 15 21:46:27 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

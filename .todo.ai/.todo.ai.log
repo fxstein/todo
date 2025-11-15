@@ -2,6 +2,19 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 21:46:27 | fxstein | NOTE | 157 | Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
+2025-11-15 21:46:20 | fxstein | NOTE | 157.7 | Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
+2025-11-15 21:46:19 | fxstein | NOTE | 157.3 | Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.
+2025-11-15 21:46:17 | fxstein | NOTE | 157.1 | Focus on lines ~2500-2600 in todo.ai. Check regex pattern for extracting task IDs, especially handling of BASH_CONVERT markers and  usage. Verify it correctly reads all task IDs including completed ones.
+2025-11-15 21:46:08 | fxstein | ADD_SUBTASK | 157.8 | Close issue#38 with release reference (parent: #157)
+2025-11-15 21:46:07 | fxstein | ADD_SUBTASK | 157.7 | Prepare and release hotfix v2.5.1 (parent: #157)
+2025-11-15 21:46:06 | fxstein | ADD_SUBTASK | 157.6 | Verify fix with both zsh and bash versions (parent: #157)
+2025-11-15 21:46:05 | fxstein | ADD_SUBTASK | 157.5 | Add test cases for ID collision detection (parent: #157)
+2025-11-15 21:46:04 | fxstein | ADD_SUBTASK | 157.4 | Fix task ID tracking logic to prevent duplicates (parent: #157)
+2025-11-15 21:46:03 | fxstein | ADD_SUBTASK | 157.3 | Review impact of bash conversion markers on regex captures (parent: #157)
+2025-11-15 21:46:02 | fxstein | ADD_SUBTASK | 157.2 | Test ID assignment with completed tasks in TODO.md (parent: #157)
+2025-11-15 21:46:01 | fxstein | ADD_SUBTASK | 157.1 | Investigate get_highest_task_number() function for ID extraction bugs (parent: #157)
+2025-11-15 21:45:54 | fxstein | ADD | 157 | Fix issue#38: Single-user mode assigns duplicate task IDs
 2025-11-15 13:48:21 | fxstein | COMPLETE | 153 | Add note management: update and delete note commands
 2025-11-15 13:48:14 | fxstein | COMPLETE | 155 | Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array)
 2025-11-15 13:40:09 | fxstein | DELETE | 136.1 | Reproduce bug: create task with note, add subtask, verify note is split

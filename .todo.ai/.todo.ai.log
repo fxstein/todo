@@ -2,6 +2,32 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 12:52:35 | fxstein | NOTE | 149.6 | Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
+- Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
+- Task 147.4: Lines 27-32 need '  > ' prefix
+- Task 147.5: Lines 21-23 need '  > ' prefix
+- Task 147.6: Lines 14-18 need '  > ' prefix
+After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
+2025-11-15 12:52:28 | fxstein | NOTE | 149.2 | Search for 'add_note()' or '^add_note\(' function in todo.ai. Check how it processes note text, especially when note contains newlines. Look for where indentation prefix is calculated and where blockquote marker (>) is added. Likely splits note on newlines but only formats first line correctly.
+2025-11-15 12:52:21 | fxstein | NOTE | 149.1 | Current behavior vs expected:
+CURRENT (broken):
+  > First line of note
+Line 2 without marker
+Line 3 without marker
+EXPECTED (correct):
+  > First line of note
+  > Line 2 with marker
+  > Line 3 with marker
+All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
+2025-11-15 12:52:14 | fxstein | NOTE | 149 | When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
+2025-11-15 12:52:06 | fxstein | ADD_SUBTASK | 149.7 | Commit fix and verify TODO.md structure is valid (parent: #149)
+2025-11-15 12:52:05 | fxstein | ADD_SUBTASK | 149.6 | Manually fix broken notes in TODO.md (tasks 147.3-147.6) (parent: #149)
+2025-11-15 12:52:05 | fxstein | ADD_SUBTASK | 149.5 | Test fix with multi-line notes at different nesting levels (parent: #149)
+2025-11-15 12:52:04 | fxstein | ADD_SUBTASK | 149.4 | Fix add_note() to properly indent all lines with blockquote markers (parent: #149)
+2025-11-15 12:52:04 | fxstein | ADD_SUBTASK | 149.3 | Identify how note lines are processed and where indentation fails (parent: #149)
+2025-11-15 12:52:03 | fxstein | ADD_SUBTASK | 149.2 | Find and analyze the add_note() function (parent: #149)
+2025-11-15 12:52:03 | fxstein | ADD_SUBTASK | 149.1 | Document the multi-line note formatting bug with examples (parent: #149)
+2025-11-15 12:51:53 | fxstein | ADD | 149 | Fix multi-line note indentation bug in add_note() function
 2025-11-15 12:48:26 | fxstein | NOTE | 147.8 | Issue #36 auto-closed by GitHub when commit contained 'Closes #36'. Added detailed comment explaining root cause, solution, and verification. Issue closed at 2025-11-15 11:47:54 UTC. Comment: https://github.com/fxstein/todo.ai/issues/36#issuecomment-3536410881
 2025-11-15 12:48:25 | fxstein | COMPLETE | 147.8 | Commit fix and close issue#36 with release reference
 2025-11-15 12:47:36 | fxstein | COMPLETE | 147 | Fix issue#36: Task show command fails for deeply nested subtasks

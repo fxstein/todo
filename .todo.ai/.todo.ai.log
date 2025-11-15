@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-15 12:48:26 | fxstein | NOTE | 147.8 | Issue #36 auto-closed by GitHub when commit contained 'Closes #36'. Added detailed comment explaining root cause, solution, and verification. Issue closed at 2025-11-15 11:47:54 UTC. Comment: https://github.com/fxstein/todo.ai/issues/36#issuecomment-3536410881
+2025-11-15 12:48:25 | fxstein | COMPLETE | 147.8 | Commit fix and close issue#36 with release reference
 2025-11-15 12:47:36 | fxstein | COMPLETE | 147 | Fix issue#36: Task show command fails for deeply nested subtasks
 2025-11-15 12:47:09 | fxstein | NOTE | 147.7 | Nesting limit (2 levels) is enforced by add-subtask command with clear error message: 'Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)'. This serves as documentation. No README update needed. Fix supports arbitrary depth if limit is ever increased.
 2025-11-15 12:47:09 | fxstein | COMPLETE | 147.7 | Update documentation if nesting limitations exist

@@ -5,7 +5,8 @@
 ## Tasks
 - [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug`
   > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
-  - [ ] **#147.8** Commit fix and close issue#36 with release reference `#bug`
+  - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug`
+    > Issue #36 auto-closed by GitHub when commit contained 'Closes #36'. Added detailed comment explaining root cause, solution, and verification. Issue closed at 2025-11-15 11:47:54 UTC. Comment: https://github.com/fxstein/todo.ai/issues/36#issuecomment-3536410881
   - [x] **#147.7** Update documentation if nesting limitations exist `#bug`
     > Nesting limit (2 levels) is enforced by add-subtask command with clear error message: 'Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)'. This serves as documentation. No README update needed. Fix supports arbitrary depth if limit is ever increased.
   - [x] **#147.6** Verify show, modify, note, complete, delete commands work on deep tasks `#bug`
@@ -530,6 +531,6 @@ Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation dep
 
 ---
 
-**Last Updated:** Sat Nov 15 12:47:36 CET 2025
+**Last Updated:** Sat Nov 15 12:48:26 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

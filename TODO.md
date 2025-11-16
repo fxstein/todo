@@ -3,23 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#152** Test bug reporting feature before v2.5.0 release `#testing`
-  - [x] **#152.7** Verify GitHub issue template structure `#testing`
-  - [x] **#152.6** Test label categorization for different error types `#testing`
-  - [x] **#152.5** Verify markdown formatting (callout blocks, tables, collapsible) `#testing`
-  - [x] **#152.4** Test human workflow (without env vars, should prompt) `#testing`
-    > Human workflow tested and verified:
-    > - WITHOUT AI env vars, shows full preview
-    > - Prompts: 'Report this bug? (y/N)'  
-    > - User must explicitly confirm with 'y'
-    > - Cancelled if user says 'N' or presses Enter
-    > - Maintains full user control as designed
-    > 
-    > Test: Ran './todo.ai report-bug "test" "test" "test"' without env vars
-    > Result: Prompted for confirmation as expected ✓
-  - [x] **#152.3** Test AI agent detection and auto-submission (with CURSOR_AI set) `#testing`
-  - [x] **#152.2** Verify context collection (git, TODO.md, env vars, commands) `#testing`
-  - [x] **#152.1** Test bug report generation with mock error `#testing`
 - [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug`
   > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
   - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug`
@@ -194,6 +177,23 @@
 ------------------
 
 ## Recently Completed
+- [x] **#152** Test bug reporting feature before v2.5.0 release `#testing` (2025-11-16)
+  - [x] **#152.7** Verify GitHub issue template structure `#testing` (2025-11-16)
+  - [x] **#152.6** Test label categorization for different error types `#testing` (2025-11-16)
+  - [x] **#152.5** Verify markdown formatting (callout blocks, tables, collapsible) `#testing` (2025-11-16)
+  - [x] **#152.4** Test human workflow (without env vars, should prompt) `#testing` (2025-11-16)
+    > Human workflow tested and verified:
+    > - WITHOUT AI env vars, shows full preview
+    > - Prompts: 'Report this bug? (y/N)'  
+    > - User must explicitly confirm with 'y'
+    > - Cancelled if user says 'N' or presses Enter
+    > - Maintains full user control as designed
+    > 
+    > Test: Ran './todo.ai report-bug "test" "test" "test"' without env vars
+    > Result: Prompted for confirmation as expected ✓
+  - [x] **#152.3** Test AI agent detection and auto-submission (with CURSOR_AI set) `#testing` (2025-11-16)
+  - [x] **#152.2** Verify context collection (git, TODO.md, env vars, commands) `#testing` (2025-11-16)
+  - [x] **#152.1** Test bug report generation with mock error `#testing` (2025-11-16)
 - [x] **#153** Add note management: update and delete note commands `#feature` (2025-11-16)
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
@@ -728,6 +728,6 @@
 
 ---
 
-**Last Updated:** Sun Nov 16 20:48:18 CET 2025
+**Last Updated:** Sun Nov 16 20:58:08 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -3,50 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug`
-  > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
-  - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug`
-    > Issue #36 auto-closed by GitHub when commit contained 'Closes #36'. Added detailed comment explaining root cause, solution, and verification. Issue closed at 2025-11-15 11:47:54 UTC. Comment: https://github.com/fxstein/todo.ai/issues/36#issuecomment-3536410881
-  - [x] **#147.7** Update documentation if nesting limitations exist `#bug`
-    > Nesting limit (2 levels) is enforced by add-subtask command with clear error message: 'Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)'. This serves as documentation. No README update needed. Fix supports arbitrary depth if limit is ever increased.
-  - [x] **#147.6** Verify show, modify, note, complete, delete commands work on deep tasks `#bug`
-    > Verified all commands work on 3-level deep tasks (148.1.1):
-    > - show: ✓ Works (displays task + notes correctly)
-    > - note: ✓ Works (added note successfully)
-    > - modify: ✓ Works (changed description)
-    > - complete: Testing now...
-    > - delete: Will test after complete
-  - [x] **#147.5** Test with 3, 4, and 5 level nested subtasks `#bug`
-    > System enforces maximum nesting depth of 2 levels (main → subtask → sub-subtask). Cannot test 4-5 levels as add-subtask rejects deeper nesting. Fix supports arbitrary depth in case limit is increased. Tested successfully:
-    > - Level 0: Task #148 ✓
-    > - Level 1: Task #148.1 ✓
-    > - Level 2: Task #148.1.1 ✓ (was failing, now fixed)
-  - [x] **#147.4** Fix task ID resolution to support arbitrary nesting depth `#bug`
-    > Fixed show_task() function in todo.ai:
-    >
-    > Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
-    > Line 4150: Same fix for fallback search
-    > Line 4168: Same fix for note line number search  
-    > Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
-    >
-    > All changes support arbitrary nesting depth and handle malformed checkboxes.
-  - [x] **#147.3** Identify where show/modify/note commands fail for deep nesting `#bug`
-    > Affected locations in show_task() function:
-    >
-    > Line 4143: Main task search - missing 4+ space patterns
-    > Line 4148: Fallback search - missing 4+ space patterns  
-    > Line 4164: Note line number search - missing 4+ space patterns
-    >
-    > For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
-    > - Lines 2559, 2664, 2693: Task operations
-    > - Lines 3035, 3040, 3061: More operations
-    > - Line 4331: Another operation
-    >
-    > Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation depth
-  - [x] **#147.2** Reproduce the bug with 3-level nested subtasks (1.2.1 pattern) `#bug`
-    > Bug confirmed: Task #148.1.1 exists in TODO.md with 4-space indentation but 'show 148.1.1' returns 'Task not found'. Tasks #148 (0 spaces) and #148.1 (2 spaces) work correctly.
-  - [x] **#147.1** Investigate task ID parsing logic for nested subtasks `#bug`
-    > Search for functions: find_task_by_id(), get_task_by_id(), parse_task_id(), or similar. Look in action handlers for 'show', 'modify', 'note' commands. Check how task IDs are split (1.2.1 -> [1,2,1]) and how TODO.md is traversed. Likely issue: regex pattern or nesting loop only handles 2 levels.
 - [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
   - [x] **#125.13** Update bug reporting design document with new implementation details `#docs`
@@ -112,6 +68,50 @@
 ------------------
 
 ## Recently Completed
+- [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug` (2025-11-16)
+  > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
+  - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug` (2025-11-16)
+    > Issue #36 auto-closed by GitHub when commit contained 'Closes #36'. Added detailed comment explaining root cause, solution, and verification. Issue closed at 2025-11-15 11:47:54 UTC. Comment: https://github.com/fxstein/todo.ai/issues/36#issuecomment-3536410881
+  - [x] **#147.7** Update documentation if nesting limitations exist `#bug` (2025-11-16)
+    > Nesting limit (2 levels) is enforced by add-subtask command with clear error message: 'Maximum nesting depth is 2 levels (main task → subtask → sub-subtask)'. This serves as documentation. No README update needed. Fix supports arbitrary depth if limit is ever increased.
+  - [x] **#147.6** Verify show, modify, note, complete, delete commands work on deep tasks `#bug` (2025-11-16)
+    > Verified all commands work on 3-level deep tasks (148.1.1):
+    > - show: ✓ Works (displays task + notes correctly)
+    > - note: ✓ Works (added note successfully)
+    > - modify: ✓ Works (changed description)
+    > - complete: Testing now...
+    > - delete: Will test after complete
+  - [x] **#147.5** Test with 3, 4, and 5 level nested subtasks `#bug` (2025-11-16)
+    > System enforces maximum nesting depth of 2 levels (main → subtask → sub-subtask). Cannot test 4-5 levels as add-subtask rejects deeper nesting. Fix supports arbitrary depth in case limit is increased. Tested successfully:
+    > - Level 0: Task #148 ✓
+    > - Level 1: Task #148.1 ✓
+    > - Level 2: Task #148.1.1 ✓ (was failing, now fixed)
+  - [x] **#147.4** Fix task ID resolution to support arbitrary nesting depth `#bug` (2025-11-16)
+    > Fixed show_task() function in todo.ai:
+    >
+    > Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
+    > Line 4150: Same fix for fallback search
+    > Line 4168: Same fix for note line number search  
+    > Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
+    >
+    > All changes support arbitrary nesting depth and handle malformed checkboxes.
+  - [x] **#147.3** Identify where show/modify/note commands fail for deep nesting `#bug` (2025-11-16)
+    > Affected locations in show_task() function:
+    >
+    > Line 4143: Main task search - missing 4+ space patterns
+    > Line 4148: Fallback search - missing 4+ space patterns  
+    > Line 4164: Note line number search - missing 4+ space patterns
+    >
+    > For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
+    > - Lines 2559, 2664, 2693: Task operations
+    > - Lines 3035, 3040, 3061: More operations
+    > - Line 4331: Another operation
+    >
+    > Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation depth
+  - [x] **#147.2** Reproduce the bug with 3-level nested subtasks (1.2.1 pattern) `#bug` (2025-11-16)
+    > Bug confirmed: Task #148.1.1 exists in TODO.md with 4-space indentation but 'show 148.1.1' returns 'Task not found'. Tasks #148 (0 spaces) and #148.1 (2 spaces) work correctly.
+  - [x] **#147.1** Investigate task ID parsing logic for nested subtasks `#bug` (2025-11-16)
+    > Search for functions: find_task_by_id(), get_task_by_id(), parse_task_id(), or similar. Look in action handlers for 'show', 'modify', 'note' commands. Check how task IDs are split (1.2.1 -> [1,2,1]) and how TODO.md is traversed. Likely issue: regex pattern or nesting loop only handles 2 levels.
 - [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug` (2025-11-16)
   > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
   - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug` (2025-11-16)
@@ -728,6 +728,6 @@
 
 ---
 
-**Last Updated:** Sun Nov 16 21:08:20 CET 2025
+**Last Updated:** Sun Nov 16 21:21:27 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

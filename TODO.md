@@ -3,71 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug`
-  > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
-  - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug`
-  - [x] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug`
-    > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
-    >
-    > **Original broken notes (from bug #36 work):**
-    > - Task 147.3: Lines 36-45 need '  > ' prefix
-    > - Task 147.4: Lines 27-32 need '  > ' prefix  
-    > - Task 147.5: Lines 21-23 need '  > ' prefix
-    > - Task 147.6: Lines 14-18 need '  > ' prefix
-    >
-    > **Newly broken notes (from creating task #149):**
-    > - Task 149: Main task note (multi-line, needs '  > ' prefix)
-    > - Task 149.1: Multi-line note about expected vs current behavior
-    > - Task 149.6: This very note! (multi-line, needs '  > ' prefix)
-    >
-    > After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
-    > Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
-    > - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
-    > - Task 147.4: Lines 27-32 need '  > ' prefix
-    > - Task 147.5: Lines 21-23 need '  > ' prefix
-    > - Task 147.6: Lines 14-18 need '  > ' prefix
-    > After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
-  - [x] **#149.5** Test fix with multi-line notes at different nesting levels `#bug`
-    > Tested multi-line notes at all 3 nesting levels:
-    > 
-    > Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
-    > Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
-    > Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
-    > 
-    > All lines properly formatted with indent + '  > ' prefix. Fix verified!
-  - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug`
-  > Fixed add_note() function with 3 key changes:
-  > 
-  > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
-  > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces  
-  > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
-  > 
-  > This note itself tests the fix - all lines should have proper blockquote markers!
-  - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug`
-    > Bug located at line 4355 in add_note() function:
-    >
-    > local note_line="${indent}  > ${note_text}"
-    >
-    > This creates a single line by concatenating indent + '  > ' + entire note_text.
-    > When note_text contains newlines, they're inserted as raw text without formatting.
-    >
-    > Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
-  - [x] **#149.2** Find and analyze the add_note() function `#bug`
-    > Search for 'add_note()' or '^add_note\(' function in todo.ai. Check how it processes note text, especially when note contains newlines. Look for where indentation prefix is calculated and where blockquote marker (>) is added. Likely splits note on newlines but only formats first line correctly.
-  - [x] **#149.1** Document the multi-line note formatting bug with examples `#bug`
-    > Current behavior vs expected:
-    >
-    > CURRENT (broken):
-    >   > First line of note
-    > Line 2 without marker
-    > Line 3 without marker
-    >
-    > EXPECTED (correct):
-    >   > First line of note
-    >   > Line 2 with marker
-    >   > Line 3 with marker
-    >
-    > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
 - [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug`
   > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
   - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug`
@@ -177,6 +112,71 @@
 ------------------
 
 ## Recently Completed
+- [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug` (2025-11-16)
+  > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
+  - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug` (2025-11-16)
+  - [x] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug` (2025-11-16)
+    > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
+    >
+    > **Original broken notes (from bug #36 work):**
+    > - Task 147.3: Lines 36-45 need '  > ' prefix
+    > - Task 147.4: Lines 27-32 need '  > ' prefix  
+    > - Task 147.5: Lines 21-23 need '  > ' prefix
+    > - Task 147.6: Lines 14-18 need '  > ' prefix
+    >
+    > **Newly broken notes (from creating task #149):**
+    > - Task 149: Main task note (multi-line, needs '  > ' prefix)
+    > - Task 149.1: Multi-line note about expected vs current behavior
+    > - Task 149.6: This very note! (multi-line, needs '  > ' prefix)
+    >
+    > After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
+    > Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
+    > - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
+    > - Task 147.4: Lines 27-32 need '  > ' prefix
+    > - Task 147.5: Lines 21-23 need '  > ' prefix
+    > - Task 147.6: Lines 14-18 need '  > ' prefix
+    > After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
+  - [x] **#149.5** Test fix with multi-line notes at different nesting levels `#bug` (2025-11-16)
+    > Tested multi-line notes at all 3 nesting levels:
+    > 
+    > Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
+    > Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
+    > Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
+    > 
+    > All lines properly formatted with indent + '  > ' prefix. Fix verified!
+  - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug` (2025-11-16)
+  > Fixed add_note() function with 3 key changes:
+  > 
+  > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
+  > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces  
+  > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
+  > 
+  > This note itself tests the fix - all lines should have proper blockquote markers!
+  - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug` (2025-11-16)
+    > Bug located at line 4355 in add_note() function:
+    >
+    > local note_line="${indent}  > ${note_text}"
+    >
+    > This creates a single line by concatenating indent + '  > ' + entire note_text.
+    > When note_text contains newlines, they're inserted as raw text without formatting.
+    >
+    > Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
+  - [x] **#149.2** Find and analyze the add_note() function `#bug` (2025-11-16)
+    > Search for 'add_note()' or '^add_note\(' function in todo.ai. Check how it processes note text, especially when note contains newlines. Look for where indentation prefix is calculated and where blockquote marker (>) is added. Likely splits note on newlines but only formats first line correctly.
+  - [x] **#149.1** Document the multi-line note formatting bug with examples `#bug` (2025-11-16)
+    > Current behavior vs expected:
+    >
+    > CURRENT (broken):
+    >   > First line of note
+    > Line 2 without marker
+    > Line 3 without marker
+    >
+    > EXPECTED (correct):
+    >   > First line of note
+    >   > Line 2 with marker
+    >   > Line 3 with marker
+    >
+    > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
 - [x] **#152** Test bug reporting feature before v2.5.0 release `#testing` (2025-11-16)
   - [x] **#152.7** Verify GitHub issue template structure `#testing` (2025-11-16)
   - [x] **#152.6** Test label categorization for different error types `#testing` (2025-11-16)
@@ -728,6 +728,6 @@
 
 ---
 
-**Last Updated:** Sun Nov 16 20:58:08 CET 2025
+**Last Updated:** Sun Nov 16 21:08:20 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

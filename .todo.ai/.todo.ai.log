@@ -2,6 +2,7 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-11-16 20:46:40 | fxstein | ARCHIVE | 157 | Fix issue#38: Single-user mode assigns duplicate task IDs (with 9 subtasks)
 2025-11-15 22:18:35 | fxstein | COMPLETE | 157 | Fix issue#38: Single-user mode assigns duplicate task IDs
 2025-11-15 22:18:35 | fxstein | COMPLETE | 157.8 | Close issue#38 with release reference
 2025-11-15 22:18:16 | fxstein | NOTE | 157.7 | Released as v2.7.0 with complete fix for issue#38.

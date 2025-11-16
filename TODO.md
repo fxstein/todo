@@ -3,28 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug`
-  > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
-  - [x] **#157.9** Fix increment_serial() to check TODO.md for highest ID `#bug`
-    > Fixed and tested. In no-coordination mode with serial=65, correctly assigned #159 (using TODO.md highest of 158).
-    > Function increment_serial() (lines 1197-1213) blindly increments serial file without checking TODO.md. In no-coordination mode, assigned #65 when TODO.md highest was #158. Fix: Use MAX(serial_file, get_highest_task_number()) + 1. This is likely the actual root cause of issue#38.
-  - [x] **#157.8** Close issue#38 with release reference `#bug`
-  - [x] **#157.7** Prepare and release hotfix v2.5.1 `#bug`
-    > Released as v2.7.0 with complete fix for issue#38.
-    > Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
-  - [x] **#157.6** Verify fix with both zsh and bash versions `#bug`
-    > Created universal converter script (release/convert_zsh_to_bash.sh). Updated release.sh to use it. Tested: bash version correctly detects highest ID (158) and ignores blockquote examples.
-  - [x] **#157.5** Add test cases for ID collision detection `#bug`
-    > Created test_id_tracking.sh with 2 test cases. Both pass: (1) identifies highest ID from TODO.md, (2) ignores blockquote examples.
-  - [x] **#157.4** Fix task ID tracking logic to prevent duplicates `#bug`
-  - [x] **#157.3** Review impact of bash conversion markers on regex captures `#bug`
-    > Bash conversion markers (# BASH_CONVERT) are NOT the cause. They're just comments and don't affect zsh execution.
-    > Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.
-  - [x] **#157.2** Test ID assignment with completed tasks in TODO.md `#bug`
-    > Test confirmed: New task assigned #158 (correct, not duplicate). Coordinator warning normal (behind by ~22 due to local development).
-  - [x] **#157.1** Investigate get_highest_task_number() function for ID extraction bugs `#bug`
-    > Root cause: get_highest_task_number() was scanning ALL lines including blockquote examples (e.g., line 77 with example #42.1). Function lines 3650-3659.
-    > Focus on lines ~2500-2600 in todo.ai. Check regex pattern for extracting task IDs, especially handling of BASH_CONVERT markers and  usage. Verify it correctly reads all task IDs including completed ones.
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug`
   > Fixed 3 critical $match[ ] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[ ] for bash or $match[ ] for zsh.
 - [x] **#153** Add note management: update and delete note commands `#feature`
@@ -295,6 +273,28 @@
 ------------------
 
 ## Recently Completed
+- [x] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug` (2025-11-16)
+  > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
+  - [x] **#157.9** Fix increment_serial() to check TODO.md for highest ID `#bug` (2025-11-16)
+    > Fixed and tested. In no-coordination mode with serial=65, correctly assigned #159 (using TODO.md highest of 158).
+    > Function increment_serial() (lines 1197-1213) blindly increments serial file without checking TODO.md. In no-coordination mode, assigned #65 when TODO.md highest was #158. Fix: Use MAX(serial_file, get_highest_task_number()) + 1. This is likely the actual root cause of issue#38.
+  - [x] **#157.8** Close issue#38 with release reference `#bug` (2025-11-16)
+  - [x] **#157.7** Prepare and release hotfix v2.5.1 `#bug` (2025-11-16)
+    > Released as v2.7.0 with complete fix for issue#38.
+    > Use release script with --patch flag. Update RELEASE_SUMMARY.md with hotfix details. Ensure both todo.ai and todo.bash are tested before release.
+  - [x] **#157.6** Verify fix with both zsh and bash versions `#bug` (2025-11-16)
+    > Created universal converter script (release/convert_zsh_to_bash.sh). Updated release.sh to use it. Tested: bash version correctly detects highest ID (158) and ignores blockquote examples.
+  - [x] **#157.5** Add test cases for ID collision detection `#bug` (2025-11-16)
+    > Created test_id_tracking.sh with 2 test cases. Both pass: (1) identifies highest ID from TODO.md, (2) ignores blockquote examples.
+  - [x] **#157.4** Fix task ID tracking logic to prevent duplicates `#bug` (2025-11-16)
+  - [x] **#157.3** Review impact of bash conversion markers on regex captures `#bug` (2025-11-16)
+    > Bash conversion markers (# BASH_CONVERT) are NOT the cause. They're just comments and don't affect zsh execution.
+    > Check if # BASH_CONVERT: BASH_REMATCH[1] comments are interfering with regex execution in zsh. Verify that conversion happens ONLY in bash version, not affecting zsh logic.
+  - [x] **#157.2** Test ID assignment with completed tasks in TODO.md `#bug` (2025-11-16)
+    > Test confirmed: New task assigned #158 (correct, not duplicate). Coordinator warning normal (behind by ~22 due to local development).
+  - [x] **#157.1** Investigate get_highest_task_number() function for ID extraction bugs `#bug` (2025-11-16)
+    > Root cause: get_highest_task_number() was scanning ALL lines including blockquote examples (e.g., line 77 with example #42.1). Function lines 3650-3659.
+    > Focus on lines ~2500-2600 in todo.ai. Check regex pattern for extracting task IDs, especially handling of BASH_CONVERT markers and  usage. Verify it correctly reads all task IDs including completed ones.
 - [x] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization` (2025-11-12)
   > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [x] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research` (2025-11-12)
@@ -728,6 +728,6 @@
 
 ---
 
-**Last Updated:** Sat Nov 15 22:18:35 CET 2025
+**Last Updated:** Sun Nov 16 20:46:40 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

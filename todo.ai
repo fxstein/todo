@@ -3129,17 +3129,23 @@ delete_task() {
     local expire_date=$(date -d "+30 days" +"%Y-%m-%d" 2>/dev/null || date -v+30d +"%Y-%m-%d" 2>/dev/null || echo "2025-11-29")
     
     for number in "${all_ids[@]}"; do
+        # Escape dots in task ID for pattern matching
+        local escaped_number=$(echo "$number" | sed 's/\./\\./g')
+        
         # Find task (anywhere - Tasks or Recently Completed, handles nested subtasks)
+        # Search for both bold and non-bold formats
         # Try resolved ID first, then try original ID if resolution added a prefix that doesn't match
-        local task_line=$(grep "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1)
+        local task_line=$(grep -E "^- \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^  - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^    - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) " "$TODO_FILE" | head -1)
         
         # If not found and number has a prefix, try without prefix (fallback for tasks created before mode switch)
         if [[ -z "$task_line" ]] && [[ "$number" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
             local number_without_prefix="${match[1]}"
-            task_line=$(grep "^- \[.\] \*\*#${number_without_prefix}\*\* \|^  - \[.\] \*\*#${number_without_prefix}\*\* \|^    - \[.\] \*\*#${number_without_prefix}\*\* " "$TODO_FILE" | head -1)
+            local escaped_plain=$(echo "$number_without_prefix" | sed 's/\./\\./g')
+            task_line=$(grep -E "^- \[.\] (\*\*#${escaped_plain}\*\*|#${escaped_plain}) |^  - \[.\] (\*\*#${escaped_plain}\*\*|#${escaped_plain}) |^    - \[.\] (\*\*#${escaped_plain}\*\*|#${escaped_plain}) " "$TODO_FILE" | head -1)
             if [[ -n "$task_line" ]]; then
                 # Found with original number - update number to match actual task ID
                 number="$number_without_prefix"
+                escaped_number="$escaped_plain"
             fi
         fi
         
@@ -3157,7 +3163,8 @@ delete_task() {
         
         # Find task line number to also remove following notes (handles nested subtasks at any level)
         # Use the actual number variable (which may have been updated to remove prefix)
-        local task_line_num=$(grep -n "^- \[.\] \*\*#$number\*\* \|^  - \[.\] \*\*#$number\*\* \|^    - \[.\] \*\*#$number\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+        # Search for both bold and non-bold formats
+        local task_line_num=$(grep -nE "^- \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^  - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^    - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) " "$TODO_FILE" | head -1 | cut -d: -f1)
         
         if [[ -n "$task_line_num" ]]; then
             # Remove the task line

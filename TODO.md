@@ -3,28 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] #163 Test task for complete fix `#test`
-- [ ] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug`
-  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
-  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug`
-    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
-  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug`
-    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
-  - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug`
-  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug`
-  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug`
-    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
-- [ ] **#160** Fix issue#35: Task not found after successful modify command `#bug`
-  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
-  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
-  - [x] **#160.5** Add tests to prevent regression `#bug`
-  - [x] **#160.4** Fix task ID resolution in modify command if bug confirmed `#bug`
-    > FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
-    > FIXED: Updated modify_todo() sed patterns to match both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats using extended regex. Also updated add_note() grep pattern to search for both formats. Updated sed_inplace() to support -E flag for extended regex. This ensures modify command can replace tasks regardless of formatting, and note command can find them afterward.
-  - [x] **#160.3** Test modify command with various task IDs and nesting levels `#bug`
-  - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug`
-  - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug`
-    > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
 - [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
   - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
   - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
@@ -77,6 +55,27 @@
 ------------------
 
 ## Recently Completed
+- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2025-12-12)
+  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
+  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2025-12-12)
+    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
+  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug` (2025-12-12)
+    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
+  - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug` (2025-12-12)
+  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug` (2025-12-12)
+  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug` (2025-12-12)
+    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
+- [x] **#160** Fix issue#35: Task not found after successful modify command `#bug` (2025-12-12)
+  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
+  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
+  - [x] **#160.5** Add tests to prevent regression `#bug` (2025-12-12)
+  - [x] **#160.4** Fix task ID resolution in modify command if bug confirmed `#bug` (2025-12-12)
+    > FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
+    > FIXED: Updated modify_todo() sed patterns to match both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats using extended regex. Also updated add_note() grep pattern to search for both formats. Updated sed_inplace() to support -E flag for extended regex. This ensures modify command can replace tasks regardless of formatting, and note command can find them afterward.
+  - [x] **#160.3** Test modify command with various task IDs and nesting levels `#bug` (2025-12-12)
+  - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug` (2025-12-12)
+  - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug` (2025-12-12)
+    > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
 - [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2025-12-12)
   > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
   - [x] **#125.13** Update bug reporting design document with new implementation details `#docs` (2025-12-12)
@@ -584,6 +583,7 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] #163 Test task for complete fix `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#159** Test task with fixed serial logic (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#65** Test task for no-coordination mode (deleted 2025-11-15, expires 2025-12-15)
@@ -696,6 +696,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 14:12:54 CET 2025
+**Last Updated:** Fri Dec 12 14:26:53 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

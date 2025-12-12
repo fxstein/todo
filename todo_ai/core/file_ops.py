@@ -12,6 +12,10 @@ class FileOps:
         self.config_dir = self.todo_path.parent / ".todo.ai"
         self.serial_path = self.config_dir / ".todo.ai.serial"
         
+        # State to preserve file structure
+        self.header_lines: List[str] = []
+        self.footer_lines: List[str] = []
+        
         # Ensure config directory exists
         if not self.config_dir.exists():
             self.config_dir.mkdir(parents=True, exist_ok=True)
@@ -19,6 +23,8 @@ class FileOps:
     def read_tasks(self) -> List[Task]:
         """Read tasks from TODO.md."""
         if not self.todo_path.exists():
+            self.header_lines = []
+            self.footer_lines = []
             return []
             
         content = self.todo_path.read_text(encoding="utf-8")
@@ -49,12 +55,18 @@ class FileOps:
         lines = content.splitlines()
         
         current_task: Optional[Task] = None
-        current_section = "Tasks"  # Default section
+        current_section = "Header"  # Start in Header mode
+        
+        self.header_lines = []
+        self.footer_lines = []
         
         # Regex patterns
         task_pattern = re.compile(r'^\s*-\s*\[([ x])\]\s*\*\*#([0-9\.]+)\*\*\s*(.*)$')
         tag_pattern = re.compile(r'`#([a-zA-Z0-9_-]+)`')
         section_pattern = re.compile(r'^##\s+(.*)$')
+        
+        # Sections that contain tasks
+        TASK_SECTIONS = {"Tasks", "Recently Completed", "Deleted Tasks"}
         
         for line in lines:
             line_stripped = line.strip()
@@ -62,13 +74,34 @@ class FileOps:
             # Check for section header
             section_match = section_pattern.match(line)
             if section_match:
-                current_section = section_match.group(1).strip()
-                current_task = None
+                section_name = section_match.group(1).strip()
+                if section_name in TASK_SECTIONS:
+                    current_section = section_name
+                    current_task = None
+                    continue
+                else:
+                    # Unknown section? Treat as footer if we've already seen tasks?
+                    # Or treat as content if in Header?
+                    # For now, if we are past "Tasks", any unknown section might be footer
+                    if current_section != "Header":
+                        current_section = "Footer"
+            
+            # Check for Footer start via separator
+            if line_stripped == "------------------" and current_section != "Header":
+                current_section = "Footer"
+                
+            # Handle Header
+            if current_section == "Header":
+                self.header_lines.append(line)
                 continue
                 
+            # Handle Footer
+            if current_section == "Footer":
+                self.footer_lines.append(line)
+                continue
+                
+            # Handle Task Sections
             # Check for task/subtask
-            # Note: We rely on indentation/logic to distinguish, but for flat parsing 
-            # we just grab the ID. The regex handles indentation in the prefix \s*
             task_match = task_pattern.match(line)
             
             if task_match:
@@ -79,11 +112,8 @@ class FileOps:
                 tag_matches = tag_pattern.findall(description)
                 for tag in tag_matches:
                     tags.add(tag)
-                    # Remove tag from description for cleaner storage? 
-                    # Existing shell script keeps them in description text but valid tags are marked.
-                    # We'll keep them in description to preserve original text format.
                 
-                # Determine status based on checkbox and section
+                # Determine status
                 status = TaskStatus.PENDING
                 if completed_char.lower() == 'x':
                     if current_section == "Recently Completed":
@@ -95,7 +125,6 @@ class FileOps:
                 elif current_section == "Deleted Tasks":
                      status = TaskStatus.DELETED
                 
-                # Create task object
                 task = Task(
                     id=task_id,
                     description=description.strip(),
@@ -106,10 +135,15 @@ class FileOps:
                 current_task = task
                 continue
             
-            # Check for notes (lines starting with >)
+            # Check for notes
             if current_task and line_stripped.startswith(">"):
                 note_content = line_stripped[1:].strip()
                 current_task.add_note(note_content)
+                continue
+                
+            # Ignore empty lines inside task sections to clean up output?
+            # Or preserve? If we ignore, we generate standard spacing.
+            pass
                 
         return tasks
 
@@ -117,72 +151,80 @@ class FileOps:
         """Generate TODO.md content from Task objects."""
         # Organize tasks by section
         active_tasks = []
-        # completed_tasks = [] # In "Tasks" section but checked
-        archived_tasks = []  # In "Recently Completed"
-        deleted_tasks = []   # In "Deleted Tasks"
+        archived_tasks = []
+        deleted_tasks = []
         
         for task in tasks:
             if task.status == TaskStatus.PENDING:
                 active_tasks.append(task)
             elif task.status == TaskStatus.COMPLETED:
-                active_tasks.append(task) # Completed but not archived yet
+                active_tasks.append(task)
             elif task.status == TaskStatus.ARCHIVED:
                 archived_tasks.append(task)
             elif task.status == TaskStatus.DELETED:
                 deleted_tasks.append(task)
         
-        # Sort tasks by ID (numerical/hierarchical)
+        # Sort tasks
         def sort_key(t):
             parts = [int(p) for p in t.id.split('.')]
             return parts
 
         active_tasks.sort(key=sort_key)
-        archived_tasks.sort(key=sort_key, reverse=True) # Usually recent first
+        archived_tasks.sort(key=sort_key, reverse=True)
         deleted_tasks.sort(key=sort_key, reverse=True)
         
-        lines = ["# todo.ai ToDo List", "", 
-                 "> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**", 
-                 "", "## Tasks"]
+        lines = []
+        
+        # 1. Header (use preserved or default)
+        if self.header_lines:
+            lines.extend(self.header_lines)
+        else:
+            lines = ["# todo.ai ToDo List", "", 
+                     "> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**", 
+                     ""]
+                     
+        # Ensure spacing before Tasks
+        if lines and lines[-1].strip() != "":
+            lines.append("")
+            
+        # 2. Tasks Section
+        lines.append("## Tasks")
         
         def format_task(t: Task) -> str:
             checkbox = "x" if t.status != TaskStatus.PENDING and t.status != TaskStatus.DELETED else " "
-            # Handle deleted status which might have unchecked box in some conventions, 
-            # but usually deleted tasks are just listed. 
-            # Existing script: deleted tasks often have [ ] or [x] depending on state when deleted?
-            # Let's standardize: Deleted = [ ] usually unless it was completed then deleted.
-            # For simplicity, if status is DELETED, we check if it was completed before?
-            # The Task model has completed_at. 
-            # For now, let's just use [ ] for deleted pending, [x] for deleted completed if we track that.
-            # Simplified: PENDING=[ ], COMPLETED=[x], ARCHIVED=[x], DELETED=[ ] (usually)
-            
             if t.status == TaskStatus.DELETED:
-                 # Check if it looks completed in description or logic? 
-                 # Default to [ ] for deleted items to differentiate from archived
                  checkbox = " "
             
-            # Indentation for subtasks
             indent = "  " * (t.id.count('.'))
-            
             line = f"{indent}- [{checkbox}] **#{t.id}** {t.description}"
             
-            # Add notes
             for note in t.notes:
                 line += f"\n{indent}  > {note}"
-                
             return line
 
         for t in active_tasks:
             lines.append(format_task(t))
             
         lines.append("")
+        
+        # 3. Recently Completed Section
         lines.append("## Recently Completed")
         for t in archived_tasks:
             lines.append(format_task(t))
             
         lines.append("")
+        
+        # 4. Deleted Tasks Section
         lines.append("## Deleted Tasks")
         for t in deleted_tasks:
             lines.append(format_task(t))
+            
+        # 5. Footer (use preserved)
+        if self.footer_lines:
+            # Ensure spacing
+            if lines[-1].strip() != "":
+                lines.append("")
+            lines.extend(self.footer_lines)
             
         return "\n".join(lines) + "\n"
 

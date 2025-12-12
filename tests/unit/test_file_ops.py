@@ -82,14 +82,17 @@ def test_parse_complex_todo(tmp_path):
     t5 = next(t for t in tasks if t.id == "5")
     assert t5.status == TaskStatus.DELETED
 
-def test_serial_generation(file_ops):
-    # First call creates file
-    s1 = file_ops.get_next_serial()
-    assert s1 == 1
-    assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "1"
+def test_serial_ops(file_ops):
+    # Initial state
+    assert file_ops.get_serial() == 0
     
-    # Second call increments
-    s2 = file_ops.get_next_serial()
-    assert s2 == 2
-    assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "2"
+    # Set serial
+    file_ops.set_serial(5)
+    assert file_ops.get_serial() == 5
+    assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "5"
+    
+    # Set again
+    file_ops.set_serial(10)
+    assert file_ops.get_serial() == 10
+    assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "10"
 

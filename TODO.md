@@ -3,6 +3,50 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
+  > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
+  - [ ] **#163.35** Release phase: Final release of Python version with migration support `#release`
+  - [ ] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release`
+  - [ ] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list) `#code`
+    > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
+  - [ ] **#163.32** Maintenance phase: Ensure existing shell script continues working during development `#code`
+    > CRITICAL REQUIREMENT: Existing shell script (todo.ai) MUST continue working throughout entire development process. Do NOT modify shell script during Python development. This ensures we can track progress using the existing tool.
+  - [ ] **#163.31** Documentation phase: Update installation instructions for pipx `#docs`
+  - [ ] **#163.30** Documentation phase: Document MCP server integration and usage `#docs`
+  - [ ] **#163.29** Documentation phase: Create migration guide from shell to Python version `#docs`
+  - [ ] **#163.28** Documentation phase: Create Python version user documentation `#docs`
+  - [ ] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces `#test`
+  - [ ] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing) `#test`
+    > Side-by-side comparison: Run same commands on test dataset with both shell version and Python version. Outputs must be identical. Use diff tools to verify.
+  - [ ] **#163.25** Testing phase: Test pipx installation and system-wide availability `#test`
+  - [ ] **#163.24** Testing phase: Test migration from shell version to Python version `#test`
+  - [ ] **#163.23** Testing phase: Test GitHub coordination integration `#test`
+  - [ ] **#163.22** Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced) `#test`
+  - [ ] **#163.21** Testing phase: Test data format compatibility (.todo.ai/, TODO.md structure) `#test`
+  - [ ] **#163.20** Testing phase: Test CLI interface matches existing shell script behavior `#test`
+  - [ ] **#163.19** Testing phase: Test MCP server interface with MCP-compatible clients `#test`
+  - [ ] **#163.18** Testing phase: Test all commands with dedicated test TODO.md dataset `#test`
+    > Test all commands using dedicated test TODO.md dataset. Compare outputs with shell version using same test data. Ensure Python version produces identical results.
+  - [ ] **#163.17** Testing phase: Create comprehensive test suite for core logic `#test`
+  - [ ] **#163.16** Implementation phase: Implement pipx packaging and installation `#code`
+  - [ ] **#163.15** Implementation phase: Implement CLI interface (maintain existing command syntax) `#code`
+  - [ ] **#163.14** Implementation phase: Implement MCP server interface (expose all commands as MCP tools) `#code`
+  - [ ] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced) `#code`
+  - [ ] **#163.12** Implementation phase: Implement GitHub coordination logic `#code`
+  - [ ] **#163.11** Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management) `#code`
+  - [ ] **#163.10** Implementation phase: Implement core task management logic (add, modify, delete, complete, archive) `#code`
+  - [ ] **#163.9** Setup phase: Create test data generator/copier for isolated testing `#test`
+    > Create utility to copy/generate test dataset from live data (sanitized) or create synthetic test data. Must ensure test environment is completely isolated from live project TODO.md.
+  - [ ] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset `#test`
+    > CRITICAL: Set up dedicated test environment with separate TODO.md and .todo.ai/ directory. Use environment variable or config to point Python version to test data. Ensure test data is never mixed with live project data.
+  - [ ] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout) `#code`
+  - [ ] **#163.6** Design phase: Create migration plan from shell to Python version `#design`
+  - [ ] **#163.5** Design phase: Design test data isolation strategy (separate test TODO.md) `#design`
+    > CRITICAL: Test data must be completely isolated. Create separate test TODO.md and .todo.ai/ directory. NEVER use the live project TODO.md for testing. Test dataset should be a copy with realistic but safe test data.
+  - [ ] **#163.4** Design phase: Design CLI interface specification (maintain existing command syntax) `#design`
+  - [ ] **#163.3** Design phase: Design MCP server interface specification `#design`
+  - [ ] **#163.2** Design phase: Define core logic API and interface contracts `#design`
+  - [ ] **#163.1** Design phase: Create architecture design document for Python refactor `#design`
 - [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
   - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
   - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
@@ -696,6 +740,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 14:26:53 CET 2025
+**Last Updated:** Fri Dec 12 14:46:36 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

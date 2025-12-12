@@ -2,6 +2,50 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-12 14:46:36 | fxstein | NOTE | 163.33 | Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
+2025-12-12 14:46:35 | fxstein | NOTE | 163.32 | CRITICAL REQUIREMENT: Existing shell script (todo.ai) MUST continue working throughout entire development process. Do NOT modify shell script during Python development. This ensures we can track progress using the existing tool.
+2025-12-12 14:46:34 | fxstein | NOTE | 163.26 | Side-by-side comparison: Run same commands on test dataset with both shell version and Python version. Outputs must be identical. Use diff tools to verify.
+2025-12-12 14:46:33 | fxstein | NOTE | 163.18 | Test all commands using dedicated test TODO.md dataset. Compare outputs with shell version using same test data. Ensure Python version produces identical results.
+2025-12-12 14:46:32 | fxstein | NOTE | 163.9 | Create utility to copy/generate test dataset from live data (sanitized) or create synthetic test data. Must ensure test environment is completely isolated from live project TODO.md.
+2025-12-12 14:46:31 | fxstein | NOTE | 163.8 | CRITICAL: Set up dedicated test environment with separate TODO.md and .todo.ai/ directory. Use environment variable or config to point Python version to test data. Ensure test data is never mixed with live project data.
+2025-12-12 14:46:30 | fxstein | NOTE | 163.5 | CRITICAL: Test data must be completely isolated. Create separate test TODO.md and .todo.ai/ directory. NEVER use the live project TODO.md for testing. Test dataset should be a copy with realistic but safe test data.
+2025-12-12 14:46:23 | fxstein | ADD_SUBTASK | 163.35 | Release phase: Final release of Python version with migration support (parent: #163)
+2025-12-12 14:46:22 | fxstein | ADD_SUBTASK | 163.34 | Release phase: Create beta/pre-release for testing with real users (parent: #163)
+2025-12-12 14:46:21 | fxstein | ADD_SUBTASK | 163.33 | Maintenance phase: Track progress using existing todo.ai script (this task list) (parent: #163)
+2025-12-12 14:46:19 | fxstein | ADD_SUBTASK | 163.32 | Maintenance phase: Ensure existing shell script continues working during development (parent: #163)
+2025-12-12 14:46:18 | fxstein | ADD_SUBTASK | 163.31 | Documentation phase: Update installation instructions for pipx (parent: #163)
+2025-12-12 14:46:17 | fxstein | ADD_SUBTASK | 163.30 | Documentation phase: Document MCP server integration and usage (parent: #163)
+2025-12-12 14:46:16 | fxstein | ADD_SUBTASK | 163.29 | Documentation phase: Create migration guide from shell to Python version (parent: #163)
+2025-12-12 14:46:15 | fxstein | ADD_SUBTASK | 163.28 | Documentation phase: Create Python version user documentation (parent: #163)
+2025-12-12 14:46:14 | fxstein | ADD_SUBTASK | 163.27 | Validation phase: Verify feature parity between MCP and CLI interfaces (parent: #163)
+2025-12-12 14:46:13 | fxstein | ADD_SUBTASK | 163.26 | Validation phase: Compare Python version output with shell version (side-by-side testing) (parent: #163)
+2025-12-12 14:46:12 | fxstein | ADD_SUBTASK | 163.25 | Testing phase: Test pipx installation and system-wide availability (parent: #163)
+2025-12-12 14:46:11 | fxstein | ADD_SUBTASK | 163.24 | Testing phase: Test migration from shell version to Python version (parent: #163)
+2025-12-12 14:46:10 | fxstein | ADD_SUBTASK | 163.23 | Testing phase: Test GitHub coordination integration (parent: #163)
+2025-12-12 14:46:09 | fxstein | ADD_SUBTASK | 163.22 | Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced) (parent: #163)
+2025-12-12 14:46:08 | fxstein | ADD_SUBTASK | 163.21 | Testing phase: Test data format compatibility (.todo.ai/, TODO.md structure) (parent: #163)
+2025-12-12 14:46:07 | fxstein | ADD_SUBTASK | 163.20 | Testing phase: Test CLI interface matches existing shell script behavior (parent: #163)
+2025-12-12 14:46:06 | fxstein | ADD_SUBTASK | 163.19 | Testing phase: Test MCP server interface with MCP-compatible clients (parent: #163)
+2025-12-12 14:46:05 | fxstein | ADD_SUBTASK | 163.18 | Testing phase: Test all commands with dedicated test TODO.md dataset (parent: #163)
+2025-12-12 14:46:04 | fxstein | ADD_SUBTASK | 163.17 | Testing phase: Create comprehensive test suite for core logic (parent: #163)
+2025-12-12 14:46:04 | fxstein | ADD_SUBTASK | 163.16 | Implementation phase: Implement pipx packaging and installation (parent: #163)
+2025-12-12 14:46:03 | fxstein | ADD_SUBTASK | 163.15 | Implementation phase: Implement CLI interface (maintain existing command syntax) (parent: #163)
+2025-12-12 14:46:02 | fxstein | ADD_SUBTASK | 163.14 | Implementation phase: Implement MCP server interface (expose all commands as MCP tools) (parent: #163)
+2025-12-12 14:46:01 | fxstein | ADD_SUBTASK | 163.13 | Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced) (parent: #163)
+2025-12-12 14:46:00 | fxstein | ADD_SUBTASK | 163.12 | Implementation phase: Implement GitHub coordination logic (parent: #163)
+2025-12-12 14:45:59 | fxstein | ADD_SUBTASK | 163.11 | Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management) (parent: #163)
+2025-12-12 14:45:58 | fxstein | ADD_SUBTASK | 163.10 | Implementation phase: Implement core task management logic (add, modify, delete, complete, archive) (parent: #163)
+2025-12-12 14:45:57 | fxstein | ADD_SUBTASK | 163.9 | Setup phase: Create test data generator/copier for isolated testing (parent: #163)
+2025-12-12 14:45:56 | fxstein | ADD_SUBTASK | 163.8 | Setup phase: Set up test environment with dedicated test TODO.md dataset (parent: #163)
+2025-12-12 14:45:55 | fxstein | ADD_SUBTASK | 163.7 | Setup phase: Create Python project structure (pyproject.toml, package layout) (parent: #163)
+2025-12-12 14:45:55 | fxstein | ADD_SUBTASK | 163.6 | Design phase: Create migration plan from shell to Python version (parent: #163)
+2025-12-12 14:45:54 | fxstein | ADD_SUBTASK | 163.5 | Design phase: Design test data isolation strategy (separate test TODO.md) (parent: #163)
+2025-12-12 14:45:53 | fxstein | ADD_SUBTASK | 163.4 | Design phase: Design CLI interface specification (maintain existing command syntax) (parent: #163)
+2025-12-12 14:45:52 | fxstein | ADD_SUBTASK | 163.3 | Design phase: Design MCP server interface specification (parent: #163)
+2025-12-12 14:45:51 | fxstein | ADD_SUBTASK | 163.2 | Design phase: Define core logic API and interface contracts (parent: #163)
+2025-12-12 14:45:50 | fxstein | ADD_SUBTASK | 163.1 | Design phase: Create architecture design document for Python refactor (parent: #163)
+2025-12-12 14:45:44 | fxstein | NOTE | 163 | Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
+2025-12-12 14:45:43 | fxstein | ADD | 163 | Refactor todo.ai into Python-based MCP server with CLI interface (issue#39)
 2025-12-12 14:26:53 | fxstein | ARCHIVE | 161 | Fix issue#26: Migration path error when todo.ai installed to system directory (with 5 subtasks)
 2025-12-12 14:26:49 | fxstein | ARCHIVE | 160 | Fix issue#35: Task not found after successful modify command (with 5 subtasks)
 2025-12-12 14:26:20 | fxstein | COMPLETE | 161 | Fix issue#26: Migration path error when todo.ai installed to system directory

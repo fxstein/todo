@@ -65,3 +65,24 @@ def test_get_issue(mock_repo_info, mock_get, github_client):
         headers=github_client._get_headers()
     )
 
+@patch("requests.get")
+@patch("todo_ai.core.github_client.GitHubClient._get_repo_info")
+def test_get_issue_comments(mock_repo_info, mock_get, github_client):
+    mock_repo_info.return_value = ("owner", "repo")
+    mock_response = MagicMock()
+    # Return a list of comments
+    mock_response.json.return_value = [
+        {"id": 1, "body": "Comment 1"},
+        {"id": 2, "body": "Next task number: 10"}
+    ]
+    mock_get.return_value = mock_response
+    
+    comments = github_client.get_issue_comments(123)
+    
+    assert len(comments) == 2
+    assert comments[1]["body"] == "Next task number: 10"
+    mock_get.assert_called_with(
+        "https://api.github.com/repos/owner/repo/issues/123/comments",
+        headers=github_client._get_headers()
+    )
+

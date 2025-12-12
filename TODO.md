@@ -3,6 +3,25 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] #163 Test task for complete fix `#test`
+- [ ] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug`
+  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
+  - [ ] **#161.5** Verify fix works with both local and system-wide installations `#bug`
+  - [ ] **#161.4** Fix migration path detection for system-wide installations `#bug`
+  - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug`
+  - [ ] **#161.2** Review get_script_path() and migration system for system directory handling `#bug`
+  - [ ] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug`
+- [ ] **#160** Fix issue#35: Task not found after successful modify command `#bug`
+  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
+  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
+  - [x] **#160.5** Add tests to prevent regression `#bug`
+  - [x] **#160.4** Fix task ID resolution in modify command if bug confirmed `#bug`
+    > FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
+    > FIXED: Updated modify_todo() sed patterns to match both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats using extended regex. Also updated add_note() grep pattern to search for both formats. Updated sed_inplace() to support -E flag for extended regex. This ensures modify command can replace tasks regardless of formatting, and note command can find them afterward.
+  - [x] **#160.3** Test modify command with various task IDs and nesting levels `#bug`
+  - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug`
+  - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug`
+    > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
 - [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
   - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
   - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
@@ -562,6 +581,7 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+- [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#159** Test task with fixed serial logic (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#65** Test task for no-coordination mode (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#158** Test task for ID tracking bug fix (deleted 2025-11-15, expires 2025-12-15)
@@ -592,19 +612,11 @@
     - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
-- [D] **#138** Test fix: task with note `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
-- [D] **#137** Test bug reproduction `#test` (deleted 2025-11-09, expires 2025-12-09)
-- [D] **#124** Convince the coffee machine to understand sarcasm `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [  D] **#123.1** Investigate delete command placement logic for Deleted Tasks section (completed - found footer boundary check missing) `#bug`
   - [  D] **#123.2** Verify expected section order: Tasks -> Recently Completed -> Deleted Tasks -> Footer (verified - order is now correct) `#bug`
   - [  D] **#123.3** Fix delete command to place Deleted Tasks section before footer (completed - updated ensure_deleted_section function) `#bug`
   - [D] **#123.4** Add tests to verify correct section ordering `#bug` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#123** Fix issue#25: Deleted tasks section placement - footer appears before Deleted Tasks section instead of after `#bug` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-106** clean the car (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#64** Test after fix (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#63** Test coordination after mode switch (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#62** Test coordination after fix (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.3** Create list_backups() function to show available backup versions `#code` (deleted 2025-11-02, expires 2025-12-02)
@@ -616,15 +628,10 @@
   - [D] **#30.9** Update help text and show_usage() to include new commands `#docs` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.10** Remove old .bak file creation logic `#cleanup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.11** Test backup and rollback functionality `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#30** Implement versioned backups and rollback capability `#feature` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-29** Test task 2 (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-28** Test coordination numbering (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-27** Test task after coordination setup (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#61** Test single-user mode `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
@@ -635,15 +642,12 @@
   - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-26** to buy folwers (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-25** Mode check `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-24** Test mode display `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
@@ -654,28 +658,14 @@
   - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-23** Another test `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-16** Test enhanced mode task creation `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-17** Test fallback scenario 1: coordination.type=none `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-18** Test fallback scenario 2: GitHub Issues unavailable (no issue_number) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-19** Test fallback scenario 3: CounterAPI unavailable (no namespace) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-20** Test fallback scenario 4: GitHub Issues API unavailable (gh CLI/auth issues) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-21** Test fallback scenario 5: CounterAPI unavailable (invalid namespace) `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-22** Test tag formatting with backticks `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#main-3** Test branch mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-9** Duplicate ID for conflict test `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-8** Test multi-user mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-7** Test multi-user mode task something else A `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-6** Test duplicate task #60 for conflict resolution `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#fxstein-5.1** Test subtask in multi-user mode `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-5** Test multi-user mode task something else B `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02) (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
@@ -685,55 +675,24 @@
   - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-15** Test duplicate #1 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-14** Manual duplicate test task 2 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-13** Manual duplicate test task 1 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-12** Test duplicate #2 again `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-11** Test duplicate #2 `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-10** Test duplicate #1 again `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#60** Test single-user mode task somthing else D `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#104** Test single-user mode task `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#103** Test single-user mode task somthing else C `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#59** Test duplicate numbering bug `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#58** Test single-user mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#57** Test single-user mode task 1 `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#main-2** Test branch mode task 1 `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#main-1** Test branch mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-4** Test multi-user mode task 1 `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-3** Test multi-user task B `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-2** Test multi-user task A `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#fxstein-1** Test multi-user mode task 2 `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#101** Add contributor section to release summary: list all contributors for each release `#feature` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#21** Ensure .todo.ai/ is tracked in git - not in gitignore or explicitly added `#setup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
     - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#34** Final nested subtask test `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-11-02, expires 2025-12-02)
     - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-11-02, expires 2025-12-02)
-- [D] **#33** Test nested subtasks implementation `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#40.1** Subtask A (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#40.2** Subtask B (deleted 2025-11-01, expires 2025-12-01)
-- [D] **#40** Test parent task 2 (deleted 2025-11-01, expires 2025-12-01)
     - [D] **#41.1.1** Level 2 nested subtask (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
-- [D] **#41** Test parent for nested subtasks (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#39.2** Test subtask 2 (deleted 2025-11-01, expires 2025-12-01)
     - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
-- [D] **#39** Test parent task for deletion bug fix (deleted 2025-11-01, expires 2025-12-01)
-- [D] **#9** Test new formatting fix `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#31** Test task after serial rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#29** Test task after file rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#27** Test task after .todo.ai rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#24** Test task after rename `#test` (deleted 2025-10-30, expires 2025-11-29)
-- [D] **#4** Test task `#test` (deleted 2025-10-30, expires 2025-11-29)
 
 ---
 
-**Last Updated:** Fri Dec 12 13:13:44 CET 2025
+**Last Updated:** Fri Dec 12 13:28:22 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

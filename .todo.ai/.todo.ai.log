@@ -2,6 +2,35 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-12 13:28:22 | fxstein | NOTE | 160 | All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
+2025-12-12 13:28:10 | fxstein | COMPLETE | 160.5 | Add tests to prevent regression
+2025-12-12 13:28:09 | fxstein | COMPLETE | 160.3 | Test modify command with various task IDs and nesting levels
+2025-12-12 13:28:09 | fxstein | NOTE | 160.4 | FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
+2025-12-12 13:28:01 | fxstein | COMPLETE | 163 | 
+2025-12-12 13:27:34 | fxstein | ADD | 163 | Test task for complete fix
+2025-12-12 13:27:31 | fxstein | DELETE | 162 | Test task for modify bug fix - MODIFIED
+2025-12-12 13:26:08 | fxstein | NOTE | 162 | Test note after modify - this should work now
+2025-12-12 13:26:00 | fxstein | MODIFY | 162 | Test task for modify bug fix - MODIFIED
+2025-12-12 13:25:46 | fxstein | ADD | 162 | Test task for modify bug fix
+2025-12-12 13:24:25 | fxstein | COMPLETE | 160.4 | Fix task ID resolution in modify command if bug confirmed
+2025-12-12 13:24:25 | fxstein | COMPLETE | 160.2 | Review modify_task() function for task ID resolution issues
+2025-12-12 13:24:24 | fxstein | NOTE | 160.4 | FIXED: Updated modify_todo() sed patterns to match both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats using extended regex. Also updated add_note() grep pattern to search for both formats. Updated sed_inplace() to support -E flag for extended regex. This ensures modify command can replace tasks regardless of formatting, and note command can find them afterward.
+2025-12-12 13:23:18 | fxstein | COMPLETE | 160.1 | Investigate modify command: reproduce the bug and identify root cause
+2025-12-12 13:23:09 | fxstein | NOTE | 160.1 | BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
+2025-12-12 13:21:47 | fxstein | NOTE | 161 | Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
+2025-12-12 13:21:45 | fxstein | NOTE | 160 | Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
+2025-12-12 13:21:33 | fxstein | ADD_SUBTASK | 161.5 | Verify fix works with both local and system-wide installations (parent: #161)
+2025-12-12 13:21:32 | fxstein | ADD_SUBTASK | 161.4 | Fix migration path detection for system-wide installations (parent: #161)
+2025-12-12 13:21:31 | fxstein | ADD_SUBTASK | 161.3 | Test migration execution when installed to /usr/local/bin or /usr/bin (parent: #161)
+2025-12-12 13:21:30 | fxstein | ADD_SUBTASK | 161.2 | Review get_script_path() and migration system for system directory handling (parent: #161)
+2025-12-12 13:21:29 | fxstein | ADD_SUBTASK | 161.1 | Investigate migration path error: reproduce with system directory installation (parent: #161)
+2025-12-12 13:21:28 | fxstein | ADD_SUBTASK | 160.5 | Add tests to prevent regression (parent: #160)
+2025-12-12 13:21:28 | fxstein | ADD_SUBTASK | 160.4 | Fix task ID resolution in modify command if bug confirmed (parent: #160)
+2025-12-12 13:21:27 | fxstein | ADD_SUBTASK | 160.3 | Test modify command with various task IDs and nesting levels (parent: #160)
+2025-12-12 13:21:26 | fxstein | ADD_SUBTASK | 160.2 | Review modify_task() function for task ID resolution issues (parent: #160)
+2025-12-12 13:21:25 | fxstein | ADD_SUBTASK | 160.1 | Investigate modify command: reproduce the bug and identify root cause (parent: #160)
+2025-12-12 13:21:20 | fxstein | ADD | 161 | Fix issue#26: Migration path error when todo.ai installed to system directory
+2025-12-12 13:21:17 | fxstein | ADD | 160 | Fix issue#35: Task not found after successful modify command
 2025-12-12 13:13:44 | fxstein | ARCHIVE | 125 | Overhaul bug reporting feature: eliminate prompts and improve formatting (with 13 subtasks)
 2025-11-16 21:21:27 | fxstein | ARCHIVE | 147 | Fix issue#36: Task show command fails for deeply nested subtasks (with 8 subtasks)
 2025-11-16 21:08:20 | fxstein | ARCHIVE | 149 | Fix multi-line note indentation bug in add_note() function (with 7 subtasks)

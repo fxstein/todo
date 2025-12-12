@@ -2,7 +2,28 @@
 name = "todo-ai"
 version = "3.0.0"
 description = "AI-Agent First TODO List Tracker with MCP and CLI interfaces"
+readme = "README.md"
 requires-python = ">=3.8"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Oliver Ratzesberger", email = "fxstein@gmail.com" }
+]
+keywords = ["todo", "ai", "mcp", "cli", "productivity", "agent"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
 dependencies = [
     "mcp>=0.1.0",
     "click>=8.0.0",
@@ -10,6 +31,12 @@ dependencies = [
     "requests>=2.28.0",
     "pygithub>=1.59.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/fxstein/todo.ai"
+Documentation = "https://github.com/fxstein/todo.ai/tree/main/docs"
+Repository = "https://github.com/fxstein/todo.ai.git"
+Issues = "https://github.com/fxstein/todo.ai/issues"
 
 [project.scripts]
 todo-ai = "todo_ai.cli.main:cli"

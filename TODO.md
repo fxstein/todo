@@ -9,25 +9,6 @@
   - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
 - [ ] **#128** Create git commit hook for todo list linting and validation `#feature`
 - [ ] **#127** Enhance --lint command with additional detection features `#feature`
-- [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
-  > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
-  - [x] **#125.13** Update bug reporting design document with new implementation details `#docs`
-    > Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
-  - [ ] **#125.12** Test new bug report format with real GitHub issue creation `#test`
-    > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
-    > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
-  - [x] **#125.11** Update cursor rules to reflect new agent-friendly bug reporting workflow `#docs`
-    > Update .cursor/rules/todo.ai-bug-reporting.mdc: (1) Remove mention of user prompts for agents, (2) Add note that agents can use report-bug directly without prompts, (3) Humans still get confirmation prompts, (4) Show updated example of agent usage: 'When error occurs, call ./todo.ai report-bug and it will auto-submit'. Keep rule concise (<25 lines).
-  - [x] **#125.10** Add intelligent error categorization and suggested labels `#feature`
-    > Auto-detect error type from error message/context and suggest GitHub labels: (1) 'bug' always, (2) 'crash' if segfault/core dump, (3) 'performance' if timeout/slow, (4) 'data-loss' if file corruption, (5) 'coordination' if GitHub API/coordination issues, (6) OS-specific: 'macos', 'linux', 'wsl', (7) Shell-specific: 'zsh', 'bash'. Use pattern matching on error message. Add labels via gh issue create --label.
-  - [x] **#125.9** Enhance context auto-collection: add git status, recent commands, TODO.md state `#code`
-    > Expand collect_error_context() function: (1) Git status: branch, dirty state, last commit, (2) Shell history: last 5 commands from .todo.ai.log, (3) TODO.md state: active task count, mode, coordination type, (4) Environment: TERM, EDITOR, relevant env vars, (5) File context: if error in specific file, include relevant lines. Format all in collapsible sections to keep bug report clean.
-  - [x] **#125.8** Remove prompts from suggest_bug_report() - make fully automated for AI agents `#code`
-    > Currently suggest_bug_report() (line 6245) prompts user with 'Report this bug? (y/N)'. For agents: (1) Detect if running in AI agent context (check for CURSOR_AI, AI_AGENT env vars), (2) If agent: show preview but proceed automatically after 2 second delay, (3) If human: keep existing prompt workflow. Agent flow: Show preview → 'Auto-submitting in 2 seconds...' → Submit. Maintains user control for humans, enables automation for agents.
-  - [x] **#125.7** Rewrite generate_bug_report() to use GitHub callout blocks and better markdown structure `#code`
-    > Use GitHub markdown features: (1) Callout blocks for System Info (> [!NOTE]), Error sections (> [!WARNING]), (2) Clean section headers with --- separators, (3) Proper code blocks with language tags, (4) Collapsible <details> for logs, (5) Table format for system information. Mirror the structure from bug_report.yml template. Located in todo.ai around line 5834.
-  - [x] **#125.6** Create GitHub issue template for bug reports (.github/ISSUE_TEMPLATE/bug_report.yml) `#feature`
-    > Create .github/ISSUE_TEMPLATE/bug_report.yml with structured fields: Error Description (textarea), Command Used (input), Error Context (textarea), System Info (auto-filled), Logs (auto-attached). Use GitHub's form schema for issue templates. This will be used as the reference template for generate_bug_report() function.
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
   - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
@@ -74,6 +55,30 @@
 ------------------
 
 ## Recently Completed
+- [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2025-12-12)
+  > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
+  - [x] **#125.13** Update bug reporting design document with new implementation details `#docs` (2025-12-12)
+    > Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
+  - [ ] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2025-12-12)
+    > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
+    > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
+  - [x] **#125.11** Update cursor rules to reflect new agent-friendly bug reporting workflow `#docs` (2025-12-12)
+    > Update .cursor/rules/todo.ai-bug-reporting.mdc: (1) Remove mention of user prompts for agents, (2) Add note that agents can use report-bug directly without prompts, (3) Humans still get confirmation prompts, (4) Show updated example of agent usage: 'When error occurs, call ./todo.ai report-bug and it will auto-submit'. Keep rule concise (<25 lines).
+  - [x] **#125.10** Add intelligent error categorization and suggested labels `#feature` (2025-12-12)
+    > Auto-detect error type from error message/context and suggest GitHub labels: (1) 'bug' always, (2) 'crash' if segfault/core dump, (3) 'performance' if timeout/slow, (4) 'data-loss' if file corruption, (5) 'coordination' if GitHub API/coordination issues, (6) OS-specific: 'macos', 'linux', 'wsl', (7) Shell-specific: 'zsh', 'bash'. Use pattern matching on error message. Add labels via gh issue create --label.
+  - [x] **#125.9** Enhance context auto-collection: add git status, recent commands, TODO.md state `#code` (2025-12-12)
+    > Expand collect_error_context() function: (1) Git status: branch, dirty state, last commit, (2) Shell history: last 5 commands from .todo.ai.log, (3) TODO.md state: active task count, mode, coordination type, (4) Environment: TERM, EDITOR, relevant env vars, (5) File context: if error in specific file, include relevant lines. Format all in collapsible sections to keep bug report clean.
+  - [x] **#125.8** Remove prompts from suggest_bug_report() - make fully automated for AI agents `#code` (2025-12-12)
+    > Currently suggest_bug_report() (line 6245) prompts user with 'Report this bug? (y/N)'. For agents: (1) Detect if running in AI agent context (check for CURSOR_AI, AI_AGENT env vars), (2) If agent: show preview but proceed automatically after 2 second delay, (3) If human: keep existing prompt workflow. Agent flow: Show preview → 'Auto-submitting in 2 seconds...' → Submit. Maintains user control for humans, enables automation for agents.
+  - [x] **#125.7** Rewrite generate_bug_report() to use GitHub callout blocks and better markdown structure `#code` (2025-12-12)
+    > Use GitHub markdown features: (1) Callout blocks for System Info (> [!NOTE]), Error sections (> [!WARNING]), (2) Clean section headers with --- separators, (3) Proper code blocks with language tags, (4) Collapsible <details> for logs, (5) Table format for system information. Mirror the structure from bug_report.yml template. Located in todo.ai around line 5834.
+  - [x] **#125.6** Create GitHub issue template for bug reports (.github/ISSUE_TEMPLATE/bug_report.yml) `#feature` (2025-12-12)
+    > Create .github/ISSUE_TEMPLATE/bug_report.yml with structured fields: Error Description (textarea), Command Used (input), Error Context (textarea), System Info (auto-filled), Logs (auto-attached). Use GitHub's form schema for issue templates. This will be used as the reference template for generate_bug_report() function.
+  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
+  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
+  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
+  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
+  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
 - [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug` (2025-11-16)
   > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
   - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug` (2025-11-16)
@@ -584,11 +589,6 @@
     - [D] **#148.1.1** Level 2 sub-subtask (MODIFIED to verify fix works) `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#148.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
 - [D] **#148** Test parent task `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12)
     - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
@@ -734,6 +734,6 @@
 
 ---
 
-**Last Updated:** Sun Nov 16 21:21:27 CET 2025
+**Last Updated:** Fri Dec 12 13:13:44 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

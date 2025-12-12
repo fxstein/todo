@@ -13,7 +13,7 @@
   "ul-indent": false,
   "list-indent": false,
   "hr-style": false,
-  "no-bare-urls": false
+  "no-bare-urls": false,
+  "no-inline-html": false,
+  "no-multiple-space-blockquote": false
 }
-
-

@@ -1,0 +1,4 @@
+mode: single-user
+coordination:
+  type: none
+

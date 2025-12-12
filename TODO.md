@@ -37,7 +37,7 @@
   - [ ] **#163.10** Implementation phase: Implement core task management logic (add, modify, delete, complete, archive) `#code`
   - [ ] **#163.9** Setup phase: Create test data generator/copier for isolated testing `#test`
     > Create utility to copy/generate test dataset from live data (sanitized) or create synthetic test data. Must ensure test environment is completely isolated from live project TODO.md.
-  - [ ] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset `#test`
+  - [x] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset `#test`
     > CRITICAL: Set up dedicated test environment with separate TODO.md and .todo.ai/ directory. Use environment variable or config to point Python version to test data. Ensure test data is never mixed with live project data.
   - [x] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout) `#code`
   - [x] **#163.6** Design phase: Create migration plan from shell to Python version `#design`
@@ -741,6 +741,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 14:51:41 CET 2025
+**Last Updated:** Fri Dec 12 19:36:33 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

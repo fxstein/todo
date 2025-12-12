@@ -165,12 +165,52 @@ install_json_linter() {
     return 1
 }
 
+# Check and install ascii-guard
+install_ascii_guard() {
+    echo "📐 Checking ASCII chart linter (ascii-guard)..."
+    
+    # Check if already installed
+    if command -v ascii-guard >/dev/null 2>&1; then
+        echo "   ✅ ascii-guard already installed"
+        installed_tools+=("ascii-guard")
+        return 0
+    fi
+    
+    # Try to install via pipx (preferred - isolated environment)
+    if command -v pipx >/dev/null 2>&1; then
+        echo "   📦 Installing ascii-guard via pipx (isolated environment)..."
+        if pipx install ascii-guard 2>/dev/null; then
+            echo "   ✅ ascii-guard installed successfully"
+            installed_tools+=("ascii-guard")
+            return 0
+        fi
+    fi
+    
+    # Check if pipx needs to be installed first
+    if command -v pip3 >/dev/null 2>&1; then
+        echo "   ⚠️  pipx not found, but pip3 is available"
+        echo "   Install pipx first: pip3 install --user pipx && pipx ensurepath"
+        echo "   Then install ascii-guard: pipx install ascii-guard"
+    elif command -v pip >/dev/null 2>&1; then
+        echo "   ⚠️  pipx not found, but pip is available"
+        echo "   Install pipx first: pip install --user pipx && pipx ensurepath"
+        echo "   Then install ascii-guard: pipx install ascii-guard"
+    else
+        echo "   ⚠️  No Python package manager found"
+    fi
+    
+    skipped_tools+=("ASCII chart linter (ascii-guard)")
+    return 1
+}
+
 # Run installations
 install_markdown_linter
 echo ""
 install_yaml_linter
 echo ""
 install_json_linter
+echo ""
+install_ascii_guard
 echo ""
 
 # Summary

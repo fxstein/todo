@@ -161,6 +161,30 @@ validate_json() {
     return $file_errors
 }
 
+# Validate ASCII charts in Markdown files
+validate_ascii_charts() {
+    local files="$1"
+    local file_errors=0
+    
+    # Check if ascii-guard is available
+    if command -v ascii-guard >/dev/null 2>&1; then
+        for file in $files; do
+            # Only check files that might contain ASCII art (Markdown files)
+            if [[ "$file" =~ \.(md|mdc|txt)$ ]]; then
+                if ! ascii-guard lint "$file" 2>/dev/null; then
+                    echo -e "${RED}❌ ASCII chart linting failed: $file${NC}"
+                    file_errors=$((file_errors + 1))
+                fi
+            fi
+        done
+    else
+        echo -e "${YELLOW}⚠️  ascii-guard not found, skipping ASCII chart validation${NC}"
+        echo "   Install 'ascii-guard' for ASCII chart linting: pipx install ascii-guard"
+    fi
+    
+    return $file_errors
+}
+
 # Validate TODO.md
 validate_todo() {
     local file_errors=0
@@ -227,6 +251,17 @@ if [[ -n "$json_files" ]]; then
         errors=$((errors + 1))
     else
         echo -e "${GREEN}✅ JSON validation passed${NC}"
+    fi
+fi
+
+# Validate ASCII charts in Markdown files
+md_files_for_ascii=$(echo "$staged_files" | grep -E '\.(md|mdc|txt)$' || true)
+if [[ -n "$md_files_for_ascii" ]]; then
+    echo "📐 Validating ASCII charts..."
+    if ! validate_ascii_charts "$md_files_for_ascii"; then
+        errors=$((errors + 1))
+    else
+        echo -e "${GREEN}✅ ASCII chart validation passed${NC}"
     fi
 fi
 

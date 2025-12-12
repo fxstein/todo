@@ -207,11 +207,38 @@ validate_python_tests() {
     # Using a subshell to avoid changing current shell environment
     (
         source .venv/bin/activate
+        
+        # 1. Run Ruff (Linting)
+        if ! command -v ruff >/dev/null 2>&1; then
+             echo -e "${YELLOW}⚠️  ruff not found in .venv. Skipping linting.${NC}"
+        else
+             echo "🧹 Running Ruff linting..."
+             if ! ruff check todo_ai tests; then
+                 echo -e "${RED}❌ Ruff linting failed${NC}"
+                 exit 1
+             fi
+             echo -e "${GREEN}✅ Ruff linting passed${NC}"
+        fi
+
+        # 2. Run Mypy (Type Checking)
+        if ! command -v mypy >/dev/null 2>&1; then
+             echo -e "${YELLOW}⚠️  mypy not found in .venv. Skipping type checking.${NC}"
+        else
+             echo "🔍 Running Mypy type checking..."
+             if ! mypy todo_ai; then
+                 echo -e "${RED}❌ Mypy type checking failed${NC}"
+                 exit 1
+             fi
+             echo -e "${GREEN}✅ Mypy type checking passed${NC}"
+        fi
+
+        # 3. Run Pytest
         if ! command -v pytest >/dev/null 2>&1; then
              echo -e "${YELLOW}⚠️  pytest not found in .venv. Skipping tests.${NC}"
              exit 0
         fi
         
+        echo "🧪 Running Pytest..."
         if ! pytest; then
             echo -e "${RED}❌ Python tests failed${NC}"
             exit 1

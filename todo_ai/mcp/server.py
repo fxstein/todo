@@ -1,7 +1,6 @@
 import asyncio
-import sys
 import mcp.types as types
-from mcp.server import Server, NotificationOptions
+from mcp.server import Server
 from mcp.server.stdio import stdio_server
 
 from todo_ai.core.task import TaskManager
@@ -80,7 +79,7 @@ class MCPServer:
                     return [types.TextContent(type="text", text=f"Completed: #{task.id} {task.description}")]
                     
                 elif name == "list_tasks":
-                    filters = {}
+                    # filters = {}
                     if arguments.get("status"):
                         # Convert string to enum if needed, or update TaskManager to handle strings
                         # For now, simplistic filtering:

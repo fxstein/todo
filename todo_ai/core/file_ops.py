@@ -1,8 +1,6 @@
 import re
-import os
-from datetime import datetime
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from todo_ai.core.task import Task, TaskStatus
 
@@ -56,7 +54,6 @@ class FileOps:
         
         # Regex patterns
         task_pattern = re.compile(r'^\s*-\s*\[([ x])\]\s*\*\*#([0-9\.]+)\*\*\s*(.*)$')
-        subtask_pattern = re.compile(r'^\s*-\s*\[([ x])\]\s*\*\*#([0-9\.]+)\*\*\s*(.*)$') # Same as task for now
         tag_pattern = re.compile(r'`#([a-zA-Z0-9_-]+)`')
         section_pattern = re.compile(r'^##\s+(.*)$')
         
@@ -121,7 +118,7 @@ class FileOps:
         """Generate TODO.md content from Task objects."""
         # Organize tasks by section
         active_tasks = []
-        completed_tasks = [] # In "Tasks" section but checked
+        # completed_tasks = [] # In "Tasks" section but checked
         archived_tasks = []  # In "Recently Completed"
         deleted_tasks = []   # In "Deleted Tasks"
         

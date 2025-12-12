@@ -1,6 +1,5 @@
 import pytest
 import os
-import requests
 from unittest.mock import patch, MagicMock
 from todo_ai.core.github_client import GitHubClient
 

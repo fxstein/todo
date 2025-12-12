@@ -1,5 +1,3 @@
-import pytest
-import os
 import subprocess
 from unittest.mock import patch
 from todo_ai.utils import git

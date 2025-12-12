@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 def reset_test_data():

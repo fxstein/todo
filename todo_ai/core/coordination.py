@@ -1,6 +1,5 @@
-import os
 import subprocess
-from typing import Optional, Tuple
+from typing import Optional
 from todo_ai.core.config import Config
 from todo_ai.core.github_client import GitHubClient
 
@@ -120,7 +119,7 @@ class CoordinationManager:
             # Normalize: lower, alphanumeric, 7 chars
             clean = "".join(c for c in name if c.isalnum()).lower()
             return clean[:7] or "user"
-        except:
+        except subprocess.CalledProcessError:
             return "user"
 
     def _get_branch_name(self) -> str:
@@ -129,6 +128,6 @@ class CoordinationManager:
             branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True).strip()
             clean = "".join(c for c in branch if c.isalnum() or c == '_').lower()
             return clean[:7] or "main"
-        except:
+        except subprocess.CalledProcessError:
             return "main"
 

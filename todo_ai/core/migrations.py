@@ -1,9 +1,6 @@
-import os
-import importlib.util
 from datetime import datetime
 from pathlib import Path
-from typing import List, Callable, Dict, Any, Optional
-from todo_ai.core.config import Config
+from typing import List, Callable, Dict
 
 class MigrationRegistry:
     """Manages migration execution."""

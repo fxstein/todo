@@ -1,5 +1,4 @@
 import pytest
-import yaml
 from todo_ai.core.migrations import MigrationRegistry
 
 @pytest.fixture
@@ -9,7 +8,7 @@ def migration_registry(tmp_path):
 
 def test_registry_init(tmp_path):
     config_dir = tmp_path / ".todo.ai"
-    registry = MigrationRegistry(str(config_dir))
+    _ = MigrationRegistry(str(config_dir))
     
     assert (config_dir / "migrations").exists()
     assert (config_dir / "migrations").is_dir()

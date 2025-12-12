@@ -1,7 +1,6 @@
 import pytest
 from click.testing import CliRunner
 from todo_ai.cli.main import cli
-from todo_ai.core.task import TaskStatus
 
 @pytest.fixture
 def runner():

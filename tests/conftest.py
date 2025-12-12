@@ -1,6 +1,5 @@
 import pytest
 import shutil
-import os
 from pathlib import Path
 
 TEST_DATA_DIR = Path(__file__).parent / "integration" / "test_data"

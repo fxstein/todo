@@ -1,5 +1,4 @@
 import pytest
-from pathlib import Path
 from todo_ai.core.task import Task, TaskStatus
 from todo_ai.core.file_ops import FileOps
 
@@ -15,7 +14,7 @@ def file_ops(temp_todo_file):
 
 def test_init_creates_config_dir(tmp_path):
     todo_path = tmp_path / "TODO.md"
-    ops = FileOps(str(todo_path))
+    _ = FileOps(str(todo_path))
     assert (tmp_path / ".todo.ai").exists()
     assert (tmp_path / ".todo.ai").is_dir()
 

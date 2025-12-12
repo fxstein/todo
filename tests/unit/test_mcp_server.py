@@ -1,6 +1,4 @@
 import pytest
-import asyncio
-from unittest.mock import MagicMock, patch
 from todo_ai.mcp.server import MCPServer
 
 @pytest.mark.asyncio

@@ -1,5 +1,3 @@
-import pytest
-import logging
 from todo_ai.utils.logging import setup_logging, get_logger
 
 def test_setup_logging_console(capsys):

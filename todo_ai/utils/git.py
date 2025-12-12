@@ -1,5 +1,5 @@
 import subprocess
-from typing import Optional, List
+from typing import Optional
 
 def get_git_root() -> Optional[str]:
     """Get the root directory of the git repository."""

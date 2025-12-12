@@ -1,8 +1,6 @@
-from typing import List, Optional
-from todo_ai.core.task import TaskManager, Task
+from typing import List
+from todo_ai.core.task import TaskManager
 from todo_ai.core.file_ops import FileOps
-from todo_ai.core.config import Config
-from todo_ai.core.coordination import CoordinationManager
 
 def get_manager() -> TaskManager:
     """Initialize core components and return TaskManager."""

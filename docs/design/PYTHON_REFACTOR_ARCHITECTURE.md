@@ -127,6 +127,7 @@ todo.ai (5,257 lines, 81 functions)
 3. **Data Compatibility:** Preserve existing file formats and directory structure
 4. **Backward Compatibility:** CLI maintains existing command syntax
 5. **Testability:** Core logic is unit-testable without interface dependencies
+6. **Environment Isolation:** ALL dependencies must be managed in a virtual environment (`venv`). No system-wide package pollution.
 
 ---
 
@@ -659,6 +660,7 @@ def migrate_from_shell():
 - Keep shell version available as legacy option
 - Update documentation
 - Provide migration guide
+- **Requirement:** Release must advise `pipx` installation to ensure environment isolation
 
 ---
 
@@ -748,50 +750,50 @@ def test_todo_file(tmp_path):
 
 ### Phase 2: Core Implementation (Task #163.7-163.13)
 
-7. **163.7:** Implement task data models and TaskManager
-8. **163.8:** Implement file operations module (TODO.md parsing/generation)
-9. **163.9:** Implement configuration module
-10. **163.10:** Implement coordination module
-11. **163.11:** Implement GitHub client module
-12. **163.12:** Implement migration system module
-13. **163.13:** Implement utility modules (git, logging)
+1. **163.7:** Implement task data models and TaskManager
+2. **163.8:** Implement file operations module (TODO.md parsing/generation)
+3. **163.9:** Implement configuration module
+4. **163.10:** Implement coordination module
+5. **163.11:** Implement GitHub client module
+6. **163.12:** Implement migration system module
+7. **163.13:** Implement utility modules (git, logging)
 
 ### Phase 3: CLI Implementation (Task #163.14-163.16)
 
-14. **163.14:** Implement CLI argument parser and command routing
-15. **163.15:** Implement all CLI commands (add, complete, delete, etc.)
-16. **163.16:** Implement CLI output formatting and error handling
+1. **163.14:** Implement CLI argument parser and command routing
+2. **163.15:** Implement all CLI commands (add, complete, delete, etc.)
+3. **163.16:** Implement CLI output formatting and error handling
 
 ### Phase 4: MCP Implementation (Task #163.17-163.19)
 
-17. **163.17:** Implement MCP server framework
-18. **163.18:** Implement MCP tools (expose all commands as tools)
-19. **163.19:** Implement MCP resources (TODO.md, config as resources)
+1. **163.17:** Implement MCP server framework
+2. **163.18:** Implement MCP tools (expose all commands as tools)
+3. **163.19:** Implement MCP resources (TODO.md, config as resources)
 
 ### Phase 5: Testing (Task #163.20-163.28)
 
-20. **163.20:** Set up test framework and test data isolation
-21. **163.21:** Write unit tests for core modules
-22. **163.22:** Write integration tests for CLI commands
-23. **163.23:** Write integration tests for MCP tools
-24. **163.24:** Write end-to-end workflow tests
-25. **163.25:** Test data format compatibility with shell version
-26. **163.26:** Test cross-platform compatibility (macOS, Linux, Windows)
-27. **163.27:** Performance testing and optimization
-28. **163.28:** Test migration system with version upgrades
+1. **163.20:** Set up test framework and test data isolation
+2. **163.21:** Write unit tests for core modules
+3. **163.22:** Write integration tests for CLI commands
+4. **163.23:** Write integration tests for MCP tools
+5. **163.24:** Write end-to-end workflow tests
+6. **163.25:** Test data format compatibility with shell version
+7. **163.26:** Test cross-platform compatibility (macOS, Linux, Windows)
+8. **163.27:** Performance testing and optimization
+9. **163.28:** Test migration system with version upgrades
 
 ### Phase 6: Validation (Task #163.29-163.30)
 
-29. **163.29:** Feature parity validation against shell version
-30. **163.30:** User acceptance testing with real workflows
+1. **163.29:** Feature parity validation against shell version
+2. **163.30:** User acceptance testing with real workflows
 
 ### Phase 7: Documentation and Release (Task #163.31-163.35)
 
-31. **163.31:** Write user documentation for Python version
-32. **163.32:** Write migration guide from shell to Python version
-33. **163.33:** Write developer documentation
-34. **163.34:** Prepare release package (pyproject.toml, setup)
-35. **163.35:** Create release plan and execute v3.0.0 release
+1. **163.31:** Write user documentation for Python version
+2. **163.32:** Write migration guide from shell to Python version
+3. **163.33:** Write developer documentation
+4. **163.34:** Prepare release package (pyproject.toml, setup)
+5. **163.35:** Create release plan and execute v3.0.0 release
 
 ---
 
@@ -818,6 +820,11 @@ def test_todo_file(tmp_path):
 5. **Testing:**
    - ✅ Isolated test data (never use live TODO.md)
    - ✅ Comprehensive test coverage
+
+6. **Environment Isolation:**
+   - ✅ STRICT REQUIREMENT: No system-wide library installation
+   - ✅ Development: Use `python -m venv .venv`
+   - ✅ Production: Use `pipx` (creates isolated venv per tool)
 
 ### Constraints
 

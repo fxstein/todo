@@ -25,14 +25,14 @@ class CoordinationManager:
         if mode == "single-user":
             return self._generate_single_user_id(current_max_serial, stored_serial)
         elif mode == "multi-user":
-            return self._generate_multi_user_id(current_max_serial)
+            return self._generate_multi_user_id(current_max_serial, stored_serial)
         elif mode == "branch":
-            return self._generate_branch_id(current_max_serial)
+            return self._generate_branch_id(current_max_serial, stored_serial)
         elif mode == "enhanced":
-            return self._generate_enhanced_id(current_max_serial)
+            return self._generate_enhanced_id(current_max_serial, stored_serial)
         else:
             # Fallback
-            return str(current_max_serial + 1)
+            return str(max(stored_serial, current_max_serial) + 1)
 
     def _generate_single_user_id(self, current_max: int, stored: int) -> str:
         """
@@ -50,36 +50,31 @@ class CoordinationManager:
         # Use max of stored (last used) and current_max, then increment
         return str(max(stored, current_max) + 1)
 
-    def _generate_multi_user_id(self, current_max: int) -> str:
+    def _generate_multi_user_id(self, current_max: int, stored: int) -> str:
         """
         Mode 2: Multi-user
         Prefix with GitHub user ID (first 7 chars).
         """
         user_id = self._get_github_user_id()
-        # In multi-user mode, we typically want a unique serial per user or global?
-        # The shell script uses: prefix + serial. 
-        # But serial is global in .todo.ai.serial.
-        # If multiple users edit same file, they share serial? 
-        # Shell script implementation: 
-        # assign_task_number_multi_user: gets user_id, increments serial, returns "{user_id}-{serial}"
-        
-        return f"{user_id}-{current_max + 1}"
+        next_val = max(stored, current_max) + 1
+        return f"{user_id}-{next_val}"
 
-    def _generate_branch_id(self, current_max: int) -> str:
+    def _generate_branch_id(self, current_max: int, stored: int) -> str:
         """
         Mode 3: Branch
         Prefix with branch name (first 7 chars).
         """
         branch = self._get_branch_name()
-        return f"{branch}-{current_max + 1}"
+        next_val = max(stored, current_max) + 1
+        return f"{branch}-{next_val}"
 
-    def _generate_enhanced_id(self, current_max: int) -> str:
+    def _generate_enhanced_id(self, current_max: int, stored: int) -> str:
         """
         Mode 4: Enhanced
         Same as single-user enhanced (uses coordination service).
         """
         # For now, behaves like single-user with coordination
-        return self._generate_single_user_id(current_max)
+        return self._generate_single_user_id(current_max, stored)
 
     def _coordinate_via_github(self, current_max: int, issue_number: int) -> str:
         """

@@ -31,14 +31,22 @@ def test_multi_user(manager, mock_config):
     
     with patch("todo_ai.core.coordination.CoordinationManager._get_github_user_id") as mock_user:
         mock_user.return_value = "devuser"
-        assert manager.generate_next_task_id(10) == "devuser-11"
+        # stored=20, current=10 -> max=20 -> next=21
+        assert manager.generate_next_task_id(10, stored_serial=20) == "devuser-21"
 
 def test_branch_mode(manager, mock_config):
     mock_config.get_numbering_mode.return_value = "branch"
     
     with patch("todo_ai.core.coordination.CoordinationManager._get_branch_name") as mock_branch:
         mock_branch.return_value = "feature"
-        assert manager.generate_next_task_id(10) == "feature-11"
+        # stored=5, current=10 -> max=10 -> next=11
+        assert manager.generate_next_task_id(10, stored_serial=5) == "feature-11"
+
+def test_enhanced_mode(manager, mock_config):
+    mock_config.get_numbering_mode.return_value = "enhanced"
+    # Should behave like single-user (max(stored, current) + 1)
+    # stored=10, current=5 -> max=10 -> next=11
+    assert manager.generate_next_task_id(5, stored_serial=10) == "11"
 
 def test_github_coordination(manager, mock_config, mock_github_client):
     mock_config.get_numbering_mode.return_value = "single-user"

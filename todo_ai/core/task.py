@@ -84,50 +84,48 @@ class TaskManager:
         """Retrieve a task by ID."""
         return self._tasks.get(task_id)
 
-    def add_task(self, description: str, tags: List[str] = None) -> Task:
+    def add_task(self, description: str, tags: List[str] = None, task_id: str = None) -> Task:
         """Add a new task."""
-        # Simple ID generation for now - will be replaced by coordination logic
-        # Find max integer ID
-        max_id = 0
-        for tid in self._tasks:
-            if tid.isdigit():
-                max_id = max(max_id, int(tid))
-        
-        new_id = str(max_id + 1)
+        if not task_id:
+            # Fallback: Find max integer ID from existing tasks
+            max_id = 0
+            for tid in self._tasks:
+                if tid.isdigit():
+                    max_id = max(max_id, int(tid))
+            task_id = str(max_id + 1)
         
         task = Task(
-            id=new_id, 
+            id=task_id, 
             description=description,
             tags=set(tags) if tags else set()
         )
-        self._tasks[new_id] = task
+        self._tasks[task_id] = task
         return task
 
-    def add_subtask(self, parent_id: str, description: str, tags: List[str] = None) -> Task:
+    def add_subtask(self, parent_id: str, description: str, tags: List[str] = None, task_id: str = None) -> Task:
         """Add a subtask to an existing task."""
         parent = self.get_task(parent_id)
         if not parent:
             raise ValueError(f"Parent task {parent_id} not found")
         
-        # Find next subtask ID
-        # Format: parent_id.sub_id (e.g. 1.1, 1.2)
-        # Note: Logic handles 2-level nesting if parent_id is already a subtask (e.g. 1.1 -> 1.1.1)
-        prefix = f"{parent_id}."
-        max_sub = 0
-        for tid in self._tasks:
-            if tid.startswith(prefix):
-                suffix = tid[len(prefix):]
-                if suffix.isdigit():
-                    max_sub = max(max_sub, int(suffix))
-        
-        new_id = f"{prefix}{max_sub + 1}"
+        if not task_id:
+            # Find next subtask ID
+            # Format: parent_id.sub_id (e.g. 1.1, 1.2)
+            prefix = f"{parent_id}."
+            max_sub = 0
+            for tid in self._tasks:
+                if tid.startswith(prefix):
+                    suffix = tid[len(prefix):]
+                    if suffix.isdigit():
+                        max_sub = max(max_sub, int(suffix))
+            task_id = f"{prefix}{max_sub + 1}"
         
         task = Task(
-            id=new_id,
+            id=task_id,
             description=description,
             tags=set(tags) if tags else set()
         )
-        self._tasks[new_id] = task
+        self._tasks[task_id] = task
         return task
 
     def complete_task(self, task_id: str) -> Task:

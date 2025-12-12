@@ -1,5 +1,5 @@
 import click
-from todo_ai.cli.commands import add_command, complete_command, list_command
+from todo_ai.cli.commands import add_command, complete_command, list_command, add_subtask_command
 
 @click.group()
 def cli():
@@ -12,6 +12,14 @@ def cli():
 def add(description, tags):
     """Add a new task."""
     add_command(description, list(tags))
+
+@cli.command("add-subtask")
+@click.argument('parent_id')
+@click.argument('description')
+@click.argument('tags', nargs=-1)
+def add_subtask(parent_id, description, tags):
+    """Add a subtask."""
+    add_subtask_command(parent_id, description, list(tags))
 
 @cli.command()
 @click.argument('task_id')
@@ -28,4 +36,3 @@ def list_tasks(status, tag):
 
 if __name__ == '__main__':
     cli()
-

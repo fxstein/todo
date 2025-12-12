@@ -26,6 +26,7 @@ def test_workflow_basic(isolated_cli):
     # 1. Add a task
     result = isolated_cli.invoke(cli, ['add', 'Buy milk', '#shopping'])
     assert result.exit_code == 0
+    # Serial is 6 (Last Used), Max is 5. Next should be 7.
     assert "Added: #7 Buy milk" in result.output 
     
     # 2. List tasks
@@ -48,6 +49,7 @@ def test_workflow_subtasks(isolated_cli):
     # 1. Add parent task
     result = isolated_cli.invoke(cli, ['add', 'Parent Task'])
     assert result.exit_code == 0
+    # Serial is 6 (Last Used). Next is 7.
     assert "Added: #7 Parent Task" in result.output
     
     # 2. Add subtask

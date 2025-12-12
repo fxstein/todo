@@ -665,6 +665,12 @@ Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation dep
 2025-11-09 21:28:49 | fxstein | ADD_SUBTASK | 130.2 | Analyze delete_task function: study how it properly removes notes (lines 2926-2935) (parent: #130)
 2025-11-09 21:28:48 | fxstein | ADD_SUBTASK | 130.1 | Investigate archive_task function: how notes are currently handled (or not handled) (parent: #130)
 2025-11-09 21:28:42 | fxstein | ADD | 130 | Fix issue#32: Archive command doesn't move task notes with the task
+2025-11-02 23:48:17 | fxstein | ADD_SUBTASK | 129.3 | Add prune command with --days and --from-task options (parent: #129)
+2025-11-02 23:48:16 | fxstein | ADD_SUBTASK | 129.2 | Implement git history analysis to identify archive dates for tasks (parent: #129)
+2025-11-02 23:48:16 | fxstein | ADD_SUBTASK | 129.1 | Design prune function with 30-day default and task ID targeting options (parent: #129)
+2025-11-02 23:48:12 | fxstein | ADD | 129 | Implement --prune function to remove old archived tasks based on git history
+2025-11-02 23:48:09 | fxstein | ADD | 128 | Create git commit hook for todo list linting and validation
+2025-11-02 23:48:07 | fxstein | ADD | 127 | Enhance --lint command with additional detection features
 2025-11-02 23:29:46 | fxstein | ARCHIVE | 126 | Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (with 4 subtasks)
 2025-11-02 23:29:45 | fxstein | COMPLETE | 126 | Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode)
 2025-11-02 23:26:37 | fxstein | COMPLETE | 126.3 | Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode)

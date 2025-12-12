@@ -3,6 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
+  - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
+  - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
+  - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
+- [ ] **#128** Create git commit hook for todo list linting and validation `#feature`
+- [ ] **#127** Enhance --lint command with additional detection features `#feature`
 - [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature`
   > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
   - [x] **#125.13** Update bug reporting design document with new implementation details `#docs`

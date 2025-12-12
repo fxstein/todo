@@ -127,24 +127,32 @@ Perfect for AI agents - just works.
 
 ## Installation
 
-### Smart Installer (Recommended)
+### Modern Python Version (v3.0+) - Recommended
 
-Automatically detects your system and installs the best version:
+Install via pipx for standard CLI and MCP Server support:
 
+```bash
+pipx install todo-ai
+```
+
+This installs two commands:
+- `todo-ai`: The CLI tool (replaces `./todo.ai`).
+- `todo-ai-mcp`: The MCP Server for AI agents (Cursor).
+
+**Documentation:**
+- [Python Migration Guide](docs/user/PYTHON_MIGRATION_GUIDE.md) - How to upgrade from v2.x (Shell).
+- [MCP Setup Guide](docs/user/MCP_SETUP.md) - How to set up Cursor AI integration.
+
+### Legacy Shell Script (v2.x)
+
+If you cannot use Python, the legacy shell script is still available:
+
+**Smart Installer:**
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
 ```
 
-The installer will:
-- ✅ Detect your OS (macOS, Linux, Windows/WSL)
-- ✅ Check shell availability (zsh, bash 4+)
-- ✅ Fetch latest release from GitHub (not main branch)
-- ✅ Install the optimal version for your system
-
-### Manual Installation
-
-If you prefer to choose the version manually:
-
+**Manual Installation:**
 **Zsh version** (recommended for macOS):
 ```bash
 curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
@@ -159,12 +167,24 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash
 
 ### Update
 
+**Python (v3.0+):**
+```bash
+pipx upgrade todo-ai
+```
+
+**Legacy Shell:**
 ```bash
 ./todo.ai update
 ```
 
 ### Uninstall
 
+**Python (v3.0+):**
+```bash
+pipx uninstall todo-ai
+```
+
+**Legacy Shell:**
 ```bash
 ./todo.ai uninstall              # Remove script only
 ./todo.ai uninstall --all        # Remove script, data, and rules

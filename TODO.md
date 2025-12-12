@@ -46,7 +46,8 @@
   - [ ] **#163.4** Design phase: Design CLI interface specification (maintain existing command syntax) `#design`
   - [ ] **#163.3** Design phase: Design MCP server interface specification `#design`
   - [ ] **#163.2** Design phase: Define core logic API and interface contracts `#design`
-  - [ ] **#163.1** Design phase: Create architecture design document for Python refactor `#design`
+  - [x] **#163.1** Design phase: Create architecture design document for Python refactor `#design`
+    > Architecture design document created at docs/design/PYTHON_REFACTOR_ARCHITECTURE.md. Document validated (v1.1) and covers: current architecture analysis, proposed Python architecture with dual interfaces (MCP + CLI), core module design, installation via pipx, migration strategy, testing strategy with isolated test data, and implementation phases.
 - [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
   - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
   - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
@@ -740,6 +741,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 14:46:36 CET 2025
+**Last Updated:** Fri Dec 12 14:51:41 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

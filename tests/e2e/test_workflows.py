@@ -32,7 +32,7 @@ def test_workflow_basic(isolated_cli):
     # 2. List tasks
     result = isolated_cli.invoke(cli, ['list'])
     assert result.exit_code == 0
-    assert "#7 Buy milk" in result.output
+    assert "**#7** Buy milk" in result.output
     
     # 3. Complete task
     result = isolated_cli.invoke(cli, ['complete', '7'])
@@ -41,7 +41,7 @@ def test_workflow_basic(isolated_cli):
     
     # 4. Verify completion
     result = isolated_cli.invoke(cli, ['list'])
-    assert "[x] #7 Buy milk" in result.output
+    assert "[x] **#7** Buy milk" in result.output
 
 def test_workflow_subtasks(isolated_cli):
     """Test subtask creation and management."""
@@ -59,7 +59,7 @@ def test_workflow_subtasks(isolated_cli):
     
     # 3. Verify listing
     result = isolated_cli.invoke(cli, ['list'])
-    assert "#7.1 Subtask 1" in result.output
+    assert "**#7.1** Subtask 1" in result.output
     
     # 4. Complete subtask
     result = isolated_cli.invoke(cli, ['complete', '7.1'])
@@ -67,4 +67,4 @@ def test_workflow_subtasks(isolated_cli):
     
     # 5. Verify completion
     result = isolated_cli.invoke(cli, ['list'])
-    assert "[x] #7.1 Subtask 1" in result.output
+    assert "[x] **#7.1** Subtask 1" in result.output

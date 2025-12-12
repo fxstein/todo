@@ -18,10 +18,10 @@
   - [ ] **#163.30** Documentation phase: Document MCP server integration and usage `#docs`
   - [ ] **#163.29** Documentation phase: Create migration guide from shell to Python version `#docs`
   - [ ] **#163.28** Documentation phase: Create Python version user documentation `#docs`
-  - [ ] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces `#test`
-  - [ ] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing) `#test`
+  - [x] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces `#test`
+  - [x] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing) `#test`
     > Side-by-side comparison: Run same commands on test dataset with both shell version and Python version. Outputs must be identical. Use diff tools to verify.
-  - [ ] **#163.25** Testing phase: Test pipx installation and system-wide availability `#test`
+  - [x] **#163.25** Testing phase: Test pipx installation and system-wide availability `#test`
   - [x] **#163.24** Testing phase: Test migration from shell version to Python version `#test`
   - [x] **#163.23** Testing phase: Test GitHub coordination integration `#test`
   - [x] **#163.22** Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced) `#test`
@@ -744,6 +744,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 23:25:06 CET 2025
+**Last Updated:** Fri Dec 12 23:32:03 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

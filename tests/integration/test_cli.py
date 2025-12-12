@@ -20,7 +20,7 @@ def test_list_command(isolated_cli):
     isolated_cli.invoke(cli, ['add', 'Task 1'])
     result = isolated_cli.invoke(cli, ['list'])
     assert result.exit_code == 0
-    assert "[ ] #1 Task 1" in result.output
+    assert "**#1** Task 1" in result.output
 
 def test_complete_command(isolated_cli):
     isolated_cli.invoke(cli, ['add', 'Task 1'])
@@ -30,5 +30,5 @@ def test_complete_command(isolated_cli):
     
     # Verify list update
     result = isolated_cli.invoke(cli, ['list'])
-    assert "[x] #1 Task 1" in result.output
+    assert "[x] **#1** Task 1" in result.output
 

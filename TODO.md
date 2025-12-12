@@ -39,7 +39,7 @@
     > Create utility to copy/generate test dataset from live data (sanitized) or create synthetic test data. Must ensure test environment is completely isolated from live project TODO.md.
   - [ ] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset `#test`
     > CRITICAL: Set up dedicated test environment with separate TODO.md and .todo.ai/ directory. Use environment variable or config to point Python version to test data. Ensure test data is never mixed with live project data.
-  - [ ] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout) `#code`
+  - [x] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout) `#code`
   - [x] **#163.6** Design phase: Create migration plan from shell to Python version `#design`
   - [x] **#163.5** Design phase: Design test data isolation strategy (separate test TODO.md) `#design`
     > CRITICAL: Test data must be completely isolated. Create separate test TODO.md and .todo.ai/ directory. NEVER use the live project TODO.md for testing. Test dataset should be a copy with realistic but safe test data.

@@ -3,6 +3,8 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
+- [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
 - [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
@@ -742,6 +744,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 20:00:19 CET 2025
+**Last Updated:** Fri Dec 12 20:04:38 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

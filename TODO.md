@@ -10,14 +10,14 @@
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
   - [ ] **#163.35** Release phase: Final release of Python version with migration support `#release`
   - [ ] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release`
-  - [ ] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list) `#code`
+  - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list) `#code`
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
-  - [ ] **#163.32** Maintenance phase: Ensure existing shell script continues working during development `#code`
+  - [x] **#163.32** Maintenance phase: Ensure existing shell script continues working during development `#code`
     > CRITICAL REQUIREMENT: Existing shell script (todo.ai) MUST continue working throughout entire development process. Do NOT modify shell script during Python development. This ensures we can track progress using the existing tool.
   - [x] **#163.31** Documentation phase: Update installation instructions for pipx `#docs`
   - [x] **#163.30** Documentation phase: Document MCP server integration and usage `#docs`
   - [x] **#163.29** Documentation phase: Create migration guide from shell to Python version `#docs`
-  - [ ] **#163.28** Documentation phase: Create Python version user documentation `#docs`
+  - [x] **#163.28** Documentation phase: Create Python version user documentation `#docs`
   - [x] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces `#test`
   - [x] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing) `#test`
     > Side-by-side comparison: Run same commands on test dataset with both shell version and Python version. Outputs must be identical. Use diff tools to verify.
@@ -744,6 +744,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 23:36:07 CET 2025
+**Last Updated:** Sat Dec 13 00:39:34 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -40,9 +40,9 @@ def add_command(description: str, tags: List[str]):
     next_id_str = coordination.generate_next_task_id(current_max, stored_serial)
     
     # Update serial file for next time
-    # If next_id is numeric, set serial to next_id + 1 (the NEXT one)
+    # If next_id is numeric, set serial to next_id (Last Used)
     if next_id_str.isdigit():
-        file_ops.set_serial(int(next_id_str) + 1)
+        file_ops.set_serial(int(next_id_str))
     
     task = manager.add_task(description, tags, task_id=next_id_str)
     file_ops.write_tasks(manager.list_tasks())

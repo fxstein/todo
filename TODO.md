@@ -31,7 +31,7 @@
   - [ ] **#163.18** Testing phase: Test all commands with dedicated test TODO.md dataset `#test`
     > Test all commands using dedicated test TODO.md dataset. Compare outputs with shell version using same test data. Ensure Python version produces identical results.
   - [ ] **#163.17** Testing phase: Create comprehensive test suite for core logic `#test`
-  - [ ] **#163.16** Implementation phase: Implement pipx packaging and installation `#code`
+  - [x] **#163.16** Implementation phase: Implement pipx packaging and installation `#code`
   - [x] **#163.15** Implementation phase: Implement CLI interface (maintain existing command syntax) `#code`
   - [x] **#163.14** Implementation phase: Implement MCP server interface (expose all commands as MCP tools) `#code`
   - [x] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced) `#code`
@@ -744,6 +744,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 20:21:25 CET 2025
+**Last Updated:** Fri Dec 12 20:29:21 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

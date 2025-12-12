@@ -6,7 +6,8 @@
 - [ ] #163 Test task for complete fix `#test`
 - [ ] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug`
   > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
-  - [ ] **#161.5** Verify fix works with both local and system-wide installations `#bug`
+  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug`
+    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
   - [x] **#161.4** Fix migration path detection for system-wide installations `#bug`
     > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
   - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug`
@@ -695,6 +696,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 14:10:20 CET 2025
+**Last Updated:** Fri Dec 12 14:12:54 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

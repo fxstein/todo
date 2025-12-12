@@ -5901,7 +5901,8 @@ run_migrations() {
     local last_migrated_version=""
     if [[ -d "$migrations_dir" ]]; then
         # Find highest version from migration marker files
-        for migration_file in "$migrations_dir"/v*_*.migrated; do
+        # Use find to avoid glob expansion errors when no files match
+        while IFS= read -r migration_file; do
             if [[ -f "$migration_file" ]]; then
                 local filename=$(basename "$migration_file")
                 # Extract version (e.g., v1.3.5_section_order_fix.migrated -> 1.3.5)
@@ -5916,7 +5917,7 @@ run_migrations() {
                     fi
                 fi
             fi
-        done
+        done < <(find "$migrations_dir" -maxdepth 1 -name "v*_*.migrated" -type f 2>/dev/null)
     fi
     
     # Collect pending migrations

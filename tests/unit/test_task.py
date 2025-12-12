@@ -1,6 +1,8 @@
 import pytest
 from datetime import datetime
-from todo_ai.core.task import Task, TaskStatus
+from todo_ai.core.task import Task, TaskStatus, TaskManager
+
+# ... (previous Task tests remain) ...
 
 def test_task_creation():
     task = Task(id="1", description="Test task")
@@ -50,3 +52,72 @@ def test_task_notes():
     assert len(task.notes) == 1
     assert task.notes[0] == "Note 1"
 
+# TaskManager Tests
+
+@pytest.fixture
+def task_manager():
+    return TaskManager()
+
+def test_manager_add_task(task_manager):
+    task = task_manager.add_task("New task", tags=["tag1"])
+    assert task.id == "1"
+    assert task.description == "New task"
+    assert "tag1" in task.tags
+    
+    task2 = task_manager.add_task("Second task")
+    assert task2.id == "2"
+
+def test_manager_add_subtask(task_manager):
+    parent = task_manager.add_task("Parent")
+    sub = task_manager.add_subtask(parent.id, "Subtask")
+    
+    assert sub.id == "1.1"
+    assert sub.description == "Subtask"
+    
+    sub2 = task_manager.add_subtask(parent.id, "Subtask 2")
+    assert sub2.id == "1.2"
+
+def test_manager_add_subtask_nested(task_manager):
+    parent = task_manager.add_task("Parent")
+    sub = task_manager.add_subtask(parent.id, "Subtask")
+    nested = task_manager.add_subtask(sub.id, "Nested")
+    
+    assert nested.id == "1.1.1"
+
+def test_manager_operations(task_manager):
+    task = task_manager.add_task("Task to modify")
+    
+    # Complete
+    task_manager.complete_task(task.id)
+    assert task.status == TaskStatus.COMPLETED
+    
+    # Archive
+    task_manager.archive_task(task.id)
+    assert task.status == TaskStatus.ARCHIVED
+    
+    # Restore
+    task_manager.restore_task(task.id)
+    assert task.status == TaskStatus.PENDING
+    
+    # Delete
+    task_manager.delete_task(task.id)
+    assert task.status == TaskStatus.DELETED
+
+def test_manager_list_tasks(task_manager):
+    t1 = task_manager.add_task("Task 1", tags=["tag1"])
+    t2 = task_manager.add_task("Task 2", tags=["tag2"])
+    task_manager.complete_task(t2.id)
+    
+    # All tasks
+    all_tasks = task_manager.list_tasks()
+    assert len(all_tasks) == 2
+    
+    # Filter by status
+    pending = task_manager.list_tasks(filters={"status": TaskStatus.PENDING})
+    assert len(pending) == 1
+    assert pending[0].id == t1.id
+    
+    # Filter by tag
+    tagged = task_manager.list_tasks(filters={"tag": "tag1"})
+    assert len(tagged) == 1
+    assert tagged[0].id == t1.id

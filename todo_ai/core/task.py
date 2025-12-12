@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Dict, Any
 
 class TaskStatus(Enum):
     PENDING = "pending"
@@ -74,3 +74,112 @@ class Task:
         self.archived_at = None
         self.updated_at = datetime.now()
 
+class TaskManager:
+    """Core task management operations"""
+    
+    def __init__(self, tasks: Optional[List[Task]] = None):
+        self._tasks: Dict[str, Task] = {t.id: t for t in tasks} if tasks else {}
+
+    def get_task(self, task_id: str) -> Optional[Task]:
+        """Retrieve a task by ID."""
+        return self._tasks.get(task_id)
+
+    def add_task(self, description: str, tags: List[str] = None) -> Task:
+        """Add a new task."""
+        # Simple ID generation for now - will be replaced by coordination logic
+        # Find max integer ID
+        max_id = 0
+        for tid in self._tasks:
+            if tid.isdigit():
+                max_id = max(max_id, int(tid))
+        
+        new_id = str(max_id + 1)
+        
+        task = Task(
+            id=new_id, 
+            description=description,
+            tags=set(tags) if tags else set()
+        )
+        self._tasks[new_id] = task
+        return task
+
+    def add_subtask(self, parent_id: str, description: str, tags: List[str] = None) -> Task:
+        """Add a subtask to an existing task."""
+        parent = self.get_task(parent_id)
+        if not parent:
+            raise ValueError(f"Parent task {parent_id} not found")
+        
+        # Find next subtask ID
+        # Format: parent_id.sub_id (e.g. 1.1, 1.2)
+        # Note: Logic handles 2-level nesting if parent_id is already a subtask (e.g. 1.1 -> 1.1.1)
+        prefix = f"{parent_id}."
+        max_sub = 0
+        for tid in self._tasks:
+            if tid.startswith(prefix):
+                suffix = tid[len(prefix):]
+                if suffix.isdigit():
+                    max_sub = max(max_sub, int(suffix))
+        
+        new_id = f"{prefix}{max_sub + 1}"
+        
+        task = Task(
+            id=new_id,
+            description=description,
+            tags=set(tags) if tags else set()
+        )
+        self._tasks[new_id] = task
+        return task
+
+    def complete_task(self, task_id: str) -> Task:
+        """Mark a task as complete."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        task.mark_completed()
+        return task
+
+    def delete_task(self, task_id: str) -> Task:
+        """Mark a task as deleted."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        task.mark_deleted()
+        return task
+
+    def archive_task(self, task_id: str) -> Task:
+        """Mark a task as archived."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        task.mark_archived()
+        return task
+
+    def restore_task(self, task_id: str) -> Task:
+        """Restore a task to pending status."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        task.restore()
+        return task
+    
+    def list_tasks(self, filters: Dict[str, Any] = None) -> List[Task]:
+        """List tasks matching filters."""
+        if not filters:
+            return list(self._tasks.values())
+            
+        result = []
+        for task in self._tasks.values():
+            match = True
+            
+            if "status" in filters:
+                if task.status != filters["status"]:
+                    match = False
+                    
+            if "tag" in filters:
+                if filters["tag"] not in task.tags:
+                    match = False
+            
+            if match:
+                result.append(task)
+                
+        return result

@@ -24,7 +24,7 @@
   - [ ] **#163.25** Testing phase: Test pipx installation and system-wide availability `#test`
   - [ ] **#163.24** Testing phase: Test migration from shell version to Python version `#test`
   - [ ] **#163.23** Testing phase: Test GitHub coordination integration `#test`
-  - [ ] **#163.22** Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced) `#test`
+  - [x] **#163.22** Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced) `#test`
   - [x] **#163.21** Testing phase: Test data format compatibility (.todo.ai/, TODO.md structure) `#test`
   - [x] **#163.20** Testing phase: Test CLI interface matches existing shell script behavior `#test`
   - [x] **#163.19** Testing phase: Test MCP server interface with MCP-compatible clients `#test`
@@ -744,6 +744,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 23:20:14 CET 2025
+**Last Updated:** Fri Dec 12 23:21:36 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

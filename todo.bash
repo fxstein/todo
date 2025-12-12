@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 2.7.0
+# Version: 2.7.1
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -27,24 +27,41 @@ set +x  # Explicitly disable debug/trace output
 
 # Cross-platform sed in-place editing function
 sed_inplace() {
+    # Handle extended regex flag (-E) if provided
+    local use_extended_regex=false
+    if [[ "$1" == "-E" ]]; then
+        use_extended_regex=true
+        shift
+    fi
+    
     if [[ "$(uname)" == "Darwin" ]]; then
-        sed -i '' "$@"
+        if [[ "$use_extended_regex" == "true" ]]; then
+            sed -i '' -E "$@"
+        else
+            sed -i '' "$@"
+        fi
     else
-        sed -i "$@"
+        if [[ "$use_extended_regex" == "true" ]]; then
+            sed -i -E "$@"
+        else
+            sed -i "$@"
+        fi
     fi
 }
 
 # Version
-VERSION="2.7.0"
+VERSION="2.7.1"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
 # Configuration
 # Can be overridden with environment variables
-TODO_FILE="${TODO_FILE:-$(pwd)/TODO.md}"
-SERIAL_FILE="${TODO_SERIAL:-$(pwd)/.todo.ai/.todo.ai.serial}"
-LOG_FILE="${TODO_LOG:-$(pwd)/.todo.ai/.todo.ai.log}"
-CONFIG_FILE="${TODO_CONFIG:-$(pwd)/.todo.ai/config.yaml}"
+# Capture original working directory at script startup (before any cd commands)
+ORIGINAL_WORKING_DIR="${ORIGINAL_WORKING_DIR:-$(pwd)}"
+TODO_FILE="${TODO_FILE:-${ORIGINAL_WORKING_DIR}/TODO.md}"
+SERIAL_FILE="${TODO_SERIAL:-${ORIGINAL_WORKING_DIR}/.todo.ai/.todo.ai.serial}"
+LOG_FILE="${TODO_LOG:-${ORIGINAL_WORKING_DIR}/.todo.ai/.todo.ai.log}"
+CONFIG_FILE="${TODO_CONFIG:-${ORIGINAL_WORKING_DIR}/.todo.ai/config.yaml}"
 
 # ============================================================================
 # Hybrid Task Numbering System
@@ -2513,15 +2530,20 @@ complete_todo() {
     # Complete all tasks
     local completed_count=0
     for number in "${all_ids[@]}"; do
-        # Skip if task doesn't exist (escape asterisks for grep)
-        if ! grep -q "\*\*#$number\*\*" "$TODO_FILE"; then
+        # Escape dots in task ID for pattern matching
+        local escaped_number=$(echo "$number" | sed 's/\./\\./g')
+        
+        # Skip if task doesn't exist (search for both bold and non-bold formats)
+        if ! grep -qE "(\*\*#$escaped_number\*\*|#$escaped_number)" "$TODO_FILE"; then
             echo "Warning: Task #$number not found, skipping"
             continue
         fi
         
-        # Complete the task
-        sed_inplace "s/- \[ \] \*\*#$number\*\* /- [x] **#$number** /" "$TODO_FILE"
-        sed_inplace "s/  - \[ \] \*\*#$number\*\* /  - [x] **#$number** /" "$TODO_FILE"
+        # Complete the task (try bold format first, then non-bold format)
+        sed_inplace "s/- \[ \] \*\*#$escaped_number\*\* /- [x] **#$escaped_number** /" "$TODO_FILE" || \
+        sed_inplace "s/- \[ \] #$escaped_number /- [x] **#$escaped_number** /" "$TODO_FILE"
+        sed_inplace "s/  - \[ \] \*\*#$escaped_number\*\* /  - [x] **#$escaped_number** /" "$TODO_FILE" || \
+        sed_inplace "s/  - \[ \] #$escaped_number /  - [x] **#$escaped_number** /" "$TODO_FILE"
         
         # Get task description for logging
         local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
@@ -2663,23 +2685,30 @@ modify_todo() {
     
     # Match everything after task ID including text and tags (with backticks)
     # Use task depth to determine which pattern to match (handles all indentation levels)
+    # Pattern matches both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats
     if [[ $task_depth -eq 0 ]]; then
         # For main tasks, replace without indentation
-        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
-        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+        # Try bold format first, then non-bold format
+        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^- \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE"
     elif [[ $task_depth -eq 1 ]]; then
         # For subtasks, replace with proper 2-space indentation
-        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
-        sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+        # Try bold format first, then non-bold format
+        sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^  - \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE"
     elif [[ $task_depth -eq 2 ]]; then
         # For sub-subtasks, replace with proper 4-space indentation
-        # Pattern matches: checkbox, task ID (with escaped dots), then everything (text and tags)
-        sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
-    else
-        # Fallback: try all indentation levels
+        # Try bold format first, then non-bold format
         sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^    - \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE"
+    else
+        # Fallback: try all indentation levels with both bold and non-bold formats
+        sed_inplace "s|^    - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^    - \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE" || \
         sed_inplace "s|^  - \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
-        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE"
+        sed_inplace "s|^  - \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^- \[.*\] \*\*#$escaped_task_id\*\* .*|$escaped_line|" "$TODO_FILE" || \
+        sed_inplace "s|^- \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE"
     fi
     update_footer
     
@@ -2817,12 +2846,12 @@ archive_task() {
     local status_note=""
     local is_completed=false
     
-    # Check if task exists and its current state
-    if grep -q "^- \[x\] \*\*#$task_id\*\* " "$TODO_FILE"; then
+    # Check if task exists and its current state (search for both bold and non-bold formats)
+    if grep -qE "^- \[x\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE"; then
         # Task is completed
         is_completed=true
         checkbox="x"
-    elif grep -q "^- \[ \] \*\*#$task_id\*\* " "$TODO_FILE"; then
+    elif grep -qE "^- \[ \] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE"; then
         # Task is incomplete - need reason to archive
         if [[ -z "$reason" ]]; then
             echo "Error: Task #$task_id is not completed"
@@ -3308,7 +3337,8 @@ restore_task() {
     
     # Simple implementation: move the task back to Tasks section
     # Get the task line (from Recently Completed or Deleted section)
-    local task_line=$(grep "^- \[[xD~>\-]\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1)
+    # Search for both bold and non-bold formats
+    local task_line=$(grep -E "^- \[[xD~>\-]\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
     if [[ -z "$task_line" ]]; then
         echo "Error: Could not find task #$task_id in Recently Completed or Deleted section"
         return 1
@@ -4223,12 +4253,13 @@ show_task() {
     # Find and display the task (try resolved ID first, then fall back to original if not found)
     # Support arbitrary nesting depth by matching any amount of leading spaces
     # Use [.*] instead of [.] to handle checkbox variations (including malformed ones)
-    local task_line=$(grep "^[ ]*- \[.*\] \*\*#$resolved_task_id\*\* " "$TODO_FILE" | head -1)
+    # Search for both bold and non-bold formats
+    local task_line=$(grep -E "^[ ]*- \[.*\] (\*\*#$resolved_task_id\*\*|#$resolved_task_id) " "$TODO_FILE" | head -1)
     
     # Fallback: if resolved ID not found and it has a prefix, try original plain number
     if [[ -z "$task_line" ]] && [[ "$resolved_task_id" != "$task_id" ]] && [[ "$resolved_task_id" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
         local plain_number="${match[1]}"
-        task_line=$(grep "^[ ]*- \[.*\] \*\*#${plain_number}\*\* " "$TODO_FILE" | head -1)
+        task_line=$(grep -E "^[ ]*- \[.*\] (\*\*#${plain_number}\*\*|#${plain_number}) " "$TODO_FILE" | head -1)
         if [[ -n "$task_line" ]]; then
             task_id="$plain_number"  # Use plain number for display
         fi
@@ -4246,7 +4277,8 @@ show_task() {
     # Get line number for note detection
     # Support arbitrary nesting depth by matching any amount of leading spaces
     # Use [.*] instead of [.] to handle checkbox variations (including malformed ones)
-    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Search for both bold and non-bold formats
+    local task_line_num=$(grep -nE "^[ ]*- \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     # Display notes if they exist (blockquotes immediately after task)
     # Support arbitrary nesting depth by matching any amount of leading spaces
@@ -4380,8 +4412,8 @@ relate_task() {
     fi
     task_id="$resolved_task_id"
     
-    # Verify task exists
-    if ! grep -q "\*\*#$task_id\*\*" "$TODO_FILE"; then
+    # Verify task exists (search for both bold and non-bold formats)
+    if ! grep -qE "(\*\*#$task_id\*\*|#$task_id)" "$TODO_FILE"; then
         echo "Error: Task #$task_id not found"
         return 1
     fi
@@ -4414,7 +4446,8 @@ add_note() {
     task_id="$resolved_task_id"
     
     # Verify task exists (support arbitrary nesting depth)
-    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Search for both bold and non-bold formats
+    local task_line_num=$(grep -nE "^[ ]*- \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     if [[ -z "$task_line_num" ]]; then
         echo "Error: Task #$task_id not found"
@@ -4554,8 +4587,8 @@ update_note() {
     # Add new notes using existing add_note logic
     # We need to manually do what add_note does but without the existence check
     
-    # Find task and get indentation
-    local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#$task_id\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
+    # Find task and get indentation (search for both bold and non-bold formats)
+    local task_line_num=$(grep -nE "^[ ]*- \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1 | cut -d: -f1)
     
     if [[ -z "$task_line_num" ]]; then
         echo "Error: Task #$task_id not found"
@@ -5847,7 +5880,9 @@ version_compare() {
 # Function to run migrations
 run_migrations() {
     local current_version="$VERSION"
-    local migrations_dir="$(pwd)/.todo.ai/migrations"
+    # Use original working directory (captured at script startup) instead of current pwd
+    # This ensures migrations run in the user's working directory, not the script's directory
+    local migrations_dir="${ORIGINAL_WORKING_DIR}/.todo.ai/migrations"
     local lock_file="${migrations_dir}/.migrations_lock"
     
     # Lock to prevent concurrent execution
@@ -5866,7 +5901,8 @@ run_migrations() {
     local last_migrated_version=""
     if [[ -d "$migrations_dir" ]]; then
         # Find highest version from migration marker files
-        for migration_file in "$migrations_dir"/v*_*.migrated; do
+        # Use find to avoid glob expansion errors when no files match
+        while IFS= read -r migration_file; do
             if [[ -f "$migration_file" ]]; then
                 local filename=$(basename "$migration_file")
                 # Extract version (e.g., v1.3.5_section_order_fix.migrated -> 1.3.5)
@@ -5881,7 +5917,7 @@ run_migrations() {
                     fi
                 fi
             fi
-        done
+        done < <(find "$migrations_dir" -maxdepth 1 -name "v*_*.migrated" -type f 2>/dev/null)
     fi
     
     # Collect pending migrations

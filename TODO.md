@@ -33,7 +33,7 @@
   - [ ] **#163.14** Implementation phase: Implement MCP server interface (expose all commands as MCP tools) `#code`
   - [ ] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced) `#code`
   - [ ] **#163.12** Implementation phase: Implement GitHub coordination logic `#code`
-  - [ ] **#163.11** Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management) `#code`
+  - [x] **#163.11** Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management) `#code`
   - [x] **#163.10** Implementation phase: Implement core task management logic (add, modify, delete, complete, archive) `#code`
   - [x] **#163.9** Setup phase: Create test data generator/copier for isolated testing `#test`
     > Create utility to copy/generate test dataset from live data (sanitized) or create synthetic test data. Must ensure test environment is completely isolated from live project TODO.md.
@@ -741,6 +741,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 19:43:47 CET 2025
+**Last Updated:** Fri Dec 12 19:46:35 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

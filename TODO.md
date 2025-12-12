@@ -14,9 +14,9 @@
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
   - [ ] **#163.32** Maintenance phase: Ensure existing shell script continues working during development `#code`
     > CRITICAL REQUIREMENT: Existing shell script (todo.ai) MUST continue working throughout entire development process. Do NOT modify shell script during Python development. This ensures we can track progress using the existing tool.
-  - [ ] **#163.31** Documentation phase: Update installation instructions for pipx `#docs`
-  - [ ] **#163.30** Documentation phase: Document MCP server integration and usage `#docs`
-  - [ ] **#163.29** Documentation phase: Create migration guide from shell to Python version `#docs`
+  - [x] **#163.31** Documentation phase: Update installation instructions for pipx `#docs`
+  - [x] **#163.30** Documentation phase: Document MCP server integration and usage `#docs`
+  - [x] **#163.29** Documentation phase: Create migration guide from shell to Python version `#docs`
   - [ ] **#163.28** Documentation phase: Create Python version user documentation `#docs`
   - [x] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces `#test`
   - [x] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing) `#test`
@@ -744,6 +744,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 23:32:03 CET 2025
+**Last Updated:** Fri Dec 12 23:36:07 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-12 14:10:20 | fxstein | COMPLETE | 161.4 | Fix migration path detection for system-wide installations
+2025-12-12 14:10:20 | fxstein | COMPLETE | 161.2 | Review get_script_path() and migration system for system directory handling
+2025-12-12 14:10:20 | fxstein | COMPLETE | 161.1 | Investigate migration path error: reproduce with system directory installation
+2025-12-12 14:10:19 | fxstein | NOTE | 161.4 | FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
+2025-12-12 14:09:57 | fxstein | NOTE | 161.1 | BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
 2025-12-12 13:28:22 | fxstein | NOTE | 160 | All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
 2025-12-12 13:28:10 | fxstein | COMPLETE | 160.5 | Add tests to prevent regression
 2025-12-12 13:28:09 | fxstein | COMPLETE | 160.3 | Test modify command with various task IDs and nesting levels

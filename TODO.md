@@ -7,10 +7,12 @@
 - [ ] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug`
   > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
   - [ ] **#161.5** Verify fix works with both local and system-wide installations `#bug`
-  - [ ] **#161.4** Fix migration path detection for system-wide installations `#bug`
+  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug`
+    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
   - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug`
-  - [ ] **#161.2** Review get_script_path() and migration system for system directory handling `#bug`
-  - [ ] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug`
+  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug`
+  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug`
+    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
 - [ ] **#160** Fix issue#35: Task not found after successful modify command `#bug`
   > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
   > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
@@ -693,6 +695,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 13:28:22 CET 2025
+**Last Updated:** Fri Dec 12 14:10:20 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -56,10 +56,12 @@ SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
 # Configuration
 # Can be overridden with environment variables
-TODO_FILE="${TODO_FILE:-$(pwd)/TODO.md}"
-SERIAL_FILE="${TODO_SERIAL:-$(pwd)/.todo.ai/.todo.ai.serial}"
-LOG_FILE="${TODO_LOG:-$(pwd)/.todo.ai/.todo.ai.log}"
-CONFIG_FILE="${TODO_CONFIG:-$(pwd)/.todo.ai/config.yaml}"
+# Capture original working directory at script startup (before any cd commands)
+ORIGINAL_WORKING_DIR="${ORIGINAL_WORKING_DIR:-$(pwd)}"
+TODO_FILE="${TODO_FILE:-${ORIGINAL_WORKING_DIR}/TODO.md}"
+SERIAL_FILE="${TODO_SERIAL:-${ORIGINAL_WORKING_DIR}/.todo.ai/.todo.ai.serial}"
+LOG_FILE="${TODO_LOG:-${ORIGINAL_WORKING_DIR}/.todo.ai/.todo.ai.log}"
+CONFIG_FILE="${TODO_CONFIG:-${ORIGINAL_WORKING_DIR}/.todo.ai/config.yaml}"
 
 # ============================================================================
 # Hybrid Task Numbering System
@@ -5878,7 +5880,9 @@ version_compare() {
 # Function to run migrations
 run_migrations() {
     local current_version="$VERSION"
-    local migrations_dir="$(pwd)/.todo.ai/migrations"
+    # Use original working directory (captured at script startup) instead of current pwd
+    # This ensures migrations run in the user's working directory, not the script's directory
+    local migrations_dir="${ORIGINAL_WORKING_DIR}/.todo.ai/migrations"
     local lock_file="${migrations_dir}/.migrations_lock"
     
     # Lock to prevent concurrent execution

@@ -32,8 +32,8 @@
   - [ ] **#163.16** Implementation phase: Implement pipx packaging and installation `#code`
   - [ ] **#163.15** Implementation phase: Implement CLI interface (maintain existing command syntax) `#code`
   - [ ] **#163.14** Implementation phase: Implement MCP server interface (expose all commands as MCP tools) `#code`
-  - [ ] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced) `#code`
-  - [ ] **#163.12** Implementation phase: Implement GitHub coordination logic `#code`
+  - [x] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced) `#code`
+  - [x] **#163.12** Implementation phase: Implement GitHub coordination logic `#code`
   - [x] **#163.11** Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management) `#code`
   - [x] **#163.10** Implementation phase: Implement core task management logic (add, modify, delete, complete, archive) `#code`
   - [x] **#163.9** Setup phase: Create test data generator/copier for isolated testing `#test`
@@ -742,6 +742,6 @@
 
 ---
 
-**Last Updated:** Fri Dec 12 19:48:39 CET 2025
+**Last Updated:** Fri Dec 12 20:00:19 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

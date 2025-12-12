@@ -185,6 +185,48 @@ validate_ascii_charts() {
     return $file_errors
 }
 
+# Run Python tests if python files are changed
+validate_python_tests() {
+    local files="$1"
+    
+    # If no Python files changed, check if pytest config changed
+    if [[ -z "$files" ]] && [[ ! -f "pyproject.toml" ]]; then
+        return 0
+    fi
+    
+    echo "🧪 Running Python tests..."
+    
+    # Check if virtual environment exists
+    if [[ ! -d ".venv" ]]; then
+        echo -e "${YELLOW}⚠️  .venv not found. Skipping Python tests.${NC}"
+        echo "   Run 'python3 -m venv .venv && source .venv/bin/activate && pip install pytest' to setup"
+        return 0
+    fi
+    
+    # Activate venv and run tests
+    # Using a subshell to avoid changing current shell environment
+    (
+        source .venv/bin/activate
+        if ! command -v pytest >/dev/null 2>&1; then
+             echo -e "${YELLOW}⚠️  pytest not found in .venv. Skipping tests.${NC}"
+             exit 0
+        fi
+        
+        if ! pytest; then
+            echo -e "${RED}❌ Python tests failed${NC}"
+            exit 1
+        fi
+    )
+    
+    # Check exit code of subshell
+    if [[ $? -ne 0 ]]; then
+        return 1
+    fi
+    
+    return 0
+}
+
+
 # Validate TODO.md
 validate_todo() {
     local file_errors=0
@@ -262,6 +304,16 @@ if [[ -n "$md_files_for_ascii" ]]; then
         errors=$((errors + 1))
     else
         echo -e "${GREEN}✅ ASCII chart validation passed${NC}"
+    fi
+fi
+
+# Run Python tests if Python files or config changed
+py_files=$(echo "$staged_files" | grep -E '\.(py|toml)$' || true)
+if [[ -n "$py_files" ]]; then
+    if ! validate_python_tests "$py_files"; then
+        errors=$((errors + 1))
+    else
+        echo -e "${GREEN}✅ Python tests passed${NC}"
     fi
 fi
 

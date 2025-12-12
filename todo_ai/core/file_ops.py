@@ -29,8 +29,8 @@ class FileOps:
         content = self._generate_markdown(tasks)
         self.todo_path.write_text(content, encoding="utf-8")
 
-    def get_last_serial(self) -> int:
-        """Get the last used serial number without incrementing."""
+    def get_serial(self) -> int:
+        """Get the current serial number from file."""
         if not self.serial_path.exists():
             return 0
             
@@ -39,16 +39,9 @@ class FileOps:
         except ValueError:
             return 0
 
-    def increment_serial(self) -> int:
-        """Increment and return the new serial number."""
-        current = self.get_last_serial()
-        next_serial = current + 1
-        self.serial_path.write_text(str(next_serial))
-        return next_serial
-
-    def get_next_serial(self) -> int:
-        """Deprecated: Use increment_serial instead."""
-        return self.increment_serial()
+    def set_serial(self, value: int) -> None:
+        """Set the serial number in file."""
+        self.serial_path.write_text(str(value))
 
     def _parse_markdown(self, content: str) -> List[Task]:
         """Parse TODO.md content into Task objects."""

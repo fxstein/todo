@@ -26,21 +26,25 @@ def add_command(description: str, tags: List[str]):
     # ID Generation
     config = Config()
     coordination = CoordinationManager(config)
-    last_serial = file_ops.get_last_serial()
+    
+    # Get current state
+    stored_serial = file_ops.get_serial()
+    
+    # Find max integer ID from existing tasks
+    current_max = 0
+    for task in tasks:
+        if task.id.isdigit():
+            current_max = max(current_max, int(task.id))
     
     # Generate next ID based on mode
-    # Note: generate_next_task_id expects current_max_serial
-    next_id = coordination.generate_next_task_id(last_serial)
+    next_id_str = coordination.generate_next_task_id(current_max, stored_serial)
     
-    # Check if we need to increment serial file
-    # Logic: if ID contains the next serial (last_serial + 1), update file
-    # Simplified: Always increment if we generated a new ID
-    # But generate_next_task_id assumes we pass it the MAX serial, and it returns MAX+1 formatted
+    # Update serial file for next time
+    # If next_id is numeric, set serial to next_id + 1 (the NEXT one)
+    if next_id_str.isdigit():
+        file_ops.set_serial(int(next_id_str) + 1)
     
-    # Update serial file
-    file_ops.increment_serial()
-    
-    task = manager.add_task(description, tags, task_id=next_id)
+    task = manager.add_task(description, tags, task_id=next_id_str)
     file_ops.write_tasks(manager.list_tasks())
     print(f"Added: #{task.id} {task.description}")
 

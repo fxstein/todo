@@ -16,14 +16,14 @@ class CoordinationManager:
     def get_coordination_type(self) -> str:
         return self.config.get_coordination_type()
 
-    def generate_next_task_id(self, current_max_serial: int) -> str:
+    def generate_next_task_id(self, current_max_serial: int, stored_serial: int = 0) -> str:
         """
         Generate the next task ID based on the current mode.
         """
         mode = self.get_numbering_mode()
         
         if mode == "single-user":
-            return self._generate_single_user_id(current_max_serial)
+            return self._generate_single_user_id(current_max_serial, stored_serial)
         elif mode == "multi-user":
             return self._generate_multi_user_id(current_max_serial)
         elif mode == "branch":
@@ -34,11 +34,11 @@ class CoordinationManager:
             # Fallback
             return str(current_max_serial + 1)
 
-    def _generate_single_user_id(self, current_max: int) -> str:
+    def _generate_single_user_id(self, current_max: int, stored: int) -> str:
         """
         Mode 1: Single-user
         If coordination.type is 'github-issues', fetch next ID from issue comments.
-        Otherwise, simple increment.
+        Otherwise, use max(stored, current_max + 1).
         """
         coord_type = self.get_coordination_type()
         
@@ -46,8 +46,9 @@ class CoordinationManager:
             issue_num = self.config.get("coordination.issue_number")
             if issue_num:
                 return self._coordinate_via_github(current_max, issue_num)
-                
-        return str(current_max + 1)
+        
+        # Use max of stored (last used) and current_max, then increment
+        return str(max(stored, current_max) + 1)
 
     def _generate_multi_user_id(self, current_max: int) -> str:
         """

@@ -40,12 +40,12 @@
   - [ ] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset `#test`
     > CRITICAL: Set up dedicated test environment with separate TODO.md and .todo.ai/ directory. Use environment variable or config to point Python version to test data. Ensure test data is never mixed with live project data.
   - [ ] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout) `#code`
-  - [ ] **#163.6** Design phase: Create migration plan from shell to Python version `#design`
-  - [ ] **#163.5** Design phase: Design test data isolation strategy (separate test TODO.md) `#design`
+  - [x] **#163.6** Design phase: Create migration plan from shell to Python version `#design`
+  - [x] **#163.5** Design phase: Design test data isolation strategy (separate test TODO.md) `#design`
     > CRITICAL: Test data must be completely isolated. Create separate test TODO.md and .todo.ai/ directory. NEVER use the live project TODO.md for testing. Test dataset should be a copy with realistic but safe test data.
-  - [ ] **#163.4** Design phase: Design CLI interface specification (maintain existing command syntax) `#design`
-  - [ ] **#163.3** Design phase: Design MCP server interface specification `#design`
-  - [ ] **#163.2** Design phase: Define core logic API and interface contracts `#design`
+  - [x] **#163.4** Design phase: Design CLI interface specification (maintain existing command syntax) `#design`
+  - [x] **#163.3** Design phase: Design MCP server interface specification `#design`
+  - [x] **#163.2** Design phase: Define core logic API and interface contracts `#design`
   - [x] **#163.1** Design phase: Create architecture design document for Python refactor `#design`
     > Architecture design document created at docs/design/PYTHON_REFACTOR_ARCHITECTURE.md. Document validated (v1.1) and covers: current architecture analysis, proposed Python architecture with dual interfaces (MCP + CLI), core module design, installation via pipx, migration strategy, testing strategy with isolated test data, and implementation phases.
 - [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`

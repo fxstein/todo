@@ -8,10 +8,11 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
     strategy:
       matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout repository
@@ -36,8 +37,25 @@ jobs:
       - name: Run type checking
         run: uv run mypy todo_ai || true
 
-      - name: Run tests
-        run: uv run pytest
+      - name: Run tests with coverage
+        run: uv run pytest --cov=todo_ai --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+
+      - name: Validate documentation (markdownlint)
+        run: |
+          if command -v markdownlint &> /dev/null; then
+            markdownlint "**/*.md" --ignore node_modules --ignore .git
+          else
+            echo "markdownlint not installed, skipping documentation validation"
+          fi
+        continue-on-error: true
 
       - name: Run pre-commit checks
         run: uv run pre-commit run --all-files || true

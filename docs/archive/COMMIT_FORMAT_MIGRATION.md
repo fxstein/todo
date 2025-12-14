@@ -83,16 +83,16 @@ This document tracks commits that use the old task number format (`#nn`) instead
 
 ### Historical Commits (Documented only)
 
-17. **1942e44** - `Merge pull request #1 from fxstein/cursor/check-current-status-61ac` (This is a PR number, not a task number - OK)
+1. **1942e44** - `Merge pull request #1 from fxstein/cursor/check-current-status-61ac` (This is a PR number, not a task number - OK)
 
-18. **f91afe4** - `Complete task #32: Implement nested subtasks support (2-level limit)`
-    - Should be: `Complete task#32: Implement nested subtasks support (2-level limit)`
+2. **f91afe4** - `Complete task #32: Implement nested subtasks support (2-level limit)`
+   - Should be: `Complete task#32: Implement nested subtasks support (2-level limit)`
 
-19. **b0b6e39** - `Add task #32: Plan for nested subtasks support (2-level limit)`
-    - Should be: `Add task#32: Plan for nested subtasks support (2-level limit)`
+3. **b0b6e39** - `Add task #32: Plan for nested subtasks support (2-level limit)`
+   - Should be: `Add task#32: Plan for nested subtasks support (2-level limit)`
 
-20. **246264d** - `Complete task #30: Implement versioned backups and rollback capability`
-    - Should be: `Complete task#30: Implement versioned backups and rollback capability`
+4. **246264d** - `Complete task #30: Implement versioned backups and rollback capability`
+   - Should be: `Complete task#30: Implement versioned backups and rollback capability`
 
 ## Implementation Plan
 

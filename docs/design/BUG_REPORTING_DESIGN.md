@@ -61,6 +61,7 @@ Bug reports now use rich GitHub markdown:
 ```
 
 **Tables for System Information:**
+
 | Component | Details |
 |-----------|---------|
 | **OS** | macOS 14.6.0 Darwin |

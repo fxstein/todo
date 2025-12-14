@@ -5,15 +5,15 @@ This guide explains how to upgrade from the legacy `todo.ai` shell script (v2.x)
 ## Overview
 
 Version 3.0 is a complete rewrite in Python, offering:
--   **Dual Interfaces:** Standard CLI + AI-native MCP (Model Context Protocol) Server.
--   **Improved Performance:** Faster parsing and task management.
--   **Cross-Platform Support:** Native support for macOS, Linux, and Windows.
--   **Zero-Data Migration:** Fully compatible with your existing `TODO.md` and `.todo.ai/` configuration.
+- **Dual Interfaces:** Standard CLI + AI-native MCP (Model Context Protocol) Server.
+- **Improved Performance:** Faster parsing and task management.
+- **Cross-Platform Support:** Native support for macOS, Linux, and Windows.
+- **Zero-Data Migration:** Fully compatible with your existing `TODO.md` and `.todo.ai/` configuration.
 
 ## Prerequisites
 
--   **Python 3.8+** installed on your system.
--   **pipx** (recommended): A tool for installing and running Python applications in isolated environments.
+- **Python 3.8+** installed on your system.
+- **pipx** (recommended): A tool for installing and running Python applications in isolated environments.
 
 ### Installing pipx (if not installed)
 
@@ -35,8 +35,8 @@ pipx install todo-ai
 ```
 
 This will expose two commands globally:
-1.  `todo-ai`: The CLI tool (replaces `./todo.ai`).
-2.  `todo-ai-mcp`: The MCP server for AI agents.
+1. `todo-ai`: The CLI tool (replaces `./todo.ai`).
+2. `todo-ai-mcp`: The MCP server for AI agents.
 
 ## Migrating from Shell Script
 
@@ -53,12 +53,12 @@ todo-ai --version
 
 If you have the `todo.ai` shell script committed in your repository root:
 
-1.  **Remove the shell script:**
+1. **Remove the shell script:**
     ```bash
     git rm todo.ai
     ```
 
-2.  **Update your workflow:**
+2. **Update your workflow:**
     Instead of running `./todo.ai [command]`, now run `todo-ai [command]`.
 
     *Example:*
@@ -74,9 +74,9 @@ If you have the `todo.ai` shell script committed in your repository root:
 
 The command syntax is preserved for core operations:
 
--   `todo-ai list`
--   `todo-ai add "My task" "#tag"`
--   `todo-ai complete <id>`
+- `todo-ai list`
+- `todo-ai add "My task" "#tag"`
+- `todo-ai complete <id>`
 
 ## Setting up AI Agent Integration (MCP)
 
@@ -91,5 +91,5 @@ Ensure your `pipx` binary directory is in your PATH. Run `pipx ensurepath` and r
 
 **Config/Data Issues**
 If you encounter issues reading your existing `TODO.md`:
-1.  Run `todo-ai list` to see if it parses correctly.
-2.  The tool automatically attempts to preserve custom headers/footers in `TODO.md`.
+1. Run `todo-ai list` to see if it parses correctly.
+2. The tool automatically attempts to preserve custom headers/footers in `TODO.md`.

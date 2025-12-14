@@ -241,7 +241,7 @@ Replace throughout:
 
 **Estimated effort:**
 - Core adoption: ~2-3 hours (file name changes, project references)
-- Infrastructure: ~1 hour (create wait-for-ci.sh, add __version__)
+- Infrastructure: ~1 hour (create wait-for-ci.sh, add **version**)
 - Testing: ~1 hour (verify workflow)
 
 **Result:** Comprehensive release.mdc matching ascii-guard's quality and safeguards, adapted for todo.ai's Python project structure.

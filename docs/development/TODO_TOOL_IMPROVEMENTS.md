@@ -1315,19 +1315,19 @@ Templates stored in `.todo/templates/` directory:
 ### Phase 2: High Value Features (Week 2)
 **Goal:** Better context and relationships
 
-5. **Task Relationships** [3 hours]
+1. **Task Relationships** [3 hours]
    - Implement relationship storage
    - Add relate/unrelate commands
    - Update display logic
    - Add relationship filtering
 
-6. **Repository/Branch Context** [3 hours]
+2. **Repository/Branch Context** [3 hours]
    - Add repo/branch metadata
    - Implement auto-detection
    - Integrate with git-status-all
    - Add context filtering
 
-7. **Task Notes** [2 hours]
+3. **Task Notes** [2 hours]
    - Implement note storage
    - Add note command
    - Integrate with complete/archive
@@ -1342,14 +1342,14 @@ Templates stored in `.todo/templates/` directory:
 ### Phase 3: Advanced Features (Week 3-4)
 **Goal:** Automation, intelligence, and integration
 
-8. **Smart Archive Suggestions** [2 hours]
-9. **Multi-Developer Git Synchronization** [2 hours]
-10. **Enhanced Lint Command** (Task #47) [2 hours]
-11. **Git Commit Hook Integration** (Task #45) [1 hour]
-12. **Prune Old Archived Tasks** (Task #43) [2 hours]
-13. **Handbook TODO Dashboard** (Task #54) [2 hours]
-14. **Progress Statistics** [3 hours]
-15. **Task Templates** [8 hours]
+1. **Smart Archive Suggestions** [2 hours]
+2. **Multi-Developer Git Synchronization** [2 hours]
+3. **Enhanced Lint Command** (Task #47) [2 hours]
+4. **Git Commit Hook Integration** (Task #45) [1 hour]
+5. **Prune Old Archived Tasks** (Task #43) [2 hours]
+6. **Handbook TODO Dashboard** (Task #54) [2 hours]
+7. **Progress Statistics** [3 hours]
+8. **Task Templates** [8 hours]
 
 **Not Included:**
 - ~~16. Interactive Review Mode~~ (incompatible with AI-agent design)

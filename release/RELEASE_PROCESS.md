@@ -110,10 +110,10 @@ The script uses a **hybrid approach** with three priority levels:
 - **Major release** (X.0.0): Breaking changes detected
   - Keywords: `breaking`, `break`, `major`, `!:` in commit messages
   - Commits with `!` suffix (e.g., `feat!:`, `fix!:`)
-  
+
 - **Minor release** (0.X.0): New features added
   - Keywords: `feat:`, `feature:`, `add`, `new`, `implement`, `create`, `support`
-  
+
 - **Patch release** (0.0.X): Bug fixes and other changes
   - Keywords: `fix:`, `bugfix:`, `patch:`, `bug`, `hotfix`, `correct`
   - All other commits default to patch
@@ -154,17 +154,17 @@ When using the `--summary` flag, the release notes will have this structure:
 ```markdown
 ## Release 1.2.0
 
-This release enhances the automated release process with AI-generated 
-human-readable summaries and fixes a critical bug in the version update 
+This release enhances the automated release process with AI-generated
+human-readable summaries and fixes a critical bug in the version update
 mechanism.
 
-The most significant improvement is the introduction of AI-generated 
-release summaries. When using AI agents like Cursor, agents can now 
-automatically generate a 2-3 paragraph human-readable summary that 
+The most significant improvement is the introduction of AI-generated
+release summaries. When using AI agents like Cursor, agents can now
+automatically generate a 2-3 paragraph human-readable summary that
 highlights key improvements and user-facing benefits...
 
-Additionally, a critical bug fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...)) 
-ensures that version updates only replace actual `VERSION=` variable 
+Additionally, a critical bug fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...))
+ensures that version updates only replace actual `VERSION=` variable
 assignments...
 
 ---
@@ -192,21 +192,21 @@ assignments...
 When generating a summary, save it to `release/RELEASE_SUMMARY.md` with this format:
 
 ```markdown
-This release enhances the automated release process with AI-generated 
-human-readable summaries and fixes a critical bug in the version update 
+This release enhances the automated release process with AI-generated
+human-readable summaries and fixes a critical bug in the version update
 mechanism.
 
-The most significant improvement is the introduction of AI-generated 
-release summaries ([dcbcb66](https://github.com/fxstein/todo.ai/commit/dcbcb66...)). 
-When using AI agents like Cursor, agents can now automatically generate 
-a 2-3 paragraph human-readable summary that highlights key improvements 
-and user-facing benefits. This summary appears at the top of release notes, 
+The most significant improvement is the introduction of AI-generated
+release summaries ([dcbcb66](https://github.com/fxstein/todo.ai/commit/dcbcb66...)).
+When using AI agents like Cursor, agents can now automatically generate
+a 2-3 paragraph human-readable summary that highlights key improvements
+and user-facing benefits. This summary appears at the top of release notes,
 making them much more accessible and informative than raw commit lists alone.
 
-Additionally, a critical bug fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...)) 
-ensures that version updates only replace actual `VERSION=` variable 
-assignments, not all occurrences throughout the codebase. This prevents 
-accidental corruption of grep patterns and other code that might contain 
+Additionally, a critical bug fix ([f6965b6](https://github.com/fxstein/todo.ai/commit/f6965b6...))
+ensures that version updates only replace actual `VERSION=` variable
+assignments, not all occurrences throughout the codebase. This prevents
+accidental corruption of grep patterns and other code that might contain
 version-like strings.
 ```
 
@@ -328,19 +328,19 @@ Use this template for consistent formatting:
 ## Release X.Y.Z
 
 ### Added
-- 
+-
 
 ### Changed
-- 
+-
 
 ### Fixed
-- 
+-
 
 ### Breaking Changes
-- 
+-
 
 ### Migration Notes
-- 
+-
 ```
 
 ## Release Script Details
@@ -437,9 +437,9 @@ Before creating a release, ensure:
    - Example:
      ```markdown
      ### Migration Notes
-     
+
      This release includes automatic migrations that will run once on update:
-     
+
      - **Section Order Fix (v1.3.5):** Automatically reorders TODO.md sections to correct order
      - **Backup Cleanup (v1.4.0):** Removes obsolete .bak files from previous versions
      ```

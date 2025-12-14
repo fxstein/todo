@@ -43,7 +43,7 @@ get_latest_release() {
             return 0
         fi
     fi
-    
+
     # No release found
     echo ""
     return 1
@@ -221,4 +221,3 @@ echo ""
 if [ -f "./todo.ai" ]; then
     ./todo.ai version 2>/dev/null || true
 fi
-

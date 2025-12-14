@@ -28,4 +28,3 @@ When making commits, use explicit prefixes to help the release script correctly 
 - ✅ Correct: `Archive completed task#15 (git hooks), delete task#21`
 - ❌ Incorrect: `feat: Implement git hooks (#15)` - will auto-link to issue #15
 - ❌ Incorrect: `feat: Implement git hooks (task #15)` - space breaks pattern
-

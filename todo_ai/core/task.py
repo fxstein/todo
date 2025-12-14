@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Set, Dict, Any
+from typing import Any
+
 
 class TaskStatus(Enum):
     PENDING = "pending"
@@ -9,11 +10,12 @@ class TaskStatus(Enum):
     ARCHIVED = "archived"
     DELETED = "deleted"
 
+
 @dataclass
 class Task:
     """
     Represents a single task with metadata.
-    
+
     Attributes:
         id: Unique identifier for the task (e.g., "42" or "42.1")
         description: The task text content
@@ -25,15 +27,16 @@ class Task:
         completed_at: Timestamp when the task was completed (if applicable)
         archived_at: Timestamp when the task was archived (if applicable)
     """
+
     id: str
     description: str
     status: TaskStatus = TaskStatus.PENDING
-    tags: Set[str] = field(default_factory=set)
-    notes: List[str] = field(default_factory=list)
+    tags: set[str] = field(default_factory=set)
+    notes: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
-    completed_at: Optional[datetime] = None
-    archived_at: Optional[datetime] = None
+    completed_at: datetime | None = None
+    archived_at: datetime | None = None
 
     def add_tag(self, tag: str) -> None:
         """Add a tag to the task."""
@@ -74,17 +77,20 @@ class Task:
         self.archived_at = None
         self.updated_at = datetime.now()
 
+
 class TaskManager:
     """Core task management operations"""
-    
-    def __init__(self, tasks: Optional[List[Task]] = None):
-        self._tasks: Dict[str, Task] = {t.id: t for t in tasks} if tasks else {}
 
-    def get_task(self, task_id: str) -> Optional[Task]:
+    def __init__(self, tasks: list[Task] | None = None):
+        self._tasks: dict[str, Task] = {t.id: t for t in tasks} if tasks else {}
+
+    def get_task(self, task_id: str) -> Task | None:
         """Retrieve a task by ID."""
         return self._tasks.get(task_id)
 
-    def add_task(self, description: str, tags: List[str] = None, task_id: str = None) -> Task:
+    def add_task(
+        self, description: str, tags: list[str] | None = None, task_id: str | None = None
+    ) -> Task:
         """Add a new task."""
         if not task_id:
             # Fallback: Find max integer ID from existing tasks
@@ -93,21 +99,23 @@ class TaskManager:
                 if tid.isdigit():
                     max_id = max(max_id, int(tid))
             task_id = str(max_id + 1)
-        
-        task = Task(
-            id=task_id, 
-            description=description,
-            tags=set(tags) if tags else set()
-        )
+
+        task = Task(id=task_id, description=description, tags=set(tags) if tags else set())
         self._tasks[task_id] = task
         return task
 
-    def add_subtask(self, parent_id: str, description: str, tags: List[str] = None, task_id: str = None) -> Task:
+    def add_subtask(
+        self,
+        parent_id: str,
+        description: str,
+        tags: list[str] | None = None,
+        task_id: str | None = None,
+    ) -> Task:
         """Add a subtask to an existing task."""
         parent = self.get_task(parent_id)
         if not parent:
             raise ValueError(f"Parent task {parent_id} not found")
-        
+
         if not task_id:
             # Find next subtask ID
             # Format: parent_id.sub_id (e.g. 1.1, 1.2)
@@ -115,16 +123,12 @@ class TaskManager:
             max_sub = 0
             for tid in self._tasks:
                 if tid.startswith(prefix):
-                    suffix = tid[len(prefix):]
+                    suffix = tid[len(prefix) :]
                     if suffix.isdigit():
                         max_sub = max(max_sub, int(suffix))
             task_id = f"{prefix}{max_sub + 1}"
-        
-        task = Task(
-            id=task_id,
-            description=description,
-            tags=set(tags) if tags else set()
-        )
+
+        task = Task(id=task_id, description=description, tags=set(tags) if tags else set())
         self._tasks[task_id] = task
         return task
 
@@ -159,25 +163,25 @@ class TaskManager:
             raise ValueError(f"Task {task_id} not found")
         task.restore()
         return task
-    
-    def list_tasks(self, filters: Dict[str, Any] = None) -> List[Task]:
+
+    def list_tasks(self, filters: dict[str, Any] | None = None) -> list[Task]:
         """List tasks matching filters."""
         if not filters:
             return list(self._tasks.values())
-            
+
         result = []
         for task in self._tasks.values():
             match = True
-            
+
             if "status" in filters:
                 if task.status != filters["status"]:
                     match = False
-                    
+
             if "tag" in filters:
                 if filters["tag"] not in task.tags:
                     match = False
-            
+
             if match:
                 result.append(task)
-                
+
         return result

@@ -21,7 +21,7 @@
 
 ### Post-Release Development
 ```
-13:48:21 - Marked tasks complete 
+13:48:21 - Marked tasks complete
 14:12:06 - Added pre-commit check
 21:46:40 - Created task#157 for issue#38
 21:49:19 - Fixed get_highest_task_number()
@@ -35,11 +35,11 @@
 22:17:42 - 🔴 RELEASE START: "Current version: 2.6.0"
            ❌ VERSION in file: 2.6.0 (NEVER RELEASED!)
            ✅ GitHub latest: v2.5.0
-           
+
 22:17:52 - Updated from 2.6.0 to 2.7.0
            ❌ Skipped 2.5.1 (intended version)
            ❌ Skipped 2.6.0 (phantom version)
-           
+
 22:17:53 - Released v2.7.0 ❌
 ```
 
@@ -123,7 +123,7 @@ get_file_version() {
 ```zsh
 get_current_version() {
     local github_version=$(get_github_version 2>/dev/null)
-    
+
     if [[ -n "$github_version" ]]; then
         # GitHub version exists - use as source of truth
         echo "$github_version"
@@ -139,7 +139,7 @@ get_current_version() {
 validate_version_consistency() {
     local github_version=$(get_github_version 2>/dev/null)
     local file_version=$(get_file_version)
-    
+
     if [[ "$file_version" != "$github_version" ]]; then
         echo "⚠️  VERSION MISMATCH DETECTED"
         echo "File version (todo.ai):    ${file_version}"
@@ -228,7 +228,7 @@ GitHub releases are the source of truth.
 **Changes:**
 - Modified: `release/release.sh` (+177/-194 lines)
 - Added: `get_github_version()` function
-- Added: `get_file_version()` function  
+- Added: `get_file_version()` function
 - Added: `validate_version_consistency()` function
 - Changed: `get_current_version()` to query GitHub
 - Updated: Release preview to show both versions
@@ -332,4 +332,3 @@ The VERSION variable in `todo.ai` is now just a placeholder that's updated durin
 - **Affected Versions:** v2.5.0 → v2.7.0 (skipped v2.5.1, v2.6.0)
 - **Release Log:** `release/RELEASE_LOG.log` (lines 5-18)
 - **Resolution Date:** 2025-11-15
-

@@ -24,7 +24,7 @@ This document provides a clear mapping of commit message prefixes/tags to releas
 | `breaking:`, `!:` | MAJOR | `feat!: Change API behavior` |
 | `major:` | MAJOR | `major: Remove deprecated command` |
 
-\* MINOR only if not explicitly marked as backend/infrastructure  
+\* MINOR only if not explicitly marked as backend/infrastructure
 \** PATCH for developer docs, may be MINOR for user-facing docs
 
 ### Keyword-Based Classification (Fallback)
@@ -340,4 +340,3 @@ This hybrid approach balances:
 - Developer control (explicit prefixes)
 - Automatic detection (file analysis)
 - Semantic versioning compliance
-

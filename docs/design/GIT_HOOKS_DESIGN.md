@@ -180,7 +180,7 @@ The hook will identify files to validate based on extensions:
 validate_markdown() {
     local files="$1"
     local errors=0
-    
+
     # Check if markdownlint-cli2 is available
     if command -v markdownlint-cli2 >/dev/null 2>&1; then
         for file in $files; do
@@ -200,7 +200,7 @@ validate_markdown() {
         echo "⚠️  No Markdown linter found, skipping Markdown validation"
         echo "   Install 'markdownlint-cli2' or 'mdl' for Markdown linting"
     fi
-    
+
     return $errors
 }
 ```
@@ -222,7 +222,7 @@ validate_markdown() {
 validate_yaml() {
     local files="$1"
     local errors=0
-    
+
     # Check if yamllint is available
     if command -v yamllint >/dev/null 2>&1; then
         for file in $files; do
@@ -243,7 +243,7 @@ validate_yaml() {
         echo "⚠️  No YAML linter found, skipping YAML validation"
         echo "   Install 'yamllint' or 'yq' for YAML linting"
     fi
-    
+
     return $errors
 }
 ```
@@ -265,7 +265,7 @@ validate_yaml() {
 validate_json() {
     local files="$1"
     local errors=0
-    
+
     # Check if jq is available
     if command -v jq >/dev/null 2>&1; then
         for file in $files; do
@@ -290,7 +290,7 @@ validate_json() {
             fi
         done
     fi
-    
+
     return $errors
 }
 ```
@@ -304,26 +304,26 @@ validate_json() {
 ```zsh
 validate_todo() {
     local errors=0
-    
+
     # Check if TODO.md exists
     if [[ ! -f "TODO.md" ]]; then
         echo "⚠️  TODO.md not found, skipping validation"
         return 0
     fi
-    
+
     # Check if todo.ai exists and is executable
     if [[ ! -x "./todo.ai" ]]; then
         echo "⚠️  todo.ai not found or not executable, skipping TODO validation"
         return 0
     fi
-    
+
     # Run todo.ai --lint
     if ! ./todo.ai --lint 2>/dev/null; then
         echo "❌ TODO.md validation failed"
         echo "   Run './todo.ai --lint' to see details"
         errors=$((errors + 1))
     fi
-    
+
     return $errors
 }
 ```
@@ -427,7 +427,7 @@ rules:
   line-length: disable
   comments: disable
   comments-indentation: disable
-  
+
 # Allow relaxed rules for front matter
 yaml-files:
   - '*.yml'
@@ -647,7 +647,7 @@ If the automated script doesn't work or you prefer manual installation:
    ```bash
    ./developer/setup-linters.sh
    ```
-   
+
    This script will install all tools and then run `./scripts/setup-git-hooks.sh` automatically.
 
 4. **Verify installation:**
@@ -668,4 +668,3 @@ If the automated script doesn't work or you prefer manual installation:
 4. **Clear Error Messages**: Provide actionable feedback to fix issues
 5. **Bypass Option**: Allow `--no-verify` for emergency situations
 6. **Tool Flexibility**: Support multiple tools for each file type (fallback chain)
-

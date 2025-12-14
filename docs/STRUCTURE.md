@@ -115,4 +115,3 @@ When creating new documentation, follow these guidelines:
 - Archive completed migration docs when no longer actively referenced
 - Consolidate related documents when they become too fragmented
 - Review and update docs/README.md quarterly for accuracy
-

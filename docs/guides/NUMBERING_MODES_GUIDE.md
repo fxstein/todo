@@ -2,7 +2,7 @@
 
 ## Overview
 
-> **Related Documentation:** 
+> **Related Documentation:**
 > - [Hybrid Task Numbering Design](HYBRID_TASK_NUMBERING_DESIGN.md) - Technical design details
 > - [Usage Patterns](USAGE_PATTERNS.md) - Practical setup examples for different scenarios
 
@@ -324,7 +324,7 @@ If something goes wrong, you can rollback:
      issue_number: 123
      fallback: multi-user
    EOF
-   
+
    ./todo.ai switch-mode enhanced
    ```
 
@@ -620,4 +620,3 @@ git pull
 - **Enhanced**: Atomic coordination for large teams
 
 Choose the mode that fits your team size and workflow, and switch modes as your needs evolve. The tool provides automatic backup, rollback, and conflict resolution to make mode switching safe and reliable.
-

@@ -72,13 +72,13 @@ mode: multi-user
 coordination:
   # Type: github-issues | counterapi | firebase | none
   type: github-issues
-  
+
   # GitHub Issues coordination
   issue_number: 123  # Issue number for task number coordination
-  
+
   # CounterAPI coordination
   namespace: todo-ai-repo-name  # Namespace for counter
-  
+
   # Fallback mode if coordination fails
   fallback: multi-user
 
@@ -157,11 +157,11 @@ get_github_user_id() {
 assign_task_number_multi_user() {
     local user_prefix=$(get_github_user_id)
     local todo_file="$TODO_FILE"
-    
+
     # Find highest task number for this user prefix
     local highest=0
     local pattern="${user_prefix}-([0-9]+)"
-    
+
     while IFS= read -r line; do
         if [[ "$line" =~ $pattern ]]; then
             local num="${match[1]}"
@@ -170,7 +170,7 @@ assign_task_number_multi_user() {
             fi
         fi
     done < "$todo_file"
-    
+
     local next_num=$((highest + 1))
     echo "${user_prefix}-${next_num}"
 }
@@ -188,20 +188,20 @@ assign_task_number_multi_user() {
 
 resolve_task_id() {
     local input_id="$1"
-    
+
     # If already has prefix, use as-is
     if [[ "$input_id" =~ ^[a-z0-9]{1,7}-[0-9]+$ ]]; then
         echo "$input_id"
         return 0
     fi
-    
+
     # If just a number, add current user's prefix
     if [[ "$input_id" =~ ^[0-9]+$ ]]; then
         local user_prefix=$(get_github_user_id)
         echo "${user_prefix}-${input_id}"
         return 0
     fi
-    
+
     # Invalid format
     return 1
 }
@@ -297,24 +297,24 @@ assign_task_number_enhanced_issues() {
     local config_file=".todo.ai/config"
     local issue_num=$(grep "COORDINATION_ISSUE=" "$config_file" | cut -d'=' -f2)
     local user_prefix=$(get_github_user_id)
-    
+
     # Get latest comment from coordination issue
     local latest_comment=$(gh api repos/:owner/:repo/issues/$issue_num/comments \
         --jq '.[0].body' 2>/dev/null || echo "")
-    
+
     # Extract current number
     local current_num=$(echo "$latest_comment" | grep -oP '\d+' | head -n1 || echo "0")
-    
+
     # Increment
     local new_num=$((current_num + 1))
-    
+
     # Post new comment atomically
     gh api -X POST repos/:owner/:repo/issues/$issue_num/comments \
         --field "body=Next task number: $new_num" 2>/dev/null || {
         # Fallback to multi-user mode
         return 1
     }
-    
+
     # Return formatted ID
     if [[ -n "$user_prefix" ]]; then
         echo "${user_prefix}-${new_num}"
@@ -342,18 +342,18 @@ assign_task_number_enhanced_counterapi() {
     local namespace=$(grep "COORDINATION_NAMESPACE=" "$config_file" | cut -d'=' -f2)
     local counter_name="task-counter"
     local user_prefix=$(get_github_user_id)
-    
+
     # Increment atomically via CounterAPI
     local response=$(curl -s -X POST \
         "https://api.counterapi.dev/v1/${namespace}/${counter_name}/up" || echo "")
-    
+
     if [[ -z "$response" ]] || ! echo "$response" | jq -e '.value' >/dev/null 2>&1; then
         # Fallback to multi-user mode
         return 1
     fi
-    
+
     local new_num=$(echo "$response" | jq -r '.value')
-    
+
     # Return formatted ID
     if [[ -n "$user_prefix" ]]; then
         echo "${user_prefix}-${new_num}"
@@ -419,10 +419,10 @@ Automatically detect and resolve numbering conflicts that may occur despite coor
 detect_conflicts() {
     local todo_file="$TODO_FILE"
     local conflicts=()
-    
+
     # Extract all task IDs
     local task_ids=$(grep -oE '#[a-z0-9]{1,7}-[0-9]+' "$todo_file" | sed 's/#//')
-    
+
     # Find duplicates
     local sorted_ids=$(echo "$task_ids" | sort)
     local prev_id=""
@@ -432,7 +432,7 @@ detect_conflicts() {
         fi
         prev_id="$id"
     done
-    
+
     echo "${conflicts[@]}"
 }
 ```
@@ -449,7 +449,7 @@ detect_conflicts() {
 resolve_conflicts() {
     local todo_file="$TODO_FILE"
     local mode=$(get_config_mode)
-    
+
     case "$mode" in
         "multi-user"|"enhanced")
             resolve_multi_user_conflicts "$todo_file"
@@ -477,34 +477,34 @@ resolve_multi_user_conflicts() {
     local temp_file=$(mktemp)
     local seen_ids=()
     local next_numbers=()  # Per user prefix
-    
+
     while IFS= read -r line; do
         if [[ "$line" =~ ^-.*\*\#([a-z0-9]{1,7}-[0-9]+)\*\ ]]; then
             local task_id="${match[1]}"
             local prefix="${task_id%-*}"
             local num="${task_id##*-}"
-            
+
             # Check if already seen
             if [[ " ${seen_ids[*]} " =~ " ${task_id} " ]]; then
                 # Duplicate - get next number for this prefix
                 local next_num=$(get_next_number_for_prefix "$prefix" "$next_numbers")
                 local new_id="${prefix}-${next_num}"
-                
+
                 # Update task ID in line
                 line=$(echo "$line" | sed "s/#${task_id}/#${new_id}/")
                 task_id="$new_id"
-                
+
                 # Update references
                 update_subtask_references "$task_id" "$new_id" "$todo_file"
             fi
-            
+
             seen_ids+=("$task_id")
             update_next_number_for_prefix "$prefix" "$num" "$next_numbers"
         fi
-        
+
         echo "$line" >> "$temp_file"
     done < "$todo_file"
-    
+
     mv "$temp_file" "$todo_file"
 }
 ```
@@ -581,7 +581,7 @@ get_config_mode() {
         echo "single-user"  # Default
         return 0
     fi
-    
+
     # Try JSON first
     if command -v jq >/dev/null 2>&1; then
         local mode=$(jq -r '.mode' "$config_file" 2>/dev/null || echo "")
@@ -590,7 +590,7 @@ get_config_mode() {
             return 0
         fi
     fi
-    
+
     # Fallback to key-value
     grep "^MODE=" "$config_file" 2>/dev/null | cut -d'=' -f2 || echo "single-user"
 }
@@ -601,7 +601,7 @@ get_config_mode() {
 validate_config() {
     local config_file=".todo.ai/config"
     local mode=$(get_config_mode)
-    
+
     # Check mode is valid
     case "$mode" in
         "single-user"|"multi-user"|"branch"|"enhanced")
@@ -611,7 +611,7 @@ validate_config() {
             return 1
             ;;
     esac
-    
+
     # Validate coordination settings if enhanced mode
     if [[ "$mode" == "enhanced" ]]; then
         local coord_type=$(get_config "coordination.type")
@@ -632,7 +632,7 @@ validate_config() {
                 ;;
         esac
     fi
-    
+
     return 0
 }
 ```
@@ -642,10 +642,10 @@ validate_config() {
 setup_config() {
     local mode="$1"
     local config_file=".todo.ai/config"
-    
+
     # Create config directory if needed
     mkdir -p "$(dirname "$config_file")"
-    
+
     case "$mode" in
         "single-user")
             echo '{"mode":"single-user"}' > "$config_file"
@@ -661,7 +661,7 @@ setup_config() {
             setup_enhanced_config "$config_file"
             ;;
     esac
-    
+
     echo "Configuration saved to $config_file"
     echo "Please commit this file to share with your team."
 }
@@ -700,19 +700,19 @@ setup_config() {
 resolve_task_reference() {
     local input="$1"
     local current_user=$(get_github_user_id)
-    
+
     # Already has prefix
     if [[ "$input" =~ ^[a-z0-9]{1,7}-[0-9]+$ ]]; then
         echo "$input"
         return 0
     fi
-    
+
     # Just a number - add current user's prefix
     if [[ "$input" =~ ^[0-9]+$ ]]; then
         echo "${current_user}-${input}"
         return 0
     fi
-    
+
     # Invalid
     echo "ERROR: Invalid task ID format: $input" >&2
     return 1
@@ -860,4 +860,3 @@ The key innovation is treating task IDs as **temporary session IDs** rather than
 6. **Phase 5 implementation** - Enhanced multi-user mode
 7. **Testing** - All modes and fallback scenarios
 8. **Documentation** - User guide for each mode
-

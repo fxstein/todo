@@ -10,4 +10,3 @@
 
 ## Deleted Tasks
 - [ ] **#5** Deleted task 1 (2025-01-01)
-

@@ -11,7 +11,7 @@ This document outlines the design decisions for implementing a tagging system in
 #ID Task Description #tag1 #tag2 #tag3 (date)
 ```
 
-**Rationale**: 
+**Rationale**:
 - ID is immediately visible for quick identification
 - Natural sorting by ID
 - Clean parsing structure
@@ -70,7 +70,7 @@ This document outlines the design decisions for implementing a tagging system in
 ### 6. Priority Tags
 **Decision**: Three-level priority system
 - `#high` - High priority tasks
-- `#medium` - Medium priority tasks  
+- `#medium` - Medium priority tasks
 - `#low` - Low priority tasks
 
 **Rationale**:
@@ -210,8 +210,7 @@ parse_task() {
 
 ---
 
-**Document Version**: 1.0  
-**Last Updated**: 2025-01-19  
-**Author**: AI Assistant  
+**Document Version**: 1.0
+**Last Updated**: 2025-01-19
+**Author**: AI Assistant
 **Status**: Design Complete - Ready for Implementation
-

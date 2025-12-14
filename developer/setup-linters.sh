@@ -15,7 +15,7 @@ failed_tools=()
 # Check and install markdownlint-cli2 or mdl
 install_markdown_linter() {
     echo "📝 Checking Markdown linter..."
-    
+
     # Check if already installed
     if command -v markdownlint-cli2 >/dev/null 2>&1; then
         echo "   ✅ markdownlint-cli2 already installed"
@@ -26,7 +26,7 @@ install_markdown_linter() {
         installed_tools+=("mdl")
         return 0
     fi
-    
+
     # Try to install markdownlint-cli2 (preferred)
     if command -v npm >/dev/null 2>&1; then
         echo "   📦 Installing markdownlint-cli2 via npm..."
@@ -36,7 +36,7 @@ install_markdown_linter() {
             return 0
         fi
     fi
-    
+
     # Fallback to mdl
     if command -v gem >/dev/null 2>&1; then
         echo "   📦 Installing mdl via gem..."
@@ -46,7 +46,7 @@ install_markdown_linter() {
             return 0
         fi
     fi
-    
+
     echo "   ⚠️  No package manager found (npm or gem)"
     skipped_tools+=("Markdown linter (markdownlint-cli2 or mdl)")
     return 1
@@ -55,7 +55,7 @@ install_markdown_linter() {
 # Check and install yamllint or yq
 install_yaml_linter() {
     echo "📄 Checking YAML linter..."
-    
+
     # Check if already installed
     if command -v yamllint >/dev/null 2>&1; then
         echo "   ✅ yamllint already installed"
@@ -66,7 +66,7 @@ install_yaml_linter() {
         installed_tools+=("yq")
         return 0
     fi
-    
+
     # Try to install yamllint (preferred)
     if command -v pip3 >/dev/null 2>&1; then
         echo "   📦 Installing yamllint via pip3..."
@@ -83,7 +83,7 @@ install_yaml_linter() {
             return 0
         fi
     fi
-    
+
     # Fallback to yq (brew)
     if command -v brew >/dev/null 2>&1; then
         echo "   📦 Installing yq via brew..."
@@ -93,13 +93,13 @@ install_yaml_linter() {
             return 0
         fi
     fi
-    
+
     # Fallback to yq (apt-get) - requires sudo, so we'll just warn
     if command -v apt-get >/dev/null 2>&1; then
         echo "   ⚠️  yq available via apt-get but requires sudo"
         echo "   Run manually: sudo apt-get install -y yq"
     fi
-    
+
     echo "   ⚠️  No package manager found (pip3, pip, or brew)"
     skipped_tools+=("YAML linter (yamllint or yq)")
     return 1
@@ -108,7 +108,7 @@ install_yaml_linter() {
 # Check and install jq or jsonlint
 install_json_linter() {
     echo "📊 Checking JSON linter..."
-    
+
     # Check if already installed
     if command -v jq >/dev/null 2>&1; then
         echo "   ✅ jq already installed"
@@ -123,7 +123,7 @@ install_json_linter() {
         installed_tools+=("python3 (json.tool)")
         return 0
     fi
-    
+
     # Try to install jq (preferred)
     if command -v brew >/dev/null 2>&1; then
         echo "   📦 Installing jq via brew..."
@@ -142,7 +142,7 @@ install_json_linter() {
         echo "   ⚠️  jq available via pacman but requires sudo"
         echo "   Run manually: sudo pacman -S jq"
     fi
-    
+
     # Fallback to jsonlint
     if command -v npm >/dev/null 2>&1; then
         echo "   📦 Installing jsonlint via npm..."
@@ -152,14 +152,14 @@ install_json_linter() {
             return 0
         fi
     fi
-    
+
     # Final fallback: python3 json.tool
     if command -v python3 >/dev/null 2>&1; then
         echo "   ✅ python3 available (can use json.tool as fallback)"
         installed_tools+=("python3 (json.tool)")
         return 0
     fi
-    
+
     echo "   ⚠️  No package manager found and python3 not available"
     skipped_tools+=("JSON linter (jq, jsonlint, or python3)")
     return 1
@@ -168,14 +168,14 @@ install_json_linter() {
 # Check and install ascii-guard
 install_ascii_guard() {
     echo "📐 Checking ASCII chart linter (ascii-guard)..."
-    
+
     # Check if already installed
     if command -v ascii-guard >/dev/null 2>&1; then
         echo "   ✅ ascii-guard already installed"
         installed_tools+=("ascii-guard")
         return 0
     fi
-    
+
     # Try to install via pipx (preferred - isolated environment)
     if command -v pipx >/dev/null 2>&1; then
         echo "   📦 Installing ascii-guard via pipx (isolated environment)..."
@@ -185,7 +185,7 @@ install_ascii_guard() {
             return 0
         fi
     fi
-    
+
     # Check if pipx needs to be installed first
     if command -v pip3 >/dev/null 2>&1; then
         echo "   ⚠️  pipx not found, but pip3 is available"
@@ -198,7 +198,7 @@ install_ascii_guard() {
     else
         echo "   ⚠️  No Python package manager found"
     fi
-    
+
     skipped_tools+=("ASCII chart linter (ascii-guard)")
     return 1
 }
@@ -248,4 +248,3 @@ fi
 
 echo ""
 echo "✅ Setup complete!"
-

@@ -68,7 +68,7 @@ fi
 validate_markdown() {
     local files="$1"
     local file_errors=0
-    
+
     # Check if markdownlint-cli2 is available
     if command -v markdownlint-cli2 >/dev/null 2>&1; then
         for file in $files; do
@@ -89,7 +89,7 @@ validate_markdown() {
         echo -e "${YELLOW}⚠️  No Markdown linter found, skipping Markdown validation${NC}"
         echo "   Install 'markdownlint-cli2' or 'mdl' for Markdown linting"
     fi
-    
+
     return $file_errors
 }
 
@@ -97,7 +97,7 @@ validate_markdown() {
 validate_yaml() {
     local files="$1"
     local file_errors=0
-    
+
     # Check if yamllint is available
     if command -v yamllint >/dev/null 2>&1; then
         for file in $files; do
@@ -118,7 +118,7 @@ validate_yaml() {
         echo -e "${YELLOW}⚠️  No YAML linter found, skipping YAML validation${NC}"
         echo "   Install 'yamllint' or 'yq' for YAML linting"
     fi
-    
+
     return $file_errors
 }
 
@@ -126,7 +126,7 @@ validate_yaml() {
 validate_json() {
     local files="$1"
     local file_errors=0
-    
+
     # Check if jq is available
     if command -v jq >/dev/null 2>&1; then
         for file in $files; do
@@ -157,7 +157,7 @@ validate_json() {
             echo "   Install 'jq', 'jsonlint', or ensure 'python3' is available for JSON linting"
         fi
     fi
-    
+
     return $file_errors
 }
 
@@ -165,7 +165,7 @@ validate_json() {
 validate_ascii_charts() {
     local files="$1"
     local file_errors=0
-    
+
     # Check if ascii-guard is available
     if command -v ascii-guard >/dev/null 2>&1; then
         for file in $files; do
@@ -181,33 +181,33 @@ validate_ascii_charts() {
         echo -e "${YELLOW}⚠️  ascii-guard not found, skipping ASCII chart validation${NC}"
         echo "   Install 'ascii-guard' for ASCII chart linting: pipx install ascii-guard"
     fi
-    
+
     return $file_errors
 }
 
 # Run Python tests if python files are changed
 validate_python_tests() {
     local files="$1"
-    
+
     # If no Python files changed, check if pytest config changed
     if [[ -z "$files" ]] && [[ ! -f "pyproject.toml" ]]; then
         return 0
     fi
-    
+
     echo "🧪 Running Python tests..."
-    
+
     # Check if virtual environment exists
     if [[ ! -d ".venv" ]]; then
         echo -e "${YELLOW}⚠️  .venv not found. Skipping Python tests.${NC}"
         echo "   Run 'python3 -m venv .venv && source .venv/bin/activate && pip install pytest' to setup"
         return 0
     fi
-    
+
     # Activate venv and run tests
     # Using a subshell to avoid changing current shell environment
     (
         source .venv/bin/activate
-        
+
         # 1. Run Ruff (Linting)
         if ! command -v ruff >/dev/null 2>&1; then
              echo -e "${YELLOW}⚠️  ruff not found in .venv. Skipping linting.${NC}"
@@ -237,19 +237,19 @@ validate_python_tests() {
              echo -e "${YELLOW}⚠️  pytest not found in .venv. Skipping tests.${NC}"
              exit 0
         fi
-        
+
         echo "🧪 Running Pytest..."
         if ! pytest; then
             echo -e "${RED}❌ Python tests failed${NC}"
             exit 1
         fi
     )
-    
+
     # Check exit code of subshell
     if [[ $? -ne 0 ]]; then
         return 1
     fi
-    
+
     return 0
 }
 
@@ -257,26 +257,26 @@ validate_python_tests() {
 # Validate TODO.md
 validate_todo() {
     local file_errors=0
-    
+
     # Check if TODO.md exists
     if [[ ! -f "TODO.md" ]]; then
         echo -e "${YELLOW}⚠️  TODO.md not found, skipping validation${NC}"
         return 0
     fi
-    
+
     # Check if todo.ai exists and is executable
     if [[ ! -x "./todo.ai" ]]; then
         echo -e "${YELLOW}⚠️  todo.ai not found or not executable, skipping TODO validation${NC}"
         return 0
     fi
-    
+
     # Run todo.ai --lint
     if ! ./todo.ai --lint 2>/dev/null; then
         echo -e "${RED}❌ TODO.md validation failed${NC}"
         echo "   Run './todo.ai --lint' to see details"
         file_errors=$((file_errors + 1))
     fi
-    
+
     return $file_errors
 }
 
@@ -355,4 +355,3 @@ fi
 
 echo -e "${GREEN}✅ All validations passed${NC}"
 exit 0
-

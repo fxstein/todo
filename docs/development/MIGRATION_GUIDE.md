@@ -1,6 +1,6 @@
 # Migration Creation Guide
 
-**Created:** 2025-11-01  
+**Created:** 2025-11-01
 **Version:** 1.0
 
 ## Overview
@@ -26,24 +26,24 @@ migrate_example_name() {
     local migration_id="example_name"
     local migrations_dir="$(pwd)/.todo.ai/migrations"
     local migration_file="${migrations_dir}/v1.4.0_${migration_id}.migrated"
-    
+
     # Check if already migrated
     if [[ -f "$migration_file" ]]; then
         return 0  # Already done
     fi
-    
+
     # Check prerequisites (e.g., TODO.md exists)
     if [[ ! -f "$TODO_FILE" ]]; then
         return 1
     fi
-    
+
     # Perform migration
     # ... your migration logic here ...
-    
+
     # Mark as complete
     mkdir -p "$migrations_dir" 2>/dev/null || return 1
     touch "$migration_file" 2>/dev/null || return 1
-    
+
     return 0
 }
 ```
@@ -83,7 +83,7 @@ declare -a MIGRATIONS=(
    ```bash
    # Run migration
    ./todo.ai list
-   
+
    # Run again - should skip (idempotent)
    ./todo.ai list
    ```
@@ -110,25 +110,25 @@ migrate_section_order() {
     local migration_id="section_order_fix"
     local migrations_dir="$(pwd)/.todo.ai/migrations"
     local migration_file="${migrations_dir}/v1.3.5_${migration_id}.migrated"
-    
+
     if [[ -f "$migration_file" ]]; then
         return 0
     fi
-    
+
     if [[ ! -f "$TODO_FILE" ]]; then
         return 1
     fi
-    
+
     # Check if sections are in wrong order
     local deleted_line=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1 | head -1)
     local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
-    
+
     # Fix if needed
     if [[ -n "$deleted_line" ]] && [[ -n "$recently_completed_line" ]] && [[ $deleted_line -lt $recently_completed_line ]]; then
         # ... reorder sections ...
         echo "✓ Migration: Fixed TODO.md section order" >&2
     fi
-    
+
     mkdir -p "$migrations_dir" 2>/dev/null || return 1
     touch "$migration_file" 2>/dev/null || return 1
     return 0
@@ -142,18 +142,18 @@ cleanup_old_backup_files() {
     local migration_id="cleanup_old_backups"
     local migrations_dir="$(pwd)/.todo.ai/migrations"
     local migration_file="${migrations_dir}/v1.4.0_${migration_id}.migrated"
-    
+
     if [[ -f "$migration_file" ]]; then
         return 0
     fi
-    
+
     # Remove old .bak files if backups/ directory exists
     local bak_files=$(find .todo.ai -name "*.bak" -type f 2>/dev/null)
     if [[ -n "$bak_files" ]] && [[ -d ".todo.ai/backups" ]]; then
         echo "$bak_files" | xargs rm -f 2>/dev/null || true
         echo "✓ Migration: Removed old .bak files" >&2
     fi
-    
+
     mkdir -p "$migrations_dir" 2>/dev/null || return 1
     touch "$migration_file" 2>/dev/null || return 1
     return 0
@@ -302,4 +302,3 @@ This release includes automatic migrations:
 - **Design Document:** `docs/design/MIGRATION_SYSTEM_DESIGN.md`
 - **Release Process:** `release/RELEASE_PROCESS.md`
 - **Task #37:** Build release migration and cleanup system
-

@@ -1,7 +1,7 @@
 # Migration and Cleanup System Design Document
 
-**Created:** 2025-11-01  
-**Status:** Design Phase  
+**Created:** 2025-11-01
+**Status:** Design Phase
 **Version:** 1.0
 
 ## Executive Summary
@@ -74,24 +74,24 @@ Each migration follows a standard pattern:
 migrate_section_order() {
     local migration_id="section_order_fix"
     local migration_file=".todo.ai/migrations/v1.3.5_${migration_id}.migrated"
-    
+
     # Check if already migrated
     if [[ -f "$migration_file" ]]; then
         return 0  # Already done
     fi
-    
+
     # Check prerequisites (e.g., TODO.md exists)
     if [[ ! -f "$TODO_FILE" ]]; then
         return 1
     fi
-    
+
     # Perform migration
     # ... migration logic ...
-    
+
     # Mark as complete
     mkdir -p "$(dirname "$migration_file")"
     touch "$migration_file"
-    
+
     return 0
 }
 ```
@@ -103,7 +103,7 @@ Migrations run automatically on script startup (after version check, before main
 ```zsh
 run_migrations() {
     local current_version="$VERSION"
-    
+
     # Lock to prevent concurrent execution
     local lock_file=".todo.ai/migrations/.migrations_lock"
     if [[ -f "$lock_file" ]]; then
@@ -111,11 +111,11 @@ run_migrations() {
         return 0
     fi
     touch "$lock_file"
-    
+
     # Process each migration
     for migration in "${MIGRATIONS[@]}"; do
         IFS='|' read -r target_version migration_id description function_name <<< "$migration"
-        
+
         # Check if this migration applies to current or earlier version
         if version_compare "$current_version" "$target_version" ">="; then
             # Check if already executed
@@ -130,7 +130,7 @@ run_migrations() {
             fi
         fi
     done
-    
+
     rm -f "$lock_file"
 }
 ```
@@ -144,11 +144,11 @@ version_compare() {
     local version1="$1"
     local version2="$2"
     local operator="$3"
-    
+
     # Convert versions to comparable format (1.3.5 -> 1003005)
     local v1_num=$(echo "$version1" | awk -F. '{printf "%d%03d%03d", $1, $2, $3}')
     local v2_num=$(echo "$version2" | awk -F. '{printf "%d%03d%03d", $1, $2, $3}')
-    
+
     case "$operator" in
         ">=") [[ $v1_num -ge $v2_num ]] ;;
         ">")  [[ $v1_num -gt $v2_num ]] ;;
@@ -172,26 +172,26 @@ version_compare() {
 migrate_section_order() {
     local migration_id="section_order_fix"
     local migration_file=".todo.ai/migrations/v1.3.5_${migration_id}.migrated"
-    
+
     if [[ -f "$migration_file" ]]; then
         return 0
     fi
-    
+
     if [[ ! -f "$TODO_FILE" ]]; then
         return 1
     fi
-    
+
     # Check if sections are in wrong order (Deleted Tasks before Recently Completed)
     local deleted_line=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1)
     local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
-    
+
     # If both exist and Deleted is before Recently Completed, fix it
     if [[ -n "$deleted_line" ]] && [[ -n "$recently_completed_line" ]] && [[ $deleted_line -lt $recently_completed_line ]]; then
         # Extract and reorder sections
         # ... implementation to move Deleted Tasks section after Recently Completed ...
         echo "Reordered TODO.md sections" >&2
     fi
-    
+
     mkdir -p "$(dirname "$migration_file")"
     touch "$migration_file"
     return 0
@@ -208,18 +208,18 @@ migrate_section_order() {
 cleanup_old_backup_files() {
     local migration_id="cleanup_old_backups"
     local migration_file=".todo.ai/migrations/v1.4.0_${migration_id}.migrated"
-    
+
     if [[ -f "$migration_file" ]]; then
         return 0
     fi
-    
+
     # Remove old .bak files if backups/ directory exists (new system uses backups/)
     local bak_files=$(find .todo.ai -name "*.bak" -type f 2>/dev/null)
     if [[ -n "$bak_files" ]] && [[ -d ".todo.ai/backups" ]]; then
         echo "$bak_files" | xargs rm -f 2>/dev/null || true
         echo "Removed old .bak files" >&2
     fi
-    
+
     mkdir -p "$(dirname "$migration_file")"
     touch "$migration_file"
     return 0
@@ -341,10 +341,10 @@ Future enhancement: store migration state for potential rollback.
 
 1. Should migrations run on every script execution or only on update?
    - **Decision:** Run on every execution (fast check via file existence)
-   
+
 2. Should we support migration dependencies?
    - **Decision:** Not initially - migrations should be independent
-   
+
 3. How to handle failed migrations?
    - **Decision:** Log error but don't block script - user can manually fix
 
@@ -352,4 +352,3 @@ Future enhancement: store migration state for potential rollback.
 
 - Task #19: Move Deleted Tasks section below Recently Completed section
 - Task #37: Build release migration and cleanup system
-

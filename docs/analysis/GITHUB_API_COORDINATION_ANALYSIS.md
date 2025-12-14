@@ -233,27 +233,27 @@ Store task number in a discussion post (not practical).
        file_data=$(gh api repos/:owner/:repo/contents/.todo.ai/task_counter.txt)
        current_num=$(echo "$file_data" | jq -r '.content' | base64 -d)
        file_sha=$(echo "$file_data" | jq -r '.sha')
-       
+
        # Increment
        new_num=$((current_num + 1))
-       
+
        # Attempt update with SHA
        response=$(gh api -X PUT repos/:owner/:repo/contents/.todo.ai/task_counter.txt \
          --field "message=Increment task counter" \
          --field "content=$(echo -n "$new_num" | base64)" \
          --field "sha=$file_sha" 2>&1)
-       
+
        # Check if update succeeded (no SHA mismatch)
        if echo "$response" | grep -q "sha"; then
            # Success - we got the new number atomically
            echo "$new_num"
            exit 0
        fi
-       
+
        # SHA mismatch - file changed, retry
        sleep 0.1
    done
-   
+
    # Failed after retries
    echo "ERROR: Could not update task counter after $max_retries attempts" >&2
    exit 1
@@ -617,4 +617,3 @@ const newValue = await db.runTransaction(async (transaction) => {
 6. **Consider fallback** - What happens if API unavailable (offline mode)
 7. **Security documentation** - Guide for users on setting up tokens and permissions
 8. **Evaluate CounterAPI/Abacus** - Test dedicated counter services as alternative to GitHub APIs
-

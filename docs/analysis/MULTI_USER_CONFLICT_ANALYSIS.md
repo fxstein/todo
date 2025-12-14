@@ -202,4 +202,3 @@ A solution must address:
 2. Design distributed numbering scheme (task #52.5)
 3. Design merge/resolution strategy (task #52.4, #52.6)
 4. Create overall architecture design (task #52.3)
-

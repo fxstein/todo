@@ -135,11 +135,11 @@ fi
 get_highest_task_number() {
     local todo_file="$1"
     local highest=0
-    
+
     # Extract all task IDs (handles main tasks and subtasks)
     # Pattern: #123 or #123.4 (subtasks)
     local task_ids=$(grep -oE '#[0-9]+(\.[0-9]+)?' "$todo_file" | sed 's/#//' | sort -t. -k1,1n -k2,2n)
-    
+
     # Find highest main task ID (non-subtask)
     for id in $task_ids; do
         # Skip subtasks (contain dot)
@@ -149,17 +149,17 @@ get_highest_task_number() {
             fi
         fi
     done
-    
+
     echo $highest
 }
 
 # Calculate next safe task number
 calculate_next_task_number() {
     local local_file="$TODO_FILE"
-    
+
     # Find highest task number in local TODO.md
     local local_max=$(get_highest_task_number "$local_file")
-    
+
     # Check main's TODO.md (from git_pull_todo_files)
     local main_max=0
     if [[ -f "$TODO_FILE.tmp.main" ]]; then
@@ -175,7 +175,7 @@ calculate_next_task_number() {
             fi
         fi
     fi
-    
+
     # Check current branch's remote TODO.md (if on feature branch)
     local branch_max=0
     local current_branch=$(git branch --show-current 2>/dev/null || echo "")
@@ -194,7 +194,7 @@ calculate_next_task_number() {
             fi
         fi
     fi
-    
+
     # Take maximum of all sources and add 1
     local overall_max=$local_max
     if [[ $main_max -gt $overall_max ]]; then
@@ -203,12 +203,12 @@ calculate_next_task_number() {
     if [[ $branch_max -gt $overall_max ]]; then
         overall_max=$branch_max
     fi
-    
+
     local next_id=$((overall_max + 1))
-    
+
     # Cleanup temp files
     rm -f "$TODO_FILE.tmp.main" "$TODO_FILE.tmp.branch" "$SERIAL_FILE.tmp.main" "$SERIAL_FILE.tmp.branch" 2>/dev/null || true
-    
+
     echo $next_id
 }
 ```
@@ -420,28 +420,28 @@ git push origin $(git branch --show-current) --quiet 2>/dev/null || {
 add_todo() {
     # Step 1: Pull latest changes from main (for coordination)
     git_pull_todo_files
-    
+
     # Step 2: Calculate next safe task number (using MAX of local and main)
     local next_id=$(calculate_next_task_number)
-    
+
     # Step 3: Create task with safe number
     local task_line="- [ ] **#$next_id** $text $tags"
     add_task_to_file "$task_line"
-    
+
     # Step 4: Update serial file (on current branch)
     echo $((next_id + 1)) > "$SERIAL_FILE"
-    
+
     # Step 5: Commit immediately to current branch
     git commit -m "task: Add task #$next_id $text" -- TODO.md "$SERIAL_FILE"
-    
+
     # Step 6: Push to current branch (make visible to others)
     git push origin $(git branch --show-current) --quiet 2>/dev/null || {
         log_todo_action "WARNING" "PUSH_FAILED" "Could not push, commit is local only"
     }
-    
+
     # Step 7: Log action
     log_todo_action "ADD" "$next_id" "$text"
-    
+
     echo "Added: #$next_id $text"
 }
 ```
@@ -462,25 +462,25 @@ add_subtask() {
     local parent_id="$1"
     local text="$2"
     local tags="$3"
-    
+
     # Step 1: Pull latest changes
     git_pull_todo_files
-    
+
     # Step 2: Verify parent exists (may have been renumbered)
     parent_id=$(verify_parent_task "$parent_id")
-    
+
     # Step 3: Calculate next subtask number
     local next_subtask=$(calculate_next_subtask_number "$parent_id")
-    
+
     # Step 4: Create subtask
     local subtask_line="  - [ ] **#$parent_id.$next_subtask** $text $tags"
     add_subtask_to_parent "$parent_id" "$subtask_line"
-    
+
     # Step 5: Commit immediately
     git commit -m "task: Add subtask #$parent_id.$next_subtask $text" -- TODO.md
-    
+
     log_todo_action "ADD_SUBTASK" "$parent_id.$next_subtask" "$text"
-    
+
     echo "Added subtask: #$parent_id.$next_subtask $text"
 }
 ```
@@ -499,11 +499,11 @@ git_pull_todo_files() {
         log_todo_action "WARNING" "GIT_FETCH_FAILED" "Could not fetch from main, using local state"
         # Continue anyway - will use local state only
     }
-    
+
     # Get main's TODO.md and serial file for comparison
     git show origin/main:TODO.md > "$TODO_FILE.tmp.main" 2>/dev/null || true
     git show origin/main:.todo.ai/.todo.ai.serial > "$SERIAL_FILE.tmp.main" 2>/dev/null || true
-    
+
     # If on a feature branch, also fetch from current branch's remote
     # This ensures we see unmerged tasks already pushed to this branch
     local current_branch=$(git branch --show-current 2>/dev/null || echo "")
@@ -513,15 +513,15 @@ git_pull_todo_files() {
             log_todo_action "WARNING" "GIT_FETCH_BRANCH_FAILED" "Could not fetch from origin/$current_branch, using main and local state"
             # Continue anyway - will use main and local state
         }
-        
+
         # Get current branch's remote TODO.md and serial file
         git show "origin/$current_branch:TODO.md" > "$TODO_FILE.tmp.branch" 2>/dev/null || true
         git show "origin/$current_branch:.todo.ai/.todo.ai.serial" > "$SERIAL_FILE.tmp.branch" 2>/dev/null || true
     fi
-    
+
     # Temp files are now available for MAX algorithm in calculate_next_task_number()
     # They will be cleaned up after use
-    
+
     return 0
 }
 ```
@@ -571,12 +571,12 @@ git_pull_todo_files() {
 ```bash
 resolve_conflicts() {
     local conflict_file="$1"
-    
+
     # Check for merge conflict markers
     if grep -q "^<<<<<<< " "$conflict_file"; then
         # Merge conflict detected
         echo "⚠️  Merge conflict detected in $conflict_file"
-        
+
         # Try automatic resolution
         if auto_resolve_conflicts "$conflict_file"; then
             echo "✅ Conflicts resolved automatically"
@@ -587,29 +587,29 @@ resolve_conflicts() {
             return 1
         fi
     fi
-    
+
     return 0
 }
 
 auto_resolve_conflicts() {
     local file="$1"
-    
+
     # Strategy: Take both sets of tasks, renumber conflicting ones
     # Keep highest numbers, renumber duplicates to next available
-    
+
     # Extract all task numbers from both sides of conflict
     local local_tasks=$(extract_task_numbers "$file" "local")
     local remote_tasks=$(extract_task_numbers "$file" "remote")
-    
+
     # Find duplicates
     local duplicates=$(find_duplicate_numbers "$local_tasks" "$remote_tasks")
-    
+
     # Renumber duplicates (use remote's numbering as base, renumber local)
     renumber_conflicting_tasks "$file" "$duplicates"
-    
+
     # Remove conflict markers
     remove_conflict_markers "$file"
-    
+
     return 0
 }
 ```
@@ -841,7 +841,7 @@ fi
 ```
 Time 0: Main has #49
 Time 1: Branch A fetches main (sees #49), calculates #50
-Time 2: Branch B fetches main (sees #49), calculates #50  
+Time 2: Branch B fetches main (sees #49), calculates #50
 Time 3: Branch A commits #50 to Branch A
 Time 4: Branch B commits #50 to Branch B
 Time 5: Branch A merges to main → main has #50
@@ -1114,4 +1114,3 @@ Before implementing, consider:
    - Design automatic conflict resolution
    - Design manual resolution tools
    - Design reference update mechanisms
-

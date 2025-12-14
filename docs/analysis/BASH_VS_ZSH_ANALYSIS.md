@@ -334,4 +334,3 @@ This approach balances:
 - ✅ Linux flexibility (both bash 4+ and zsh work)
 - ✅ User choice (both versions available)
 - ✅ Minimal maintenance (versions differ by only 7 lines)
-

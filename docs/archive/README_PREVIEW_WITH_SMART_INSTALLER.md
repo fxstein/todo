@@ -13,7 +13,7 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai &
 
 Then create a task "Implement user authentication" with subtasks:
 - Design database schema
-- Create API endpoints  
+- Create API endpoints
 - Add frontend components
 - Write tests
 ```
@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | s
 
 Then create a task "Implement user authentication" with subtasks:
 - Design database schema
-- Create API endpoints  
+- Create API endpoints
 - Add frontend components
 - Write tests
 ```
@@ -250,4 +250,3 @@ The smart installer maintains the **simplicity and zero-interaction philosophy**
 - 🔧 **Maintains control:** Direct download still available for manual choice
 
 The smart installer is a **natural evolution** that improves the installation experience without sacrificing the core philosophy of simplicity.
-

@@ -33,18 +33,18 @@
      - Rule 1: Track tasks using todo.ai (not built-in TODO tools)
      - Rule 2: TODO.md and .todo.ai/ must be committed together
      - Rule 3: Ask confirmation before archiving tasks
-   
+
    - **## Installation** section:
      - Installation instructions for todo.ai
      - How to download and set up the tool using curl
      - Note: NOT cloning the repo, only downloading the single file
      - Helps agents install or update todo.ai when needed
-   
+
    - **## Bug Reporting** section:
      - Critical requirements for bug reporting
      - Usage examples
      - Why it's required
-   
+
    **Rules for Developer Environment (local to todo.ai repo only - NOT created by `init_cursor_rules()`, manually committed):**
    - **## Repository Context** section (NEW):
      - This is the development repository for todo.ai itself
@@ -52,12 +52,12 @@
      - Do NOT run installation commands (curl, download) - the tool is already present in this repo
      - The `todo.ai` file in this directory IS the tool being developed
      - Avoid circular references: don't try to install/update todo.ai when already in the todo.ai repo
-   
+
    - **## Releases** section:
      - Release process instructions
      - How to generate release summaries
      - How to run release script
-   
+
    - **## Commit Message Prefixes for Release Numbering** section:
      - Guidelines for backend/infrastructure commits (PATCH)
      - Guidelines for frontend/user-facing commits (MINOR/MAJOR)
@@ -89,7 +89,7 @@
   - Enable easy filtering and identification (users can easily see which rules are from todo.ai)
   - Avoid conflicts with user's own custom rules
   - Allow users to organize/manage todo.ai rules separately from their own rules
-  
+
 - **Developer Rules** (local to repo): NO prefix to:
   - Clearly distinguish them from tool-installed rules
   - Show they are specific to the todo.ai development environment
@@ -186,7 +186,7 @@ Cursor rules reference `todo.ai` with hardcoded paths that don't work across all
    get_todo_ai_path() {
        # Strategy 1: Script's own location (most reliable)
        local script_path=$(realpath "$0" 2>/dev/null || echo "$0")
-       
+
        # Strategy 2: Check if in PATH (works for global installs)
        if command -v todo.ai >/dev/null 2>&1; then
            local path_location=$(which todo.ai)
@@ -196,7 +196,7 @@ Cursor rules reference `todo.ai` with hardcoded paths that don't work across all
                return 0
            fi
        fi
-       
+
        # Strategy 3: Use script location
        echo "$script_path"
    }
@@ -280,4 +280,3 @@ This is a **critical requirement** because:
 7. Update documentation (Task #44.7)
 8. Update release process docs (Task #44.8)
 9. Manage installation path of tool relative to cursor rules (Task #44.9)
-

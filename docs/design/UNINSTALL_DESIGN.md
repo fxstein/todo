@@ -85,7 +85,7 @@ uninstall_tool() {
         echo "It may already be uninstalled."
         return 1
     }
-    
+
     # ... rest of uninstall logic
 }
 ```
@@ -219,4 +219,3 @@ Proceed with uninstall? (y/N): y
 1. **Uninstall from PATH**: Detect all installations if tool is in PATH
 2. **Backup before uninstall**: Create backup of `.todo.ai/` before removal
 3. **Reinstall prompt**: Suggest reinstall command if needed
-

@@ -1,8 +1,8 @@
 # TODO Tool Improvement Proposals
 
-**Created:** 2025-10-30  
-**Status:** Proposal Phase  
-**Current Version:** 1.0  
+**Created:** 2025-10-30
+**Status:** Proposal Phase
+**Current Version:** 1.0
 
 ## Executive Summary
 
@@ -102,7 +102,7 @@ The TODO system (`./scripts/todo/todo.zsh`) currently provides:
 
 **Problem:** Requires shell loops to complete multiple tasks:
 ```zsh
-for subtask in 104.3 104.4 104.5 104.6 104.7 104.8 104.9 104.10; do 
+for subtask in 104.3 104.4 104.5 104.6 104.7 104.8 104.9 104.10; do
     ./scripts/todo/todo.zsh complete $subtask
 done
 ```
@@ -405,7 +405,7 @@ done
 ```markdown
 ---
 **Last Updated:** Thu Oct 30 14:23:45 CET 2025
-**Repository:** https://github.com/fxstein/homeassistant  
+**Repository:** https://github.com/fxstein/homeassistant
 **Maintenance:** Use `./scripts/todo/todo.zsh` script only
 
 ## Task Metadata
@@ -597,7 +597,7 @@ Add metadata to task line:
 
 ```markdown
 - [x] **#104** Design meter direction fix `#solax` (2025-10-30)
-  > Completed as part of #107 and #108 work  
+  > Completed as part of #107 and #108 work
   > Oscillation issues fully resolved in production
 ```
 
@@ -623,7 +623,7 @@ In IDE (raw markdown):
 In rendered markdown (GitHub):
 ```
 - [x] **#104** Design meter direction fix `#solax` (2025-10-30)
-  
+
   > Completed as part of #107 and #108 work
   > Oscillation issues fully resolved in production
 ```
@@ -679,7 +679,7 @@ In rendered markdown (GitHub):
 
 **Problem:** Current lint command has limited validation capabilities. Cannot detect orphaned subtasks or formatting issues.
 
-**Existing Task:** #47 - Enhance --lint command to detect orphaned subtasks  
+**Existing Task:** #47 - Enhance --lint command to detect orphaned subtasks
 **Subtasks:**
 - #47.1 - Detect empty lines in task lists
 - #47.2 - Detect orphaned subtasks (subtasks without parent tasks)
@@ -809,7 +809,7 @@ git commit -m "Update tasks"
 
 **Problem:** Archived tasks accumulate indefinitely, making TODO.md large and slow to parse. No way to clean up old completed work.
 
-**Existing Task:** #43 - Implement --prune function to remove old archived tasks based on git history  
+**Existing Task:** #43 - Implement --prune function to remove old archived tasks based on git history
 **Subtasks:**
 - #43.1 - Design prune function with 30-day default and task ID targeting options
 - #43.2 - Implement git history analysis to identify archive dates for tasks
@@ -913,7 +913,7 @@ git log --all --grep="archive 104" -- TODO.md
 **Handbook Page Features:**
 
 - **Active Tasks View**: List of all pending tasks
-- **Recently Completed**: Last 10 completed tasks  
+- **Recently Completed**: Last 10 completed tasks
 - **Statistics**: Task counts by tag, status
 - **Progress Indicators**: Visual progress bars
 - **Repository Context**: Tasks grouped by repo
@@ -1031,17 +1031,17 @@ Error: TODO.md has conflicts. Please resolve manually.
 add_todo() {
     # Step 1: Silent git pull (optimistic)
     git pull --quiet origin main -- TODO.md .todo_serial
-    
+
     # Step 2: Auto-resolve .todo_serial conflicts (take MAX)
     resolve_serial_conflict
-    
+
     # Step 3: Get next safe ID (skip any duplicates)
     next_id=$(get_next_safe_id)
-    
+
     # Step 4: Create task
     echo "- [ ] **#${next_id}** ${text} ${tags}" >> TODO.md
     echo $((next_id + 1)) > .todo_serial
-    
+
     # Done (no prompts, no interaction)
 }
 ```
@@ -1237,7 +1237,7 @@ Templates stored in `.todo/templates/` directory:
 ./scripts/todo/todo.zsh review --completed
 # Shows each completed task:
 # [x] #107 Investigate PM overflow (completed 5 days ago)
-# Actions: [a]rchive, [k]eep, [n]ote, [s]how, [q]uit: 
+# Actions: [a]rchive, [k]eep, [n]ote, [s]how, [q]uit:
 
 # Review all tasks
 ./scripts/todo/todo.zsh review
@@ -1495,7 +1495,7 @@ Templates stored in `.todo/templates/` directory:
 - If offline work is rare
 - Requires significant implementation effort
 
-**Recommendation:** 
+**Recommendation:**
 - Re-evaluate in 6-12 months
 - Only if collaboration needs emerge
 - Current git-based multi-developer support (3.6) handles team scenarios
@@ -1637,7 +1637,7 @@ View all repos: `./scripts/git-status-all.zsh`
 
 ---
 **Last Updated:** Thu Oct 30 14:23:45 CET 2025
-**Repository:** https://github.com/fxstein/homeassistant  
+**Repository:** https://github.com/fxstein/homeassistant
 **Maintenance:** Use `./scripts/todo/todo.zsh` script only
 
 ## Task Metadata
@@ -1709,4 +1709,3 @@ The proposed changes address real pain points observed in production use while m
 3. Create implementation tasks
 4. Begin Phase 1 development
 5. Migrate files to `.todo/` directory structure
-

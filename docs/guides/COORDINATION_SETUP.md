@@ -339,7 +339,7 @@ Check that:
   ```
 
 **Problem: "Issue #123 not found or not accessible"**
-- **Solution:** 
+- **Solution:**
   - Verify the issue number is correct
   - Check you have access to the repository
   - Ensure the issue exists: `gh issue list`

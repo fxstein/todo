@@ -259,7 +259,7 @@ report_bug_on_error() {
 
 **Strategy**: Use multiple heuristics to detect similar issues:
 
-1. **Title Similarity**: 
+1. **Title Similarity**:
    - Exact match on error message keywords
    - Fuzzy matching on error descriptions
    - Pattern matching on error types
@@ -277,7 +277,7 @@ report_bug_on_error() {
 check_for_duplicate_issues() {
     local title="$1"
     local body="$2"
-    
+
     # Search for issues with similar titles
     # Note: This only searches, doesn't automatically reply
     local similar_issues=$(gh issue list \
@@ -285,7 +285,7 @@ check_for_duplicate_issues() {
         --search "in:title $title" \
         --limit 10 \
         --json number,title,body,state)
-    
+
     # Check each issue for similarity
     local duplicates=()
     for issue in "$similar_issues"; do
@@ -294,7 +294,7 @@ check_for_duplicate_issues() {
             duplicates+=("$issue")  # Potential duplicate
         fi
     done
-    
+
     # Return duplicates found (user will confirm)
     echo "${duplicates[@]}"
 }
@@ -306,9 +306,9 @@ check_for_duplicate_issues() {
 handle_duplicate_detection() {
     local title="$1"
     local body="$2"
-    
+
     local duplicates=$(check_for_duplicate_issues "$title" "$body")
-    
+
     if [[ -n "$duplicates" ]]; then
         echo "Similar issues found:"
         # Show similar issues
@@ -494,10 +494,10 @@ BUG_REPORT_THRESHOLD="${BUG_REPORT_THRESHOLD:-75}"  # Similarity threshold (%) -
 suggest_bug_report() {
     local error_message="$1"
     local error_context="$2"
-    
+
     # Collect full context
     local bug_report=$(generate_bug_report "$error_message" "$error_context")
-    
+
     # Show error and suggest reporting
     echo "⚠️  An error occurred: $error_message"
     echo ""
@@ -508,16 +508,16 @@ suggest_bug_report() {
     echo "$bug_report" | head -30
     echo "---"
     echo ""
-    
+
     # Always require confirmation
     printf "Report this bug? (y/N) "
     read -r reply
-    
+
     if [[ ! "$reply" =~ ^[Yy]$ ]]; then
         echo "Bug report cancelled by user"
         return 0
     fi
-    
+
     # User confirmed - proceed with duplicate check and reporting
     handle_duplicate_detection "$error_message" "$bug_report"
 }
@@ -570,10 +570,10 @@ This ensures:
 report_bug() {
     local error_message="$1"
     local error_context="$2"
-    
+
     # Generate bug report
     local bug_report=$(generate_bug_report "$error_message" "$error_context")
-    
+
     # Show error and suggestion
     echo "⚠️  An error occurred: $error_message"
     echo ""
@@ -586,12 +586,12 @@ report_bug() {
     echo ""
     printf "Report this bug? (y/N) "
     read -r reply
-    
+
     if [[ ! "$reply" =~ ^[Yy]$ ]]; then
         echo "Bug report cancelled by user"
         return 0
     fi
-    
+
     # Proceed with reporting
     # ... (rest of reporting logic)
 }
@@ -693,4 +693,3 @@ Example:
 3. **Similarity Threshold**: Starting at 75%, will be tested and adjusted
 4. **Rate Limits**: Not an issue since all reporting requires manual confirmation
 5. **Private Repos**: Hide all repository identifiers, only include todo.ai-specific information
-

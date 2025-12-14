@@ -1,7 +1,7 @@
 import subprocess
-from typing import Optional
 
-def get_git_root() -> Optional[str]:
+
+def get_git_root() -> str | None:
     """Get the root directory of the git repository."""
     try:
         root = subprocess.check_output(["git", "rev-parse", "--show-toplevel"], text=True).strip()
@@ -9,13 +9,17 @@ def get_git_root() -> Optional[str]:
     except subprocess.CalledProcessError:
         return None
 
+
 def get_current_branch() -> str:
     """Get current git branch name."""
     try:
-        branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True).strip()
+        branch = subprocess.check_output(
+            ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+        ).strip()
         return branch
     except subprocess.CalledProcessError:
         return "main"
+
 
 def get_user_name() -> str:
     """Get git user name."""
@@ -25,6 +29,7 @@ def get_user_name() -> str:
     except subprocess.CalledProcessError:
         return "user"
 
+
 def get_user_email() -> str:
     """Get git user email."""
     try:
@@ -33,7 +38,7 @@ def get_user_email() -> str:
     except subprocess.CalledProcessError:
         return ""
 
+
 def is_git_repo() -> bool:
     """Check if current directory is inside a git repository."""
     return get_git_root() is not None
-

@@ -1,7 +1,7 @@
 # Code Size Analysis for todo.ai
 
-**Analysis Date:** November 5, 2025  
-**Current Version:** Post v2.0.x  
+**Analysis Date:** November 5, 2025
+**Current Version:** Post v2.0.x
 **Analyst:** Comprehensive automated analysis
 
 ## Executive Summary
@@ -101,7 +101,7 @@ Utilities/Helpers:             ~1,461 lines (21%)
 1. **`migrate_section_order()`** - 94 lines
    - Purpose: Fix TODO.md section ordering (v1.3.5)
    - Status: Deployed 2+ versions ago
-   
+
 2. **`migrate_cursor_rules_to_mdc()`** - 269 lines
    - Purpose: Convert .cursorrules to .cursor/rules/ (v1.6.0)
    - Status: Recent, but one-time use
@@ -313,8 +313,8 @@ declare -A COMMANDS=(
 ## Recommended Implementation Roadmap
 
 ### Phase 1: Quick Wins (v2.1.0) - Conservative
-**Timeline:** 1-2 weeks  
-**Risk:** LOW  
+**Timeline:** 1-2 weeks
+**Risk:** LOW
 **Effort:** LOW
 
 1. **Remove old migration** (`migrate_section_order`) - **94 lines**
@@ -333,8 +333,8 @@ declare -A COMMANDS=(
 **Total reduction: 394 lines (5.7%) → 6,557 lines**
 
 ### Phase 2: Cursor Rules Extraction (v2.2.0) - Medium
-**Timeline:** 2-3 weeks  
-**Risk:** MEDIUM  
+**Timeline:** 2-3 weeks
+**Risk:** MEDIUM
 **Effort:** MEDIUM
 
 1. **Extract Cursor rules system** - **540 lines**
@@ -349,8 +349,8 @@ declare -A COMMANDS=(
 **Total reduction: 984 lines (14.2%) → 5,967 lines**
 
 ### Phase 3: Plugin Architecture (v3.0.0) - Aggressive
-**Timeline:** 4-6 weeks  
-**Risk:** HIGH  
+**Timeline:** 4-6 weeks
+**Risk:** HIGH
 **Effort:** HIGH
 
 1. **Design plugin system**
@@ -381,7 +381,7 @@ declare -A COMMANDS=(
 ### Phase 1 Risks: ⚠️ LOW
 - **Migration removal**: Low risk if sunset properly
   - Mitigation: Announce in release notes, provide manual steps
-  
+
 ### Phase 2 Risks: ⚠️ MEDIUM
 - **Cursor rules extraction**: Could break automated setup
   - Mitigation: Keep auto-detection, download on-demand

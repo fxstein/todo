@@ -124,4 +124,3 @@ All other commits remain as-is (preserves Git history). They are documented here
 - ✅ Commits with old format identified
 - ✅ Migration plan documented
 - 🔄 Ready to implement Step 1 (fix most recent commit)
-

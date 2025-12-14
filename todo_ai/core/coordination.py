@@ -1,12 +1,13 @@
 import subprocess
-from typing import Optional
+
 from todo_ai.core.config import Config
 from todo_ai.core.github_client import GitHubClient
 
+
 class CoordinationManager:
     """Handles multi-user coordination modes and task ID generation."""
-    
-    def __init__(self, config: Config, github_client: Optional[GitHubClient] = None):
+
+    def __init__(self, config: Config, github_client: GitHubClient | None = None):
         self.config = config
         self.github_client = github_client or GitHubClient()
 
@@ -21,7 +22,7 @@ class CoordinationManager:
         Generate the next task ID based on the current mode.
         """
         mode = self.get_numbering_mode()
-        
+
         if mode == "single-user":
             return self._generate_single_user_id(current_max_serial, stored_serial)
         elif mode == "multi-user":
@@ -41,12 +42,12 @@ class CoordinationManager:
         Otherwise, use max(stored, current_max + 1).
         """
         coord_type = self.get_coordination_type()
-        
+
         if coord_type == "github-issues":
             issue_num = self.config.get("coordination.issue_number")
             if issue_num:
                 return self._coordinate_via_github(current_max, issue_num)
-        
+
         # Use max of stored (last used) and current_max, then increment
         return str(max(stored, current_max) + 1)
 
@@ -84,7 +85,7 @@ class CoordinationManager:
         try:
             comments = self.github_client.get_issue_comments(issue_number)
             remote_max = 0
-            
+
             # Simple parsing: look for digits in comments
             # Shell script looks for "Next task number: 123" or just digits
             for comment in reversed(comments):
@@ -93,14 +94,15 @@ class CoordinationManager:
                 # This is a simplified logic compared to shell script's regex
                 # Ideally we'd use a regex to find "Next task number: (\d+)"
                 import re
-                match = re.search(r'Next task number: (\d+)', body)
+
+                match = re.search(r"Next task number: (\d+)", body)
                 if match:
                     remote_max = int(match.group(1))
                     break
-                    
+
             next_val = max(current_max, remote_max) + 1
             return str(next_val)
-            
+
         except Exception as e:
             print(f"Warning: GitHub coordination failed: {e}")
             return str(current_max + 1)
@@ -121,9 +123,10 @@ class CoordinationManager:
     def _get_branch_name(self) -> str:
         """Get first 7 chars of current branch."""
         try:
-            branch = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True).strip()
-            clean = "".join(c for c in branch if c.isalnum() or c == '_').lower()
+            branch = subprocess.check_output(
+                ["git", "rev-parse", "--abbrev-ref", "HEAD"], text=True
+            ).strip()
+            clean = "".join(c for c in branch if c.isalnum() or c == "_").lower()
             return clean[:7] or "main"
         except subprocess.CalledProcessError:
             return "main"
-

@@ -1,8 +1,8 @@
 # Architecture Design: Python Refactor with MCP and CLI Interfaces
 
-**Created:** 2025-12-12  
+**Created:** 2025-12-12
 **Status:** Validated
-**Version:** 1.1  
+**Version:** 1.1
 **Related Issue:** #39
 
 ## Executive Summary
@@ -215,11 +215,11 @@ class FileManager:
 class CoordinationManager:
     """Handles multi-user coordination modes"""
     def __init__(self, mode: str, config: Config)
-    
+
     def get_next_task_id(self, current_max: int) -> int
     def sync_with_remote(self) -> Dict[str, Any]
     def resolve_conflicts(self, local_tasks: List[Task], remote_tasks: List[Task]) -> List[Task]
-    
+
     # Modes: single-user, multi-user, branch, enhanced
 ```
 
@@ -232,7 +232,7 @@ class CoordinationManager:
 class GitHubClient:
     """GitHub API client for issue management and bug reporting"""
     def __init__(self, token: Optional[str] = None)
-    
+
     def create_issue(self, title: str, body: str, labels: List[str]) -> Dict
     def close_issue(self, issue_number: int, comment: Optional[str] = None) -> Dict
     def get_issue(self, issue_number: int) -> Dict
@@ -249,7 +249,7 @@ class GitHubClient:
 class MigrationRegistry:
     """Manages migration execution"""
     def __init__(self, migrations_dir: str)
-    
+
     def register_migration(self, version: str, migration_id: str, func: Callable) -> None
     def run_pending_migrations(self, current_version: str) -> List[str]
     def is_migration_complete(self, version: str, migration_id: str) -> bool
@@ -264,7 +264,7 @@ class MigrationRegistry:
 class RulesManager:
     """Manages Cursor AI rules installation and updates"""
     def __init__(self, rules_dir: str)
-    
+
     def init_rules(self) -> None
     def update_rules(self) -> None
     def get_rule_content(self, rule_name: str) -> str
@@ -291,7 +291,7 @@ def check_git_hooks_status() -> Dict[str, bool]
 class Config:
     """Manages todo.ai configuration"""
     def __init__(self, config_path: str)
-    
+
     def get(self, key: str, default: Any = None) -> Any
     def set(self, key: str, value: Any) -> None
     def get_numbering_mode(self) -> str
@@ -361,7 +361,7 @@ class MCPServer:
     """MCP server implementation"""
     def __init__(self, core_manager: TaskManager):
         self.core = core_manager
-    
+
     async def handle_tool_call(self, tool_name: str, arguments: Dict) -> Dict:
         """Route MCP tool calls to core logic"""
         if tool_name == "add_task":
@@ -370,7 +370,7 @@ class MCPServer:
                 tags=arguments.get("tags", [])
             )
             return {"task_id": task.id, "status": "success"}
-        
+
         # ... route all tools to core logic
 ```
 
@@ -412,7 +412,7 @@ async def main():
     """MCP server entry point"""
     core_manager = TaskManager(...)
     server = MCPServer(core_manager)
-    
+
     # Start MCP server (stdin/stdout for MCP protocol)
     await server.run()
 ```
@@ -449,10 +449,10 @@ def add_command(description: str, tags: List[str] = None):
     """CLI implementation of add command"""
     # Initialize core manager
     manager = TaskManager.from_config()
-    
+
     # Call core logic (same as MCP would call)
     task = manager.add_task(description=description, tags=tags or [])
-    
+
     # Format output for CLI
     print(f"Added: #{task.id} {task.description}")
     return task
@@ -945,4 +945,3 @@ def test_todo_file(tmp_path):
 **Document Status:** Validated
 **Last Updated:** 2025-12-12
 **Next Review:** Implementation Phase
-

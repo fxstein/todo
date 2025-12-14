@@ -79,4 +79,3 @@ See [BASH_VS_ZSH_ANALYSIS.md](../analysis/BASH_VS_ZSH_ANALYSIS.md) for:
 - Compatibility analysis
 - Conversion details (only 7 changes needed)
 - Detailed recommendations
-

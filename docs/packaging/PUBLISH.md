@@ -57,4 +57,3 @@ You will be prompted for your username (`__token__`) and your API token (starts 
 
 2. **Check Listing:**
     Visit [https://pypi.org/project/todo-ai/](https://pypi.org/project/todo-ai/) to ensure the description and metadata are correct.
-

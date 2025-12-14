@@ -78,4 +78,3 @@ git commit -m "feat: add new feature"
 - `.cursor/rules/zsh-first-development.mdc` - Cursor rule enforcing this workflow
 - `docs/analysis/BASH_VS_ZSH_ANALYSIS.md` - Why we support both versions
 - `release/release.sh` - Automated conversion logic
-

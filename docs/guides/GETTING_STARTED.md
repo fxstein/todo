@@ -4,7 +4,7 @@ This guide will help you install and configure `todo.ai` for your development wo
 
 > **Related Documentation:**
 > - [Numbering Modes Guide](NUMBERING_MODES_GUIDE.md) - Complete guide to all modes
-> - [Usage Patterns](USAGE_PATTERNS.md) - Real-world usage scenarios  
+> - [Usage Patterns](USAGE_PATTERNS.md) - Real-world usage scenarios
 > - [Coordination Setup Instructions](COORDINATION_SETUP.md) - Detailed setup guides
 
 ---
@@ -431,4 +431,3 @@ Re-run setup:
 - **Report bugs:** `./todo.ai report-bug "description" "context" "command"`
 - **GitHub:** https://github.com/fxstein/todo.ai
 - **Issues:** https://github.com/fxstein/todo.ai/issues
-

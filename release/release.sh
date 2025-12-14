@@ -903,6 +903,19 @@ execute_release() {
     echo -e "${BLUE}📝 Updating version in todo.ai and pyproject.toml...${NC}"
     log_release_step "UPDATE VERSION" "Updating version in todo.ai and pyproject.toml from ${CURRENT_VERSION} to ${NEW_VERSION}"
     update_version "$NEW_VERSION"
+
+    # Verify both files were updated correctly
+    if ! grep -q "^VERSION="${NEW_VERSION}"" todo.ai 2>/dev/null; then
+        echo -e "${RED}❌ Error: Version update failed in todo.ai${NC}"
+        log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo.ai to ${NEW_VERSION}"
+        exit 1
+    fi
+    if ! grep -q "^version = "${NEW_VERSION}"" pyproject.toml 2>/dev/null; then
+        echo -e "${RED}❌ Error: Version update failed in pyproject.toml${NC}"
+        log_release_step "VERSION UPDATE ERROR" "Failed to update version in pyproject.toml to ${NEW_VERSION}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Verified version updated in both todo.ai and pyproject.toml${NC}"
     log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai and pyproject.toml"
 
     # Commit version change and summary file
@@ -968,8 +981,8 @@ Includes release summary from ${SUMMARY_FILE}"
     # Verify tag points to commit with correct version
     if ! git show "$TAG":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
         echo -e "${RED}❌ Error: Tag verification failed${NC}"
-        echo "Tag does not point to commit with correct version"
-        log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - tag doesn't point to commit with VERSION=${NEW_VERSION}"
+        echo "Tag does not point to commit with correct version in todo.ai or pyproject.toml"
+        log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - tag doesn't point to commit with VERSION=${NEW_VERSION} in todo.ai or pyproject.toml"
         exit 1
     fi
 

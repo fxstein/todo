@@ -107,11 +107,15 @@ class FileOps:
             if task_match:
                 completed_char, task_id, description = task_match.groups()
 
-                # Extract tags
+                # Extract tags and remove them from description
                 tags = set()
                 tag_matches = tag_pattern.findall(description)
                 for tag in tag_matches:
                     tags.add(tag)
+
+                # Remove tags from description (format: `#tag`)
+                if tag_matches:
+                    description = tag_pattern.sub("", description).strip()
 
                 # Determine status
                 status = TaskStatus.PENDING
@@ -196,7 +200,14 @@ class FileOps:
                 checkbox = " "
 
             indent = "  " * (t.id.count("."))
-            line = f"{indent}- [{checkbox}] **#{t.id}** {t.description}"
+
+            # Format description with tags
+            description = t.description
+            if t.tags:
+                tag_str = " ".join([f"`#{tag}`" for tag in sorted(t.tags)])
+                description = f"{description} {tag_str}".strip()
+
+            line = f"{indent}- [{checkbox}] **#{t.id}** {description}"
 
             for note in t.notes:
                 line += f"\n{indent}  > {note}"

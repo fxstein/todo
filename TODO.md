@@ -64,14 +64,14 @@
     - [ ] **#163.37.3** Implement update-note command - Replace existing notes with new text `#code`
     - [ ] **#163.37.2** Implement delete-note command - Delete all notes from a task `#code`
     - [ ] **#163.37.1** Implement note command - Add note to task (blockquote format) `#code`
-  - [ ] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands `#code`
-    - [ ] **#163.36.8** Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations `#code`
-    - [ ] **#163.36.7** Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10) `#code`
-    - [ ] **#163.36.6** Add bulk operations support - Complete/delete/archive multiple tasks at once `#code`
-    - [ ] **#163.36.5** Implement undo command - Reopen completed task `#code`
-    - [ ] **#163.36.4** Implement restore command - Move task from Deleted/Recently Completed back to Tasks section `#code`
-    - [ ] **#163.36.3** Implement archive command - Move task to Recently Completed section (not just mark as archived) `#code`
-    - [ ] **#163.36.2** Implement delete command - Move task to Deleted section (not just mark as deleted) `#code`
+  - [x] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands `#code`
+    - [x] **#163.36.8** Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations `#code`
+    - [x] **#163.36.7** Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10) `#code`
+    - [x] **#163.36.6** Add bulk operations support - Complete/delete/archive multiple tasks at once `#code`
+    - [x] **#163.36.5** Implement undo command - Reopen completed task `#code`
+    - [x] **#163.36.4** Implement restore command - Move task from Deleted/Recently Completed back to Tasks section `#code`
+    - [x] **#163.36.3** Implement archive command - Move task to Recently Completed section (not just mark as archived) `#code`
+    - [x] **#163.36.2** Implement delete command - Move task to Deleted section (not just mark as deleted) `#code`
     - [ ] **#163.36.1** Implement modify command - Update task description and tags `#code`
   - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list) `#code`
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Sun Dec 14 23:26:03 CET 2025
+**Last Updated:** Sun Dec 14 23:34:45 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

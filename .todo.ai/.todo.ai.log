@@ -2,6 +2,15 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-14 23:34:45 | fxstein | COMPLETE | 163.36.8 | Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations
+2025-12-14 23:34:45 | fxstein | COMPLETE | 163.36.7 | Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10)
+2025-12-14 23:34:45 | fxstein | COMPLETE | 163.36.6 | Add bulk operations support - Complete/delete/archive multiple tasks at once
+2025-12-14 23:34:44 | fxstein | COMPLETE | 163.36.5 | Implement undo command - Reopen completed task
+2025-12-14 23:34:44 | fxstein | COMPLETE | 163.36.4 | Implement restore command - Move task from Deleted/Recently Completed back to Tasks section
+2025-12-14 23:34:44 | fxstein | COMPLETE | 163.36.3 | Implement archive command - Move task to Recently Completed section (not just mark as archived)
+2025-12-14 23:34:44 | fxstein | COMPLETE | 163.36 | Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands
+2025-12-14 23:34:44 | fxstein | COMPLETE | 163.36.2 | Implement delete command - Move task to Deleted section (not just mark as deleted)
+2025-12-14 23:34:44 | fxstein | COMPLETE | 163.36.1 | Implement modify command - Update task description and tags
 2025-12-14 23:26:03 | fxstein | ADD_SUBTASK | 163.45.6 | Final release: Update installation instructions and migration guide (parent: #163.45)
 2025-12-14 23:26:02 | fxstein | ADD_SUBTASK | 163.45.5 | Final release: Publish final release to PyPI with migration support (parent: #163.45)
 2025-12-14 23:26:01 | fxstein | ADD_SUBTASK | 163.45.4 | Final release: Finalize migration support and documentation (parent: #163.45)

@@ -164,6 +164,41 @@ class TaskManager:
         task.restore()
         return task
 
+    def modify_task(
+        self, task_id: str, description: str | None = None, tags: list[str] | None = None
+    ) -> Task:
+        """Modify a task's description and/or tags."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        if description is not None:
+            task.description = description
+            task.updated_at = datetime.now()
+
+        if tags is not None:
+            task.tags = set(tags)
+            task.updated_at = datetime.now()
+
+        return task
+
+    def undo_task(self, task_id: str) -> Task:
+        """Reopen (undo) a completed task."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        if task.status != TaskStatus.COMPLETED:
+            raise ValueError(f"Task {task_id} is not completed, cannot undo")
+
+        task.restore()
+        return task
+
+    def get_subtasks(self, parent_id: str) -> list[Task]:
+        """Get all subtasks of a parent task."""
+        prefix = f"{parent_id}."
+        return [task for task_id, task in self._tasks.items() if task_id.startswith(prefix)]
+
     def list_tasks(self, filters: dict[str, Any] | None = None) -> list[Task]:
         """List tasks matching filters."""
         if not filters:

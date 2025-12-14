@@ -134,3 +134,56 @@ def test_manager_list_tasks(task_manager):
     tagged = task_manager.list_tasks(filters={"tag": "tag1"})
     assert len(tagged) == 1
     assert tagged[0].id == t1.id
+
+
+def test_manager_modify_task(task_manager):
+    task = task_manager.add_task("Original task", tags=["old"])
+
+    # Modify description
+    modified = task_manager.modify_task(task.id, "Updated task")
+    assert modified.description == "Updated task"
+    assert "old" in modified.tags
+
+    # Modify tags
+    modified = task_manager.modify_task(task.id, None, ["new", "tags"])
+    assert modified.description == "Updated task"
+    assert "new" in modified.tags
+    assert "tags" in modified.tags
+    assert "old" not in modified.tags
+
+    # Modify both
+    modified = task_manager.modify_task(task.id, "Final task", ["final"])
+    assert modified.description == "Final task"
+    assert "final" in modified.tags
+    assert len(modified.tags) == 1
+
+
+def test_manager_undo_task(task_manager):
+    task = task_manager.add_task("Task to undo")
+
+    # Complete it
+    task_manager.complete_task(task.id)
+    assert task.status == TaskStatus.COMPLETED
+
+    # Undo it
+    undone = task_manager.undo_task(task.id)
+    assert undone.status == TaskStatus.PENDING
+    assert undone.completed_at is None
+
+    # Cannot undo non-completed task
+    with pytest.raises(ValueError, match="not completed"):
+        task_manager.undo_task(task.id)
+
+
+def test_manager_get_subtasks(task_manager):
+    parent = task_manager.add_task("Parent")
+    sub1 = task_manager.add_subtask(parent.id, "Subtask 1")
+    sub2 = task_manager.add_subtask(parent.id, "Subtask 2")
+    other = task_manager.add_task("Other task")
+
+    subtasks = task_manager.get_subtasks(parent.id)
+    assert len(subtasks) == 2
+    assert {s.id for s in subtasks} == {sub1.id, sub2.id}
+
+    # Other task should not be included
+    assert other.id not in {s.id for s in subtasks}

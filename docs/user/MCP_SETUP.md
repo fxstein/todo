@@ -13,7 +13,7 @@
 ## Configuration
 
 1.  **Locate the MCP Server Command:**
-    
+
     If you installed via `pipx`, the command `todo-ai-mcp` should be available globally.
     Verify it by running:
     ```bash
@@ -35,7 +35,7 @@
     *Note: If `todo-ai-mcp` is not in Cursor's PATH, explicitly use the full path found in step 1.*
 
 3.  **Verify Connection:**
-    
+
     Once added, the status indicator next to `todo-ai` should turn green.
 
 ## Usage in Cursor
@@ -56,4 +56,3 @@ Cursor will automatically call the appropriate `todo-ai` tools (`add_task`, `lis
 -   The MCP server runs locally on your machine.
 -   It only accesses the `TODO.md` file in the directory where the MCP server was started.
     *Note: Currently, the global `todo-ai-mcp` command typically targets the `TODO.md` in the directory where Cursor launched the server process, or defaults to the current working directory.*
-

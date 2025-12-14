@@ -65,7 +65,7 @@ If you have the `todo.ai` shell script committed in your repository root:
     ```bash
     # Old
     ./todo.ai list
-    
+
     # New
     todo-ai list
     ```
@@ -93,4 +93,3 @@ Ensure your `pipx` binary directory is in your PATH. Run `pipx ensurepath` and r
 If you encounter issues reading your existing `TODO.md`:
 1.  Run `todo-ai list` to see if it parses correctly.
 2.  The tool automatically attempts to preserve custom headers/footers in `TODO.md`.
-

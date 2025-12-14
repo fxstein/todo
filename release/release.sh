@@ -26,7 +26,7 @@ log_release_step() {
     local message="$2"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     local user_id=$(get_github_user)
-    
+
     # Create header if file doesn't exist
     if [[ ! -f "$RELEASE_LOG" ]]; then
         local generated_date=$(date)
@@ -37,42 +37,42 @@ log_release_step() {
 #
 EOF
     fi
-    
+
     # Create log entry (flatten multi-line messages to single line)
     local flat_message=$(echo "$message" | tr '\n' ' ' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//')
     local log_entry="${timestamp} | ${user_id} | ${step} | ${flat_message}"
-    
+
     # Find where header ends (before the first log entry - the empty line separator)
     # Find first timestamp line (log entry), then use the line before it as header end
     local first_log_line=$(awk '/^[0-9]/ {print NR; exit}' "$RELEASE_LOG" 2>/dev/null || echo 0)
-    
+
     # If no log entries found, header is entire file
     if [[ -z "$first_log_line" ]] || [[ "$first_log_line" -eq 0 ]]; then
         first_log_line=$(wc -l < "$RELEASE_LOG" 2>/dev/null || echo 4)
     fi
-    
+
     # Header ends at the line before first log entry (the empty line separator)
     local header_end=$((first_log_line - 1))
-    
+
     # Ensure header_end is at least the header lines (3 comment lines + empty line = 4)
     if [[ $header_end -lt 4 ]]; then
         header_end=4
     fi
-    
+
     # Create new log: header + new entry + old entries
     local temp_log=$(mktemp)
-    
+
     # Copy header (includes empty line separator, stops before first log entry)
     head -n "$header_end" "$RELEASE_LOG" > "$temp_log" 2>/dev/null
-    
+
     # Add new entry (prepend - newest on top)
     echo "$log_entry" >> "$temp_log"
-    
+
     # Append existing log entries (skip header, start from first log entry)
     if [[ $first_log_line -gt 0 ]]; then
         tail -n +$first_log_line "$RELEASE_LOG" 2>/dev/null >> "$temp_log" || true
     fi
-    
+
     mv "$temp_log" "$RELEASE_LOG"
 }
 
@@ -85,13 +85,13 @@ get_file_version() {
 get_github_version() {
     # Query GitHub for the latest release tag
     local latest_tag=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
-    
+
     if [[ -z "$latest_tag" ]]; then
         # No releases found on GitHub
         echo ""
         return 1
     fi
-    
+
     # Remove 'v' prefix from tag (e.g., v2.5.0 -> 2.5.0)
     echo "${latest_tag#v}"
 }
@@ -99,7 +99,7 @@ get_github_version() {
 # Get current version (PRIMARY: from GitHub, FALLBACK: from file if no GitHub releases)
 get_current_version() {
     local github_version=$(get_github_version 2>/dev/null)
-    
+
     if [[ -n "$github_version" ]]; then
         # GitHub version exists - use it as source of truth
         echo "$github_version"
@@ -120,12 +120,12 @@ get_current_version() {
 validate_version_consistency() {
     local github_version=$(get_github_version 2>/dev/null)
     local file_version=$(get_file_version)
-    
+
     # If no GitHub releases exist yet, skip validation
     if [[ -z "$github_version" ]]; then
         return 0
     fi
-    
+
     # Compare versions
     if [[ "$file_version" != "$github_version" ]]; then
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -157,7 +157,7 @@ get_last_tag() {
 # Check if release is backend-only (infrastructure only, no user-facing changes)
 is_backend_only_release() {
     local commit_range="$1"
-    
+
     # Get list of changed files
     local changed_files
     if [[ "$commit_range" == "HEAD" ]]; then
@@ -170,11 +170,11 @@ is_backend_only_release() {
         # Range of commits (e.g., v1.1.0..HEAD) - use diff
         changed_files=$(git diff --name-only "$commit_range" 2>/dev/null || echo "")
     fi
-    
+
     if [[ -z "$changed_files" ]]; then
         return 1  # Can't determine, use normal logic
     fi
-    
+
     # Backend file patterns (infrastructure only)
     local backend_patterns=(
         "^release/release\.sh$"
@@ -187,34 +187,34 @@ is_backend_only_release() {
         "^docs/TEST_PLAN\.md$"
         "^release/RELEASE_NUMBERING_ANALYSIS\.md$"
     )
-    
+
     # Frontend file patterns (user-facing)
     local frontend_patterns=(
         "^README\.md$"
         "^docs/[^/]+\.md$"  # General docs (excluding RELEASE_PROCESS, TEST_PLAN)
         "^todo\.ai$"  # Only count if functional changes (handled separately)
     )
-    
+
     local has_frontend=false
     local has_backend=false
-    
+
     while IFS= read -r file; do
         [[ -z "$file" ]] && continue
-        
+
         # Skip version bump commits
         if [[ "$file" == "todo.ai" ]]; then
             # Check if todo.ai changes are functional or just version bumps
             # This is handled by commit message analysis below
             continue
         fi
-        
+
         # Check if frontend (user-facing docs)
         if [[ "$file" == "README.md" ]] || [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
             if [[ "$file" != "docs/TEST_PLAN.md" ]]; then
                 has_frontend=true
             fi
         fi
-        
+
         # Check if backend (infrastructure)
         if [[ "$file" =~ ^(release/release\.sh|\.cursor/rules/|\.todo\.ai/|tests/|release/RELEASE_SUMMARY\.md|release/RELEASE_LOG\.log|release/RELEASE_PROCESS\.md|docs/TEST_PLAN\.md|release/RELEASE_NUMBERING_ANALYSIS\.md)$ ]] ||
            [[ "$file" =~ ^release/ ]] || [[ "$file" =~ ^\.cursor/rules/ ]] ||
@@ -222,7 +222,7 @@ is_backend_only_release() {
             has_backend=true
         fi
     done <<< "$changed_files"
-    
+
     # Return true if only backend files changed
     if [[ "$has_backend" == true ]] && [[ "$has_frontend" == false ]]; then
         return 0  # Backend-only
@@ -234,7 +234,7 @@ is_backend_only_release() {
 # Analyze commits to determine version bump (major/minor/patch)
 analyze_commits() {
     local commit_range="$1"
-    
+
     # If commit_range is empty, use HEAD (all commits)
     # If it doesn't contain ".." (range separator), convert to tag..HEAD
     if [[ -z "$commit_range" ]]; then
@@ -243,9 +243,9 @@ analyze_commits() {
         # Tag provided without range separator - analyze commits since that tag
         commit_range="${commit_range}..HEAD"
     fi
-    
+
     local highest_level="patch"
-    
+
     # Get individual commit hashes to check per-commit file changes
     local commit_hashes
     if [[ "$commit_range" == "HEAD" ]]; then
@@ -255,28 +255,28 @@ analyze_commits() {
     else
         commit_hashes=$(git log "$commit_range" --pretty=format:"%H" --no-merges 2>/dev/null || echo "")
     fi
-    
+
     # Process each commit individually
     while IFS= read -r commit_hash || [[ -n "$commit_hash" ]]; do
         [[ -z "$commit_hash" ]] && continue
-        
+
         # Get commit message for this specific commit
         local commit=$(git log -1 --pretty=format:"%s" "$commit_hash" 2>/dev/null || echo "")
         [[ -z "$commit" ]] && continue
-        
+
         local lower_commit=$(echo "$commit" | tr '[:upper:]' '[:lower:]' 2>/dev/null || echo "$commit")
         local commit_level="patch"
-        
+
         # Get files changed in this specific commit
         local commit_files=$(git diff-tree --no-commit-id --name-only -r "$commit_hash" 2>/dev/null || echo "")
-        
+
         # Classify this commit by stepping down from highest to lowest level
         # Default is PATCH - we only need to check for MAJOR and MINOR
-        
+
         # Check for MAJOR - Breaking changes (highest priority)
         # Check for explicit MAJOR tag in commit message (must contain #MAJOR as a tag, not as part of "tag" or "detection")
-        if (echo "$commit" | grep -qi "#MAJOR" && ! echo "$commit" | grep -qiE "MAJOR tag|tag.*MAJOR|MAJOR.*detection|detection.*MAJOR") || 
-           [[ "$lower_commit" =~ (breaking|break|!:) ]] || 
+        if (echo "$commit" | grep -qi "#MAJOR" && ! echo "$commit" | grep -qiE "MAJOR tag|tag.*MAJOR|MAJOR.*detection|detection.*MAJOR") ||
+           [[ "$lower_commit" =~ (breaking|break|!:) ]] ||
            [[ "$lower_commit" =~ ^(feat|fix|refactor|perf)!: ]]; then
             commit_level="major"
         # Check for MINOR - User-facing features
@@ -284,7 +284,7 @@ analyze_commits() {
             # Check if this is a user-facing feature based on files changed in this commit
             local todo_ai_changed=false
             local cursor_rules_changed=false
-            
+
             # Skip if explicitly marked as backend
             if echo "$commit" | grep -qiE "(backend|infra|release|internal|refactor|developer)"; then
                 # Explicitly backend - stays PATCH (default)
@@ -308,18 +308,18 @@ analyze_commits() {
             # Check if this commit only changed backend files
             local has_frontend=false
             local has_backend=false
-            
+
             while IFS= read -r file || [[ -n "$file" ]]; do
                 [[ -z "$file" ]] && continue
-                
+
                 # Check if frontend (user-facing docs or todo.ai)
-                if [[ "$file" == "README.md" ]] || [[ "$file" == "todo.ai" ]] || 
+                if [[ "$file" == "README.md" ]] || [[ "$file" == "todo.ai" ]] ||
                    [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
                     if [[ "$file" != "docs/TEST_PLAN.md" ]]; then
                         has_frontend=true
                     fi
                 fi
-                
+
                 # Check if backend (infrastructure)
                 if [[ "$file" =~ ^(release/release\.sh|\.cursor/rules/|\.todo\.ai/|tests/|release/RELEASE_SUMMARY\.md|release/RELEASE_LOG\.log|release/RELEASE_PROCESS\.md|docs/TEST_PLAN\.md|release/RELEASE_NUMBERING_ANALYSIS\.md)$ ]] ||
                    [[ "$file" =~ ^release/ ]] || [[ "$file" =~ ^\.cursor/rules/ ]] ||
@@ -327,7 +327,7 @@ analyze_commits() {
                     has_backend=true
                 fi
             done <<< "$commit_files"
-            
+
             # If only backend files changed in this commit, it stays PATCH (default)
             # Otherwise, it's MINOR
             if [[ "$has_backend" == true ]] && [[ "$has_frontend" == false ]]; then
@@ -338,7 +338,7 @@ analyze_commits() {
             fi
         fi
         # Everything else defaults to PATCH (commit_level="patch" already set above)
-        
+
         # Update highest level if this commit has a higher priority
         case "$commit_level" in
             major)
@@ -357,13 +357,13 @@ analyze_commits() {
                 ;;
         esac
     done <<< "$commit_hashes"
-    
+
     # If highest level is still patch, check if entire release is backend-only
     if [[ "$highest_level" == "patch" ]] && is_backend_only_release "$commit_range"; then
         echo "patch"
         return
     fi
-    
+
     # Return the highest level found
     echo "$highest_level"
 }
@@ -372,9 +372,9 @@ analyze_commits() {
 calculate_next_version() {
     local current_version="$1"
     local bump_type="$2"
-    
+
     IFS='.' read -r major minor patch <<< "$current_version"
-    
+
     case "$bump_type" in
         major)
             major=$((major + 1))
@@ -389,7 +389,7 @@ calculate_next_version() {
             patch=$((patch + 1))
             ;;
     esac
-    
+
     echo "${major}.${minor}.${patch}"
 }
 
@@ -400,15 +400,15 @@ get_repo_url() {
         echo "https://github.com/fxstein/todo.ai"
         return
     fi
-    
+
     # Convert SSH URL to HTTPS if needed
     if [[ "$remote_url" =~ git@github.com: ]]; then
         remote_url=$(echo "$remote_url" | sed 's/git@github.com:/https:\/\/github.com\//')
     fi
-    
+
     # Remove .git suffix if present
     remote_url=$(echo "$remote_url" | sed 's/\.git$//')
-    
+
     echo "$remote_url"
 }
 
@@ -418,7 +418,7 @@ generate_release_notes() {
     local new_version="$2"
     local summary_file="${3:-}"
     local commit_range
-    
+
     if [[ -z "$last_tag" ]] || [[ ! "$last_tag" =~ ^v ]]; then
         # No previous tag or not a version tag - use all commits
         commit_range="HEAD"
@@ -426,13 +426,13 @@ generate_release_notes() {
         # Previous tag exists - use commits since that tag
         commit_range="${last_tag}..HEAD"
     fi
-    
+
     local repo_url=$(get_repo_url)
     local temp_notes=$(mktemp)
-    
+
     echo "## Release ${new_version}" > "$temp_notes"
     echo "" >> "$temp_notes"
-    
+
     # Add AI-generated summary if provided
     if [[ -n "$summary_file" ]] && [[ -f "$summary_file" ]]; then
         echo "$(cat "$summary_file")" >> "$temp_notes"
@@ -440,36 +440,36 @@ generate_release_notes() {
         echo "---" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
-    
+
     # Categorize commits
     local breaking_commits=()
     local feature_commits=()
     local fix_commits=()
     local other_commits=()
-    
+
     local commits
     if [[ "$commit_range" == "HEAD" ]]; then
         commits=$(git log "$commit_range" --pretty=format:"%H|%s" --no-merges 2>/dev/null || echo "")
     else
         commits=$(git log "$commit_range" --pretty=format:"%H|%s" --no-merges 2>/dev/null || echo "")
     fi
-    
+
     while IFS='|' read -r hash message || [[ -n "$message" ]]; do
         [[ -z "$message" ]] && continue
-        
+
         # Skip version bump commits
         if [[ "$message" =~ ^(release:|Bump version to) ]]; then
             continue
         fi
-        
+
         # Skip release log commits
         if [[ "$message" =~ ^(Add release log for) ]]; then
             continue
         fi
-        
+
         # Create commit link
         local commit_link="([${hash:0:7}](${repo_url}/commit/${hash}))"
-        
+
         # Categorize
         if [[ "$message" =~ ^(feat|fix|refactor|perf)!: ]] || [[ "$message" =~ (breaking|BREAKING) ]]; then
             breaking_commits+=("- ${message} ${commit_link}")
@@ -481,7 +481,7 @@ generate_release_notes() {
             other_commits+=("- ${message} ${commit_link}")
         fi
     done <<< "$commits"
-    
+
     # Write categorized commits
     if [[ ${#breaking_commits[@]} -gt 0 ]]; then
         echo "### 🔴 Breaking Changes" >> "$temp_notes"
@@ -489,47 +489,53 @@ generate_release_notes() {
         printf '%s\n' "${breaking_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
-    
+
     if [[ ${#feature_commits[@]} -gt 0 ]]; then
         echo "### ✨ Features" >> "$temp_notes"
         echo "" >> "$temp_notes"
         printf '%s\n' "${feature_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
-    
+
     if [[ ${#fix_commits[@]} -gt 0 ]]; then
         echo "### 🐛 Bug Fixes" >> "$temp_notes"
         echo "" >> "$temp_notes"
         printf '%s\n' "${fix_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
-    
+
     if [[ ${#other_commits[@]} -gt 0 ]]; then
         echo "### 🔧 Other Changes" >> "$temp_notes"
         echo "" >> "$temp_notes"
         printf '%s\n' "${other_commits[@]}" >> "$temp_notes"
         echo "" >> "$temp_notes"
     fi
-    
+
     echo "$temp_notes"
 }
 
-# Update version in todo.ai
+# Update version in todo.ai and pyproject.toml
 update_version() {
     local new_version="$1"
-    
+
     # Use sed_inplace function if available, otherwise use direct sed
     if command -v sed_inplace &> /dev/null; then
         sed_inplace "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
         sed_inplace "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+        # Update version in pyproject.toml
+        sed_inplace "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
     else
         # macOS or Linux compatible
         if [[ "$(uname)" == "Darwin" ]]; then
             sed -i '' "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
             sed -i '' "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+            # Update version in pyproject.toml
+            sed -i '' "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
         else
             sed -i "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
             sed -i "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+            # Update version in pyproject.toml
+            sed -i "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
         fi
     fi
 }
@@ -537,18 +543,18 @@ update_version() {
 # Convert zsh version to bash version
 convert_to_bash() {
     local converter_script="release/convert_zsh_to_bash.sh"
-    
+
     if [[ ! -f "$converter_script" ]]; then
         echo -e "${RED}❌ Error: Converter script not found: $converter_script${NC}"
         return 1
     fi
-    
+
     # Run converter
     if ! bash "$converter_script"; then
         echo -e "${RED}❌ Error: Conversion failed${NC}"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -557,7 +563,7 @@ main() {
     local MODE="prepare"  # Default to prepare mode
     local SUMMARY_FILE=""
     local PREPARE_STATE_FILE="release/.prepare_state"
-    
+
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -588,32 +594,32 @@ main() {
                 ;;
         esac
     done
-    
+
     # Execute mode: load state and perform release
     if [[ "$MODE" == "execute" ]]; then
         execute_release
         return $?
     fi
-    
+
     # Prepare mode (default): analyze and preview
     echo -e "${BLUE}🚀 Preparing release preview...${NC}"
     echo ""
-    
+
     # Check if summary file exists if provided (no prompt, just warn)
     if [[ -n "$SUMMARY_FILE" ]] && [[ ! -f "$SUMMARY_FILE" ]]; then
         echo -e "${YELLOW}⚠️  Warning: Summary file not found: $SUMMARY_FILE (continuing without it)${NC}"
         SUMMARY_FILE=""
     fi
-    
+
     # Validate summary file is not stale (newer than last release)
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
         # Get the last release tag
         local last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-        
+
         if [[ -n "$last_tag" ]]; then
             # Get timestamp of last release tag (seconds since epoch)
             local tag_timestamp=$(git log -1 --format=%ct "$last_tag" 2>/dev/null || echo "0")
-            
+
             # Get modification time of summary file (seconds since epoch)
             if [[ "$(uname)" == "Darwin" ]]; then
                 # macOS stat command
@@ -622,7 +628,7 @@ main() {
                 # Linux stat command
                 local summary_mtime=$(stat -c %Y "$SUMMARY_FILE" 2>/dev/null || echo "0")
             fi
-            
+
             # Compare timestamps
             if [[ "$summary_mtime" -lt "$tag_timestamp" ]]; then
                 echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -637,7 +643,7 @@ main() {
                 echo -e "${YELLOW}This suggests the summary may be from a previous release.${NC}"
                 echo -e "${YELLOW}You should update the summary file for this release.${NC}"
                 echo ""
-                
+
                 # Check if we're in interactive mode
                 if [[ -t 0 ]]; then
                     read -p "Continue anyway? (y/N): " -n 1 -r
@@ -657,14 +663,14 @@ main() {
             fi
         fi
     fi
-    
+
     # Verify prerequisites
     if ! command -v gh &> /dev/null; then
         echo -e "${RED}❌ Error: GitHub CLI (gh) is not installed${NC}"
         echo "Install it with: brew install gh"
         exit 1
     fi
-    
+
     # Verify we're on main branch (no prompt, just warn)
     CURRENT_BRANCH=$(git branch --show-current)
     if [[ "$CURRENT_BRANCH" != "main" ]]; then
@@ -672,11 +678,11 @@ main() {
         echo -e "${YELLOW}   Releases should be created from main branch${NC}"
         echo ""
     fi
-    
+
     # Check for uncommitted changes (filter out weird backup files)
     local status_output=$(git status -s)
     local uncommitted=""
-    
+
     # Filter out files that should be ignored during release
     while IFS= read -r line; do
         # Skip weird backup files like "todo.ai ''"
@@ -702,7 +708,7 @@ main() {
             fi
         fi
     done <<< "$status_output"
-    
+
     # If RELEASE_SUMMARY.md exists and is uncommitted, we'll commit it as part of the release
     local summary_needs_commit=false
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
@@ -715,14 +721,14 @@ main() {
             uncommitted=$(echo -e "$uncommitted" | grep -vF "$SUMMARY_FILE" || true)
         fi
     fi
-    
+
     # Auto-commit any remaining uncommitted changes (except those already handled)
     if [[ -n "$uncommitted" ]]; then
         echo -e "${YELLOW}⚠️  Auto-committing uncommitted changes before release...${NC}"
         echo "Uncommitted files:"
         echo -e "$uncommitted"
         echo ""
-        
+
         # Add all remaining uncommitted files
         local uncommitted_files=$(echo -e "$uncommitted" | sed 's/^[?AM] */ /' | sed 's/^ //' | grep -v "^$" || true)
         for file in ${uncommitted_files[@]}; do
@@ -731,7 +737,7 @@ main() {
                 git add "$file"
             fi
         done
-        
+
         # Commit with a generic message
         local auto_commit_msg="chore: Auto-commit changes before release"
         git commit -m "$auto_commit_msg" || {
@@ -744,21 +750,21 @@ main() {
         echo -e "${GREEN}✓ Changes auto-committed${NC}"
         echo ""
     fi
-    
+
     # Validate version consistency between file and GitHub
     validate_version_consistency
-    
+
     # Get current version from GitHub (source of truth)
     CURRENT_VERSION=$(get_current_version)
     local file_version=$(get_file_version)
-    
+
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}📌 Version Information${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}Current version (GitHub):  ${CURRENT_VERSION} ✓${NC}"
     echo -e "${BLUE}File version (todo.ai):     ${file_version}${NC}"
     echo ""
-    
+
     # Get last tag
     LAST_TAG=$(get_last_tag)
     if [[ "$LAST_TAG" =~ ^v ]]; then
@@ -766,12 +772,12 @@ main() {
     else
         echo -e "${YELLOW}📌 No previous release found (using initial commit)${NC}"
     fi
-    
+
     # Analyze commits to determine bump type
     echo ""
     echo -e "${BLUE}📊 Analyzing commits since last release...${NC}"
     BUMP_TYPE=$(analyze_commits "$LAST_TAG")
-    
+
     case "$BUMP_TYPE" in
         major)
             echo -e "${RED}🔴 Major release detected (breaking changes)${NC}"
@@ -783,12 +789,12 @@ main() {
             echo -e "${GREEN}🟢 Patch release detected (bug fixes)${NC}"
             ;;
     esac
-    
+
     # Calculate next version
     NEW_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
     echo -e "${GREEN}📌 Proposed new version: ${NEW_VERSION}${NC}"
     echo ""
-    
+
     # Log release start with all details
     log_release_step "RELEASE START" "Starting release process:
 - Current version (GitHub): ${CURRENT_VERSION}
@@ -797,24 +803,24 @@ main() {
 - Bump type: ${BUMP_TYPE}
 - Last tag: ${LAST_TAG}
 - Summary file: ${SUMMARY_FILE:-none}"
-    
+
     # Generate release notes for preview
     echo -e "${BLUE}📝 Generating release notes preview...${NC}"
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
         echo -e "${GREEN}📄 Including AI-generated summary from: $SUMMARY_FILE${NC}"
     fi
     local preview_notes_file=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
-    
+
     # Show release notes preview
     echo ""
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     cat "$preview_notes_file"
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
-    
+
     # Clean up preview file
     rm -f "$preview_notes_file"
-    
+
     # Show review recommendation if major or large release
     local last_tag_for_count=$(get_last_tag)
     local commit_range_for_count
@@ -824,7 +830,7 @@ main() {
         commit_range_for_count="${last_tag_for_count}..HEAD"
     fi
     local commit_count=$(git log "$commit_range_for_count" --oneline --no-merges 2>/dev/null | wc -l | tr -d ' ')
-    
+
     if [[ "$BUMP_TYPE" == "major" ]]; then
         echo -e "${YELLOW}⚠️  Major release detected - please review carefully before executing${NC}"
         echo ""
@@ -832,7 +838,7 @@ main() {
         echo -e "${YELLOW}⚠️  Large release ($commit_count commits) - please review carefully before executing${NC}"
         echo ""
     fi
-    
+
     # Convert to bash version
     if ! convert_to_bash; then
         echo -e "${RED}❌ Error: Bash conversion failed${NC}"
@@ -840,7 +846,7 @@ main() {
         exit 1
     fi
     log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash"
-    
+
     # Save prepare state for execute mode
     # Note: RELEASE_NOTES_FILE is NOT saved - it will be regenerated during execute
     # to ensure RELEASE_SUMMARY.md is the single source of truth
@@ -853,7 +859,7 @@ SUMMARY_FILE=$SUMMARY_FILE
 summary_needs_commit=$summary_needs_commit
 EOF
     log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION}"
-    
+
     # Display execution command
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}✅ Release preview prepared successfully!${NC}"
@@ -865,51 +871,51 @@ EOF
     echo -e "${GREEN}To execute this release, run:${NC}"
     echo -e "${GREEN}  ./release/release.sh --execute${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    
+
     return 0
 }
 
 # Execute prepared release
 execute_release() {
     local PREPARE_STATE_FILE="release/.prepare_state"
-    
+
     # Check if prepare was run
     if [[ ! -f "$PREPARE_STATE_FILE" ]]; then
         echo -e "${RED}❌ Error: Release not prepared${NC}"
         echo "Please run: ./release/release.sh --prepare [--summary <file>]"
         exit 1
     fi
-    
+
     # Load prepared state
     source "$PREPARE_STATE_FILE"
-    
+
     echo -e "${BLUE}🚀 Executing release ${NEW_VERSION}...${NC}"
     echo ""
-    
+
     # Regenerate release notes from RELEASE_SUMMARY.md (single source of truth)
     # This ensures any updates to the summary after prepare are included
     echo -e "${BLUE}📝 Generating release notes from ${SUMMARY_FILE:-commits}...${NC}"
     RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
     echo -e "${GREEN}✓ Release notes generated${NC}"
     echo ""
-    
+
     # Update version
-    echo -e "${BLUE}📝 Updating version in todo.ai...${NC}"
-    log_release_step "UPDATE VERSION" "Updating version in todo.ai from ${CURRENT_VERSION} to ${NEW_VERSION}"
+    echo -e "${BLUE}📝 Updating version in todo.ai and pyproject.toml...${NC}"
+    log_release_step "UPDATE VERSION" "Updating version in todo.ai and pyproject.toml from ${CURRENT_VERSION} to ${NEW_VERSION}"
     update_version "$NEW_VERSION"
-    log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai"
-    
+    log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai and pyproject.toml"
+
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
-    git add todo.ai
-    
+    git add todo.ai pyproject.toml
+
     # Commit summary file if it exists and is uncommitted
     if [[ "$summary_needs_commit" == true ]] && [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
         log_release_step "COMMIT SUMMARY" "Adding release summary file to commit: ${SUMMARY_FILE}"
         git add "$SUMMARY_FILE"
     fi
-    
+
     # Commit TODO.md and .todo.ai files if they're uncommitted (they should always be committed together)
     local todo_status=$(git status -s | grep -E "(TODO\.md|\.todo\.ai/)" || echo "")
     if [[ -n "$todo_status" ]]; then
@@ -922,12 +928,12 @@ execute_release() {
             git add .todo.ai/.todo.ai.serial .todo.ai/.todo.ai.log 2>/dev/null || true
         fi
     fi
-    
+
     # Add todo.bash if it was converted (should always be the case after prepare)
     if [[ -f "todo.bash" ]]; then
         git add todo.bash
     fi
-    
+
     # Create version commit message
     local commit_message="release: Version ${NEW_VERSION}"
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]] && [[ "$summary_needs_commit" == true ]]; then
@@ -935,14 +941,14 @@ execute_release() {
 
 Includes release summary from ${SUMMARY_FILE}"
     fi
-    
+
     # Commit the version change
     local commit_output=$(git commit -m "$commit_message" 2>&1 || echo "no commit needed")
     log_release_step "VERSION COMMITTED" "Version change committed: ${commit_output}"
-    
+
     # Get the commit hash for the version change
     local version_commit_hash=$(git rev-parse HEAD 2>/dev/null || echo "")
-    
+
     # Verify version was actually updated in the commit
     if [[ -n "$version_commit_hash" ]]; then
         if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
@@ -950,7 +956,7 @@ Includes release summary from ${SUMMARY_FILE}"
             echo -e "${YELLOW}   This is expected if version was updated in a previous failed attempt${NC}"
         fi
     fi
-    
+
     # Create and push tag
     TAG="v${NEW_VERSION}"
     echo -e "${BLUE}🏷️  Creating tag ${TAG}...${NC}"
@@ -958,7 +964,7 @@ Includes release summary from ${SUMMARY_FILE}"
     # Explicitly tag the commit hash to ensure we're tagging the right commit
     git tag -a "$TAG" -m "Release version $NEW_VERSION" "$version_commit_hash" > /dev/null 2>&1
     log_release_step "TAG CREATED" "Git tag ${TAG} created successfully at commit ${version_commit_hash}"
-    
+
     # Verify tag points to commit with correct version
     if ! git show "$TAG":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
         echo -e "${RED}❌ Error: Tag verification failed${NC}"
@@ -966,18 +972,18 @@ Includes release summary from ${SUMMARY_FILE}"
         log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - tag doesn't point to commit with VERSION=${NEW_VERSION}"
         exit 1
     fi
-    
+
     echo -e "${BLUE}📤 Pushing to remote...${NC}"
     log_release_step "PUSH MAIN" "Pushing main branch to origin"
     git push origin main > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push main branch"
-    
+
     log_release_step "PUSH TAG" "Pushing tag ${TAG} to origin"
     git push origin "$TAG" > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push tag ${TAG}"
-    
+
     # Create GitHub release with assets
     echo -e "${BLUE}📦 Creating GitHub release with assets...${NC}"
     log_release_step "CREATE GITHUB RELEASE" "Creating GitHub release for tag ${TAG} with assets: todo.ai, todo.bash, install.sh"
-    
+
     # Verify assets exist
     if [[ ! -f "todo.ai" ]]; then
         echo -e "${RED}❌ Error: todo.ai not found${NC}"
@@ -991,11 +997,11 @@ Includes release summary from ${SUMMARY_FILE}"
         echo -e "${RED}❌ Error: install.sh not found${NC}"
         exit 1
     fi
-    
+
     echo -e "  ${GREEN}✓ todo.ai (zsh version)${NC}"
     echo -e "  ${GREEN}✓ todo.bash (bash version)${NC}"
     echo -e "  ${GREEN}✓ install.sh (smart installer)${NC}"
-    
+
     # Temporarily disable set -e to capture error
     set +e
     local release_output=$(gh release create "$TAG" \
@@ -1006,7 +1012,7 @@ Includes release summary from ${SUMMARY_FILE}"
         install.sh 2>&1)
     local release_status=$?
     set -e
-    
+
     if [[ $release_status -eq 0 ]]; then
         log_release_step "GITHUB RELEASE CREATED" "GitHub release created successfully for ${TAG}\nOutput: ${release_output}"
     else
@@ -1016,23 +1022,23 @@ Includes release summary from ${SUMMARY_FILE}"
         echo "Check the release log: ${RELEASE_LOG}"
         echo "Try manually: gh release view ${TAG} || gh release create ${TAG} --title ${NEW_VERSION} --notes-file <file>"
     fi
-    
+
     # Cleanup
     rm -f "$RELEASE_NOTES_FILE"
-    
+
     local repo_url=$(get_repo_url)
     log_release_step "RELEASE COMPLETE" "Release ${NEW_VERSION} published successfully!
 - Tag: ${TAG}
 - URL: ${repo_url}/releases/tag/${TAG}
 - Release log: ${RELEASE_LOG}"
-    
+
     # Commit and push RELEASE_LOG.log at the very end to capture all release operations
     # Note: We don't log these operations since they happen after the log is committed
     if [[ -f "$RELEASE_LOG" ]]; then
         echo -e "${BLUE}📋 Committing release log...${NC}"
         git add "$RELEASE_LOG"
         local log_commit=$(git commit -m "Add release log for ${NEW_VERSION}" 2>&1 || echo "no commit needed")
-        
+
         if [[ "$log_commit" != "no commit needed" ]]; then
             echo -e "${GREEN}✓ Release log committed${NC}"
             echo -e "${BLUE}📤 Pushing release log...${NC}"
@@ -1041,7 +1047,7 @@ Includes release summary from ${SUMMARY_FILE}"
             echo -e "${GREEN}✓ Release log already committed${NC}"
         fi
     fi
-    
+
     echo ""
     echo -e "${GREEN}✅ Release ${NEW_VERSION} published successfully!${NC}"
     echo -e "${GREEN}🔗 View release: ${repo_url}/releases/tag/${TAG}${NC}"

@@ -8,7 +8,8 @@
   - [ ] **#167.9** Phase 3.3: Add documentation automation `#cicd`
   - [ ] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd`
   - [ ] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd`
-  - [ ] **#167.6** Phase 2.3: Integrate automated release process with release.sh `#cicd`
+  - [x] **#167.6** Phase 2.3: Integrate automated release process with release.sh `#cicd`
+    > Integration complete: release.sh creates GitHub release with shell assets and release notes. GitHub Actions workflow (triggered by tag push) builds Python package, publishes to PyPI, and attaches dist files to existing release. Clean separation of concerns achieved.
     > Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
   - [x] **#167.5** Phase 2.2: Configure code quality tools `#cicd`
     > Configured [tool.ruff] section with target-version py310, select rules (E, W, F, I, B, C4, UP), and per-file ignores for tests. Configured [tool.mypy] section with python_version 3.10 and strict type checking options.
@@ -762,6 +763,6 @@
 
 ---
 
-**Last Updated:** Sun Dec 14 19:02:20 CET 2025
+**Last Updated:** Sun Dec 14 21:55:47 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

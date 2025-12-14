@@ -19,6 +19,7 @@ from todo_ai.cli.commands import (
     note_command,
     reformat_command,
     relate_command,
+    report_bug_tool_command,
     resolve_conflicts_command,
     restore_command,
     rollback_mode_tool_command,
@@ -28,8 +29,10 @@ from todo_ai.cli.commands import (
     show_command,
     switch_mode_tool_command,
     undo_command,
+    uninstall_tool_command,
     update_note_command,
     update_tool_command,
+    version_tool_command,
 )
 
 
@@ -344,6 +347,47 @@ def list_mode_backups(ctx):
 def rollback_mode(ctx, backup_name):
     """Rollback from mode switch backup."""
     rollback_mode_tool_command(backup_name, todo_path=ctx.obj["todo_file"])
+
+
+# Phase 7: Utility Commands
+@cli.command("report-bug")
+@click.argument("error_description")
+@click.argument("error_context", required=False)
+@click.argument("command", required=False)
+def report_bug(error_description, error_context, command):
+    """Report bugs to GitHub Issues (with duplicate detection)."""
+    report_bug_tool_command(error_description, error_context, command)
+
+
+@cli.command()
+@click.option("--remove-data", "--data", is_flag=True, help="Remove .todo.ai/ data directory")
+@click.option("--remove-rules", "--rules", is_flag=True, help="Remove Cursor rules")
+@click.option("--all", is_flag=True, help="Remove script, data, and rules")
+@click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
+def uninstall(remove_data, remove_rules, all, force):
+    """Uninstall todo.ai."""
+    if all:
+        remove_data = True
+        remove_rules = True
+    uninstall_tool_command(remove_data=remove_data, remove_rules=remove_rules, force=force)
+
+
+@cli.command("version")
+def version():
+    """Show version information."""
+    version_tool_command()
+
+
+@cli.command("-v")
+def version_v():
+    """Show version information (alias)."""
+    version_tool_command()
+
+
+@cli.command("--version")
+def version_long():
+    """Show version information (alias)."""
+    version_tool_command()
 
 
 if __name__ == "__main__":

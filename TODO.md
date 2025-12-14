@@ -32,10 +32,10 @@
     - [ ] **#163.43.3** Add MCP tools for Phase 3 commands - show_task, relate_task `#code`
     - [ ] **#163.43.2** Add MCP tools for Phase 2 commands - add_note, delete_note, update_note `#code`
     - [ ] **#163.43.1** Add MCP tools for Phase 1 commands - modify_task, delete_task, archive_task, restore_task, undo_task `#code`
-  - [ ] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands `#code`
-    - [ ] **#163.42.3** Implement version command - Show version information `#code`
-    - [ ] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options) `#code`
-    - [ ] **#163.42.1** Implement report-bug command - Report bugs to GitHub Issues (with duplicate detection) `#code`
+  - [x] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands `#code`
+    - [x] **#163.42.3** Implement version command - Show version information `#code`
+    - [x] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options) `#code`
+    - [x] **#163.42.1** Implement report-bug command - Report bugs to GitHub Issues (with duplicate detection) `#code`
   - [x] **#163.41** Phase 6: Configuration and Setup - Implement config, detect-coordination, setup-coordination, setup, switch-mode, list-mode-backups, rollback-mode commands `#code`
     - [x] **#163.41.8** Implement mode switch backup system - Create backups before mode switches `#code`
     - [x] **#163.41.7** Implement rollback-mode command - Rollback from mode switch backup `#code`
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 00:17:40 CET 2025
+**Last Updated:** Mon Dec 15 00:29:39 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

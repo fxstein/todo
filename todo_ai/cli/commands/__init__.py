@@ -19,6 +19,11 @@ from todo_ai.cli.system_ops import (
     update_command,
     view_log_command,
 )
+from todo_ai.cli.utility_ops import (
+    report_bug_command,
+    uninstall_command,
+    version_command,
+)
 from todo_ai.core.config import Config
 from todo_ai.core.coordination import CoordinationManager
 from todo_ai.core.file_ops import FileOps
@@ -1081,3 +1086,27 @@ def list_mode_backups_tool_command(todo_path: str = "TODO.md") -> None:
 def rollback_mode_tool_command(backup_name: str, todo_path: str = "TODO.md") -> None:
     """Rollback from mode switch backup."""
     rollback_mode_command(backup_name, todo_path)
+
+
+# Phase 7: Utility Commands
+def report_bug_tool_command(
+    error_description: str,
+    error_context: str | None = None,
+    command: str | None = None,
+) -> None:
+    """Report bugs to GitHub Issues (with duplicate detection)."""
+    report_bug_command(error_description, error_context, command)
+
+
+def uninstall_tool_command(
+    remove_data: bool = False,
+    remove_rules: bool = False,
+    force: bool = False,
+) -> None:
+    """Uninstall todo.ai (with --remove-data, --remove-rules, --all options)."""
+    uninstall_command(remove_data, remove_rules, force)
+
+
+def version_tool_command() -> None:
+    """Show version information."""
+    version_command()

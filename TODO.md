@@ -22,7 +22,7 @@
     - [ ] **#163.44.4** Test all commands with dedicated test TODO.md dataset - Ensure Python version produces identical results to shell version `#test`
     - [ ] **#163.44.3** Re-run feature parity validation - Compare Python version output with shell version (side-by-side testing) `#test`
     - [ ] **#163.44.2** Add integration tests for all new MCP tools - Verify each tool works correctly `#test`
-    - [ ] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly `#test`
+    - [x] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly `#test`
   - [x] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands `#code`
     - [ ] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format `#test`
     - [x] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool `#code`
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 00:35:51 CET 2025
+**Last Updated:** Mon Dec 15 00:42:06 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

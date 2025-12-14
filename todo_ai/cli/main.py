@@ -10,7 +10,9 @@ from todo_ai.cli.commands import (
     list_command,
     modify_command,
     note_command,
+    relate_command,
     restore_command,
+    show_command,
     undo_command,
     update_note_command,
 )
@@ -131,6 +133,59 @@ def delete_note(ctx, task_id):
 def update_note(ctx, task_id, new_note_text):
     """Replace existing notes with new text."""
     update_note_command(task_id, new_note_text, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.argument("task_id")
+@click.pass_context
+def show(ctx, task_id):
+    """Display task with subtasks, relationships, and notes."""
+    show_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.argument("task_id")
+@click.option("--completed-by", help="Task completed by other task(s)")
+@click.option("--depends-on", help="Task depends on other task(s)")
+@click.option("--blocks", help="Task blocks other task(s)")
+@click.option("--related-to", help="General relationship")
+@click.option("--duplicate-of", help="Task is duplicate of another")
+@click.pass_context
+def relate(ctx, task_id, completed_by, depends_on, blocks, related_to, duplicate_of):
+    """Add task relationship."""
+    # Determine relationship type and targets
+    rel_type = None
+    targets = None
+
+    if completed_by:
+        rel_type = "completed-by"
+        targets = completed_by.split()
+    elif depends_on:
+        rel_type = "depends-on"
+        targets = depends_on.split()
+    elif blocks:
+        rel_type = "blocks"
+        targets = blocks.split()
+    elif related_to:
+        rel_type = "related-to"
+        targets = related_to.split()
+    elif duplicate_of:
+        rel_type = "duplicate-of"
+        targets = [duplicate_of]  # duplicate-of takes single target
+
+    if not rel_type or not targets:
+        print("Error: Missing required parameters")
+        print("Usage: relate <id> --<relation-type> <target-ids>")
+        print("")
+        print("Relation types:")
+        print("  --completed-by <ids>   Task completed by other task(s)")
+        print("  --depends-on <ids>     Task depends on other task(s)")
+        print("  --blocks <ids>         Task blocks other task(s)")
+        print("  --related-to <ids>     General relationship")
+        print("  --duplicate-of <id>    Task is duplicate of another")
+        return
+
+    relate_command(task_id, rel_type, targets, todo_path=ctx.obj["todo_file"])
 
 
 if __name__ == "__main__":

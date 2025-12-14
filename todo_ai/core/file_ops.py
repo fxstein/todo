@@ -15,6 +15,10 @@ class FileOps:
         # State to preserve file structure
         self.header_lines: list[str] = []
         self.footer_lines: list[str] = []
+        self.metadata_lines: list[str] = []
+        self.relationships: dict[
+            str, dict[str, list[str]]
+        ] = {}  # task_id -> {rel_type -> [targets]}
 
         # Ensure config directory exists
         if not self.config_dir.exists():
@@ -25,8 +29,12 @@ class FileOps:
         if not self.todo_path.exists():
             self.header_lines = []
             self.footer_lines = []
+            self.metadata_lines = []
+            self.relationships = {}
             return []
 
+        # Reset relationships before parsing
+        self.relationships = {}
         content = self.todo_path.read_text(encoding="utf-8")
         return self._parse_markdown(content)
 
@@ -49,6 +57,17 @@ class FileOps:
         """Set the serial number in file."""
         self.serial_path.write_text(str(value))
 
+    def get_relationships(self, task_id: str) -> dict[str, list[str]]:
+        """Get all relationships for a task."""
+        return self.relationships.get(task_id, {})
+
+    def add_relationship(self, task_id: str, rel_type: str, target_ids: list[str]) -> None:
+        """Add a relationship for a task."""
+        if task_id not in self.relationships:
+            self.relationships[task_id] = {}
+        # Replace existing relationship of this type
+        self.relationships[task_id][rel_type] = target_ids
+
     def _parse_markdown(self, content: str) -> list[Task]:
         """Parse TODO.md content into Task objects."""
         tasks = []
@@ -59,14 +78,20 @@ class FileOps:
 
         self.header_lines = []
         self.footer_lines = []
+        self.metadata_lines = []
+        self.relationships = {}  # Will be populated during parsing
 
         # Regex patterns
         task_pattern = re.compile(r"^\s*-\s*\[([ x])\]\s*\*\*#([0-9\.]+)\*\*\s*(.*)$")
         tag_pattern = re.compile(r"`#([a-zA-Z0-9_-]+)`")
         section_pattern = re.compile(r"^##\s+(.*)$")
+        relationship_pattern = re.compile(r"^([0-9\.]+):([a-z-]+):(.+)$")
 
         # Sections that contain tasks
         TASK_SECTIONS = {"Tasks", "Recently Completed", "Deleted Tasks"}
+        in_relationships_section = False
+        in_metadata_section = False
+        in_metadata_section = False
 
         for line in lines:
             line_stripped = line.strip()
@@ -78,17 +103,62 @@ class FileOps:
                 if section_name in TASK_SECTIONS:
                     current_section = section_name
                     current_task = None
+                    in_metadata_section = False
+                    continue
+                elif section_name == "Task Metadata":
+                    in_metadata_section = True
+                    self.metadata_lines.append(line)
                     continue
                 else:
                     # Unknown section? Treat as footer if we've already seen tasks?
                     # Or treat as content if in Header?
                     # For now, if we are past "Tasks", any unknown section might be footer
-                    if current_section != "Header":
+                    if current_section != "Header" and not in_metadata_section:
                         current_section = "Footer"
 
             # Check for Footer start via separator
-            if line_stripped == "------------------" and current_section != "Header":
+            if (
+                line_stripped == "------------------"
+                and current_section != "Header"
+                and not in_metadata_section
+            ):
                 current_section = "Footer"
+
+            # Check for relationships section directly (even without Task Metadata header)
+            if line_stripped == "<!-- TASK RELATIONSHIPS":
+                in_relationships_section = True
+                in_metadata_section = True
+                self.metadata_lines.append(line)
+                continue
+
+            # Handle metadata section
+            if in_metadata_section:
+                # Check for Task Metadata section
+                if line_stripped == "<!-- TASK RELATIONSHIPS":
+                    in_relationships_section = True
+                    self.metadata_lines.append(line)
+                    continue
+
+                if in_relationships_section:
+                    if line_stripped == "-->":
+                        in_relationships_section = False
+                        self.metadata_lines.append(line)
+                        continue
+                    # Parse relationship line: task_id:rel_type:targets
+                    rel_match = relationship_pattern.match(line_stripped)
+                    if rel_match:
+                        task_id, rel_type, targets = rel_match.groups()
+                        if task_id not in self.relationships:
+                            self.relationships[task_id] = {}
+                        # Targets can be space-separated list
+                        target_list = [t.strip() for t in targets.split() if t.strip()]
+                        self.relationships[task_id][rel_type] = target_list
+                    self.metadata_lines.append(line)
+                    continue
+                else:
+                    # Other metadata lines (descriptions, etc.)
+                    self.metadata_lines.append(line)
+                    continue
 
             # Handle Header
             if current_section == "Header":
@@ -230,7 +300,35 @@ class FileOps:
         for t in deleted_tasks:
             lines.append(format_task(t))
 
-        # 5. Footer (use preserved)
+        # 5. Task Metadata Section (if relationships exist or section was present)
+        if self.relationships or self.metadata_lines:
+            if lines[-1].strip() != "":
+                lines.append("")
+            # If we have relationships, write them
+            if self.relationships:
+                # Check if metadata section header exists in preserved lines
+                has_metadata_header = any(
+                    "## Task Metadata" in line for line in self.metadata_lines
+                )
+                if not has_metadata_header:
+                    lines.append("## Task Metadata")
+                    lines.append("")
+                    lines.append("Task relationships and dependencies (managed by todo.ai tool).")
+                    lines.append("View with: `./todo.ai show <task-id>`")
+                    lines.append("")
+                lines.append("<!-- TASK RELATIONSHIPS")
+                # Write relationships
+                for task_id in sorted(self.relationships.keys()):
+                    for rel_type in sorted(self.relationships[task_id].keys()):
+                        targets = " ".join(self.relationships[task_id][rel_type])
+                        lines.append(f"{task_id}:{rel_type}:{targets}")
+                lines.append("-->")
+            else:
+                # Preserve existing metadata section if no relationships
+                if self.metadata_lines:
+                    lines.extend(self.metadata_lines)
+
+        # 6. Footer (use preserved)
         if self.footer_lines:
             # Ensure spacing
             if lines[-1].strip() != "":

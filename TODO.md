@@ -56,10 +56,10 @@
     - [ ] **#163.39.3** Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option) `#code`
     - [ ] **#163.39.2** Implement --reformat command - Apply formatting fixes (with --dry-run option) `#code`
     - [ ] **#163.39.1** Implement --lint command - Identify formatting issues (indentation, checkboxes) `#code`
-  - [ ] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands `#code`
-    - [ ] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks `#code`
-    - [ ] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of) `#code`
-    - [ ] **#163.38.1** Implement show command - Display task with subtasks, relationships, and notes `#code`
+  - [x] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands `#code`
+    - [x] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks `#code`
+    - [x] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of) `#code`
+    - [x] **#163.38.1** Implement show command - Display task with subtasks, relationships, and notes `#code`
   - [x] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands `#code`
     - [x] **#163.37.3** Implement update-note command - Replace existing notes with new text `#code`
     - [x] **#163.37.2** Implement delete-note command - Delete all notes from a task `#code`
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 00:00:12 CET 2025
+**Last Updated:** Mon Dec 15 00:05:03 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

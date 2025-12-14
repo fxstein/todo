@@ -2,6 +2,10 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-15 00:05:03 | fxstein | COMPLETE | 163.38.3 | Implement task relationship data model - Store and retrieve relationships between tasks
+2025-12-15 00:05:03 | fxstein | COMPLETE | 163.38.2 | Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of)
+2025-12-15 00:05:03 | fxstein | COMPLETE | 163.38 | Phase 3: Task Display and Relationships - Implement show and relate commands
+2025-12-15 00:05:02 | fxstein | COMPLETE | 163.38.1 | Implement show command - Display task with subtasks, relationships, and notes
 2025-12-15 00:00:12 | fxstein | COMPLETE | 163.37 | Phase 2: Note Management - Implement note, delete-note, update-note commands
 2025-12-15 00:00:12 | fxstein | COMPLETE | 163.37.3 | Implement update-note command - Replace existing notes with new text
 2025-12-15 00:00:12 | fxstein | COMPLETE | 163.37.2 | Implement delete-note command - Delete all notes from a task

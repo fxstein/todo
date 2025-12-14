@@ -103,3 +103,53 @@ def test_serial_ops(file_ops):
     file_ops.set_serial(10)
     assert file_ops.get_serial() == 10
     assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "10"
+
+
+def test_relationships(tmp_path):
+    content = """# todo.ai ToDo List
+
+## Tasks
+- [ ] **#1** Task 1
+- [ ] **#2** Task 2
+
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
+<!-- TASK RELATIONSHIPS
+1:depends-on:2
+1:blocks:3
+2:related-to:1 4
+-->
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    # Check relationships
+    rels_1 = ops.get_relationships("1")
+    assert "depends-on" in rels_1
+    assert rels_1["depends-on"] == ["2"]
+    assert "blocks" in rels_1
+    assert rels_1["blocks"] == ["3"]
+
+    rels_2 = ops.get_relationships("2")
+    assert "related-to" in rels_2
+    assert rels_2["related-to"] == ["1", "4"]
+
+    # Add a relationship
+    ops.add_relationship("1", "completed-by", ["5", "6"])
+    ops.write_tasks(tasks)
+
+    # Read back and verify
+    ops2 = FileOps(str(todo_path))
+    ops2.read_tasks()
+    rels_1_updated = ops2.get_relationships("1")
+    assert "completed-by" in rels_1_updated
+    assert rels_1_updated["completed-by"] == ["5", "6"]
+    # Old relationships should still be there
+    assert "depends-on" in rels_1_updated
+    assert "blocks" in rels_1_updated

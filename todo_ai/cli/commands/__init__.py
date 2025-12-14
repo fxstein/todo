@@ -6,17 +6,26 @@ from todo_ai.core.coordination import CoordinationManager
 from todo_ai.core.file_ops import FileOps
 from todo_ai.core.task import TaskManager
 
+# Global file_ops cache to preserve relationships across operations
+_file_ops_cache: dict[str, FileOps] = {}
+
 
 def get_manager(todo_path: str = "TODO.md") -> TaskManager:
     """Initialize core components and return TaskManager."""
     file_ops = FileOps(todo_path)
     tasks = file_ops.read_tasks()
+    # Cache file_ops to preserve relationships
+    _file_ops_cache[todo_path] = file_ops
     return TaskManager(tasks)
 
 
 def save_changes(manager: TaskManager, todo_path: str = "TODO.md") -> None:
-    """Save tasks back to file."""
-    file_ops = FileOps(todo_path)
+    """Save tasks back to file, preserving relationships."""
+    # Use cached file_ops if available to preserve relationships
+    file_ops = _file_ops_cache.get(todo_path)
+    if file_ops is None:
+        file_ops = FileOps(todo_path)
+        file_ops.read_tasks()  # Read to get relationships
     tasks = manager.list_tasks()
     file_ops.write_tasks(tasks)
 
@@ -382,3 +391,87 @@ def update_note_command(task_id: str, new_note_text: str, todo_path: str = "TODO
         print(f"Updated notes for task #{task.id}")
     except ValueError as e:
         print(f"Error: {e}")
+
+
+def show_command(task_id: str, todo_path: str = "TODO.md"):
+    """Display task with subtasks, relationships, and notes."""
+    file_ops = FileOps(todo_path)
+    tasks = file_ops.read_tasks()
+    manager = TaskManager(tasks)
+
+    task = manager.get_task(task_id)
+    if not task:
+        print(f"Error: Task #{task_id} not found")
+        return
+
+    # Display task line
+    checkbox = "[x]" if task.status.value != "pending" else "[ ]"
+    indent = "  " * (task.id.count("."))
+    tag_str = " ".join([f"`#{tag}`" for tag in sorted(task.tags)]) if task.tags else ""
+    description = task.description
+    if tag_str:
+        description = f"{description} {tag_str}".strip()
+    print(f"{indent}- {checkbox} **#{task.id}** {description}")
+
+    # Display notes
+    for note in task.notes:
+        print(f"{indent}  > {note}")
+
+    # Display subtasks
+    subtasks = manager.get_subtasks(task_id)
+    if subtasks:
+        for subtask in sorted(subtasks, key=lambda t: t.id):
+            sub_checkbox = "[x]" if subtask.status.value != "pending" else "[ ]"
+            sub_indent = "  " * (subtask.id.count("."))
+            sub_tag_str = (
+                " ".join([f"`#{tag}`" for tag in sorted(subtask.tags)]) if subtask.tags else ""
+            )
+            sub_description = subtask.description
+            if sub_tag_str:
+                sub_description = f"{sub_description} {sub_tag_str}".strip()
+            print(f"{sub_indent}- {sub_checkbox} **#{subtask.id}** {sub_description}")
+            for note in subtask.notes:
+                print(f"{sub_indent}  > {note}")
+
+    # Display relationships
+    relationships = file_ops.get_relationships(task_id)
+    if relationships:
+        for rel_type, targets in sorted(relationships.items()):
+            # Format relationship type
+            formatted_type = rel_type.replace("-", " ").title()
+            targets_str = " ".join(targets)
+            print(f"  ↳ {formatted_type}: {targets_str}")
+    else:
+        print("  (No relationships)")
+
+
+def relate_command(
+    task_id: str,
+    rel_type: str,
+    target_ids: list[str],
+    todo_path: str = "TODO.md",
+):
+    """Add a task relationship."""
+    file_ops = FileOps(todo_path)
+    tasks = file_ops.read_tasks()  # This also parses relationships
+    manager = TaskManager(tasks)
+
+    # Verify task exists
+    task = manager.get_task(task_id)
+    if not task:
+        print(f"Error: Task #{task_id} not found")
+        return
+
+    # Validate relationship type
+    valid_types = ["completed-by", "depends-on", "blocks", "related-to", "duplicate-of"]
+    if rel_type not in valid_types:
+        print(f"Error: Invalid relationship type '{rel_type}'")
+        print(f"Valid types: {', '.join(valid_types)}")
+        return
+
+    # Add relationship
+    file_ops.add_relationship(task_id, rel_type, target_ids)
+    file_ops.write_tasks(tasks)  # Write back to preserve relationships
+
+    targets_str = " ".join(target_ids)
+    print(f"Added relationship: #{task_id} {rel_type} {targets_str}")

@@ -5,7 +5,7 @@ from todo_ai.mcp.server import MCPServer
 
 @pytest.mark.asyncio
 async def test_server_initialization():
-    server = MCPServer()
+    server = MCPServer("TODO.md")
     assert server.app.name == "todo-ai"
 
 

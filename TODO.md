@@ -23,15 +23,15 @@
     - [ ] **#163.44.3** Re-run feature parity validation - Compare Python version output with shell version (side-by-side testing) `#test`
     - [ ] **#163.44.2** Add integration tests for all new MCP tools - Verify each tool works correctly `#test`
     - [ ] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly `#test`
-  - [ ] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands `#code`
+  - [x] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands `#code`
     - [ ] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format `#test`
-    - [ ] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool `#code`
-    - [ ] **#163.43.6** Add MCP tools for Phase 6 commands - show_config, detect_coordination, setup_coordination, switch_mode `#code`
-    - [ ] **#163.43.5** Add MCP tools for Phase 5 commands - view_log, update_tool, list_backups, rollback `#code`
-    - [ ] **#163.43.4** Add MCP tools for Phase 4 commands - lint_todo, reformat_todo, resolve_conflicts `#code`
-    - [ ] **#163.43.3** Add MCP tools for Phase 3 commands - show_task, relate_task `#code`
-    - [ ] **#163.43.2** Add MCP tools for Phase 2 commands - add_note, delete_note, update_note `#code`
-    - [ ] **#163.43.1** Add MCP tools for Phase 1 commands - modify_task, delete_task, archive_task, restore_task, undo_task `#code`
+    - [x] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool `#code`
+    - [x] **#163.43.6** Add MCP tools for Phase 6 commands - show_config, detect_coordination, setup_coordination, switch_mode `#code`
+    - [x] **#163.43.5** Add MCP tools for Phase 5 commands - view_log, update_tool, list_backups, rollback `#code`
+    - [x] **#163.43.4** Add MCP tools for Phase 4 commands - lint_todo, reformat_todo, resolve_conflicts `#code`
+    - [x] **#163.43.3** Add MCP tools for Phase 3 commands - show_task, relate_task `#code`
+    - [x] **#163.43.2** Add MCP tools for Phase 2 commands - add_note, delete_note, update_note `#code`
+    - [x] **#163.43.1** Add MCP tools for Phase 1 commands - modify_task, delete_task, archive_task, restore_task, undo_task `#code`
   - [x] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands `#code`
     - [x] **#163.42.3** Implement version command - Show version information `#code`
     - [x] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options) `#code`
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 00:29:39 CET 2025
+**Last Updated:** Mon Dec 15 00:35:51 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

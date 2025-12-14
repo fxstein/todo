@@ -905,12 +905,12 @@ execute_release() {
     update_version "$NEW_VERSION"
 
     # Verify both files were updated correctly
-    if ! grep -q "^VERSION="${NEW_VERSION}"" todo.ai 2>/dev/null; then
+    if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai 2>/dev/null; then
         echo -e "${RED}❌ Error: Version update failed in todo.ai${NC}"
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo.ai to ${NEW_VERSION}"
         exit 1
     fi
-    if ! grep -q "^version = "${NEW_VERSION}"" pyproject.toml 2>/dev/null; then
+    if ! grep -q "^version = \"${NEW_VERSION}\"" pyproject.toml 2>/dev/null; then
         echo -e "${RED}❌ Error: Version update failed in pyproject.toml${NC}"
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in pyproject.toml to ${NEW_VERSION}"
         exit 1

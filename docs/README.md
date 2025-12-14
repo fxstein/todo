@@ -63,6 +63,7 @@ Research documents, analysis reports, and comparison studies.
 
 | Document | Description |
 |----------|-------------|
+| [CI/CD Process Parity](analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md) | Assessment and implementation of modern CI/CD infrastructure (uv, pre-commit, GitHub Actions) |
 | [Bash vs Zsh Analysis](analysis/BASH_VS_ZSH_ANALYSIS.md) | Bash vs zsh comparison and recommendations |
 | [Code Size Analysis](analysis/CODE_SIZE_ANALYSIS.md) | Codebase size analysis and optimization |
 | [GitHub API Coordination](analysis/GITHUB_API_COORDINATION_ANALYSIS.md) | GitHub API coordination analysis |
@@ -115,5 +116,5 @@ See [STRUCTURE.md](STRUCTURE.md) for complete documentation structure guidelines
 
 ---
 
-**Last Updated:** 2025-11-11  
+**Last Updated:** 2025-11-11
 **Repository:** https://github.com/fxstein/todo.ai

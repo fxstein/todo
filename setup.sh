@@ -7,8 +7,12 @@ echo "🚀 Setting up todo.ai development environment..."
 if ! command -v uv &> /dev/null; then
     echo "📦 Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
-    # Add uv to PATH for current session
-    export PATH="$HOME/.cargo/bin:$PATH"
+    # Add uv to PATH for current session (default installation path)
+    export PATH="$HOME/.local/bin:$PATH"
+    # Also check XDG_BIN_HOME if set
+    if [[ -n "$XDG_BIN_HOME" ]]; then
+        export PATH="$XDG_BIN_HOME:$PATH"
+    fi
 fi
 
 # Sync dependencies

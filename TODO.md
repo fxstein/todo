@@ -3,6 +3,23 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd`
+  > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
+  - [ ] **#167.9** Phase 3.3: Add documentation automation `#cicd`
+  - [ ] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd`
+  - [ ] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd`
+  - [ ] **#167.6** Phase 2.3: Integrate automated release process with release.sh `#cicd`
+    > Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
+  - [x] **#167.5** Phase 2.2: Configure code quality tools `#cicd`
+    > Configured [tool.ruff] section with target-version py310, select rules (E, W, F, I, B, C4, UP), and per-file ignores for tests. Configured [tool.mypy] section with python_version 3.10 and strict type checking options.
+  - [x] **#167.4** Phase 2.1: Add development dependencies `#cicd`
+    > Added [project.optional-dependencies] dev section to pyproject.toml with: pytest, pytest-cov, ruff, mypy, pre-commit, build, twine, types-requests, types-pyyaml.
+  - [x] **#167.3** Phase 1.3: Create GitHub Actions CI/CD `#cicd`
+    > Created .github/workflows/ci.yml with test matrix for Python 3.10-3.12, linting, type checking, and pre-commit checks. Created .github/workflows/release.yml for automated PyPI publishing on version tags.
+  - [x] **#167.2** Phase 1.2: Migrate to pre-commit framework `#cicd`
+    > Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
+  - [x] **#167.1** Phase 1.1: Add uv dependency management `#cicd`
+    > Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
@@ -172,7 +189,7 @@
     >
     > Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
     > Line 4150: Same fix for fallback search
-    > Line 4168: Same fix for note line number search  
+    > Line 4168: Same fix for note line number search
     > Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
     >
     > All changes support arbitrary nesting depth and handle malformed checkboxes.
@@ -180,7 +197,7 @@
     > Affected locations in show_task() function:
     >
     > Line 4143: Main task search - missing 4+ space patterns
-    > Line 4148: Fallback search - missing 4+ space patterns  
+    > Line 4148: Fallback search - missing 4+ space patterns
     > Line 4164: Note line number search - missing 4+ space patterns
     >
     > For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
@@ -201,7 +218,7 @@
     >
     > **Original broken notes (from bug #36 work):**
     > - Task 147.3: Lines 36-45 need '  > ' prefix
-    > - Task 147.4: Lines 27-32 need '  > ' prefix  
+    > - Task 147.4: Lines 27-32 need '  > ' prefix
     > - Task 147.5: Lines 21-23 need '  > ' prefix
     > - Task 147.6: Lines 14-18 need '  > ' prefix
     >
@@ -219,19 +236,19 @@
     > After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
   - [x] **#149.5** Test fix with multi-line notes at different nesting levels `#bug` (2025-11-16)
     > Tested multi-line notes at all 3 nesting levels:
-    > 
+    >
     > Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
     > Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
     > Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
-    > 
+    >
     > All lines properly formatted with indent + '  > ' prefix. Fix verified!
   - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug` (2025-11-16)
   > Fixed add_note() function with 3 key changes:
-  > 
+  >
   > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
-  > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces  
+  > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces
   > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
-  > 
+  >
   > This note itself tests the fix - all lines should have proper blockquote markers!
   - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug` (2025-11-16)
     > Bug located at line 4355 in add_note() function:
@@ -265,11 +282,11 @@
   - [x] **#152.4** Test human workflow (without env vars, should prompt) `#testing` (2025-11-16)
     > Human workflow tested and verified:
     > - WITHOUT AI env vars, shows full preview
-    > - Prompts: 'Report this bug? (y/N)'  
+    > - Prompts: 'Report this bug? (y/N)'
     > - User must explicitly confirm with 'y'
     > - Cancelled if user says 'N' or presses Enter
     > - Maintains full user control as designed
-    > 
+    >
     > Test: Ran './todo.ai report-bug "test" "test" "test"' without env vars
     > Result: Prompted for confirmation as expected ✓
   - [x] **#152.3** Test AI agent detection and auto-submission (with CURSOR_AI set) `#testing` (2025-11-16)
@@ -279,13 +296,13 @@
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
   > - update-note: Replace existing notes with new text
-  > 
+  >
   > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
   - [x] **#153.8** Update GETTING_STARTED.md with note management examples `#feature` (2025-11-16)
   - [x] **#153.7** Add commands to help text and usage documentation `#feature` (2025-11-16)
   - [x] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature` (2025-11-16)
     > Test scenarios:
-    > 
+    >
     > 1. delete-note on task with single-line note
     > 2. delete-note on task with multi-line note
     > 3. delete-note on task with no notes (should error)
@@ -299,28 +316,28 @@
   - [x] **#153.5** Handle multi-line notes correctly in both commands `#feature` (2025-11-16)
   - [x] **#153.4** Implement update-note command to replace existing notes `#feature` (2025-11-16)
     > Implementation approach for update-note:
-    > 
+    >
     > 1. Call delete-note logic to remove existing notes
     > 2. Call add_note() logic to add new notes
     > 3. Essentially: delete + add in one operation
     > 4. Ensures proper formatting via existing add_note()
-    > 
+    >
     > Could be wrapper function:
     > update_note() {
     >   delete_note_internal $task_id  # No prompt version
     >   add_note $task_id $new_text
     > }
-    > 
+    >
     > Reuse existing add_note() multi-line formatting logic from fix #149.
   - [x] **#153.3** Implement delete-note command to remove all notes from a task `#feature` (2025-11-16)
     > Implementation approach for delete-note:
-    > 
+    >
     > 1. Find task line number (reuse logic from show_task)
     > 2. Find all consecutive blockquote lines after task
     > 3. Use sed or temp file to delete those lines
     > 4. Update footer timestamp
     > 5. Log the action
-    > 
+    >
     > Reference collect_task_notes() function if it exists - may already have note detection logic. Similar pattern to delete_task() but only removes note lines, not the task itself.
   - [x] **#153.2** Analyze current note storage format in TODO.md `#feature` (2025-11-16)
     > Notes in TODO.md format:
@@ -329,28 +346,28 @@
     > - Each line starts with '  >' (indent + > + space)
     > - Can span multiple lines
     > - Ends when next non-blockquote line encountered
-    > 
+    >
     > Example level-1 subtask:
     >   - [ ] **#42.1** Task description
     >     > Note line 1
     >     > Note line 2
     >     > Note line 3
-    > 
+    >
     > Need to identify all note lines for delete/update operations.
   - [x] **#153.1** Design command syntax for update-note and delete-note `#feature` (2025-11-16)
     > Proposed command syntax:
-    > 
+    >
     > ./todo.ai delete-note <task-id>
     >   - Removes ALL notes from specified task
     >   - Confirmation prompt: 'Delete all notes from task #X? (y/N)'
     >   - Returns error if task has no notes
-    > 
+    >
     > ./todo.ai update-note <task-id> "new note text"
     >   - Replaces ALL existing notes with new text
     >   - Supports multi-line notes (like add note)
     >   - Shows preview: 'Replace N lines with M lines?'
     >   - Returns error if task has no notes to update
-    > 
+    >
     > Alternative: Could add --force to skip confirmations for both commands.
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug` (2025-11-16)
   > Fixed 3 critical $match[ ] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[ ] for bash or $match[ ] for zsh.
@@ -745,6 +762,6 @@
 
 ---
 
-**Last Updated:** Sat Dec 13 00:57:46 CET 2025
+**Last Updated:** Sun Dec 14 19:02:20 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

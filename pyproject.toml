@@ -58,6 +58,9 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0.0",
     "pre-commit>=3.0.0",
+    "build>=1.0.0",
+    "twine>=5.0.0",
+    "ascii-guard>=0.1.0",
     "types-requests>=2.28.0",
     "types-pyyaml>=6.0",
 ]
@@ -97,4 +100,3 @@ strict_optional = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
-

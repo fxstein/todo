@@ -2,6 +2,48 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-14 19:02:20 | fxstein | NOTE | 167.6 | Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
+2025-12-14 19:02:19 | fxstein | NOTE | 167.5 | Configured [tool.ruff] section with target-version py310, select rules (E, W, F, I, B, C4, UP), and per-file ignores for tests. Configured [tool.mypy] section with python_version 3.10 and strict type checking options.
+2025-12-14 19:02:17 | fxstein | NOTE | 167.4 | Added [project.optional-dependencies] dev section to pyproject.toml with: pytest, pytest-cov, ruff, mypy, pre-commit, build, twine, types-requests, types-pyyaml.
+2025-12-14 19:02:15 | fxstein | NOTE | 167.3 | Created .github/workflows/ci.yml with test matrix for Python 3.10-3.12, linting, type checking, and pre-commit checks. Created .github/workflows/release.yml for automated PyPI publishing on version tags.
+2025-12-14 19:02:13 | fxstein | NOTE | 167.2 | Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
+2025-12-14 19:02:12 | fxstein | DELETE_NOTE | 167.6 | Deleted 2 line(s) of notes
+2025-12-14 19:02:12 | fxstein | DELETE_NOTE | 167.5 | Deleted 2 line(s) of notes
+2025-12-14 19:02:12 | fxstein | NOTE | 167.1 | Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
+2025-12-14 19:02:11 | fxstein | DELETE_NOTE | 167.4 | Deleted 2 line(s) of notes
+2025-12-14 19:02:11 | fxstein | DELETE_NOTE | 167.3 | Deleted 2 line(s) of notes
+2025-12-14 19:02:11 | fxstein | DELETE_NOTE | 167.2 | Deleted 2 line(s) of notes
+2025-12-14 19:02:10 | fxstein | DELETE_NOTE | 167.1 | Deleted 2 line(s) of notes
+2025-12-14 19:02:08 | fxstein | UPDATE_NOTE | 167 | Updated note (was 2 lines, now        1 lines)
+2025-12-14 19:01:42 | fxstein | NOTE | 167.6 | Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
+2025-12-14 19:01:41 | fxstein | NOTE | 167.5 | Configured [tool.ruff] section with target-version py310, select rules (E, W, F, I, B, C4, UP), and per-file ignores for tests. Configured [tool.mypy] section with python_version 3.10 and strict type checking options.
+2025-12-14 19:01:39 | fxstein | NOTE | 167.4 | Added [project.optional-dependencies] dev section to pyproject.toml with: pytest, pytest-cov, ruff, mypy, pre-commit, build, twine, types-requests, types-pyyaml.
+2025-12-14 19:01:38 | fxstein | NOTE | 167.3 | Created .github/workflows/ci.yml with test matrix for Python 3.10-3.12, linting, type checking, and pre-commit checks. Created .github/workflows/release.yml for automated PyPI publishing on version tags.
+2025-12-14 19:01:37 | fxstein | NOTE | 167.2 | Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
+2025-12-14 19:01:37 | fxstein | NOTE | 167.1 | Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for /Users/oratzes/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
+2025-12-14 19:01:35 | fxstein | NOTE | 167 | Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
+2025-12-14 19:00:19 | fxstein | NOTE | 167.6 | PENDING: Release workflow created but needs integration with existing release/release.sh process
+2025-12-14 19:00:18 | fxstein | NOTE | 167.5 | COMPLETE: ruff and mypy configured in pyproject.toml in Phase 1
+2025-12-14 19:00:18 | fxstein | NOTE | 167.4 | COMPLETE: Dev dependencies added to pyproject.toml in Phase 1 (pytest, ruff, mypy, pre-commit, build, twine, types)
+2025-12-14 19:00:17 | fxstein | NOTE | 167.3 | COMPLETE: .github/workflows/ci.yml and release.yml created, test matrix configured for Python 3.10-3.12
+2025-12-14 19:00:16 | fxstein | NOTE | 167.2 | COMPLETE: .pre-commit-config.yaml created, scripts/setup-git-hooks.sh updated to use pre-commit framework
+2025-12-14 19:00:15 | fxstein | NOTE | 167.1 | COMPLETE: uv.lock created, pyproject.toml updated with dev deps, setup.sh created with correct PATH, docs/development/SETUP.md created
+2025-12-14 19:00:13 | fxstein | NOTE | 167 | Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Phase 1 complete (2025-12-14). Phase 2 partially complete (2.1 and 2.2 done, 2.3 pending). Phase 3 pending.
+2025-12-14 19:00:07 | fxstein | COMPLETE | 167.5 | Phase 2.2: Configure code quality tools
+2025-12-14 19:00:06 | fxstein | COMPLETE | 167.4 | Phase 2.1: Add development dependencies
+2025-12-14 19:00:06 | fxstein | COMPLETE | 167.3 | Phase 1.3: Create GitHub Actions CI/CD
+2025-12-14 19:00:05 | fxstein | COMPLETE | 167.2 | Phase 1.2: Migrate to pre-commit framework
+2025-12-14 19:00:05 | fxstein | COMPLETE | 167.1 | Phase 1.1: Add uv dependency management
+2025-12-14 19:00:01 | fxstein | ADD_SUBTASK | 167.9 | Phase 3.3: Add documentation automation (parent: #167)
+2025-12-14 19:00:00 | fxstein | ADD_SUBTASK | 167.8 | Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) (parent: #167)
+2025-12-14 19:00:00 | fxstein | ADD_SUBTASK | 167.7 | Phase 3.1: Add code coverage reporting (codecov) (parent: #167)
+2025-12-14 18:59:58 | fxstein | ADD_SUBTASK | 167.6 | Phase 2.3: Integrate automated release process with release.sh (parent: #167)
+2025-12-14 18:59:57 | fxstein | ADD_SUBTASK | 167.5 | Phase 2.2: Configure code quality tools (parent: #167)
+2025-12-14 18:59:57 | fxstein | ADD_SUBTASK | 167.4 | Phase 2.1: Add development dependencies (parent: #167)
+2025-12-14 18:59:55 | fxstein | ADD_SUBTASK | 167.3 | Phase 1.3: Create GitHub Actions CI/CD (parent: #167)
+2025-12-14 18:59:55 | fxstein | ADD_SUBTASK | 167.2 | Phase 1.2: Migrate to pre-commit framework (parent: #167)
+2025-12-14 18:59:54 | fxstein | ADD_SUBTASK | 167.1 | Phase 1.1: Add uv dependency management (parent: #167)
+2025-12-14 18:59:52 | fxstein | ADD | 167 | Implement CI/CD process parity with ascii-guard (Phase 1-3)
 2025-12-13 00:57:46 | fxstein | ADD_SUBTASK | 163.34.1 | Publish to PyPI (parent: #163.34)
 2025-12-13 00:39:34 | fxstein | COMPLETE | 163.33 | Maintenance phase: Track progress using existing todo.ai script (this task list)
 2025-12-13 00:39:34 | fxstein | COMPLETE | 163.32 | Maintenance phase: Ensure existing shell script continues working during development
@@ -98,7 +140,7 @@
 2025-12-12 13:28:10 | fxstein | COMPLETE | 160.5 | Add tests to prevent regression
 2025-12-12 13:28:09 | fxstein | COMPLETE | 160.3 | Test modify command with various task IDs and nesting levels
 2025-12-12 13:28:09 | fxstein | NOTE | 160.4 | FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
-2025-12-12 13:28:01 | fxstein | COMPLETE | 163 | 
+2025-12-12 13:28:01 | fxstein | COMPLETE | 163 |
 2025-12-12 13:27:34 | fxstein | ADD | 163 | Test task for complete fix
 2025-12-12 13:27:31 | fxstein | DELETE | 162 | Test task for modify bug fix - MODIFIED
 2025-12-12 13:26:08 | fxstein | NOTE | 162 | Test note after modify - this should work now
@@ -287,7 +329,7 @@ This allows fixing mistakes, removing outdated info, and updating context withou
 2025-11-15 13:05:05 | fxstein | COMPLETE | 152 | Test bug reporting feature before v2.5.0 release
 2025-11-15 13:04:53 | fxstein | NOTE | 152.4 | Human workflow tested and verified:
 - WITHOUT AI env vars, shows full preview
-- Prompts: 'Report this bug? (y/N)'  
+- Prompts: 'Report this bug? (y/N)'
 - User must explicitly confirm with 'y'
 - Cancelled if user says 'N' or presses Enter
 - Maintains full user control as designed
@@ -358,7 +400,7 @@ Line 3 of main task note
 2025-11-15 12:56:23 | fxstein | ADD | 150 | Test main task (level 0)
 2025-11-15 12:56:01 | fxstein | NOTE | 149.4 | Fixed add_note() function with 3 key changes:
 Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
-Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces  
+Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces
 Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
 This note itself tests the fix - all lines should have proper blockquote markers!
 2025-11-15 12:56:00 | fxstein | COMPLETE | 149.4 | Fix add_note() to properly indent all lines with blockquote markers
@@ -373,7 +415,7 @@ Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
 2025-11-15 12:54:04 | fxstein | NOTE | 149.6 | Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
 **Original broken notes (from bug #36 work):**
 - Task 147.3: Lines 36-45 need '  > ' prefix
-- Task 147.4: Lines 27-32 need '  > ' prefix  
+- Task 147.4: Lines 27-32 need '  > ' prefix
 - Task 147.5: Lines 21-23 need '  > ' prefix
 - Task 147.6: Lines 14-18 need '  > ' prefix
 **Newly broken notes (from creating task #149):**
@@ -434,7 +476,7 @@ All note lines must have proper indentation (matching task depth) AND blockquote
 2025-11-15 12:45:53 | fxstein | NOTE | 147.4 | Fixed show_task() function in todo.ai:
 Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
 Line 4150: Same fix for fallback search
-Line 4168: Same fix for note line number search  
+Line 4168: Same fix for note line number search
 Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
 All changes support arbitrary nesting depth and handle malformed checkboxes.
 2025-11-15 12:45:53 | fxstein | COMPLETE | 147.4 | Fix task ID resolution to support arbitrary nesting depth
@@ -443,7 +485,7 @@ All changes support arbitrary nesting depth and handle malformed checkboxes.
 2025-11-15 12:43:48 | fxstein | COMPLETE | 147.3 | Identify where show/modify/note commands fail for deep nesting
 2025-11-15 12:43:44 | fxstein | NOTE | 147.3 | Affected locations in show_task() function:
 Line 4143: Main task search - missing 4+ space patterns
-Line 4148: Fallback search - missing 4+ space patterns  
+Line 4148: Fallback search - missing 4+ space patterns
 Line 4164: Note line number search - missing 4+ space patterns
 For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
 - Lines 2559, 2664, 2693: Task operations
@@ -1424,7 +1466,7 @@ main-3 | - [D] **#fxstein-25** Test
 2025-11-02 14:41:23 | fxstein | COMPLETE | 52.15 | Test all numbering modes: verify correct task assignment, reference resolution, and conflict handling
 2025-11-02 14:38:40 | fxstein | MODIFY | fxstein-60 | Modified task in multi-user mode
 2025-11-02 14:38:37 | fxstein | COMPLETE | 60 | Test single-user mode task
-2025-11-02 14:38:21 | fxstein | UNDO | fxstein-60 | 
+2025-11-02 14:38:21 | fxstein | UNDO | fxstein-60 |
 2025-11-02 14:38:18 | fxstein | COMPLETE | 60 | Test single-user mode task
 2025-11-02 14:37:17 | fxstein | MODE_SWITCH | single-user → multi-user | Switched from single-user to multi-user
 2025-11-02 14:36:08 | fxstein | MODE_SWITCH | multi-user → single-user | Switched from multi-user to single-user

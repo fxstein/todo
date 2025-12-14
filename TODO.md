@@ -3,28 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd`
-  > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
-  - [x] **#167.9** Phase 3.3: Add documentation automation `#cicd`
-  - [x] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd`
-  - [x] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd`
-  - [x] **#167.6** Phase 2.3: Integrate automated release process with release.sh `#cicd`
-    > Integration complete: release.sh creates GitHub release with shell assets and release notes. GitHub Actions workflow (triggered by tag push) builds Python package, publishes to PyPI, and attaches dist files to existing release. Clean separation of concerns achieved.
-    > Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
-  - [x] **#167.5** Phase 2.2: Configure code quality tools `#cicd`
-    > Configured [tool.ruff] section with target-version py310, select rules (E, W, F, I, B, C4, UP), and per-file ignores for tests. Configured [tool.mypy] section with python_version 3.10 and strict type checking options.
-  - [x] **#167.4** Phase 2.1: Add development dependencies `#cicd`
-    > Added [project.optional-dependencies] dev section to pyproject.toml with: pytest, pytest-cov, ruff, mypy, pre-commit, build, twine, types-requests, types-pyyaml.
-  - [x] **#167.3** Phase 1.3: Create GitHub Actions CI/CD `#cicd`
-    > Created .github/workflows/ci.yml with test matrix for Python 3.10-3.12, linting, type checking, and pre-commit checks. Created .github/workflows/release.yml for automated PyPI publishing on version tags.
-  - [x] **#167.2** Phase 1.2: Migrate to pre-commit framework `#cicd`
-    > Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
-  - [x] **#167.1** Phase 1.1: Add uv dependency management `#cicd`
-    > Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
 - [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
+  > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
   - [ ] **#163.35** Release phase: Final release of Python version with migration support `#release`
   - [ ] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release`
@@ -122,6 +105,24 @@
 ------------------
 
 ## Recently Completed
+- [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd` (2025-12-14)
+  > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
+  - [x] **#167.9** Phase 3.3: Add documentation automation `#cicd` (2025-12-14)
+  - [x] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd` (2025-12-14)
+  - [x] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd` (2025-12-14)
+  - [x] **#167.6** Phase 2.3: Integrate automated release process with release.sh `#cicd` (2025-12-14)
+    > Integration complete: release.sh creates GitHub release with shell assets and release notes. GitHub Actions workflow (triggered by tag push) builds Python package, publishes to PyPI, and attaches dist files to existing release. Clean separation of concerns achieved.
+    > Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
+  - [x] **#167.5** Phase 2.2: Configure code quality tools `#cicd` (2025-12-14)
+    > Configured [tool.ruff] section with target-version py310, select rules (E, W, F, I, B, C4, UP), and per-file ignores for tests. Configured [tool.mypy] section with python_version 3.10 and strict type checking options.
+  - [x] **#167.4** Phase 2.1: Add development dependencies `#cicd` (2025-12-14)
+    > Added [project.optional-dependencies] dev section to pyproject.toml with: pytest, pytest-cov, ruff, mypy, pre-commit, build, twine, types-requests, types-pyyaml.
+  - [x] **#167.3** Phase 1.3: Create GitHub Actions CI/CD `#cicd` (2025-12-14)
+    > Created .github/workflows/ci.yml with test matrix for Python 3.10-3.12, linting, type checking, and pre-commit checks. Created .github/workflows/release.yml for automated PyPI publishing on version tags.
+  - [x] **#167.2** Phase 1.2: Migrate to pre-commit framework `#cicd` (2025-12-14)
+    > Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
+  - [x] **#167.1** Phase 1.1: Add uv dependency management `#cicd` (2025-12-14)
+    > Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
 - [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2025-12-12)
   > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
   - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2025-12-12)
@@ -763,6 +764,6 @@
 
 ---
 
-**Last Updated:** Sun Dec 14 22:10:21 CET 2025
+**Last Updated:** Sun Dec 14 23:17:45 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

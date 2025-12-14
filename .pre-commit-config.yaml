@@ -37,5 +37,4 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-        always_run: false
-        stages: [manual]
+        always_run: true

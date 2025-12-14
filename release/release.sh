@@ -514,7 +514,7 @@ generate_release_notes() {
     echo "$temp_notes"
 }
 
-# Update version in todo.ai and pyproject.toml
+# Update version in todo.ai, pyproject.toml, and todo_ai/__init__.py
 update_version() {
     local new_version="$1"
 
@@ -524,6 +524,8 @@ update_version() {
         sed_inplace "s/^# Version: .*/# Version: ${new_version}/" todo.ai
         # Update version in pyproject.toml
         sed_inplace "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
+        # Update version in todo_ai/__init__.py
+        sed_inplace "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" todo_ai/__init__.py
     else
         # macOS or Linux compatible
         if [[ "$(uname)" == "Darwin" ]]; then
@@ -531,11 +533,15 @@ update_version() {
             sed -i '' "s/^# Version: .*/# Version: ${new_version}/" todo.ai
             # Update version in pyproject.toml
             sed -i '' "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
+            # Update version in todo_ai/__init__.py
+            sed -i '' "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" todo_ai/__init__.py
         else
             sed -i "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
             sed -i "s/^# Version: .*/# Version: ${new_version}/" todo.ai
             # Update version in pyproject.toml
             sed -i "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
+            # Update version in todo_ai/__init__.py
+            sed -i "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" todo_ai/__init__.py
         fi
     fi
 }
@@ -900,11 +906,11 @@ execute_release() {
     echo ""
 
     # Update version
-    echo -e "${BLUE}📝 Updating version in todo.ai and pyproject.toml...${NC}"
-    log_release_step "UPDATE VERSION" "Updating version in todo.ai and pyproject.toml from ${CURRENT_VERSION} to ${NEW_VERSION}"
+    echo -e "${BLUE}📝 Updating version in todo.ai, pyproject.toml, and todo_ai/__init__.py...${NC}"
+    log_release_step "UPDATE VERSION" "Updating version in todo.ai, pyproject.toml, and todo_ai/__init__.py from ${CURRENT_VERSION} to ${NEW_VERSION}"
     update_version "$NEW_VERSION"
 
-    # Verify both files were updated correctly
+    # Verify all files were updated correctly
     if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai 2>/dev/null; then
         echo -e "${RED}❌ Error: Version update failed in todo.ai${NC}"
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo.ai to ${NEW_VERSION}"
@@ -915,13 +921,18 @@ execute_release() {
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in pyproject.toml to ${NEW_VERSION}"
         exit 1
     fi
-    echo -e "${GREEN}✓ Verified version updated in both todo.ai and pyproject.toml${NC}"
-    log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai and pyproject.toml"
+    if ! grep -q "^__version__ = \"${NEW_VERSION}\"" todo_ai/__init__.py 2>/dev/null; then
+        echo -e "${RED}❌ Error: Version update failed in todo_ai/__init__.py${NC}"
+        log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo_ai/__init__.py to ${NEW_VERSION}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Verified version updated in todo.ai, pyproject.toml, and todo_ai/__init__.py${NC}"
+    log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai, pyproject.toml, and todo_ai/__init__.py"
 
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
-    git add todo.ai pyproject.toml
+    git add todo.ai pyproject.toml todo_ai/__init__.py
 
     # Commit summary file if it exists and is uncommitted
     if [[ "$summary_needs_commit" == true ]] && [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then

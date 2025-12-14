@@ -60,10 +60,10 @@
     - [ ] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks `#code`
     - [ ] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of) `#code`
     - [ ] **#163.38.1** Implement show command - Display task with subtasks, relationships, and notes `#code`
-  - [ ] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands `#code`
-    - [ ] **#163.37.3** Implement update-note command - Replace existing notes with new text `#code`
-    - [ ] **#163.37.2** Implement delete-note command - Delete all notes from a task `#code`
-    - [ ] **#163.37.1** Implement note command - Add note to task (blockquote format) `#code`
+  - [x] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands `#code`
+    - [x] **#163.37.3** Implement update-note command - Replace existing notes with new text `#code`
+    - [x] **#163.37.2** Implement delete-note command - Delete all notes from a task `#code`
+    - [x] **#163.37.1** Implement note command - Add note to task (blockquote format) `#code`
   - [x] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands `#code`
     - [x] **#163.36.8** Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations `#code`
     - [x] **#163.36.7** Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10) `#code`
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Sun Dec 14 23:34:45 CET 2025
+**Last Updated:** Mon Dec 15 00:00:12 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

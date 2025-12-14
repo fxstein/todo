@@ -6,10 +6,13 @@ from todo_ai.cli.commands import (
     archive_command,
     complete_command,
     delete_command,
+    delete_note_command,
     list_command,
     modify_command,
+    note_command,
     restore_command,
     undo_command,
+    update_note_command,
 )
 
 
@@ -102,6 +105,32 @@ def restore(ctx, task_id):
 def undo(ctx, task_id):
     """Reopen (undo) a completed task."""
     undo_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.argument("task_id")
+@click.argument("note_text")
+@click.pass_context
+def note(ctx, task_id, note_text):
+    """Add a note to a task."""
+    note_command(task_id, note_text, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("delete-note")
+@click.argument("task_id")
+@click.pass_context
+def delete_note(ctx, task_id):
+    """Delete all notes from a task."""
+    delete_note_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("update-note")
+@click.argument("task_id")
+@click.argument("new_note_text")
+@click.pass_context
+def update_note(ctx, task_id, new_note_text):
+    """Replace existing notes with new text."""
+    update_note_command(task_id, new_note_text, todo_path=ctx.obj["todo_file"])
 
 
 if __name__ == "__main__":

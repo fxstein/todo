@@ -199,6 +199,43 @@ class TaskManager:
         prefix = f"{parent_id}."
         return [task for task_id, task in self._tasks.items() if task_id.startswith(prefix)]
 
+    def add_note_to_task(self, task_id: str, note: str) -> Task:
+        """Add a note to a task. Handles multi-line notes by splitting on newlines."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        # Handle multi-line notes - split by newlines and add each line
+        for line in note.split("\n"):
+            if line.strip():
+                task.add_note(line.strip())
+        return task
+
+    def delete_notes_from_task(self, task_id: str) -> Task:
+        """Delete all notes from a task."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        if not task.notes:
+            raise ValueError(f"Task {task_id} has no notes to delete")
+        task.notes.clear()
+        task.updated_at = datetime.now()
+        return task
+
+    def update_notes_for_task(self, task_id: str, new_note: str) -> Task:
+        """Replace all notes for a task with a new note."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+        if not task.notes:
+            raise ValueError(f"Task {task_id} has no notes to update")
+        task.notes.clear()
+        # Handle multi-line notes - split by newlines and add each line
+        for line in new_note.split("\n"):
+            if line.strip():
+                task.notes.append(line.strip())
+        task.updated_at = datetime.now()
+        return task
+
     def list_tasks(self, filters: dict[str, Any] | None = None) -> list[Task]:
         """List tasks matching filters."""
         if not filters:

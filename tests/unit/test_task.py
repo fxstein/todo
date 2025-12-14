@@ -187,3 +187,51 @@ def test_manager_get_subtasks(task_manager):
 
     # Other task should not be included
     assert other.id not in {s.id for s in subtasks}
+
+
+def test_manager_add_note_to_task(task_manager):
+    task = task_manager.add_task("Task with note")
+    task = task_manager.add_note_to_task(task.id, "Note 1")
+    assert len(task.notes) == 1
+    assert task.notes[0] == "Note 1"
+
+    # Multi-line note
+    task = task_manager.add_note_to_task(task.id, "Line 1\nLine 2\nLine 3")
+    assert len(task.notes) == 4  # Original note + 3 new lines
+    assert "Line 1" in task.notes
+    assert "Line 2" in task.notes
+    assert "Line 3" in task.notes
+
+
+def test_manager_delete_notes_from_task(task_manager):
+    task = task_manager.add_task("Task with notes")
+    task.add_note("Note 1")
+    task.add_note("Note 2")
+
+    task = task_manager.delete_notes_from_task(task.id)
+    assert len(task.notes) == 0
+
+    # Should raise error if no notes
+    with pytest.raises(ValueError, match="has no notes to delete"):
+        task_manager.delete_notes_from_task(task.id)
+
+
+def test_manager_update_notes_for_task(task_manager):
+    task = task_manager.add_task("Task with notes")
+    task.add_note("Old note 1")
+    task.add_note("Old note 2")
+
+    task = task_manager.update_notes_for_task(task.id, "New note")
+    assert len(task.notes) == 1
+    assert task.notes[0] == "New note"
+
+    # Multi-line update
+    task = task_manager.update_notes_for_task(task.id, "Line 1\nLine 2")
+    assert len(task.notes) == 2
+    assert task.notes[0] == "Line 1"
+    assert task.notes[1] == "Line 2"
+
+    # Should raise error if no notes
+    task.notes.clear()
+    with pytest.raises(ValueError, match="has no notes to update"):
+        task_manager.update_notes_for_task(task.id, "New note")

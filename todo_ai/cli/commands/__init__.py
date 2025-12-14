@@ -312,3 +312,73 @@ def undo_command(task_id: str, todo_path: str = "TODO.md"):
         print(f"Reopened: #{task.id} {task.description}")
     except ValueError as e:
         print(f"Error: {e}")
+
+
+def note_command(task_id: str, note_text: str, todo_path: str = "TODO.md"):
+    """Add a note to a task."""
+    manager = get_manager(todo_path)
+    try:
+        task = manager.add_note_to_task(task_id, note_text)
+        save_changes(manager, todo_path)
+        print(f"Added note to task #{task.id}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
+def delete_note_command(task_id: str, todo_path: str = "TODO.md"):
+    """Delete all notes from a task."""
+    manager = get_manager(todo_path)
+    try:
+        task = manager.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        if not task.notes:
+            print(f"Error: Task #{task_id} has no notes to delete")
+            return
+
+        # Show confirmation (matching shell script behavior)
+        note_count = len(task.notes)
+        print(f"Task #{task_id} has {note_count} note(s).")
+        reply = input(f"Delete all notes from task #{task_id}? (y/N) ")
+
+        if reply.strip().lower() != "y":
+            print("Cancelled - notes not deleted")
+            return
+
+        task = manager.delete_notes_from_task(task_id)
+        save_changes(manager, todo_path)
+        print(f"Deleted notes from task #{task.id}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
+def update_note_command(task_id: str, new_note_text: str, todo_path: str = "TODO.md"):
+    """Replace all notes for a task with new text."""
+    manager = get_manager(todo_path)
+    try:
+        task = manager.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        if not task.notes:
+            print(f"Error: Task #{task_id} has no notes to update")
+            print(f"Hint: Use 'note {task_id} \"text\"' to add notes")
+            return
+
+        # Show preview (matching shell script behavior)
+        old_count = len(task.notes)
+        new_count = len(new_note_text.split("\n"))
+        print(f"Task #{task_id} currently has {old_count} note(s).")
+        print(f"New note will have {new_count} line(s).")
+        reply = input(f"Replace notes for task #{task_id}? (y/N) ")
+
+        if reply.strip().lower() != "y":
+            print("Cancelled - notes not updated")
+            return
+
+        task = manager.update_notes_for_task(task_id, new_note_text)
+        save_changes(manager, todo_path)
+        print(f"Updated notes for task #{task.id}")
+    except ValueError as e:
+        print(f"Error: {e}")

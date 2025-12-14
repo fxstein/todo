@@ -48,13 +48,13 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-      - name: Validate documentation (markdownlint)
-        run: |
-          if command -v markdownlint &> /dev/null; then
-            markdownlint "**/*.md" --ignore node_modules --ignore .git
-          else
-            echo "markdownlint not installed, skipping documentation validation"
-          fi
+      - name: Validate documentation
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
+            !.git/**
         continue-on-error: true
 
       - name: Run pre-commit checks

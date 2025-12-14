@@ -1028,19 +1028,35 @@ Includes release summary from ${SUMMARY_FILE}"
 
     # Temporarily disable set -e to capture error
     set +e
-    local release_output=$(gh release create "$TAG" \
-        --title "$NEW_VERSION" \
-        --notes-file "$RELEASE_NOTES_FILE" \
-        todo.ai \
-        todo.bash \
-        install.sh 2>&1)
-    local release_status=$?
+    # Check if release already exists (shouldn't happen, but handle gracefully)
+    if gh release view "$TAG" > /dev/null 2>&1; then
+        echo -e "${YELLOW}⚠️  Release ${TAG} already exists, attaching assets...${NC}"
+        log_release_step "GITHUB RELEASE EXISTS" "Release ${TAG} already exists, attaching shell script assets"
+        local release_output=$(gh release upload "$TAG" \
+            todo.ai \
+            todo.bash \
+            install.sh \
+            --clobber 2>&1)
+        local release_status=$?
+    else
+        # Create new release with shell script assets
+        # Note: GitHub Actions workflow will attach Python package (dist/*) after PyPI publish
+        local release_output=$(gh release create "$TAG" \
+            --title "$NEW_VERSION" \
+            --notes-file "$RELEASE_NOTES_FILE" \
+            todo.ai \
+            todo.bash \
+            install.sh 2>&1)
+        local release_status=$?
+    fi
     set -e
 
     if [[ $release_status -eq 0 ]]; then
-        log_release_step "GITHUB RELEASE CREATED" "GitHub release created successfully for ${TAG}\nOutput: ${release_output}"
+        log_release_step "GITHUB RELEASE CREATED" "GitHub release created/updated successfully for ${TAG}\nOutput: ${release_output}\nNote: Python package will be attached by GitHub Actions workflow"
+        echo -e "${GREEN}✓ GitHub release created/updated${NC}"
+        echo -e "${BLUE}  Note: Python package (dist/*) will be automatically attached by CI/CD workflow${NC}"
     else
-        log_release_step "GITHUB RELEASE ERROR" "Failed to create GitHub release for ${TAG}\nError: ${release_output}\nExit code: ${release_status}"
+        log_release_step "GITHUB RELEASE ERROR" "Failed to create/update GitHub release for ${TAG}\nError: ${release_output}\nExit code: ${release_status}"
         echo -e "${RED}⚠️  Warning: GitHub release creation failed${NC}"
         echo "Error: ${release_output}"
         echo "Check the release log: ${RELEASE_LOG}"

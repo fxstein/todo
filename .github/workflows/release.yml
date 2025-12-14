@@ -1,5 +1,10 @@
 name: Release
 
+# This workflow is integrated with release/release.sh:
+# 1. release.sh creates the tag, commits version changes, and creates GitHub release with shell assets
+# 2. This workflow (triggered by tag push) builds Python package, publishes to PyPI, and attaches dist files
+# The release.sh script creates the release first, so this workflow attaches files to the existing release
+
 on:
   push:
     tags:
@@ -41,10 +46,13 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: uv run twine upload dist/*
 
-      - name: Create GitHub Release
+      - name: Attach Python package to GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*
-          generate_release_notes: true
+          # Don't generate notes - release.sh already created the release with notes
+          # This action will attach files to the existing release created by release.sh
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

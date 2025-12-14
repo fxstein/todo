@@ -23,6 +23,25 @@ if [ -z "$WORKFLOWS" ]; then
     LATEST=$(gh run list --limit 3 --json name,status,conclusion \
         --jq '.[] | select(.status == "completed")')
 
+    # FIX: Check if LATEST is empty (no completed workflows to verify)
+    if [ -z "$LATEST" ]; then
+        echo -e "${YELLOW}⚠️  No completed workflows found to verify${NC}"
+        echo ""
+        echo -e "${YELLOW}This could mean:${NC}"
+        echo -e "${YELLOW}  - No workflows have run yet${NC}"
+        echo -e "${YELLOW}  - Workflows are disabled${NC}"
+        echo -e "${YELLOW}  - Repository is new and hasn't triggered CI/CD${NC}"
+        echo ""
+        echo -e "${RED}❌ Cannot verify CI/CD status - aborting for safety${NC}"
+        echo ""
+        echo -e "${YELLOW}To proceed, you must:${NC}"
+        echo -e "${YELLOW}  1. Ensure CI/CD workflows are enabled${NC}"
+        echo -e "${YELLOW}  2. Trigger a workflow (push a commit or create a PR)${NC}"
+        echo -e "${YELLOW}  3. Wait for at least one workflow to complete${NC}"
+        echo -e "${YELLOW}  4. Run this script again${NC}"
+        exit 1
+    fi
+
     ALL_SUCCESS=true
     while IFS= read -r line; do
         CONCLUSION=$(echo "$line" | grep -o '"conclusion":"[^"]*"' | cut -d'"' -f4)

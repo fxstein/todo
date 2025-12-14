@@ -9,9 +9,70 @@
 - [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
   > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
-  - [ ] **#163.35** Release phase: Final release of Python version with migration support `#release`
-  - [ ] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release`
-    - [ ] **#163.34.1** Publish to PyPI `#release`
+  - [ ] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release`
+    - [ ] **#163.45.6** Final release: Update installation instructions and migration guide `#docs`
+    - [ ] **#163.45.5** Final release: Publish final release to PyPI with migration support `#release`
+    - [ ] **#163.45.4** Final release: Finalize migration support and documentation `#release`
+    - [ ] **#163.45.3** Beta/Pre-release: Conduct real user testing and collect feedback `#release`
+    - [ ] **#163.45.2** Beta/Pre-release: Publish to PyPI as pre-release version `#release`
+    - [ ] **#163.45.1** Beta/Pre-release: Create beta/pre-release for testing with real users `#release`
+  - [ ] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script `#test`
+    - [ ] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested `#test`
+    - [ ] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop `#test`
+    - [ ] **#163.44.4** Test all commands with dedicated test TODO.md dataset - Ensure Python version produces identical results to shell version `#test`
+    - [ ] **#163.44.3** Re-run feature parity validation - Compare Python version output with shell version (side-by-side testing) `#test`
+    - [ ] **#163.44.2** Add integration tests for all new MCP tools - Verify each tool works correctly `#test`
+    - [ ] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly `#test`
+  - [ ] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands `#code`
+    - [ ] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format `#test`
+    - [ ] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool `#code`
+    - [ ] **#163.43.6** Add MCP tools for Phase 6 commands - show_config, detect_coordination, setup_coordination, switch_mode `#code`
+    - [ ] **#163.43.5** Add MCP tools for Phase 5 commands - view_log, update_tool, list_backups, rollback `#code`
+    - [ ] **#163.43.4** Add MCP tools for Phase 4 commands - lint_todo, reformat_todo, resolve_conflicts `#code`
+    - [ ] **#163.43.3** Add MCP tools for Phase 3 commands - show_task, relate_task `#code`
+    - [ ] **#163.43.2** Add MCP tools for Phase 2 commands - add_note, delete_note, update_note `#code`
+    - [ ] **#163.43.1** Add MCP tools for Phase 1 commands - modify_task, delete_task, archive_task, restore_task, undo_task `#code`
+  - [ ] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands `#code`
+    - [ ] **#163.42.3** Implement version command - Show version information `#code`
+    - [ ] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options) `#code`
+    - [ ] **#163.42.1** Implement report-bug command - Report bugs to GitHub Issues (with duplicate detection) `#code`
+  - [ ] **#163.41** Phase 6: Configuration and Setup - Implement config, detect-coordination, setup-coordination, setup, switch-mode, list-mode-backups, rollback-mode commands `#code`
+    - [ ] **#163.41.8** Implement mode switch backup system - Create backups before mode switches `#code`
+    - [ ] **#163.41.7** Implement rollback-mode command - Rollback from mode switch backup `#code`
+    - [ ] **#163.41.6** Implement list-mode-backups command - List mode switch backups `#code`
+    - [ ] **#163.41.5** Implement switch-mode command - Switch numbering mode (single-user, multi-user, branch, enhanced) with --force and --renumber options `#code`
+    - [ ] **#163.41.4** Implement setup command - Interactive setup wizard for mode and coordination `#code`
+    - [ ] **#163.41.3** Implement setup-coordination command - Set up coordination service (github-issues, counterapi) `#code`
+    - [ ] **#163.41.2** Implement detect-coordination command - Detect available coordination options based on system `#code`
+    - [ ] **#163.41.1** Implement config command - Show current configuration `#code`
+  - [ ] **#163.40** Phase 5: System Operations - Implement log, update, backups, rollback commands `#code`
+    - [ ] **#163.40.5** Implement backup system - Create backups before major operations `#code`
+    - [ ] **#163.40.4** Implement rollback command - Rollback to previous version (by index or timestamp) `#code`
+    - [ ] **#163.40.3** Implement backups command - List available backup versions `#code`
+    - [ ] **#163.40.2** Implement update command - Update todo.ai to latest version `#code`
+    - [ ] **#163.40.1** Implement log command - View TODO operation log (with --filter and --lines options) `#code`
+  - [ ] **#163.39** Phase 4: File Operations - Implement lint, reformat, resolve-conflicts, edit commands `#code`
+    - [ ] **#163.39.4** Implement edit command - Open TODO.md in editor `#code`
+    - [ ] **#163.39.3** Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option) `#code`
+    - [ ] **#163.39.2** Implement --reformat command - Apply formatting fixes (with --dry-run option) `#code`
+    - [ ] **#163.39.1** Implement --lint command - Identify formatting issues (indentation, checkboxes) `#code`
+  - [ ] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands `#code`
+    - [ ] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks `#code`
+    - [ ] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of) `#code`
+    - [ ] **#163.38.1** Implement show command - Display task with subtasks, relationships, and notes `#code`
+  - [ ] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands `#code`
+    - [ ] **#163.37.3** Implement update-note command - Replace existing notes with new text `#code`
+    - [ ] **#163.37.2** Implement delete-note command - Delete all notes from a task `#code`
+    - [ ] **#163.37.1** Implement note command - Add note to task (blockquote format) `#code`
+  - [ ] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands `#code`
+    - [ ] **#163.36.8** Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations `#code`
+    - [ ] **#163.36.7** Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10) `#code`
+    - [ ] **#163.36.6** Add bulk operations support - Complete/delete/archive multiple tasks at once `#code`
+    - [ ] **#163.36.5** Implement undo command - Reopen completed task `#code`
+    - [ ] **#163.36.4** Implement restore command - Move task from Deleted/Recently Completed back to Tasks section `#code`
+    - [ ] **#163.36.3** Implement archive command - Move task to Recently Completed section (not just mark as archived) `#code`
+    - [ ] **#163.36.2** Implement delete command - Move task to Deleted section (not just mark as deleted) `#code`
+    - [ ] **#163.36.1** Implement modify command - Update task description and tags `#code`
   - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list) `#code`
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
   - [x] **#163.32** Maintenance phase: Ensure existing shell script continues working during development `#code`
@@ -651,6 +712,9 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-14, expires 2026-01-13)
+    - [D] **#163.34.1** Publish to PyPI `#release` (deleted 2025-12-14, expires 2026-01-13)
+  - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
 - [D] #163 Test task for complete fix `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#159** Test task with fixed serial logic (deleted 2025-11-15, expires 2025-12-15)
@@ -764,6 +828,6 @@
 
 ---
 
-**Last Updated:** Sun Dec 14 23:17:45 CET 2025
+**Last Updated:** Sun Dec 14 23:26:03 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

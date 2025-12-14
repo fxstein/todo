@@ -1,8 +1,10 @@
-import pytest
 import shutil
 from pathlib import Path
 
+import pytest
+
 TEST_DATA_DIR = Path(__file__).parent / "integration" / "test_data"
+
 
 @pytest.fixture
 def test_env(tmp_path):
@@ -21,9 +23,8 @@ def test_env(tmp_path):
     # Copy files
     if src_todo.exists():
         shutil.copy2(src_todo, dest_todo)
-    
+
     if src_config_dir.exists():
         shutil.copytree(src_config_dir, dest_config_dir)
 
     return tmp_path
-

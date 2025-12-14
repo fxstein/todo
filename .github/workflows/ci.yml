@@ -55,6 +55,10 @@ jobs:
             **/*.md
             !node_modules/**
             !.git/**
+            !.venv/**
+            !**/site-packages/**
+            !**/dist-info/**
+            !**/dist/**
         continue-on-error: true
 
       - name: Run pre-commit checks

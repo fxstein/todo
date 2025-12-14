@@ -131,7 +131,7 @@ class CoordinationManager:
         except subprocess.CalledProcessError:
             return "main"
 
-    def get_next_task_id(self, task_manager) -> str:
+    def get_next_task_id(self, task_manager, file_ops=None) -> str:
         """
         Get next task ID for a new task.
         Wrapper around generate_next_task_id that extracts current_max and stored_serial from TaskManager.
@@ -157,8 +157,12 @@ class CoordinationManager:
                 pass
 
         # Get stored serial from file
-        # This would need FileOps, but for now we'll use current_max
-        stored_serial = current_max
+        if file_ops is None:
+            # Try to get from task_manager if it has file_ops reference
+            # Otherwise default to current_max
+            stored_serial = current_max
+        else:
+            stored_serial = file_ops.get_serial()
 
         return self.generate_next_task_id(current_max, stored_serial)
 

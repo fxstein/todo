@@ -58,11 +58,24 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
     config = Config(str(config_path))
     coord_manager = CoordinationManager(config)
-    new_id = coord_manager.get_next_task_id(manager)
+    new_id = coord_manager.get_next_task_id(manager, file_ops)
 
     # Create task
     task = manager.add_task(description, tags, task_id=new_id)
     save_changes(manager, todo_path)
+
+    # Update serial file with new task ID
+    # Extract numeric part from task ID
+    task_id_num = new_id
+    if "-" in task_id_num:
+        task_id_num = task_id_num.split("-")[-1]
+    if "." in task_id_num:
+        task_id_num = task_id_num.split(".")[0]
+    try:
+        serial_value = int(task_id_num)
+        file_ops.set_serial(serial_value)
+    except ValueError:
+        pass
 
     # Format output with tags
     tag_str = " ".join([f"`#{tag}`" for tag in sorted(task.tags)]) if task.tags else ""
@@ -76,7 +89,9 @@ def add_subtask_command(
     parent_id: str, description: str, tags: list[str], todo_path: str = "TODO.md"
 ):
     """Add a subtask to an existing task."""
-    manager = get_manager(todo_path)
+    file_ops = FileOps(todo_path)
+    tasks = file_ops.read_tasks()
+    manager = TaskManager(tasks)
     try:
         parent = manager.get_task(parent_id)
         if not parent:
@@ -150,18 +165,20 @@ def complete_command(task_ids: list[str], with_subtasks: bool = False, todo_path
     # Expand task IDs (ranges, with-subtasks, etc.)
     expanded_ids = expand_task_ids(task_ids, with_subtasks, todo_path)
 
-    completed_count = 0
+    completed_tasks = []
     for task_id in expanded_ids:
         try:
             task = manager.complete_task(task_id)
             if task:
-                completed_count += 1
+                completed_tasks.append(task)
         except ValueError as e:
             print(f"Error: {e}")
 
-    if completed_count > 0:
+    if completed_tasks:
         save_changes(manager, todo_path)
-        print(f"Marked {completed_count} task(s) as completed")
+        # Output format: "Completed: #X Task Description" for each task
+        for task in completed_tasks:
+            print(f"Completed: #{task.id} {task.description}")
 
 
 def modify_command(

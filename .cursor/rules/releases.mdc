@@ -2,29 +2,656 @@
 description: "Release process for todo.ai development"
 alwaysApply: true
 ---
+# todo.ai Release Process
+
+## CRITICAL: Two-Phase Process with Human Gate
+
+**The release process has TWO separate phases with a mandatory human review between them:**
+
+### Phase 1: PREPARE (AI does this)
+When user says "prepare release":
+1. Check CI/CD status
+2. Write AI summary
+3. Run `./release/release.sh --prepare`
+4. **STOP and wait for human**
+
+### Phase 2: EXECUTE (AI does this ONLY when told)
+When user says "execute release":
+1. Run `./release/release.sh --execute`
+2. Report success
+
+**⚠️ NEVER skip the human review gate between prepare and execute.**
+**⚠️ NEVER automatically execute after prepare - ALWAYS wait for explicit "execute" command.**
+
+---
+
 When the user says "Release todo.ai" or similar:
 
-1. **Generate a human-readable release summary** by analyzing commits since the last release
-   - Review the commit messages to understand the changes
-   - Write a 2-3 paragraph summary highlighting the key improvements, new features, and important changes
-   - Focus on user-facing benefits and notable improvements
-   - Optionally include commit links: `([hash](https://github.com/user/repo/commit/fullhash))` when referencing specific commits
-   - Get the repo URL: `git remote get-url origin` and convert SSH to HTTPS if needed
-   - **Save to `release/RELEASE_SUMMARY.md`** - This is the ONLY source of truth for release notes
+## CRITICAL: Python Environment Management
 
-2. **Prepare release (default):** `./release/release.sh --prepare --summary release/RELEASE_SUMMARY.md`
-   - Analyzes commits since last release
-   - Determines version bump type (major/minor/patch) based on commit messages
-   - Generates preview from RELEASE_SUMMARY.md
-   - Saves state for execution
-   - **You can edit RELEASE_SUMMARY.md after this step** - changes will be included in release
+**THIS PROJECT USES uv FOR PACKAGE MANAGEMENT:**
 
-3. **Execute release:** Run the command shown by prepare step: `./release/release.sh --execute`
-   - Regenerates release notes from current RELEASE_SUMMARY.md (ensuring latest edits are included)
-   - Updates version in todo.ai
-   - Commits, tags, and pushes to GitHub
-   - Creates GitHub release with regenerated notes
-   - No prompts or manual input required
+### Rules for AI Agents:
 
-**CRITICAL:** `release/RELEASE_SUMMARY.md` is the single source of truth - any edits before execute are automatically included.
+1. **ALWAYS use `uv` for package operations**
+   - ❌ NEVER run: `pip install <package>`
+   - ✅ PREFER: `uv sync --frozen --extra dev` for installing project dependencies (enforces lockfile)
+   - ✅ ALTERNATIVE: `uv pip install <package>` for installing individual tools/packages
+   - ❌ NEVER run: `python -m pytest` (uses system Python)
+   - ✅ ALWAYS run: `uv run pytest` (uses project venv automatically)
+   - ❌ NEVER run: `python3 -m venv .venv`
+   - ✅ ALWAYS run: `uv venv` to create virtual environment
 
+   **Dependency Installation Priority:**
+   - **For project dependencies (from pyproject.toml):** Use `uv sync --frozen --extra dev` (strict lockfile enforcement)
+   - **For CI/CD workflows:** ALWAYS use `uv sync --frozen --extra dev` (never `uv pip install -e ".[dev]"`)
+   - **For installing tools (bandit, safety, etc.):** Use `uv pip install <tool>` (acceptable for one-off tools)
+
+2. **Check uv is available before operations**
+   ```bash
+   if ! command -v uv &> /dev/null; then
+       echo "ERROR: uv not found!"
+       echo "Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
+       exit 1
+   fi
+   ```
+
+3. **Check venv exists before operations**
+   ```bash
+   if [[ ! -d .venv ]]; then
+       echo "ERROR: Virtual environment not found!"
+       echo "Run: ./setup.sh"
+       exit 1
+   fi
+   ```
+
+4. **Pre-commit hooks work with uv venv**
+   - `.pre-commit-config.yaml` uses `.venv/bin/python` paths
+   - No manual venv activation needed for commits
+   - If pre-commit fails with import errors, venv is broken - rebuild with `./setup.sh`
+
+5. **If you need to install a package for testing:**
+   ```bash
+   # For project dependencies (from pyproject.toml/uv.lock):
+   uv sync --frozen --extra dev  # Preferred - enforces lockfile
+
+   # For one-off tools or packages not in lockfile:
+   uv pip install <package>  # Acceptable for tools like bandit, safety
+
+   # NEVER:
+   pip install <package>     # Wrong! Bypasses uv
+   ```
+
+6. **Use `uv run` for all commands**
+   - ✅ `uv run pytest` - runs pytest in project venv
+   - ✅ `uv run ruff check .` - runs ruff in project venv
+   - ✅ `uv run mypy todo_ai` - runs mypy in project venv
+   - ✅ `uv run python -m build` - runs build in project venv
+   - No need to activate venv manually when using `uv run`
+
+**Why this matters:**
+- uv provides faster, more reliable package management
+- uv run automatically uses the project's venv
+- Eliminates manual venv activation steps
+- Ensures consistent environment across all operations
+
+---
+
+## Step 0: MANDATORY CI/CD Check (ALWAYS DO THIS FIRST)
+
+**BEFORE STARTING ANY RELEASE - CHECK CI/CD STATUS:**
+
+```bash
+./scripts/wait-for-ci.sh
+```
+
+**If the script doesn't exist, use GitHub CLI directly:**
+```bash
+# Check latest workflow run status
+gh run list --limit 1 --json status,conclusion --jq '.[0] | "\(.status) - \(.conclusion)"'
+
+# Wait for workflows to complete (if any are running)
+gh run watch
+```
+
+**This check will:**
+- Verify all active workflows are passing
+- Wait for completion if workflows are running
+- Report success or failure with clean output
+- Exit with appropriate status code
+
+**If CI/CD is failing (exit code 1 or failed status):**
+- **STOP IMMEDIATELY** - Do NOT start release preparation
+- Politely inform user: "CI/CD is currently failing. Cannot proceed with release until all checks pass."
+- Ask user to check: `gh run list --limit 5`
+- Ask user to fix CI/CD errors first
+- Wait for user confirmation that CI/CD is fixed before proceeding
+
+**Only proceed if:**
+- CI/CD checks pass (exit code 0 or success status)
+
+**During release preparation (after any commits):**
+- Run CI/CD check again to wait for workflows
+- If it fails: STOP and report
+- Never proceed while CI/CD is failing
+
+**NEVER:**
+- Bypass CI/CD failures with manual workarounds
+- Proceed with release if CI/CD is failing
+- Use `--no-verify` on release-related commits
+- Ignore or work around GitHub Actions errors
+
+**Why this matters:**
+- CI/CD failures indicate code quality issues
+- Releasing broken code to PyPI is irreversible
+- Users depend on package quality
+- Automated tests are the last line of defense
+
+---
+
+## CRITICAL: Error Handling During Releases
+
+**ZERO TOLERANCE FOR ERRORS DURING RELEASE PROCESS**
+
+### Rule: STOP on ANY Error
+
+Once a release process has started (from Step 1 onwards), **EVERY ERROR MUST STOP THE PROCESS IMMEDIATELY**.
+
+**When an error occurs:**
+
+1. **STOP** - Do NOT continue with workarounds
+2. **REPORT** - Clearly communicate:
+   - What command failed
+   - What the error message says
+   - What step of the release process you were in
+3. **DISCUSS** - Ask user: "An error occurred during release. How should we proceed?"
+4. **WAIT** - Do NOT make assumptions or try fixes without approval
+
+### What Counts as an Error
+
+**Examples of errors that MUST stop the process:**
+- `pyenv: version 'X.Y' is not installed`
+- `No module named 'build'`
+- `pre-commit hook failed`
+- `gh: command not found`
+- `git push` failed
+- Package build failed
+- Any Python exception or traceback
+- Any non-zero exit code from release commands
+- CI/CD workflow failures after commits
+
+### What NOT to Do
+
+**NEVER:**
+- Work around errors with manual commands
+- Skip steps to "fix it later"
+- Use alternative methods without discussion
+- Modify files manually to bypass issues
+- Continue hoping "it will work out"
+- Create manual GitHub releases
+- Upload to PyPI manually
+- Force push without approval
+
+### What TO Do
+
+**ALWAYS:**
+- Report the error immediately and clearly
+- Stop all release activities
+- Explain what the error means
+- Propose systematic fixes (not workarounds)
+- Wait for user approval before implementing fixes
+- Document the error and fix in task notes
+- Verify fix works before retrying release
+
+### Example Error Response
+
+**Bad Response:**
+```
+Error: pyenv version not found. Let me work around this...
+[proceeds to manually build package]
+```
+
+**Good Response:**
+```
+❌ ERROR: Release process stopped
+
+Command failed: python3 -m build
+Error: pyenv: version '3.12' is not installed
+
+This error occurred during Step 4 (Execute Release).
+
+Root cause: System doesn't have Python 3.12 installed.
+
+We need to fix this before continuing the release. Options:
+A) Install Python 3.12: pyenv install 3.12
+B) Cancel release and create task to fix environment
+
+How would you like to proceed?
+```
+
+### Recovery Process
+
+If release is stopped due to errors:
+
+1. **Document**: Create task for fixing the error properly
+2. **Rollback**: If needed, rollback any partial release state
+3. **Fix**: Address root cause systematically
+4. **Test**: Verify fix with dry-run
+5. **Retry**: Start fresh release attempt
+
+**Remember: A delayed release is better than a broken release.**
+
+---
+
+## Step 1: Generate AI Release Summary
+
+- Review commit messages to understand changes since last release
+- Write 2-3 paragraph summary highlighting key improvements
+- Focus on user-facing benefits and why this release matters
+- Keep it human-readable (no commit lists, no technical jargon)
+- **CRITICAL: DO NOT include any headers (no `#` markdown headers)**
+- The release script will automatically generate the title header
+- Save to `release/AI_RELEASE_SUMMARY.md`
+
+### Example AI Summary (NO HEADERS)
+
+```markdown
+This release introduces comprehensive task management improvements and enhanced
+AI agent integration. The tool now provides better coordination support for
+multi-user environments and improved error handling throughout the codebase.
+
+Key improvements include a modern Python package structure with CLI and MCP
+interfaces, comprehensive test coverage, and seamless integration with GitHub
+for coordination. The tool maintains backward compatibility with the legacy
+shell script while providing a more robust foundation for future development.
+
+Users can now benefit from faster dependency management with uv, automated
+CI/CD workflows, and improved reliability across all operating systems.
+```
+
+**Note:** The script will prepend `# todo.ai vX.Y.Z` as the H1 header automatically.
+
+## Step 2: Prepare Release
+
+```bash
+./release/release.sh --prepare
+```
+
+**What it does:**
+- Analyzes commits since last release
+- Determines version bump (major/minor/patch) automatically
+- Reads AI summary from `release/AI_RELEASE_SUMMARY.md` (if using two-file system) or `release/RELEASE_SUMMARY.md` (if using single-file system)
+- Generates complete release notes in `release/RELEASE_NOTES.md` (summary + categorized commits)
+- Displays preview and saves prepare state
+
+**Output:**
+- `release/RELEASE_NOTES.md` (complete release notes - **THIS IS WHAT GETS REVIEWED**)
+- `release/.prepare_state` (metadata for execute step)
+
+**⚠️ CRITICAL: STOP HERE AND WAIT FOR HUMAN**
+
+**After this step:**
+- **STOP IMMEDIATELY** - Do NOT proceed to execute
+- Show the user what version was detected
+- Show the user the release notes location
+- **WAIT** for explicit human instruction to:
+  - Execute the release (`--execute`)
+  - Change the version (`--set-version X.Y.Z`)
+  - Cancel/edit manually
+
+**NEVER automatically execute after prepare.**
+
+## Step 3: Review & Edit Release Notes (IMPORTANT)
+
+**CRITICAL: Between prepare and execute, the human can/should:**
+1. Edit the generated release notes
+2. Override the version number if desired
+
+### Where Are the Notes?
+
+**TWO files are used in the release process:**
+
+1. **`release/AI_RELEASE_SUMMARY.md`** - AI-written summary (Step 1)
+   - Written by AI in Step 1
+   - Just the 2-3 paragraph summary, no commits
+   - Can be edited before running prepare
+   - Input to the prepare process
+
+2. **`release/RELEASE_NOTES.md`** - Complete release notes (Step 2)
+   - Generated by prepare script
+   - Contains: AI summary + categorized commits
+   - **THIS IS THE FILE TO REVIEW/EDIT** before execute
+
+**Note:** If using single-file system (`RELEASE_SUMMARY.md`), that file serves both purposes and can be edited after prepare.
+
+### How to Edit
+
+**Option 1: Edit AI Summary Before Prepare**
+```bash
+# Edit the AI-written summary before running prepare
+vim release/AI_RELEASE_SUMMARY.md
+./release/release.sh --prepare
+```
+
+**Option 2: Edit Release Notes After Prepare (RECOMMENDED)**
+```bash
+# Edit the complete release notes after prepare
+vim release/RELEASE_NOTES.md
+./release/release.sh --execute
+```
+
+**Option 3: Override Version Number**
+
+If the human wants a specific version (e.g., "This should be 1.0.0"):
+
+```bash
+./release/release.sh --set-version 1.0.0
+# Then execute
+./release/release.sh --execute
+```
+
+**Natural Language Triggers:**
+- "change version to 1.0.0"
+- "make this version 2.0.0"
+- "set version to 1.5.0"
+- "this should be version 1.0.0"
+
+**What it does:**
+- Validates format (X.Y.Z)
+- Validates new version > current version
+- Updates prepare state
+- Updates release/RELEASE_NOTES.md header
+- Logs the override
+
+### Common Edits
+
+- Remove commits that shouldn't be in release notes
+- Regroup commits into different categories
+- Rewrite commit messages for clarity
+- Add context or explanations
+- Improve AI summary wording
+
+## Step 4: Execute Release
+
+```bash
+./release/release.sh --execute
+```
+
+**What it does:**
+1. Updates version in `pyproject.toml`, `todo.ai`, and `todo_ai/__init__.py`
+2. Builds Python package (`uv run python -m build`)
+3. Commits version changes and release notes
+4. Creates git tag `vX.Y.Z`
+5. Pushes tag and main branch to GitHub
+6. **GitHub Actions takes over:**
+   - Runs full test suite
+   - Publishes to PyPI (currently using token-based auth)
+   - Creates GitHub release with wheel/sdist artifacts
+7. Cleans up working files
+8. Commits release log
+
+**Result:** Release is initiated, GitHub Actions completes publishing
+
+---
+
+## Complete Workflow Example
+
+```bash
+# 1. AI writes summary
+# (AI creates release/AI_RELEASE_SUMMARY.md with 2-3 paragraphs)
+
+# 2. AI commits the summary immediately (NO VERSION NUMBER YET!)
+git add release/AI_RELEASE_SUMMARY.md
+git commit -m "chore: add AI release summary"
+git push
+
+# 3. AI runs prepare (within 60 seconds of commit)
+#    This determines the version number automatically
+./release/release.sh --prepare
+# (Reads AI summary, adds commits, writes release/RELEASE_NOTES.md)
+
+# 4. Human reviews and optionally edits release notes
+vim release/RELEASE_NOTES.md  # THIS is the file to edit!
+
+# Optional: Override version
+./release/release.sh --set-version 1.0.0
+
+# 5. Human instructs AI to execute
+./release/release.sh --execute
+# (Updates version, builds, tags, pushes - GitHub Actions publishes)
+```
+
+---
+
+## Key GitHub Actions Integration
+
+**CRITICAL:**
+- todo.ai does **NOT** publish to PyPI directly from release.sh
+- Instead, pushing the tag triggers GitHub Actions workflow (`.github/workflows/release.yml`)
+- GitHub Actions currently uses **token-based publishing** (can be upgraded to trusted publishing)
+- This ensures:
+  - Tests run before publishing
+  - Secure publishing without local credentials
+  - Consistent CI/CD process
+
+**Workflow after execute:**
+1. `release.sh --execute` pushes tag `vX.Y.Z`
+2. GitHub Actions `release.yml` is triggered by tag push
+3. GitHub Actions builds package
+4. GitHub Actions runs tests
+5. GitHub Actions publishes to PyPI (token-based auth)
+6. GitHub Actions creates GitHub release with wheel and sdist
+
+**Monitor release:**
+- GitHub Actions: https://github.com/fxstein/todo.ai/actions
+- PyPI (when complete): https://pypi.org/project/todo-ai/
+- GitHub Releases: https://github.com/fxstein/todo.ai/releases
+
+---
+
+## Safeguards
+
+**❌ NEVER DO THIS:**
+- Do NOT modify `release/release.sh` logic to filter commits
+- Do NOT add skip conditions to the release script
+- Do NOT change the release process code
+- Do NOT attempt to publish to PyPI manually (GitHub Actions does this)
+- Do NOT push tags manually (use the script)
+
+**✅ ALWAYS DO THIS:**
+- ALWAYS create AI summary in `release/AI_RELEASE_SUMMARY.md` first (or `release/RELEASE_SUMMARY.md` if using single-file system)
+- ALWAYS commit the AI summary immediately after creating it
+- ALWAYS run prepare within 60 seconds of committing the AI summary (if using two-file system)
+- ALWAYS run prepare before execute
+- ALWAYS wait for human review before execute
+- ALWAYS let the human edit `release/RELEASE_NOTES.md` if they want
+- ALWAYS verify GitHub CLI is authenticated (`gh auth status`)
+- ALWAYS check build dependencies are installed (`uv run python -m build` works, or run `uv sync --extra dev` to install all dependencies)
+
+**Editing release notes is MANUAL TEXT EDITING, not code changes.**
+
+---
+
+## Error Handling
+
+### Common Issues
+
+**Error: "Release not prepared"**
+- Solution: Run `./release/release.sh --prepare` first
+
+**Error: "Uncommitted changes detected"**
+- Solution: Commit or stash all changes before releasing
+- Exception: Release working files are automatically excluded
+
+**Error: "Invalid version format"**
+- Solution: Use X.Y.Z format (e.g., 1.0.0, 0.2.5)
+
+**Error: "New version must be greater than current"**
+- Solution: Ensure new version > current version
+
+**Error: "Package build failed"**
+- Solution: Ensure dependencies are installed: `uv sync --extra dev` (preferred) or `uv pip install build`
+- Or run: `./setup.sh` to install all dev dependencies
+- Check pyproject.toml is valid
+
+**Error: "gh not authenticated"**
+- Solution: Run `gh auth login`
+
+---
+
+## Version Numbering
+
+todo.ai uses [Semantic Versioning](https://semver.org/):
+
+### Automatic Detection
+
+The script analyzes commit messages:
+
+```bash
+# MAJOR bump triggers (X.0.0)
+feat!: ...          # Breaking feature
+fix!: ...           # Breaking fix
+BREAKING CHANGE:    # Explicit breaking change
+
+# MINOR bump triggers (0.X.0)
+feat: ...           # New feature
+feature: ...        # New feature (alt)
+
+# PATCH bump triggers (0.0.X)
+fix: ...            # Bug fix
+chore: ...          # Maintenance
+docs: ...           # Documentation
+refactor: ...       # Code refactoring
+```
+
+### Manual Override
+
+If automatic detection doesn't match your intent:
+
+```bash
+./release/release.sh --set-version 1.0.0
+```
+
+---
+
+## Files and Tracking
+
+### What Gets Committed
+
+| File | When | Why |
+|------|------|-----|
+| `release/AI_RELEASE_SUMMARY.md` | During execute | Audit trail: what AI wrote (if using two-file system) |
+| `release/RELEASE_NOTES.md` | During execute | Audit trail: what was reviewed |
+| `release/RELEASE_SUMMARY.md` | During execute | Historical record (if using single-file system) |
+| `release/RELEASE_LOG.log` | After execute | Operational audit log |
+| `pyproject.toml` | During execute | Version updated |
+| `todo.ai` | During execute | Version updated (legacy shell script) |
+| `todo_ai/__init__.py` | During execute | Version updated (Python package) |
+
+### What Gets Deleted
+
+| File | When | Why |
+|------|------|-----|
+| `release/AI_RELEASE_SUMMARY.md` | After execute | Working file, already committed (if using two-file system) |
+| `release/RELEASE_NOTES.md` | After execute | Working file, already committed |
+| `release/.prepare_state` | After execute | Temporary metadata |
+| `dist/` | After execute | Build artifacts |
+| `build/` | After execute | Build cache |
+
+### What's Gitignored
+
+- `dist/`
+- `build/`
+- `*.egg-info/`
+- `release/.prepare_state`
+
+---
+
+## AI Agent Workflow
+
+### When User Says "prepare release" or "prepare todo.ai release"
+
+1. **Check CI/CD Status FIRST:**
+   ```bash
+   ./scripts/wait-for-ci.sh
+   ```
+   Or if script doesn't exist:
+   ```bash
+   gh run list --limit 1 --json status,conclusion --jq '.[0] | "\(.status) - \(.conclusion)"'
+   gh run watch
+   ```
+   - If this fails, **STOP** and tell user to fix CI/CD first
+   - Only proceed if exit code is 0 or status is success
+
+2. **Generate AI Summary:**
+   ```markdown
+   I'll help you prepare the release. First, let me create a release summary.
+
+   [Write 2-3 paragraph summary about what changed and why it matters]
+   [NO HEADERS - just plain paragraphs]
+
+   Saved to: release/AI_RELEASE_SUMMARY.md
+   ```
+
+3. **Commit AI Summary Immediately:**
+   ```bash
+   git add release/AI_RELEASE_SUMMARY.md
+   git commit -m "chore: add AI release summary"
+   git push
+   ```
+   - This keeps the AI summary in version history for easy diffs
+   - Must be done BEFORE running --prepare (within 60 seconds if using two-file system)
+   - DO NOT include version number - it's not determined yet!
+
+4. **Run Prepare:**
+   ```bash
+   ./release/release.sh --prepare
+   ```
+
+5. **STOP AND SHOW PREVIEW:**
+   ```markdown
+   ✅ Release prepared successfully!
+
+   - Current version: 3.0.0
+   - Proposed version: 3.0.1 (patch)
+   - Release notes: release/RELEASE_NOTES.md
+
+   What would you like to do?
+   - Review the release notes in release/RELEASE_NOTES.md
+   - Tell me "execute release" when ready
+   - Tell me "set version to X.Y.Z" if you want to change it
+   ```
+
+6. **⚠️ STOP HERE - WAIT FOR USER TO SAY:**
+   - "execute release" → Then run `./release/release.sh --execute`
+   - "set version to X.Y.Z" → Then run `./release/release.sh --set-version X.Y.Z`
+   - Any other instruction
+
+**NEVER proceed to execute automatically - ALWAYS wait for explicit instruction.**
+
+### When User Says "execute release" (ONLY after prepare)
+
+1. **Run Execute:**
+   ```bash
+   ./release/release.sh --execute
+   ```
+
+2. **Report Success:**
+   ```markdown
+   ✅ Release v3.0.1 initiated successfully!
+
+   GitHub Actions is now:
+   - Building and testing the package
+   - Publishing to PyPI (token-based auth)
+   - Creating GitHub release
+
+   Monitor progress:
+   - GitHub Actions: https://github.com/fxstein/todo.ai/actions
+   - PyPI (when complete): https://pypi.org/project/todo-ai/
+   - GitHub Release: https://github.com/fxstein/todo.ai/releases
+   ```
+
+---
+
+**Remember: Release notes editing = text editing, NOT code changes.**
+**GitHub Actions handles PyPI publishing automatically.**

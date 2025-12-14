@@ -3,11 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd`
+- [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd`
   > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
-  - [ ] **#167.9** Phase 3.3: Add documentation automation `#cicd`
-  - [ ] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd`
-  - [ ] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd`
+  - [x] **#167.9** Phase 3.3: Add documentation automation `#cicd`
+  - [x] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd`
+  - [x] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd`
   - [x] **#167.6** Phase 2.3: Integrate automated release process with release.sh `#cicd`
     > Integration complete: release.sh creates GitHub release with shell assets and release notes. GitHub Actions workflow (triggered by tag push) builds Python package, publishes to PyPI, and attaches dist files to existing release. Clean separation of concerns achieved.
     > Release workflow (.github/workflows/release.yml) created but needs integration with existing release/release.sh process. Consider: (1) Have release.sh trigger workflow, (2) Replace release.sh with workflow, or (3) Keep both with different purposes.
@@ -763,6 +763,6 @@
 
 ---
 
-**Last Updated:** Sun Dec 14 21:55:47 CET 2025
+**Last Updated:** Sun Dec 14 22:10:21 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

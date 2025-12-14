@@ -4,17 +4,32 @@ from todo_ai.cli.commands import (
     add_command,
     add_subtask_command,
     archive_command,
+    backups_command,
     complete_command,
+    config_command,
     delete_command,
     delete_note_command,
+    detect_coordination_tool_command,
+    edit_command,
+    lint_command,
     list_command,
+    list_mode_backups_tool_command,
+    log_command,
     modify_command,
     note_command,
+    reformat_command,
     relate_command,
+    resolve_conflicts_command,
     restore_command,
+    rollback_mode_tool_command,
+    rollback_tool_command,
+    setup_coordination_tool_command,
+    setup_wizard_tool_command,
     show_command,
+    switch_mode_tool_command,
     undo_command,
     update_note_command,
+    update_tool_command,
 )
 
 
@@ -86,11 +101,10 @@ def delete(ctx, task_ids, with_subtasks):
 @cli.command()
 @click.argument("task_ids", nargs=-1, required=True)
 @click.option("--reason", help="Reason for archiving incomplete tasks")
-@click.option("--with-subtasks", is_flag=True, help="Include subtasks in operation")
 @click.pass_context
-def archive(ctx, task_ids, reason, with_subtasks):
+def archive(ctx, task_ids, reason):
     """Archive task(s) - move to Recently Completed section."""
-    archive_command(list(task_ids), reason, with_subtasks, todo_path=ctx.obj["todo_file"])
+    archive_command(list(task_ids), reason=reason, todo_path=ctx.obj["todo_file"])
 
 
 @cli.command()
@@ -186,6 +200,150 @@ def relate(ctx, task_id, completed_by, depends_on, blocks, related_to, duplicate
         return
 
     relate_command(task_id, rel_type, targets, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.pass_context
+def lint(ctx):
+    """Identify formatting issues (indentation, checkboxes)."""
+    lint_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.option("--dry-run", is_flag=True, help="Preview changes without applying")
+@click.pass_context
+def reformat(ctx, dry_run):
+    """Apply formatting fixes."""
+    reformat_command(dry_run, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("resolve-conflicts")
+@click.option("--dry-run", is_flag=True, help="Preview changes without applying")
+@click.pass_context
+def resolve_conflicts(ctx, dry_run):
+    """Detect and resolve duplicate task IDs."""
+    resolve_conflicts_command(dry_run, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.pass_context
+def edit(ctx):
+    """Open TODO.md in editor."""
+    edit_command(todo_path=ctx.obj["todo_file"])
+
+
+# Phase 5: System Operations
+@cli.command()
+@click.option("--filter", help="Filter log entries by text")
+@click.option("--lines", type=int, help="Number of lines to show")
+@click.pass_context
+def log(ctx, filter, lines):
+    """View TODO operation log."""
+    log_command(filter_text=filter, lines=lines, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+def update():
+    """Update todo.ai to latest version."""
+    update_tool_command()
+
+
+@cli.command("backups")
+@click.pass_context
+def backups(ctx):
+    """List available backup versions."""
+    backups_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("list-backups")
+@click.pass_context
+def list_backups(ctx):
+    """List available backup versions (alias for backups)."""
+    backups_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.argument("target", required=False)
+@click.pass_context
+def rollback(ctx, target):
+    """Rollback to previous version (by index or timestamp)."""
+    rollback_tool_command(target=target, todo_path=ctx.obj["todo_file"])
+
+
+# Phase 6: Configuration and Setup
+@cli.command("config")
+@click.pass_context
+def config(ctx):
+    """Show current configuration."""
+    config_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("show-config")
+@click.pass_context
+def show_config(ctx):
+    """Show current configuration (alias for config)."""
+    config_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("detect-coordination")
+@click.pass_context
+def detect_coordination(ctx):
+    """Detect available coordination options based on system."""
+    detect_coordination_tool_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("detect-options")
+@click.pass_context
+def detect_options(ctx):
+    """Detect available coordination options (alias for detect-coordination)."""
+    detect_coordination_tool_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("setup-coordination")
+@click.argument("coord_type")
+@click.pass_context
+def setup_coordination(ctx, coord_type):
+    """Set up coordination service (github-issues, counterapi)."""
+    setup_coordination_tool_command(coord_type, interactive=True, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("setup")
+@click.pass_context
+def setup(ctx):
+    """Interactive setup wizard for mode and coordination."""
+    setup_wizard_tool_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("setup-wizard")
+@click.pass_context
+def setup_wizard(ctx):
+    """Interactive setup wizard (alias for setup)."""
+    setup_wizard_tool_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("switch-mode")
+@click.argument("mode")
+@click.option("--force", "-f", is_flag=True, help="Force mode switch (skip validation)")
+@click.option("--renumber", is_flag=True, help="Renumber existing tasks to match new mode")
+@click.pass_context
+def switch_mode(ctx, mode, force, renumber):
+    """Switch numbering mode (single-user, multi-user, branch, enhanced)."""
+    switch_mode_tool_command(mode, force=force, renumber=renumber, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("list-mode-backups")
+@click.pass_context
+def list_mode_backups(ctx):
+    """List mode switch backups."""
+    list_mode_backups_tool_command(todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("rollback-mode")
+@click.argument("backup_name")
+@click.pass_context
+def rollback_mode(ctx, backup_name):
+    """Rollback from mode switch backup."""
+    rollback_mode_tool_command(backup_name, todo_path=ctx.obj["todo_file"])
 
 
 if __name__ == "__main__":

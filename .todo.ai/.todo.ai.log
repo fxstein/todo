@@ -2,6 +2,25 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.8 | Implement mode switch backup system - Create backups before mode switches
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.7 | Implement rollback-mode command - Rollback from mode switch backup
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.6 | Implement list-mode-backups command - List mode switch backups
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.5 | Implement switch-mode command - Switch numbering mode (single-user, multi-user, branch, enhanced) with --force and --renumber options
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.4 | Implement setup command - Interactive setup wizard for mode and coordination
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.3 | Implement setup-coordination command - Set up coordination service (github-issues, counterapi)
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.2 | Implement detect-coordination command - Detect available coordination options based on system
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.41.1 | Implement config command - Show current configuration
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.40.5 | Implement backup system - Create backups before major operations
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.40.4 | Implement rollback command - Rollback to previous version (by index or timestamp)
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.40.3 | Implement backups command - List available backup versions
+2025-12-15 00:17:40 | fxstein | COMPLETE | 163.40 | Phase 5: System Operations - Implement log, update, backups, rollback commands
+2025-12-15 00:17:39 | fxstein | COMPLETE | 163.40.2 | Implement update command - Update todo.ai to latest version
+2025-12-15 00:17:39 | fxstein | COMPLETE | 163.40.1 | Implement log command - View TODO operation log (with --filter and --lines options)
+2025-12-15 00:11:11 | fxstein | COMPLETE | 163.39.4 | Implement edit command - Open TODO.md in editor
+2025-12-15 00:11:11 | fxstein | COMPLETE | 163.39.3 | Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option)
+2025-12-15 00:11:10 | fxstein | COMPLETE | 163.39.2 | Implement --reformat command - Apply formatting fixes (with --dry-run option)
+2025-12-15 00:11:10 | fxstein | COMPLETE | 163.39 | Phase 4: File Operations - Implement lint, reformat, resolve-conflicts, edit commands
+2025-12-15 00:11:10 | fxstein | COMPLETE | 163.39.1 | Implement --lint command - Identify formatting issues (indentation, checkboxes)
 2025-12-15 00:05:03 | fxstein | COMPLETE | 163.38.3 | Implement task relationship data model - Store and retrieve relationships between tasks
 2025-12-15 00:05:03 | fxstein | COMPLETE | 163.38.2 | Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of)
 2025-12-15 00:05:03 | fxstein | COMPLETE | 163.38 | Phase 3: Task Display and Relationships - Implement show and relate commands

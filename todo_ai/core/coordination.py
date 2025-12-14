@@ -130,3 +130,79 @@ class CoordinationManager:
             return clean[:7] or "main"
         except subprocess.CalledProcessError:
             return "main"
+
+    def get_next_task_id(self, task_manager) -> str:
+        """
+        Get next task ID for a new task.
+        Wrapper around generate_next_task_id that extracts current_max and stored_serial from TaskManager.
+        """
+
+        # Get current max task ID from manager
+        tasks = task_manager.list_tasks()
+        current_max = 0
+        for task in tasks:
+            # Extract numeric part from task ID
+            task_id = task.id
+            # Remove prefix if present (e.g., "fxstein-50" -> "50")
+            if "-" in task_id:
+                task_id = task_id.split("-")[-1]
+            # Extract base number (e.g., "50.1" -> "50")
+            if "." in task_id:
+                task_id = task_id.split(".")[0]
+            try:
+                num = int(task_id)
+                if num > current_max:
+                    current_max = num
+            except ValueError:
+                pass
+
+        # Get stored serial from file
+        # This would need FileOps, but for now we'll use current_max
+        stored_serial = current_max
+
+        return self.generate_next_task_id(current_max, stored_serial)
+
+    def get_next_subtask_id(self, parent_id: str, task_manager) -> str:
+        """
+        Get next subtask ID for a parent task.
+        """
+        # Get all subtasks of this parent
+        subtasks = task_manager.get_subtasks(parent_id)
+        current_max = 0
+
+        for subtask in subtasks:
+            # Extract subtask number (e.g., "50.3" -> 3, "fxstein-50.3" -> 3)
+            subtask_id = subtask.id
+            # Remove prefix if present
+            if "-" in subtask_id:
+                subtask_id = subtask_id.split("-", 1)[1]
+            # Extract subtask number
+            if "." in subtask_id:
+                subtask_num_str = subtask_id.split(".")[-1]
+                try:
+                    num = int(subtask_num_str)
+                    if num > current_max:
+                        current_max = num
+                except ValueError:
+                    pass
+
+        # Next subtask number
+        next_num = current_max + 1
+
+        # Generate parent's prefix if needed (for multi-user, branch modes)
+        mode = self.get_numbering_mode()
+        if mode == "multi-user":
+            user_id = self._get_github_user_id()
+            # Parent ID might already have prefix, extract base number
+            base_parent = parent_id.split("-")[-1] if "-" in parent_id else parent_id
+            return f"{user_id}-{base_parent}.{next_num}"
+        elif mode == "branch":
+            branch = self._get_branch_name()
+            # Parent ID might already have prefix, extract base number
+            base_parent = parent_id.split("-")[-1] if "-" in parent_id else parent_id
+            return f"{branch}-{base_parent}.{next_num}"
+        else:
+            # Single-user or enhanced - just use parent_id.next_num
+            # Parent ID might have prefix, extract base number
+            base_parent = parent_id.split("-")[-1] if "-" in parent_id else parent_id
+            return f"{base_parent}.{next_num}"

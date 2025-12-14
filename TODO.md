@@ -36,26 +36,26 @@
     - [ ] **#163.42.3** Implement version command - Show version information `#code`
     - [ ] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options) `#code`
     - [ ] **#163.42.1** Implement report-bug command - Report bugs to GitHub Issues (with duplicate detection) `#code`
-  - [ ] **#163.41** Phase 6: Configuration and Setup - Implement config, detect-coordination, setup-coordination, setup, switch-mode, list-mode-backups, rollback-mode commands `#code`
-    - [ ] **#163.41.8** Implement mode switch backup system - Create backups before mode switches `#code`
-    - [ ] **#163.41.7** Implement rollback-mode command - Rollback from mode switch backup `#code`
-    - [ ] **#163.41.6** Implement list-mode-backups command - List mode switch backups `#code`
-    - [ ] **#163.41.5** Implement switch-mode command - Switch numbering mode (single-user, multi-user, branch, enhanced) with --force and --renumber options `#code`
-    - [ ] **#163.41.4** Implement setup command - Interactive setup wizard for mode and coordination `#code`
-    - [ ] **#163.41.3** Implement setup-coordination command - Set up coordination service (github-issues, counterapi) `#code`
-    - [ ] **#163.41.2** Implement detect-coordination command - Detect available coordination options based on system `#code`
-    - [ ] **#163.41.1** Implement config command - Show current configuration `#code`
-  - [ ] **#163.40** Phase 5: System Operations - Implement log, update, backups, rollback commands `#code`
-    - [ ] **#163.40.5** Implement backup system - Create backups before major operations `#code`
-    - [ ] **#163.40.4** Implement rollback command - Rollback to previous version (by index or timestamp) `#code`
-    - [ ] **#163.40.3** Implement backups command - List available backup versions `#code`
-    - [ ] **#163.40.2** Implement update command - Update todo.ai to latest version `#code`
-    - [ ] **#163.40.1** Implement log command - View TODO operation log (with --filter and --lines options) `#code`
-  - [ ] **#163.39** Phase 4: File Operations - Implement lint, reformat, resolve-conflicts, edit commands `#code`
-    - [ ] **#163.39.4** Implement edit command - Open TODO.md in editor `#code`
-    - [ ] **#163.39.3** Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option) `#code`
-    - [ ] **#163.39.2** Implement --reformat command - Apply formatting fixes (with --dry-run option) `#code`
-    - [ ] **#163.39.1** Implement --lint command - Identify formatting issues (indentation, checkboxes) `#code`
+  - [x] **#163.41** Phase 6: Configuration and Setup - Implement config, detect-coordination, setup-coordination, setup, switch-mode, list-mode-backups, rollback-mode commands `#code`
+    - [x] **#163.41.8** Implement mode switch backup system - Create backups before mode switches `#code`
+    - [x] **#163.41.7** Implement rollback-mode command - Rollback from mode switch backup `#code`
+    - [x] **#163.41.6** Implement list-mode-backups command - List mode switch backups `#code`
+    - [x] **#163.41.5** Implement switch-mode command - Switch numbering mode (single-user, multi-user, branch, enhanced) with --force and --renumber options `#code`
+    - [x] **#163.41.4** Implement setup command - Interactive setup wizard for mode and coordination `#code`
+    - [x] **#163.41.3** Implement setup-coordination command - Set up coordination service (github-issues, counterapi) `#code`
+    - [x] **#163.41.2** Implement detect-coordination command - Detect available coordination options based on system `#code`
+    - [x] **#163.41.1** Implement config command - Show current configuration `#code`
+  - [x] **#163.40** Phase 5: System Operations - Implement log, update, backups, rollback commands `#code`
+    - [x] **#163.40.5** Implement backup system - Create backups before major operations `#code`
+    - [x] **#163.40.4** Implement rollback command - Rollback to previous version (by index or timestamp) `#code`
+    - [x] **#163.40.3** Implement backups command - List available backup versions `#code`
+    - [x] **#163.40.2** Implement update command - Update todo.ai to latest version `#code`
+    - [x] **#163.40.1** Implement log command - View TODO operation log (with --filter and --lines options) `#code`
+  - [x] **#163.39** Phase 4: File Operations - Implement lint, reformat, resolve-conflicts, edit commands `#code`
+    - [x] **#163.39.4** Implement edit command - Open TODO.md in editor `#code`
+    - [x] **#163.39.3** Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option) `#code`
+    - [x] **#163.39.2** Implement --reformat command - Apply formatting fixes (with --dry-run option) `#code`
+    - [x] **#163.39.1** Implement --lint command - Identify formatting issues (indentation, checkboxes) `#code`
   - [x] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands `#code`
     - [x] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks `#code`
     - [x] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of) `#code`
@@ -828,6 +828,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 00:05:03 CET 2025
+**Last Updated:** Mon Dec 15 00:17:40 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

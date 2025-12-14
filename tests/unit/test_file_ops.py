@@ -76,8 +76,8 @@ def test_parse_complex_todo(tmp_path):
     assert len(tasks) == 6  # 1, 2, 3, 3.1, 4, 5
 
     t1 = next(t for t in tasks if t.id == "1")
-    assert "#tag1" in t1.description  # Tags kept in text
-    assert "tag1" in t1.tags
+    assert t1.description == "Task 1"  # Tags removed from description
+    assert "tag1" in t1.tags  # Tags stored separately
     assert t1.notes == ["Note 1"]
 
     t3_1 = next(t for t in tasks if t.id == "3.1")

@@ -4,9 +4,10 @@
 This document outlines the current state of the `todo.ai` CI/CD pipeline and provides recommendations to improve performance, reduce resource usage, and accelerate developer feedback loops.
 
 The analysis identified three primary bottlenecks:
+
 1. **Redundant Test Execution**: The full test matrix (9 jobs) runs on every PR.
-1. **Sequential Job Execution**: Linting and testing run in a single serial flow.
-1. **Aggressive Local Hooks**: Local pre-commit hooks run the entire test suite, slowing down the commit process.
+2. **Sequential Job Execution**: Linting and testing run in a single serial flow.
+3. **Aggressive Local Hooks**: Local pre-commit hooks run the entire test suite, slowing down the commit process.
 
 ## Current State Analysis
 
@@ -75,18 +76,18 @@ The analysis identified three primary bottlenecks:
 ## Implementation Plan
 
 1. **Refactor `.github/workflows/ci.yml`**:
-  * Split into `quality` and `test` jobs.
-  * Remove redundant linting steps.
-  * Add conditional logic for the matrix strategy.
-  * Add Python 3.13 and 3.14 to the release matrix.
-1. **Update `.pre-commit-config.yaml`**:
-  * Modify `pytest` entry to target `tests/unit`.
-  * Add `ascii-guard` hook.
-  * Add `todo.ai --lint` hook.
-  * Add `codespell` hook.
-  * Add `detect-secrets` hook.
-1. **Cleanup**:
-  * Remove `scripts/pre-commit-hook.sh`.
+   * Split into `quality` and `test` jobs.
+   * Remove redundant linting steps.
+   * Add conditional logic for the matrix strategy.
+   * Add Python 3.13 and 3.14 to the release matrix.
+2. **Update `.pre-commit-config.yaml`**:
+   * Modify `pytest` entry to target `tests/unit`.
+   * Add `ascii-guard` hook.
+   * Add `todo.ai --lint` hook.
+   * Add `codespell` hook.
+   * Add `detect-secrets` hook.
+3. **Cleanup**:
+   * Remove `scripts/pre-commit-hook.sh`.
 
 ## Next Steps
 Approved for implementation starting with **CI Workflow Refactoring**.

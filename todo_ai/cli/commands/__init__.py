@@ -48,14 +48,36 @@ def save_changes(manager: TaskManager, todo_path: str = "TODO.md") -> None:
     file_ops = _file_ops_cache.get(todo_path)
     if file_ops is None:
         file_ops = FileOps(todo_path)
-        file_ops.read_tasks()  # Read to get relationships
+        file_ops.read_tasks()  # Read to get relationships and original blank line state
+        # Cache it for future operations
+        _file_ops_cache[todo_path] = file_ops
+    else:
+        # Re-read to get latest file state (in case file was modified externally)
+        # This ensures we have the correct original_tasks_header_has_blank_line
+        file_ops.read_tasks()
     tasks = manager.list_tasks()
+    # Always restore original blank line state for normal operations (not add/restore)
+    # This ensures blank lines are preserved across operations
+    if hasattr(file_ops, "original_tasks_header_has_blank_line"):
+        file_ops.tasks_header_has_blank_line = file_ops.original_tasks_header_has_blank_line
+        # Clear override flag for normal operations
+        if hasattr(file_ops, "_blank_line_overridden"):
+            delattr(file_ops, "_blank_line_overridden")
     file_ops.write_tasks(tasks)
 
 
 def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     """Add a new task."""
-    file_ops = FileOps(todo_path)
+    # Use cached file_ops if available, otherwise create new one
+    file_ops = _file_ops_cache.get(todo_path)
+    if file_ops is None:
+        file_ops = FileOps(todo_path)
+        file_ops.read_tasks()
+        _file_ops_cache[todo_path] = file_ops
+    else:
+        # Re-read to get latest state
+        file_ops.read_tasks()
+
     tasks = file_ops.read_tasks()
     # Check if original file had blank line after ## Tasks (will become blank between tasks)
     original_had_blank_after_header = file_ops.tasks_header_has_blank_line
@@ -75,6 +97,7 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     # - Insert directly after ## Tasks (no blank line after header)
     # - But preserve original blank line as blank line between tasks
     file_ops.tasks_header_has_blank_line = False
+    file_ops._blank_line_overridden = True  # Mark as explicitly overridden
     file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
 
     # After writing, if original had blank after header, ensure blank line between first two tasks
@@ -116,8 +139,13 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
                     lines.insert(second_task_idx, "")
                     Path(todo_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    # Cache file_ops for future operations
-    _file_ops_cache[todo_path] = file_ops
+    # Restore original blank line state for future operations
+    # This ensures subsequent operations (modify, complete, undo) preserve blank lines correctly
+    if hasattr(file_ops, "original_tasks_header_has_blank_line"):
+        file_ops.tasks_header_has_blank_line = file_ops.original_tasks_header_has_blank_line
+    # Clear override flag so normal operations work correctly
+    if hasattr(file_ops, "_blank_line_overridden"):
+        delattr(file_ops, "_blank_line_overridden")
 
     # Update serial file with new task ID
     # Extract numeric part from task ID
@@ -335,6 +363,7 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
         # - Insert directly after ## Tasks (no blank line after header)
         # - But preserve original blank line as blank line between tasks
         file_ops.tasks_header_has_blank_line = False
+        file_ops._blank_line_overridden = True  # Mark as explicitly overridden
         file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
 
         # After writing, if original had blank after header, ensure blank line between first two tasks

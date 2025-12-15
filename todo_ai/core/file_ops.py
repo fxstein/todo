@@ -30,6 +30,12 @@ class FileOps:
         self.tasks_header_has_blank_line: bool = (
             False  # Track if original file had blank line after Tasks header
         )
+        self.original_tasks_header_has_blank_line: bool = (
+            False  # Preserve original blank line state (never changes)
+        )
+        self._blank_line_overridden: bool = (
+            False  # Temporary override flag for add/restore operations
+        )
         self.tasks_had_blank_between: bool = (
             False  # Track if original file had blank lines between tasks in Tasks section
         )
@@ -163,6 +169,9 @@ class FileOps:
                     next_line = lines[line_idx + 1]
                     if next_line.strip() == "":
                         self.tasks_header_has_blank_line = True
+                        self.original_tasks_header_has_blank_line = True
+                    else:
+                        self.original_tasks_header_has_blank_line = False
                 # Don't add to header_lines - it's the tasks section header, not a header line
                 # We'll write it separately in _generate_markdown
                 current_section = "Tasks"
@@ -192,9 +201,11 @@ class FileOps:
                             next_line = lines[line_idx + 1]
                             if next_line.strip() == "":
                                 self.tasks_header_has_blank_line = True
+                                self.original_tasks_header_has_blank_line = True
                             # If next line is a task (starts with "- ["), no blank line after header
                             elif next_line.strip().startswith("- ["):
                                 self.tasks_header_has_blank_line = False
+                                self.original_tasks_header_has_blank_line = False
                     current_section = section_name
                     seen_tasks_section = True
                     current_task = None
@@ -431,7 +442,25 @@ class FileOps:
             # BUT: shell restore inserts directly, but preserves existing blank lines between tasks
             # So if we detect no blank line after header but there are multiple tasks,
             # the blank line was between tasks, not after header
-            if self.tasks_header_has_blank_line and active_tasks:
+            # Use original_tasks_header_has_blank_line to preserve across operations
+            # This ensures blank lines are preserved even after add/restore operations
+            # BUT: if tasks_header_has_blank_line was explicitly set to False (e.g., by restore/add),
+            # respect that override (those commands handle blank lines manually)
+            # Only use original if current state is True or if we haven't explicitly overridden it
+            if self.tasks_header_has_blank_line is False and hasattr(
+                self, "_blank_line_overridden"
+            ):
+                # Explicitly overridden to False (restore/add operation) - don't add blank line after header
+                blank_after_header = False
+            elif (
+                hasattr(self, "original_tasks_header_has_blank_line")
+                and self.original_tasks_header_has_blank_line
+            ):
+                # Use original state if it was True
+                blank_after_header = True
+            else:
+                blank_after_header = self.tasks_header_has_blank_line
+            if blank_after_header and active_tasks:
                 # Original had blank line - preserve it
                 lines.append("")
             # If original had no blank line, don't add one (matches shell restore behavior)

@@ -12,10 +12,10 @@ The proposed beta strategy provides a comprehensive plan for introducing pre-rel
 
 ## 2. Strengths & Best Practice Alignment
 
-*   **Standard Compliance:** accurately distinguishes between Git tags (SemVer) and Python packages (PEP 440) with a clear mapping strategy. This is essential for compatibility with the Python tooling ecosystem.
-*   **Release Channels:** The "Alpha (Internal) → Beta (Early Adopters) → RC (Stability) → Stable" pipeline represents a gold standard for robust software delivery.
-*   **Tooling Awareness:** The explicit inclusion of modern Python tooling (`uv`, `pipx`) in installation instructions demonstrates strong user empathy and forward-looking design.
-*   **Risk Management:** The emphasis on "Data Safety" (backups) and defined "Rollback" procedures (yanking, hotfixes) indicates a mature approach to stability.
+* **Standard Compliance:** accurately distinguishes between Git tags (SemVer) and Python packages (PEP 440) with a clear mapping strategy. This is essential for compatibility with the Python tooling ecosystem.
+* **Release Channels:** The "Alpha (Internal) → Beta (Early Adopters) → RC (Stability) → Stable" pipeline represents a gold standard for robust software delivery.
+* **Tooling Awareness:** The explicit inclusion of modern Python tooling (`uv`, `pipx`) in installation instructions demonstrates strong user empathy and forward-looking design.
+* **Risk Management:** The emphasis on "Data Safety" (backups) and defined "Rollback" procedures (yanking, hotfixes) indicates a mature approach to stability.
 
 ## 3. Identified Gaps & Risks
 
@@ -59,11 +59,11 @@ uv tool install --index-url https://pypi.org/simple/ --extra-index-url https://t
 
 ### 4.2 Release Process Adjustments
 
-1.  **GitHub "Latest" Tag:** Ensure the GitHub Actions workflow marks Alpha/Beta/RC releases as "Prerelease". This prevents them from being identified as the "Latest" release in the GitHub UI, which could confuse users.
-2.  **Release Note Context:** For Beta/RC releases, the automated notes should ideally highlight "Changes since last Stable" rather than just "Changes since last Beta" to provide testers full context, or clearly link to the full changelog.
+1. **GitHub "Latest" Tag:** Ensure the GitHub Actions workflow marks Alpha/Beta/RC releases as "Prerelease". This prevents them from being identified as the "Latest" release in the GitHub UI, which could confuse users.
+2. **Release Note Context:** For Beta/RC releases, the automated notes should ideally highlight "Changes since last Stable" rather than just "Changes since last Beta" to provide testers full context, or clearly link to the full changelog.
 
 ### 4.3 Version Management
 
 To minimize drift risk between `pyproject.toml`, `todo.ai`, and `__init__.py`:
-*   **Source of Truth:** Designate `pyproject.toml` as the single source of truth.
-*   **Automation:** Utilize a tool like `bump-my-version` or a custom Python script during the `prepare` phase to synchronously update all version occurrences, rather than independent `sed` commands.
+* **Source of Truth:** Designate `pyproject.toml` as the single source of truth.
+* **Automation:** Utilize a tool like `bump-my-version` or a custom Python script during the `prepare` phase to synchronously update all version occurrences, rather than independent `sed` commands.

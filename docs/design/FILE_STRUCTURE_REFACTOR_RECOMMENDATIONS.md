@@ -18,9 +18,9 @@ This document outlines these findings and provides specific recommendations to a
 **Issue:** The legacy shell script uses `sed`, `head`, and `tail` for modifications. These tools preserve *everything* in the file except the specific lines being targeted. The Python implementation uses a **Parse → Model → Regenerate** cycle.
 
 **Current Gap:** The `FileOps` parser currently discards any content within the "Tasks" section that does not match a specific pattern (Header, Task, or Metadata).
-*   **Scenario:** A user adds a comment `# NOTE: Urgent` between two tasks in `TODO.md`.
-*   **Shell Script:** Preserves the comment because it only touches the task lines.
-*   **Proposed Python Refactor:** The parser ignores the comment line. The `FileStructureSnapshot` captures formatting *rules* but not content. When `write_tasks()` regenerates the file, the comment is permanently deleted.
+* **Scenario:** A user adds a comment `# NOTE: Urgent` between two tasks in `TODO.md`.
+* **Shell Script:** Preserves the comment because it only touches the task lines.
+* **Proposed Python Refactor:** The parser ignores the comment line. The `FileStructureSnapshot` captures formatting *rules* but not content. When `write_tasks()` regenerates the file, the comment is permanently deleted.
 
 ### 2. Stale State in Long-Running Processes
 **Issue:** The proposal introduces a global `_file_ops_cache` to persist the snapshot across commands. This assumes a short-lived CLI environment.

@@ -2656,11 +2656,11 @@ modify_todo() {
     
     # Extract existing tags from current line (tags are in backticks after the task text)
     local existing_tags=""
-    if echo "$current_line" | grep -q '\`#'; then
+    if echo "$current_line" | grep -q '`#'; then
         # Extract tags (everything in backticks)
         existing_tags=$(echo "$current_line" | sed 's/.*\(`#[^`]*`\).*/\1/' | sed 's/`//g')
         # Handle multiple tags
-        local all_tags=$(echo "$current_line" | grep -o '\`#[^`]*`' | sed 's/`//g' | tr '\n' ' ' | sed 's/ $//')
+        local all_tags=$(echo "$current_line" | grep -o '`#[^`]*`' | sed 's/`//g' | tr '\n' ' ' | sed 's/ $//')
         if [[ -n "$all_tags" ]]; then
             existing_tags="$all_tags"
         fi

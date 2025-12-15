@@ -53,14 +53,14 @@
     - [x] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID `#code`
     - [x] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
   - [ ] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script `#test`
-    - [ ] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested `#test`
-    - [ ] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop `#test`
+    - [x] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested `#test`
+    - [x] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop `#test`
     - [x] **#163.44.4** Test all commands with dedicated test TODO.md dataset - Ensure Python version produces identical results to shell version `#test`
     - [x] **#163.44.3** Re-run feature parity validation - Compare Python version output with shell version (side-by-side testing) `#test`
     - [x] **#163.44.2** Add integration tests for all new MCP tools - Verify each tool works correctly `#test`
     - [x] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly `#test`
   - [x] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands `#code`
-    - [ ] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format `#test`
+    - [x] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format `#test`
     - [x] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool `#code`
     - [x] **#163.43.6** Add MCP tools for Phase 6 commands - show_config, detect_coordination, setup_coordination, switch_mode `#code`
     - [x] **#163.43.5** Add MCP tools for Phase 5 commands - view_log, update_tool, list_backups, rollback `#code`
@@ -108,7 +108,7 @@
     - [x] **#163.36.4** Implement restore command - Move task from Deleted/Recently Completed back to Tasks section `#code`
     - [x] **#163.36.3** Implement archive command - Move task to Recently Completed section (not just mark as archived) `#code`
     - [x] **#163.36.2** Implement delete command - Move task to Deleted section (not just mark as deleted) `#code`
-    - [ ] **#163.36.1** Implement modify command - Update task description and tags `#code`
+    - [x] **#163.36.1** Implement modify command - Update task description and tags `#code`
   - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list) `#code`
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
   - [x] **#163.32** Maintenance phase: Ensure existing shell script continues working during development `#code`
@@ -901,6 +901,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 20:31:18 CET 2025
+**Last Updated:** Mon Dec 15 22:59:22 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

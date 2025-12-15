@@ -288,9 +288,6 @@ def test_archive_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert match, f"TODO.md files differ after archive:\n{diff}"
 
 
-@pytest.mark.skip(
-    reason="Blank line differences expected in Phase 12 dual mode - will be fixed in Phase 13"
-)
 def test_restore_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test restore command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -302,11 +299,7 @@ def test_restore_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    # Fix Tasks section header to ## Tasks (shell script requires double hash)
-    for env in [shell_env, python_env]:
-        content = (env / "TODO.md").read_text()
-        content = content.replace("# Tasks", "## Tasks")
-        (env / "TODO.md").write_text(content)
+    # Test data already has ## Tasks header format (no fix needed)
 
     # First delete a task (task #5 is already in Deleted section, so delete task #1 instead)
     # (cwd parameter ensures isolation - no os.chdir needed)
@@ -393,9 +386,6 @@ def test_lint_with_dataset(test_env_shell, test_env_python, tmp_path):
     # Both should report lint results (may differ in format, but should both work)
 
 
-@pytest.mark.skip(
-    reason="Phase 10: Blank line handling differences expected. Will be fixed in Phase 12 with snapshot system."
-)
 def test_workflow_sequence_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test a sequence of commands with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -409,15 +399,20 @@ def test_workflow_sequence_with_dataset(test_env_shell, test_env_python, tmp_pat
 
     # Sequence: add -> modify -> complete -> undo
     # (cwd parameter ensures isolation - no os.chdir needed)
-    run_shell_command(["add", "New task", "#test"], shell_env)
-    run_shell_command(["modify", "6", "Modified new task"], shell_env)
-    run_shell_command(["complete", "6"], shell_env)
-    run_shell_command(["undo", "6"], shell_env)
+    # Note: Test data has serial=6, tasks #1-5, so next task will be #7 (max(6,5)+1)
+    shell_output, _ = run_shell_command(["add", "New task", "#test"], shell_env)
+    # Extract task ID from output (e.g., "Added: #7 New task")
+    shell_task_id = "7"  # Based on serial=6, max(6,5)+1=7
+    run_shell_command(["modify", shell_task_id, "Modified new task"], shell_env)
+    run_shell_command(["complete", shell_task_id], shell_env)
+    run_shell_command(["undo", shell_task_id], shell_env)
 
-    run_python_command(["add", "New task", "#test"], python_env)
-    run_python_command(["modify", "6", "Modified new task"], python_env)
-    run_python_command(["complete", "6"], python_env)
-    run_python_command(["undo", "6"], python_env)
+    python_output, _ = run_python_command(["add", "New task", "#test"], python_env)
+    # Extract task ID from output (e.g., "Added: #7 New task")
+    python_task_id = "7"  # Based on serial=6, max(6,5)+1=7
+    run_python_command(["modify", python_task_id, "Modified new task"], python_env)
+    run_python_command(["complete", python_task_id], python_env)
+    run_python_command(["undo", python_task_id], python_env)
 
     # Compare final TODO.md files
     match, diff = compare_todo_files(shell_env / "TODO.md", python_env / "TODO.md")

@@ -36,6 +36,10 @@ class FileStructureSnapshot:
     # Preserves user comments, notes, or other content between tasks
     interleaved_content: dict[str, tuple[str, ...]]
 
+    # Original task order in Tasks section (to preserve order of existing tasks)
+    # New tasks (not in this list) should appear first, then existing tasks in this order
+    original_task_order: tuple[str, ...]
+
 
 class FileOps:
     """Handles file operations for TODO.md and .todo.ai directory."""
@@ -400,6 +404,7 @@ class FileOps:
             has_original_header=False,
             metadata_lines=(),
             interleaved_content={},
+            original_task_order=(),
         )
 
     def _capture_structure_snapshot(self) -> FileStructureSnapshot:
@@ -572,6 +577,7 @@ class FileOps:
             has_original_header=has_original_header,
             metadata_lines=tuple(metadata_lines),
             interleaved_content={k: tuple(v) for k, v in interleaved_content.items()},
+            original_task_order=tuple(tasks_in_section),
         )
 
     def _generate_markdown(
@@ -598,12 +604,10 @@ class FileOps:
             elif task.status == TaskStatus.DELETED:
                 deleted_tasks.append(task)
 
-        # Sort tasks
-        def sort_key(t):
-            parts = [int(p) for p in t.id.split(".")]
-            return parts
-
-        active_tasks.sort(key=sort_key)
+        # CRITICAL: Do NOT reorder tasks here!
+        # Tasks should be written in the exact order they appear in the tasks list.
+        # The ADD operation handles putting new tasks at the top BEFORE calling write.
+        # All other operations (modify, complete, undo) preserve existing order.
         # Archived tasks: sort by archive date (most recent first), then by ID (reverse)
         archived_tasks.sort(
             key=lambda t: (
@@ -674,7 +678,10 @@ class FileOps:
             # Format description with tags
             description = t.description
             if t.tags:
-                tag_str = " ".join([f"`#{tag}`" for tag in sorted(t.tags)])
+                # Tags may or may not have leading # - preserve as-is
+                tag_str = " ".join(
+                    [f"`{tag}`" if tag.startswith("#") else f"`#{tag}`" for tag in sorted(t.tags)]
+                )
                 description = f"{description} {tag_str}".strip()
 
             line = f"{indent}- [{checkbox}] **#{t.id}** {description}"
@@ -701,7 +708,7 @@ class FileOps:
             # Phase 13: Insert interleaved content if any (preserves user comments/notes)
             if t.id in snapshot.interleaved_content:
                 lines.extend(snapshot.interleaved_content[t.id])
-            # Add blank line between tasks if snapshot/old logic indicates
+            # Add blank line between tasks if snapshot indicates
             if blank_between_tasks and i < len(active_tasks) - 1:
                 lines.append("")
 

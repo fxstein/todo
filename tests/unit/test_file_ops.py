@@ -475,6 +475,7 @@ def test_file_structure_snapshot_immutability():
         has_original_header=True,
         metadata_lines=("<!-- comment -->",),
         interleaved_content={"1": ("# Comment",)},
+        original_task_order=(),
     )
 
     # Verify it's a frozen dataclass - cannot modify fields
@@ -499,6 +500,7 @@ def test_file_structure_snapshot_creation():
         has_original_header=False,
         metadata_lines=(),
         interleaved_content={},
+        original_task_order=(),
     )
     assert snapshot1.tasks_header_format == "## Tasks"
     assert snapshot1.blank_after_tasks_header is False
@@ -515,6 +517,7 @@ def test_file_structure_snapshot_creation():
         has_original_header=True,
         metadata_lines=("Metadata 1",),
         interleaved_content={"1": ("Comment 1", "Comment 2"), "2": ("Comment 3",)},
+        original_task_order=(),
     )
     assert snapshot2.tasks_header_format == "# Tasks"
     assert snapshot2.blank_after_tasks_header is True
@@ -537,6 +540,7 @@ def test_file_structure_snapshot_equality():
         has_original_header=False,
         metadata_lines=(),
         interleaved_content={},
+        original_task_order=(),
     )
 
     snapshot2 = FileStructureSnapshot(
@@ -549,6 +553,7 @@ def test_file_structure_snapshot_equality():
         has_original_header=False,
         metadata_lines=(),
         interleaved_content={},
+        original_task_order=(),
     )
 
     snapshot3 = FileStructureSnapshot(
@@ -561,6 +566,7 @@ def test_file_structure_snapshot_equality():
         has_original_header=False,
         metadata_lines=(),
         interleaved_content={},
+        original_task_order=(),
     )
 
     assert snapshot1 == snapshot2  # Same values
@@ -582,6 +588,7 @@ def test_file_structure_snapshot_interleaved_content():
             "1": ("# Comment for task 1", "  Additional note"),
             "2": ("# Comment for task 2",),
         },
+        original_task_order=(),
     )
 
     assert "1" in snapshot.interleaved_content

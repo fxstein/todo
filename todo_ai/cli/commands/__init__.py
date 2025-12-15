@@ -84,9 +84,14 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     # Create task
     task = manager.add_task(description, tags, task_id=new_id)
 
+    # CRITICAL: New tasks must appear at the TOP of the Tasks section
+    # Reorder tasks to put newly added task first
+    all_tasks = manager.list_tasks()
+    reordered_tasks = [task] + [t for t in all_tasks if t.id != task.id]
+
     # Phase 14: Structure preservation is handled automatically by snapshot
     # No manual file editing needed
-    file_ops.write_tasks(manager.list_tasks())
+    file_ops.write_tasks(reordered_tasks)
 
     # Update serial file with new task ID
     # Extract numeric part from task ID
@@ -211,6 +216,11 @@ def modify_command(
     """Modify a task's description and/or tags."""
     manager = get_manager(todo_path)
     try:
+        # Get existing task to preserve tags if not explicitly changing them
+        existing_task = manager.get_task(task_id)
+        if not existing_task:
+            raise ValueError(f"Task {task_id} not found")
+
         # Extract tags from description if they're in backticks (format: `#tag`)
         tag_pattern = re.compile(r"`#([a-zA-Z0-9_-]+)`")
         found_tags = tag_pattern.findall(description)
@@ -219,10 +229,14 @@ def modify_command(
         description = tag_pattern.sub("", description).strip()
 
         # Combine tags from description and explicit tags argument
+        # CRITICAL: If no new tags provided, preserve existing tags
         if tags:
             all_tags: list[str] | None = list(set(found_tags + tags))
+        elif found_tags:
+            all_tags = found_tags
         else:
-            all_tags = found_tags if found_tags else None
+            # No new tags - preserve existing tags
+            all_tags = list(existing_task.tags) if existing_task.tags else None
 
         task = manager.modify_task(task_id, description, all_tags)
         save_changes(manager, todo_path)
@@ -297,13 +311,21 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
 
         task = manager.restore_task(task_id)
 
+        # CRITICAL: Restored tasks must appear at the TOP of the Tasks section
+        # Reorder tasks to put restored task first
+        all_tasks = manager.list_tasks()
+        reordered_tasks = [task] + [t for t in all_tasks if t.id != task.id]
+
         # Phase 14: Structure preservation is handled automatically by snapshot
         # No manual file editing needed
-        file_ops.write_tasks(manager.list_tasks())
+        file_ops.write_tasks(reordered_tasks)
 
         print(f"Restored task #{task.id} to Tasks section")
     except ValueError as e:
         print(f"Error: {e}")
+        import sys
+
+        sys.exit(1)
 
 
 def undo_command(task_id: str, todo_path: str = "TODO.md"):

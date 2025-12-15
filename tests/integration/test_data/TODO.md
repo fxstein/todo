@@ -1,4 +1,4 @@
-# Tasks
+## Tasks
 
 - [ ] **#1** Test task 1
 - [ ] **#2** Test task 2 `#tag1`

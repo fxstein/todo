@@ -1,8 +1,40 @@
 import re
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
 from todo_ai.core.task import Task, TaskStatus
+
+
+@dataclass(frozen=True)
+class FileStructureSnapshot:
+    """Immutable snapshot of file structure captured from pristine file.
+
+    This snapshot is captured ONCE when FileOps first reads a file, and
+    is never modified, even if the file is re-read after modifications.
+    This ensures consistent structure preservation across all operations.
+    """
+
+    # Tasks section header format
+    tasks_header_format: str  # "# Tasks" or "## Tasks"
+
+    # Blank line preservation
+    blank_after_tasks_header: bool  # True if blank line after header
+    blank_between_tasks: bool  # True if blank lines between tasks in Tasks section
+    blank_after_tasks_section: bool  # True if blank line after Tasks (before other sections)
+
+    # File sections
+    header_lines: tuple[str, ...]  # Immutable tuple of header lines
+    footer_lines: tuple[str, ...]  # Immutable tuple of footer lines
+
+    # Metadata
+    has_original_header: bool  # True if file had header before Tasks section
+    metadata_lines: tuple[str, ...]  # HTML comments, relationships, etc.
+
+    # Interleaved content (non-task lines in Tasks section)
+    # Key: task_id (of preceding task), Value: tuple[str, ...] (lines of comments/whitespace)
+    # Preserves user comments, notes, or other content between tasks
+    interleaved_content: dict[str, tuple[str, ...]]
 
 
 class FileOps:
@@ -44,20 +76,40 @@ class FileOps:
         # Preserves user comments, notes, or other content between tasks
         self.interleaved_content: dict[str, list[str]] = {}
 
+        # Phase 11: Structure snapshot - captured once, never modified
+        self._structure_snapshot: FileStructureSnapshot | None = None
+        self._snapshot_mtime: float = 0.0  # File modification time when snapshot was captured
+        # Used to detect external file modifications (e.g., user edits in editor)
+        # If file mtime > snapshot_mtime, snapshot is stale and must be recaptured
+
         # Ensure config directory exists
         if not self.config_dir.exists():
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
     def read_tasks(self) -> list[Task]:
-        """Read tasks from TODO.md."""
+        """Read tasks from TODO.md.
+
+        On first call, captures structure snapshot from pristine file.
+        Subsequent calls can re-read tasks, but snapshot remains unchanged unless file is modified externally.
+        """
         if not self.todo_path.exists():
+            # No file - use default structure
+            if self._structure_snapshot is None:
+                self._structure_snapshot = self._create_default_snapshot()
             self.header_lines = []
             self.footer_lines = []
             self.metadata_lines = []
             self.relationships = {}
             return []
 
-        # Reset relationships before parsing
+        # Check if file was modified externally (e.g., by user in editor)
+        # If so, invalidate snapshot and recapture
+        current_mtime = self.todo_path.stat().st_mtime
+        if self._structure_snapshot is None or current_mtime > self._snapshot_mtime:
+            self._structure_snapshot = self._capture_structure_snapshot()
+            self._snapshot_mtime = current_mtime
+
+        # Reset relationships before parsing (relationships can change)
         self.relationships = {}
         content = self.todo_path.read_text(encoding="utf-8")
         return self._parse_markdown(content)
@@ -388,6 +440,192 @@ class FileOps:
             pass
 
         return tasks
+
+    def _create_default_snapshot(self) -> FileStructureSnapshot:
+        """Create a default structure snapshot for files that don't exist yet."""
+        return FileStructureSnapshot(
+            tasks_header_format="## Tasks",
+            blank_after_tasks_header=True,
+            blank_between_tasks=False,
+            blank_after_tasks_section=False,
+            header_lines=(),
+            footer_lines=(),
+            has_original_header=False,
+            metadata_lines=(),
+            interleaved_content={},
+        )
+
+    def _capture_structure_snapshot(self) -> FileStructureSnapshot:
+        """Capture structure snapshot from pristine file.
+
+        This is called ONCE when FileOps first reads a file, or when file is modified externally.
+        The snapshot is immutable and never modified.
+        """
+        if not self.todo_path.exists():
+            return self._create_default_snapshot()
+
+        content = self.todo_path.read_text(encoding="utf-8")
+        lines = content.splitlines()
+
+        # Parse structure elements
+        header_lines: list[str] = []
+        footer_lines: list[str] = []
+        metadata_lines: list[str] = []
+        tasks_header_format: str | None = None
+        blank_after_tasks_header = False
+        blank_between_tasks = False
+        blank_after_tasks_section = False
+        has_original_header = False
+        interleaved_content: dict[str, list[str]] = {}  # Will be converted to tuple
+
+        # Regex patterns
+        task_pattern = re.compile(r"^\s*-\s*\[([ xD])\]\s*\*\*#([0-9\.]+)\*\*\s*(.*)$")
+        section_pattern = re.compile(r"^##\s+(.*)$")
+        single_section_pattern = re.compile(r"^#\s+Tasks\s*$")
+
+        # Sections that contain tasks
+        TASK_SECTIONS = {"Tasks", "Recently Completed", "Deleted Tasks"}
+        current_section = "Header"
+        seen_tasks_section = False
+        in_relationships_section = False
+        in_metadata_section = False
+        current_task_id: str | None = None
+        tasks_in_section: list[str] = []  # Track task IDs to detect blank lines between
+
+        for line_idx, line in enumerate(lines):
+            line_stripped = line.strip()
+
+            # Check for single # Tasks section
+            single_section_match = single_section_pattern.match(line)
+            if single_section_match:
+                tasks_header_format = line
+                if not seen_tasks_section and len(header_lines) == 0:
+                    has_original_header = False
+                # Check if next line is blank
+                if line_idx + 1 < len(lines):
+                    next_line = lines[line_idx + 1]
+                    if next_line.strip() == "":
+                        blank_after_tasks_header = True
+                current_section = "Tasks"
+                seen_tasks_section = True
+                current_task_id = None
+                in_metadata_section = False
+                continue
+
+            # Check for section header
+            section_match = section_pattern.match(line)
+            if section_match:
+                section_name = section_match.group(1).strip()
+                if section_name in TASK_SECTIONS:
+                    if (
+                        current_section == "Header"
+                        and section_name == "Tasks"
+                        and len(header_lines) == 0
+                    ):
+                        has_original_header = False
+                    if section_name == "Tasks":
+                        tasks_header_format = line
+                        blank_after_tasks_header = False
+                        if line_idx + 1 < len(lines):
+                            next_line = lines[line_idx + 1]
+                            if next_line.strip() == "":
+                                blank_after_tasks_header = True
+                        tasks_in_section = []  # Reset for Tasks section
+                    elif section_name == "Recently Completed":
+                        # Check if there's a blank line before this section (after Tasks)
+                        if current_section == "Tasks" and tasks_in_section:
+                            if line_idx > 0 and lines[line_idx - 1].strip() == "":
+                                blank_after_tasks_section = True
+                    current_section = section_name
+                    seen_tasks_section = True
+                    current_task_id = None
+                    in_metadata_section = False
+                    continue
+                elif section_name == "Task Metadata":
+                    in_metadata_section = True
+                    metadata_lines.append(line)
+                    continue
+                else:
+                    if current_section != "Header" and not in_metadata_section:
+                        current_section = "Footer"
+
+            # Check for Footer start
+            if (
+                line_stripped == "------------------"
+                and current_section != "Header"
+                and not in_metadata_section
+            ):
+                current_section = "Footer"
+
+            # Check for relationships section
+            if line_stripped == "<!-- TASK RELATIONSHIPS":
+                in_relationships_section = True
+                in_metadata_section = True
+                metadata_lines.append(line)
+                continue
+
+            # Handle metadata section
+            if in_metadata_section:
+                if line_stripped == "<!-- TASK RELATIONSHIPS":
+                    in_relationships_section = True
+                    metadata_lines.append(line)
+                    continue
+                if in_relationships_section:
+                    if line_stripped == "-->":
+                        in_relationships_section = False
+                    metadata_lines.append(line)
+                    continue
+                else:
+                    metadata_lines.append(line)
+                    continue
+
+            # Handle Header
+            if current_section == "Header":
+                header_lines.append(line)
+                has_original_header = True
+                continue
+
+            # Handle Footer
+            if current_section == "Footer":
+                footer_lines.append(line)
+                continue
+
+            # Handle Task Sections - detect tasks and interleaved content
+            task_match = task_pattern.match(line)
+            if task_match:
+                task_id = task_match.group(2)
+                # Check for blank line between tasks
+                if current_section == "Tasks" and tasks_in_section:
+                    # Check if previous line was blank
+                    if line_idx > 0 and lines[line_idx - 1].strip() == "":
+                        blank_between_tasks = True
+                if current_section == "Tasks":
+                    tasks_in_section.append(task_id)
+                current_task_id = task_id
+                continue
+
+            # Check for notes (blockquotes) - these are part of tasks, not interleaved
+            if current_task_id and line_stripped.startswith(">"):
+                continue
+
+            # Phase 10: Capture interleaved content (non-task, non-note, non-blank lines)
+            if current_section == "Tasks" and current_task_id and line_stripped:
+                if current_task_id not in interleaved_content:
+                    interleaved_content[current_task_id] = []
+                interleaved_content[current_task_id].append(line)
+                continue
+
+        return FileStructureSnapshot(
+            tasks_header_format=tasks_header_format or "## Tasks",
+            blank_after_tasks_header=blank_after_tasks_header,
+            blank_between_tasks=blank_between_tasks,
+            blank_after_tasks_section=blank_after_tasks_section,
+            header_lines=tuple(header_lines),
+            footer_lines=tuple(footer_lines),
+            has_original_header=has_original_header,
+            metadata_lines=tuple(metadata_lines),
+            interleaved_content={k: tuple(v) for k, v in interleaved_content.items()},
+        )
 
     def _generate_markdown(self, tasks: list[Task]) -> str:
         """Generate TODO.md content from Task objects."""

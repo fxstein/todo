@@ -40,12 +40,12 @@
     - [ ] **#163.48.9** Implement mtime validation in read_tasks() to detect external modifications `#code`
     - [ ] **#163.48.8** Update write_tasks() to use snapshot `#code`
     - [ ] **#163.48.7** Modify _generate_markdown() to accept snapshot parameter `#code`
-  - [ ] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file `#code`
-    - [ ] **#163.47.10** Verify existing tests still pass, verify interleaved content captured `#test`
-    - [ ] **#163.47.9** Store snapshot in FileOps with _snapshot_mtime tracking `#code`
-    - [ ] **#163.47.8** Modify _parse_markdown() to populate snapshot including interleaved content `#code`
-    - [ ] **#163.47.7** Add _capture_structure_snapshot() method to FileOps `#code`
-    - [ ] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field `#code`
+  - [x] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file `#code`
+    - [x] **#163.47.10** Verify existing tests still pass, verify interleaved content captured `#test`
+    - [x] **#163.47.9** Store snapshot in FileOps with _snapshot_mtime tracking `#code`
+    - [x] **#163.47.8** Modify _parse_markdown() to populate snapshot including interleaved content `#code`
+    - [x] **#163.47.7** Add _capture_structure_snapshot() method to FileOps `#code`
+    - [x] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field `#code`
   - [x] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
     - [x] **#163.46.8** Verify no data loss in files with user comments/notes `#test`
     - [ ] **#163.46.7** Test that interleaved content survives read/write cycle `#test`
@@ -901,6 +901,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 19:28:31 CET 2025
+**Last Updated:** Mon Dec 15 19:32:53 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

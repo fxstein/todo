@@ -214,3 +214,116 @@ def test_interleaved_content_excludes_blank_lines(tmp_path):
     # Verify non-blank interleaved content (comments) IS captured
     assert "2" in ops.interleaved_content
     assert "# Comment after task 2" in ops.interleaved_content["2"]
+
+
+def test_structure_snapshot_creation(tmp_path):
+    """Phase 11: Test that structure snapshot is created on first read."""
+    content = """# Custom Header
+> Some warning
+
+## Tasks
+- [ ] **#1** Task 1
+# Comment
+- [ ] **#2** Task 2
+
+## Recently Completed
+- [x] **#3** Task 3
+
+------------------
+**Last Updated:** 2025-01-01
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    ops.read_tasks()
+
+    # Verify snapshot was created
+    assert ops._structure_snapshot is not None
+    snapshot = ops._structure_snapshot
+
+    # Verify snapshot captures structure elements
+    assert snapshot.tasks_header_format == "## Tasks"
+    assert snapshot.blank_after_tasks_header is False  # Task follows directly
+    assert snapshot.has_original_header is True
+    assert "# Custom Header" in snapshot.header_lines
+    assert "**Last Updated:** 2025-01-01" in snapshot.footer_lines
+    assert "1" in snapshot.interleaved_content
+    assert "# Comment" in snapshot.interleaved_content["1"]
+
+
+def test_structure_snapshot_persistence(tmp_path):
+    """Phase 11: Test that snapshot persists across multiple read_tasks() calls."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    ops.read_tasks()
+    snapshot1 = ops._structure_snapshot
+    mtime1 = ops._snapshot_mtime
+
+    # Read again without modifying file
+    ops.read_tasks()
+    snapshot2 = ops._structure_snapshot
+    mtime2 = ops._snapshot_mtime
+
+    # Snapshot should be the same object (not recreated)
+    snapshot2 = ops._structure_snapshot
+    mtime2 = ops._snapshot_mtime
+    assert snapshot1 is snapshot2
+    assert mtime1 == mtime2
+
+
+def test_structure_snapshot_recreation_on_file_modification(tmp_path):
+    """Phase 11: Test that snapshot is recreated when file is modified externally."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    ops.read_tasks()
+    snapshot1 = ops._structure_snapshot
+
+    # Modify file externally (simulate user edit)
+    import time
+
+    time.sleep(0.1)  # Ensure mtime changes
+    new_content = """## Tasks
+- [ ] **#1** Task 1
+- [ ] **#2** Task 2
+"""
+    todo_path.write_text(new_content, encoding="utf-8")
+
+    # Read again - snapshot should be recreated
+    tasks2 = ops.read_tasks()
+    snapshot2 = ops._structure_snapshot
+
+    # Snapshot should be different (recreated)
+    assert snapshot1 is not snapshot2
+    assert len(tasks2) == 2  # New task should be detected
+
+
+def test_structure_snapshot_default_for_missing_file(tmp_path):
+    """Phase 11: Test that default snapshot is created for non-existent files."""
+    todo_path = tmp_path / "TODO.md"
+
+    ops = FileOps(str(todo_path))
+    ops.read_tasks()
+
+    # Verify default snapshot was created
+    assert ops._structure_snapshot is not None
+    snapshot = ops._structure_snapshot
+
+    # Verify default values
+    assert snapshot.tasks_header_format == "## Tasks"
+    assert snapshot.blank_after_tasks_header is True
+    assert snapshot.blank_between_tasks is False
+    assert snapshot.has_original_header is False
+    assert len(snapshot.header_lines) == 0
+    assert len(snapshot.footer_lines) == 0
+    assert len(snapshot.interleaved_content) == 0

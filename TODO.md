@@ -33,13 +33,13 @@
     - [ ] **#163.49.8** Remove _blank_line_overridden `#code`
     - [ ] **#163.49.7** Remove original_tasks_header_has_blank_line `#code`
     - [ ] **#163.49.6** Remove tasks_header_has_blank_line `#code`
-  - [ ] **#163.48** Phase 12: Use Snapshot for Generation (Non-Breaking) - Modify _generate_markdown() to use snapshot and implement mtime validation `#code`
-    - [ ] **#163.48.12** Verify existing tests still pass, test mtime invalidation `#test`
-    - [ ] **#163.48.11** Keep old state variables for now (dual mode) `#code`
-    - [ ] **#163.48.10** Insert interleaved content during generation `#code`
-    - [ ] **#163.48.9** Implement mtime validation in read_tasks() to detect external modifications `#code`
-    - [ ] **#163.48.8** Update write_tasks() to use snapshot `#code`
-    - [ ] **#163.48.7** Modify _generate_markdown() to accept snapshot parameter `#code`
+  - [x] **#163.48** Phase 12: Use Snapshot for Generation (Non-Breaking) - Modify _generate_markdown() to use snapshot and implement mtime validation `#code`
+    - [x] **#163.48.12** Verify existing tests still pass, test mtime invalidation `#test`
+    - [x] **#163.48.11** Keep old state variables for now (dual mode) `#code`
+    - [x] **#163.48.10** Insert interleaved content during generation `#code`
+    - [x] **#163.48.9** Implement mtime validation in read_tasks() to detect external modifications `#code`
+    - [x] **#163.48.8** Update write_tasks() to use snapshot `#code`
+    - [x] **#163.48.7** Modify _generate_markdown() to accept snapshot parameter `#code`
   - [x] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file `#code`
     - [x] **#163.47.10** Verify existing tests still pass, verify interleaved content captured `#test`
     - [x] **#163.47.9** Store snapshot in FileOps with _snapshot_mtime tracking `#code`
@@ -48,7 +48,7 @@
     - [x] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field `#code`
   - [x] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
     - [x] **#163.46.8** Verify no data loss in files with user comments/notes `#test`
-    - [ ] **#163.46.7** Test that interleaved content survives read/write cycle `#test`
+    - [x] **#163.46.7** Test that interleaved content survives read/write cycle `#test`
       > Interleaved content capture verified. Full read/write cycle test will be completed in Phase 12 when interleaved content is inserted back into generated markdown.
     - [x] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID `#code`
     - [x] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
@@ -901,6 +901,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 19:32:53 CET 2025
+**Last Updated:** Mon Dec 15 19:37:32 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

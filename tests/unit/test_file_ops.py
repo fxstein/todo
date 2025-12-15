@@ -327,3 +327,143 @@ def test_structure_snapshot_default_for_missing_file(tmp_path):
     assert len(snapshot.header_lines) == 0
     assert len(snapshot.footer_lines) == 0
     assert len(snapshot.interleaved_content) == 0
+
+
+def test_generate_markdown_uses_snapshot(tmp_path):
+    """Phase 12: Test that _generate_markdown uses snapshot when available."""
+    content = """# Custom Header
+> Warning
+
+## Tasks
+- [ ] **#1** Task 1
+# Comment between tasks
+- [ ] **#2** Task 2
+
+------------------
+**Footer**
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    # Verify snapshot was created
+    assert ops._structure_snapshot is not None
+    snapshot = ops._structure_snapshot
+
+    # Generate markdown using snapshot
+    generated = ops._generate_markdown(tasks, snapshot)
+
+    # Verify snapshot structure is used
+    assert "# Custom Header" in generated
+    assert "## Tasks" in generated
+    assert "**Footer**" in generated
+    # Verify interleaved content is inserted
+    assert "# Comment between tasks" in generated
+    # Verify it appears between tasks
+    lines = generated.splitlines()
+    task1_idx = next(i for i, line in enumerate(lines) if "**#1**" in line)
+    comment_idx = next(i for i, line in enumerate(lines) if "# Comment between tasks" in line)
+    task2_idx = next(i for i, line in enumerate(lines) if "**#2**" in line)
+    assert task1_idx < comment_idx < task2_idx
+
+
+def test_generate_markdown_fallback_to_old_state(tmp_path):
+    """Phase 12: Test that _generate_markdown falls back to old state when snapshot is None (dual mode)."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    # Manually set old state variables
+    ops.tasks_header_format = "## Tasks"
+    ops.header_lines = []
+    ops.footer_lines = []
+
+    # Generate markdown without snapshot (None)
+    generated = ops._generate_markdown(tasks, None)
+
+    # Verify old state variables are used
+    assert "## Tasks" in generated
+    assert "**#1** Task 1" in generated
+
+
+def test_interleaved_content_insertion_in_generation(tmp_path):
+    """Phase 12: Test that interleaved content is inserted during markdown generation."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+# User comment here
+- [ ] **#2** Task 2
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    # Verify snapshot has interleaved content
+    assert ops._structure_snapshot is not None
+    snapshot = ops._structure_snapshot
+    assert "1" in snapshot.interleaved_content
+    assert "# User comment here" in snapshot.interleaved_content["1"]
+
+    # Generate markdown
+    generated = ops._generate_markdown(tasks, snapshot)
+
+    # Verify interleaved content appears in generated markdown
+    lines = generated.splitlines()
+    task1_line = next(i for i, line in enumerate(lines) if "**#1**" in line)
+    comment_line = next(i for i, line in enumerate(lines) if "# User comment here" in line)
+    task2_line = next(i for i, line in enumerate(lines) if "**#2**" in line)
+
+    # Comment should be between task 1 and task 2
+    assert task1_line < comment_line < task2_line
+
+
+def test_interleaved_content_survives_read_write_cycle(tmp_path):
+    """Phase 12: Test that interleaved content survives read/write cycle (task#163.46.7)."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+# User comment between tasks
+- [ ] **#2** Task 2
+# Another comment
+- [ ] **#3** Task 3
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    # Read tasks (captures snapshot with interleaved content)
+    tasks = ops.read_tasks()
+
+    # Verify interleaved content is in snapshot
+    assert ops._structure_snapshot is not None
+    snapshot = ops._structure_snapshot
+    assert "1" in snapshot.interleaved_content
+    assert "# User comment between tasks" in snapshot.interleaved_content["1"]
+    assert "2" in snapshot.interleaved_content
+    assert "# Another comment" in snapshot.interleaved_content["2"]
+
+    # Write tasks back (should use snapshot to preserve interleaved content)
+    ops.write_tasks(tasks)
+
+    # Read again and verify interleaved content is still there
+    ops2 = FileOps(str(todo_path))
+    ops2.read_tasks()
+    snapshot2 = ops2._structure_snapshot
+
+    # Verify interleaved content survived
+    assert "1" in snapshot2.interleaved_content
+    assert "# User comment between tasks" in snapshot2.interleaved_content["1"]
+    assert "2" in snapshot2.interleaved_content
+    assert "# Another comment" in snapshot2.interleaved_content["2"]
+
+    # Verify it's in the file content
+    file_content = todo_path.read_text(encoding="utf-8")
+    assert "# User comment between tasks" in file_content
+    assert "# Another comment" in file_content

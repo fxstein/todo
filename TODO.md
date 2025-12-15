@@ -9,13 +9,48 @@
 - [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
   > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
-  - [ ] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release`
-    - [ ] **#163.45.6** Final release: Update installation instructions and migration guide `#docs`
-    - [ ] **#163.45.5** Final release: Publish final release to PyPI with migration support `#release`
-    - [ ] **#163.45.4** Final release: Finalize migration support and documentation `#release`
-    - [ ] **#163.45.3** Beta/Pre-release: Conduct real user testing and collect feedback `#release`
-    - [ ] **#163.45.2** Beta/Pre-release: Publish to PyPI as pre-release version `#release`
-    - [ ] **#163.45.1** Beta/Pre-release: Create beta/pre-release for testing with real users `#release`
+  - [ ] **#163.52** Phase 16: Release Phase - Beta/pre-release and final release with migration support `#release`
+    - [ ] **#163.52.6** Beta/Pre-release: Create beta/pre-release for testing with real users `#release`
+    - [ ] **#163.52.5** Beta/Pre-release: Publish to PyPI as pre-release version `#release`
+    - [ ] **#163.52.4** Beta/Pre-release: Conduct real user testing and collect feedback `#release`
+    - [ ] **#163.52.3** Final release: Finalize migration support and documentation `#release`
+    - [ ] **#163.52.2** Final release: Publish final release to PyPI with migration support `#release`
+    - [ ] **#163.52.1** Final release: Update installation instructions and migration guide `#docs`
+  - [ ] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests `#code`
+    - [ ] **#163.51.8** Final validation with all parity tests `#test`
+    - [ ] **#163.51.7** Add unit tests for FileStructureSnapshot `#test`
+    - [ ] **#163.51.6** Update documentation `#docs`
+    - [ ] **#163.51.5** Remove unused methods and parameters `#code`
+  - [ ] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands `#code`
+    - [ ] **#163.50.10** Run full test suite, verify parity tests pass `#test`
+    - [ ] **#163.50.9** Remove preserve_blank_line_state parameter from write_tasks() `#code`
+    - [ ] **#163.50.8** Remove state restoration logic from all commands `#code`
+    - [ ] **#163.50.7** Remove manual file editing from restore_command() `#code`
+    - [ ] **#163.50.6** Remove manual file editing from add_command() `#code`
+  - [ ] **#163.49** Phase 13: Remove Old State Variables (Breaking) - Remove mutable state variables and override logic `#code`
+    - [ ] **#163.49.10** Run full test suite, fix any regressions `#test`
+    - [ ] **#163.49.9** Remove all override logic from _generate_markdown() `#code`
+    - [ ] **#163.49.8** Remove _blank_line_overridden `#code`
+    - [ ] **#163.49.7** Remove original_tasks_header_has_blank_line `#code`
+    - [ ] **#163.49.6** Remove tasks_header_has_blank_line `#code`
+  - [ ] **#163.48** Phase 12: Use Snapshot for Generation (Non-Breaking) - Modify _generate_markdown() to use snapshot and implement mtime validation `#code`
+    - [ ] **#163.48.12** Verify existing tests still pass, test mtime invalidation `#test`
+    - [ ] **#163.48.11** Keep old state variables for now (dual mode) `#code`
+    - [ ] **#163.48.10** Insert interleaved content during generation `#code`
+    - [ ] **#163.48.9** Implement mtime validation in read_tasks() to detect external modifications `#code`
+    - [ ] **#163.48.8** Update write_tasks() to use snapshot `#code`
+    - [ ] **#163.48.7** Modify _generate_markdown() to accept snapshot parameter `#code`
+  - [ ] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file `#code`
+    - [ ] **#163.47.10** Verify existing tests still pass, verify interleaved content captured `#test`
+    - [ ] **#163.47.9** Store snapshot in FileOps with _snapshot_mtime tracking `#code`
+    - [ ] **#163.47.8** Modify _parse_markdown() to populate snapshot including interleaved content `#code`
+    - [ ] **#163.47.7** Add _capture_structure_snapshot() method to FileOps `#code`
+    - [ ] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field `#code`
+  - [ ] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
+    - [ ] **#163.46.8** Verify no data loss in files with user comments/notes `#test`
+    - [ ] **#163.46.7** Test that interleaved content survives read/write cycle `#test`
+    - [ ] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID `#code`
+    - [ ] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
   - [ ] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script `#test`
     - [ ] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested `#test`
     - [ ] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop `#test`
@@ -712,6 +747,43 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+    - [D] **#163.51.4** Remove unused methods and parameters `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.51.3** Update documentation `#docs` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.51.2** Add unit tests for FileStructureSnapshot `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.51.1** Final validation with all parity tests `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.5** Run full test suite, verify parity tests pass `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.4** Remove manual file editing from add_command() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.3** Remove manual file editing from restore_command() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.2** Remove state restoration logic from all commands `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.1** Remove preserve_blank_line_state parameter from write_tasks() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.5** Run full test suite, fix any regressions `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.4** Remove tasks_header_has_blank_line `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.3** Remove original_tasks_header_has_blank_line `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.2** Remove _blank_line_overridden `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.1** Remove all override logic from _generate_markdown() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.6** Verify existing tests still pass, test mtime invalidation `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.5** Modify _generate_markdown() to accept snapshot parameter `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.4** Update write_tasks() to use snapshot `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.3** Implement mtime validation in read_tasks() to detect external modifications `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.2** Keep old state variables for now (dual mode) `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.1** Insert interleaved content during generation `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.5** Verify existing tests still pass, verify interleaved content captured `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.4** Create FileStructureSnapshot dataclass with interleaved_content field `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.3** Add _capture_structure_snapshot() method to FileOps `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.2** Modify _parse_markdown() to populate snapshot including interleaved content `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.1** Store snapshot in FileOps with _snapshot_mtime tracking `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.4** Verify no data loss in files with user comments/notes `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.3** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.2** Store interleaved content (comments, notes) keyed by preceding task ID `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.1** Test that interleaved content survives read/write cycle `#test` (deleted 2025-12-15, expires 2026-01-14)
+- [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
+  - [D] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.1** Beta/Pre-release: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.2** Beta/Pre-release: Publish to PyPI as pre-release version `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.3** Beta/Pre-release: Conduct real user testing and collect feedback `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.4** Final release: Finalize migration support and documentation `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.5** Final release: Publish final release to PyPI with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.6** Final release: Update installation instructions and migration guide `#docs` (deleted 2025-12-15, expires 2026-01-14)
   - [D] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-14, expires 2026-01-13)
     - [D] **#163.34.1** Publish to PyPI `#release` (deleted 2025-12-14, expires 2026-01-13)
   - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
@@ -828,6 +900,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 00:53:33 CET 2025
+**Last Updated:** Mon Dec 15 19:24:56 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

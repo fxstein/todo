@@ -16,11 +16,11 @@
     - [ ] **#163.52.3** Final release: Finalize migration support and documentation `#release`
     - [ ] **#163.52.2** Final release: Publish final release to PyPI with migration support `#release`
     - [ ] **#163.52.1** Final release: Update installation instructions and migration guide `#docs`
-  - [ ] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests `#code`
-    - [ ] **#163.51.8** Final validation with all parity tests `#test`
-    - [ ] **#163.51.7** Add unit tests for FileStructureSnapshot `#test`
-    - [ ] **#163.51.6** Update documentation `#docs`
-    - [ ] **#163.51.5** Remove unused methods and parameters `#code`
+  - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests `#code`
+    - [x] **#163.51.8** Final validation with all parity tests `#test`
+    - [x] **#163.51.7** Add unit tests for FileStructureSnapshot `#test`
+    - [x] **#163.51.6** Update documentation `#docs`
+    - [x] **#163.51.5** Remove unused methods and parameters `#code`
   - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands `#code`
     - [x] **#163.50.10** Run full test suite, verify parity tests pass `#test`
     - [x] **#163.50.9** Remove preserve_blank_line_state parameter from write_tasks() `#code`
@@ -901,6 +901,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 20:00:04 CET 2025
+**Last Updated:** Mon Dec 15 20:31:18 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -59,9 +59,6 @@ class FileOps:
         self.has_original_header: bool = (
             False  # Track if file had a header before first task section
         )
-        self.tasks_had_blank_between: bool = (
-            False  # Track if original file had blank lines between tasks in Tasks section
-        )
         # Interleaved content (non-task lines in Tasks section) - Phase 10
         # Key: task_id (of preceding task), Value: list[str] (lines of comments/whitespace)
         # Preserves user comments, notes, or other content between tasks
@@ -580,11 +577,11 @@ class FileOps:
     def _generate_markdown(
         self, tasks: list[Task], snapshot: FileStructureSnapshot | None = None
     ) -> str:
-        """Generate TODO.md content from Task objects.
+        """Generate TODO.md content from Task objects using structure snapshot.
 
         Args:
             tasks: List of tasks to generate markdown for
-            snapshot: Optional structure snapshot to use. If None, falls back to old state variables (dual mode).
+            snapshot: Structure snapshot to use. Must not be None (raises ValueError if None).
         """
         # Organize tasks by section
         active_tasks = []

@@ -1,6 +1,6 @@
 import pytest
 
-from todo_ai.core.file_ops import FileOps
+from todo_ai.core.file_ops import FileOps, FileStructureSnapshot
 from todo_ai.core.task import Task, TaskStatus
 
 
@@ -459,3 +459,134 @@ def test_interleaved_content_survives_read_write_cycle(tmp_path):
     file_content = todo_path.read_text(encoding="utf-8")
     assert "# User comment between tasks" in file_content
     assert "# Another comment" in file_content
+
+
+def test_file_structure_snapshot_immutability():
+    """Phase 15: Test that FileStructureSnapshot is immutable (frozen dataclass)."""
+    from dataclasses import FrozenInstanceError
+
+    snapshot = FileStructureSnapshot(
+        tasks_header_format="## Tasks",
+        blank_after_tasks_header=True,
+        blank_between_tasks=False,
+        blank_after_tasks_section=False,
+        header_lines=("Header line 1", "Header line 2"),
+        footer_lines=("Footer line 1",),
+        has_original_header=True,
+        metadata_lines=("<!-- comment -->",),
+        interleaved_content={"1": ("# Comment",)},
+    )
+
+    # Verify it's a frozen dataclass - cannot modify fields
+    with pytest.raises(FrozenInstanceError):
+        snapshot.tasks_header_format = "# Tasks"
+
+    # Verify tuple fields are immutable (tuples don't have append, but test assignment)
+    with pytest.raises(FrozenInstanceError):
+        snapshot.header_lines = ("New line",)
+
+
+def test_file_structure_snapshot_creation():
+    """Phase 15: Test creating FileStructureSnapshot with various configurations."""
+    # Minimal snapshot
+    snapshot1 = FileStructureSnapshot(
+        tasks_header_format="## Tasks",
+        blank_after_tasks_header=False,
+        blank_between_tasks=False,
+        blank_after_tasks_section=False,
+        header_lines=(),
+        footer_lines=(),
+        has_original_header=False,
+        metadata_lines=(),
+        interleaved_content={},
+    )
+    assert snapshot1.tasks_header_format == "## Tasks"
+    assert snapshot1.blank_after_tasks_header is False
+    assert len(snapshot1.header_lines) == 0
+
+    # Full snapshot with all fields
+    snapshot2 = FileStructureSnapshot(
+        tasks_header_format="# Tasks",
+        blank_after_tasks_header=True,
+        blank_between_tasks=True,
+        blank_after_tasks_section=True,
+        header_lines=("Header 1", "Header 2"),
+        footer_lines=("Footer 1",),
+        has_original_header=True,
+        metadata_lines=("Metadata 1",),
+        interleaved_content={"1": ("Comment 1", "Comment 2"), "2": ("Comment 3",)},
+    )
+    assert snapshot2.tasks_header_format == "# Tasks"
+    assert snapshot2.blank_after_tasks_header is True
+    assert snapshot2.blank_between_tasks is True
+    assert len(snapshot2.header_lines) == 2
+    assert len(snapshot2.interleaved_content) == 2
+    assert "1" in snapshot2.interleaved_content
+    assert len(snapshot2.interleaved_content["1"]) == 2
+
+
+def test_file_structure_snapshot_equality():
+    """Phase 15: Test that FileStructureSnapshot equality works correctly."""
+    snapshot1 = FileStructureSnapshot(
+        tasks_header_format="## Tasks",
+        blank_after_tasks_header=True,
+        blank_between_tasks=False,
+        blank_after_tasks_section=False,
+        header_lines=(),
+        footer_lines=(),
+        has_original_header=False,
+        metadata_lines=(),
+        interleaved_content={},
+    )
+
+    snapshot2 = FileStructureSnapshot(
+        tasks_header_format="## Tasks",
+        blank_after_tasks_header=True,
+        blank_between_tasks=False,
+        blank_after_tasks_section=False,
+        header_lines=(),
+        footer_lines=(),
+        has_original_header=False,
+        metadata_lines=(),
+        interleaved_content={},
+    )
+
+    snapshot3 = FileStructureSnapshot(
+        tasks_header_format="## Tasks",
+        blank_after_tasks_header=False,  # Different
+        blank_between_tasks=False,
+        blank_after_tasks_section=False,
+        header_lines=(),
+        footer_lines=(),
+        has_original_header=False,
+        metadata_lines=(),
+        interleaved_content={},
+    )
+
+    assert snapshot1 == snapshot2  # Same values
+    assert snapshot1 != snapshot3  # Different values
+
+
+def test_file_structure_snapshot_interleaved_content():
+    """Phase 15: Test FileStructureSnapshot interleaved_content field."""
+    snapshot = FileStructureSnapshot(
+        tasks_header_format="## Tasks",
+        blank_after_tasks_header=False,
+        blank_between_tasks=False,
+        blank_after_tasks_section=False,
+        header_lines=(),
+        footer_lines=(),
+        has_original_header=False,
+        metadata_lines=(),
+        interleaved_content={
+            "1": ("# Comment for task 1", "  Additional note"),
+            "2": ("# Comment for task 2",),
+        },
+    )
+
+    assert "1" in snapshot.interleaved_content
+    assert "2" in snapshot.interleaved_content
+    assert len(snapshot.interleaved_content["1"]) == 2
+    assert len(snapshot.interleaved_content["2"]) == 1
+    assert "# Comment for task 1" in snapshot.interleaved_content["1"][0]
+    assert "# Comment for task 2" in snapshot.interleaved_content["2"][0]

@@ -1,0 +1,6 @@
+
+# Ignore test data files that might not conform to standard markdown rules
+tests/integration/test_data/TODO.md
+
+# Ignore archived documents that won't be updated
+docs/archive/*.md

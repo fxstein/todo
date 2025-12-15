@@ -5,9 +5,13 @@ Compare Python CLI output with shell script output to ensure identical behavior.
 
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
+
+# Skip all tests in this module on Windows
+pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="Shell script requires Zsh")
 
 # Path to shell script (todo.ai in repo root)
 SHELL_SCRIPT = Path(__file__).parent.parent.parent / "todo.ai"

@@ -120,9 +120,9 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 | Channel | Version Format | Purpose | Users | Update Frequency |
 |---------|---------------|---------|-------|------------------|
 | **Alpha** | `1.0.0a1` | Internal testing, breaking changes OK | Maintainers | As needed |
-| **Beta** | `1.0.0b1` | External testing, feature-complete | Early adopters | 1-2 weeks |
-| **RC** | `1.0.0rc1` | Final testing, no new features | Testers | 1 week |
-| **Stable** | `1.0.0` | Production ready | All users | 4-6 weeks |
+| **Beta** | `1.0.0b1` | External testing, feature-complete | Early adopters | Regular |
+| **RC** | `1.0.0rc1` | Final testing, no new features | Testers | Before stable |
+| **Stable** | `1.0.0` | Production ready | All users | Regular cadence |
 
 ### 2.4 Cloud Native Patterns
 
@@ -169,7 +169,6 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 **Phase 1: Alpha (Internal Testing)**
 
 **Trigger:** Major refactor complete, core features working
-**Duration:** 1-2 weeks
 **Audience:** Maintainers, contributors
 **Testing:** Automated tests + manual workflows
 **Changes Allowed:** Breaking changes, API redesign
@@ -183,13 +182,13 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 **Phase 2: Beta (External Testing)**
 
 **Trigger:** Alpha stable, ready for early adopters
-**Duration:** 2-4 weeks
 **Audience:** GitHub watchers, early adopters, power users
 **Testing:** Real-world usage, edge cases, compatibility
 **Changes Allowed:** Bug fixes, minor features, documentation
+**Recommended Duration:** 2-4 weeks
 
 **Criteria for RC:**
-- No critical bugs in last week
+- No critical bugs reported recently
 - Positive feedback from beta users
 - All planned features implemented
 - Migration path tested
@@ -197,10 +196,10 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 **Phase 3: Release Candidate (Final Validation)**
 
 **Trigger:** Beta stable, production-ready
-**Duration:** 1 week
 **Audience:** Brave stable users, final testers
 **Testing:** Production-like scenarios, stress testing
 **Changes Allowed:** Critical bug fixes only, documentation
+**Recommended Duration:** 1 week
 
 **Criteria for Stable:**
 - No bugs reported in RC period
@@ -211,7 +210,6 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 **Phase 4: Stable (General Availability)**
 
 **Trigger:** RC passes all validation
-**Duration:** Ongoing
 **Audience:** All users
 **Testing:** Production monitoring, user feedback
 **Changes:** Patch releases for bugs, minor releases for features
@@ -252,29 +250,47 @@ v1.0.0
 
 **Alpha Channel:**
 ```bash
-# From test PyPI
-pip install --pre --index-url https://test.pypi.org/simple/ todo-ai
+# From test PyPI (recommended)
+uv tool install --index-url https://test.pypi.org/simple/ --prerelease=allow todo-ai
 
 # From Git tag
+uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
+
+# Alternative: pipx
 pipx install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
+
+# Alternative: pip
+pip install --pre --index-url https://test.pypi.org/simple/ todo-ai
 ```
 
 **Beta Channel:**
 ```bash
-# Pre-release from PyPI
-pip install --pre todo-ai
+# Pre-release from PyPI (recommended)
+uv tool install --prerelease=allow todo-ai
 
 # Specific beta version
-pipx install todo-ai==1.0.0b1
+uv tool install todo-ai==1.0.0b1
+
+# Alternative: pipx
+pipx install --pre todo-ai
+
+# Alternative: pip
+pip install --pre todo-ai
 ```
 
 **Stable Channel:**
 ```bash
-# Latest stable (default)
-pipx install todo-ai
+# Latest stable (recommended)
+uv tool install todo-ai
 
 # Specific stable version
-pipx install todo-ai==1.0.0
+uv tool install todo-ai==1.0.0
+
+# Alternative: pipx
+pipx install todo-ai
+
+# Alternative: pip
+pip install todo-ai
 ```
 
 ---
@@ -487,17 +503,35 @@ update_version_files() {
 
 ### Stable Release (Recommended)
 ```bash
+# Using uv (recommended)
+uv tool install todo-ai
+
+# Alternative: pipx
 pipx install todo-ai
+
+# Alternative: pip
+pip install todo-ai
 ```
 
 ### Beta Testing
 Help test upcoming features:
 ```bash
+# Using uv (recommended)
+uv tool install --prerelease=allow todo-ai
+
+# Alternative: pipx
 pipx install --pre todo-ai
+
+# Alternative: pip
+pip install --pre todo-ai
 ```
 
 ### Development Version
 ```bash
+# Using uv (recommended)
+uv tool install git+https://github.com/fxstein/todo.ai.git@main
+
+# Alternative: pipx
 pipx install git+https://github.com/fxstein/todo.ai.git@main
 ```
 
@@ -588,7 +622,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 ## 🚀 What's New
 - Full Python implementation with MCP server support
 - 100% command parity with shell version
-- Installable via pipx: `pipx install --pre todo-ai`
+- Installable via uv: `uv tool install --prerelease=allow todo-ai`
 
 ## ⚠️ Beta Status
 This is a **pre-release** version. While extensively tested, we recommend:
@@ -598,8 +632,8 @@ This is a **pre-release** version. While extensively tested, we recommend:
 
 ## 🧪 Help Us Test
 We need your help to make 1.0.0 stable amazing:
-1. Install: `pipx install --pre todo-ai`
-2. Try it: Use it for real work this week
+1. Install: `uv tool install --prerelease=allow todo-ai` (or use pipx/pip)
+2. Try it: Use it for real work
 3. Report: Share feedback on GitHub Discussions
 
 ## 📊 What's Been Tested
@@ -616,7 +650,7 @@ We need your help to make 1.0.0 stable amazing:
 
 ---
 
-**Install:** `pipx install --pre todo-ai`
+**Install:** `uv tool install --prerelease=allow todo-ai`
 **Report Issues:** https://github.com/fxstein/todo.ai/issues
 **Discuss:** https://github.com/fxstein/todo.ai/discussions
 ```
@@ -664,13 +698,19 @@ We need your help to make 1.0.0 stable amazing:
 **Allow users to pin versions:**
 
 ```bash
-# Install specific version
-pipx install todo-ai==1.0.0
+# Install specific version (recommended: uv)
+uv tool install todo-ai==1.0.0
 
 # Upgrade to latest stable
-pipx upgrade todo-ai
+uv tool upgrade todo-ai
 
 # Downgrade if issues
+uv tool uninstall todo-ai
+uv tool install todo-ai==0.9.5
+
+# Alternative: pipx
+pipx install todo-ai==1.0.0
+pipx upgrade todo-ai
 pipx install --force todo-ai==0.9.5
 ```
 
@@ -735,37 +775,37 @@ pipx install --force todo-ai==0.9.5
 
 ---
 
-## 9. Implementation Timeline
+## 9. Implementation Phases
 
-### Phase 1: Infrastructure (Week 1)
+### Phase 1: Infrastructure
 
 - [ ] Update release.sh with pre-release flags
 - [ ] Update GitHub Actions for pre-release detection
 - [ ] Add Test PyPI credentials to GitHub secrets
 - [ ] Update documentation with beta installation instructions
 
-### Phase 2: Alpha Release (Week 2)
+### Phase 2: Alpha Release (Optional)
 
 - [ ] Create v1.0.0-alpha.1 release
 - [ ] Publish to Test PyPI
 - [ ] Internal testing by maintainers
 - [ ] Fix critical issues
 
-### Phase 3: Beta Release (Week 3-4)
+### Phase 3: Beta Release
 
 - [ ] Create v1.0.0-beta.1 release
 - [ ] Announce to GitHub watchers
 - [ ] Collect feedback from early adopters
 - [ ] Iterate with beta.2, beta.3 as needed
 
-### Phase 4: Release Candidate (Week 5)
+### Phase 4: Release Candidate
 
 - [ ] Create v1.0.0-rc.1 release
 - [ ] Final testing period
 - [ ] Documentation review
 - [ ] Freeze feature additions
 
-### Phase 5: Stable Release (Week 6)
+### Phase 5: Stable Release
 
 - [ ] Create v1.0.0 stable release
 - [ ] Major announcement
@@ -788,11 +828,12 @@ Given that todo.ai has:
 
 Skip alpha (since internal testing is complete) and go directly to:
 
-1. **Week 1:** Implement beta release infrastructure
-2. **Week 2:** Release v1.0.0-beta.1
-3. **Week 3-4:** Beta testing period (2-4 weeks)
-4. **Week 5:** Release v1.0.0-rc.1
-5. **Week 6:** Release v1.0.0 stable
+1. Implement beta release infrastructure
+2. Release v1.0.0-beta.1
+3. Beta testing period (2-4 weeks recommended)
+4. Release v1.0.0-rc.1
+5. RC validation period (1 week recommended)
+6. Release v1.0.0 stable
 
 ### Long-term Strategy
 
@@ -801,9 +842,9 @@ Skip alpha (since internal testing is complete) and go directly to:
 - Use RC for major version transitions (2.0.0)
 - Consider nightly/dev builds for active contributors
 
-**Version Cadence:**
-- **Stable releases:** Every 6-8 weeks
-- **Beta releases:** 2-4 weeks before stable
+**Version Cadence (Suggested):**
+- **Stable releases:** Regular cadence for features
+- **Beta releases:** Before each stable for validation
 - **Patch releases:** As needed for critical bugs
 
 ---
@@ -839,14 +880,19 @@ Skip alpha (since internal testing is complete) and go directly to:
 
 **Install Beta:**
 ```bash
-# Install latest beta
-pipx install --pre todo-ai
+# Install latest beta (recommended: uv)
+uv tool install --prerelease=allow todo-ai
 
 # Install specific beta
-pipx install todo-ai==1.0.0b1
+uv tool install todo-ai==1.0.0b1
 
 # Upgrade to latest stable
-pipx install --upgrade todo-ai
+uv tool upgrade todo-ai
+
+# Alternative: pipx
+pipx install --pre todo-ai
+pipx install todo-ai==1.0.0b1
+pipx upgrade todo-ai
 ```
 
 **Check Version:**
@@ -854,7 +900,10 @@ pipx install --upgrade todo-ai
 # Show installed version
 todo-ai version
 
-# List available versions
+# List available versions (uv)
+uv tool list | grep todo-ai
+
+# List available versions (pipx)
 pipx list | grep todo-ai
 ```
 

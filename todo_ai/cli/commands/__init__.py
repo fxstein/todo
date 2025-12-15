@@ -272,7 +272,12 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
     manager = get_manager(todo_path)
     try:
         task = manager.restore_task(task_id)
-        save_changes(manager, todo_path)
+        # For restore, match shell script behavior: insert directly after ## Tasks (no blank line)
+        file_ops = FileOps(todo_path)
+        file_ops.read_tasks()
+        # Override blank line state to match shell restore behavior
+        file_ops.tasks_header_has_blank_line = False
+        file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
         print(f"Restored task #{task.id} to Tasks section")
     except ValueError as e:
         print(f"Error: {e}")

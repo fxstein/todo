@@ -37,6 +37,8 @@ class Task:
     updated_at: datetime = field(default_factory=datetime.now)
     completed_at: datetime | None = None
     archived_at: datetime | None = None
+    deleted_at: datetime | None = None
+    expires_at: datetime | None = None
 
     def add_tag(self, tag: str) -> None:
         """Add a tag to the task."""
@@ -64,10 +66,19 @@ class Task:
         self.status = TaskStatus.ARCHIVED
         self.archived_at = datetime.now()
         self.updated_at = datetime.now()
+        # If task was completed, preserve completed_at
+        if not self.completed_at and self.status == TaskStatus.ARCHIVED:
+            # Task is being archived directly (not from completed state)
+            pass
 
     def mark_deleted(self) -> None:
         """Mark task as deleted."""
         self.status = TaskStatus.DELETED
+        self.deleted_at = datetime.now()
+        # Set expiry to 30 days from deletion
+        from datetime import timedelta
+
+        self.expires_at = self.deleted_at + timedelta(days=30)
         self.updated_at = datetime.now()
 
     def restore(self) -> None:

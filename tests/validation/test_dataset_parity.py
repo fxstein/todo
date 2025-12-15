@@ -1,6 +1,10 @@
 """Test all commands with dedicated test TODO.md dataset.
 
 Ensure Python version produces identical results to shell version.
+
+CRITICAL: These tests use isolated temporary directories and NEVER modify
+the project's TODO.md file. All test operations use the cwd parameter in
+subprocess calls to ensure complete isolation.
 """
 
 import os
@@ -13,6 +17,8 @@ import pytest
 # Path to shell script and test data
 SHELL_SCRIPT = Path(__file__).parent.parent.parent / "todo.ai"
 TEST_DATA_DIR = Path(__file__).parent.parent / "integration" / "test_data"
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_TODO = PROJECT_ROOT / "TODO.md"
 
 
 def run_shell_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
@@ -55,7 +61,18 @@ def run_python_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
 
 
 def copy_test_data(dest: Path) -> None:
-    """Copy test data to destination directory."""
+    """Copy test data to destination directory.
+
+    CRITICAL: Ensures dest is NOT the project root to prevent modifying
+    the project's TODO.md file.
+    """
+    # Safety check: Never copy test data to project root
+    if dest.resolve() == PROJECT_ROOT.resolve():
+        raise ValueError(
+            f"CRITICAL: Attempted to copy test data to project root! "
+            f"This would modify {PROJECT_TODO}. Use a temporary directory instead."
+        )
+
     # Copy TODO.md
     if (TEST_DATA_DIR / "TODO.md").exists():
         shutil.copy2(TEST_DATA_DIR / "TODO.md", dest / "TODO.md")
@@ -111,27 +128,42 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
 
 @pytest.fixture
 def test_env_shell(tmp_path):
-    """Create test environment for shell script testing."""
+    """Create test environment for shell script testing.
+
+    CRITICAL: Uses isolated tmp_path that is NOT the project root.
+    """
+    # Safety check: Ensure tmp_path is not project root
+    if tmp_path.resolve() == PROJECT_ROOT.resolve():
+        pytest.fail(
+            f"CRITICAL: tmp_path resolved to project root! "
+            f"This would modify {PROJECT_TODO}. Test setup is broken."
+        )
     copy_test_data(tmp_path)
     return tmp_path
 
 
 @pytest.fixture
 def test_env_python(tmp_path):
-    """Create test environment for Python CLI testing."""
+    """Create test environment for Python CLI testing.
+
+    CRITICAL: Uses isolated tmp_path that is NOT the project root.
+    """
+    # Safety check: Ensure tmp_path is not project root
+    if tmp_path.resolve() == PROJECT_ROOT.resolve():
+        pytest.fail(
+            f"CRITICAL: tmp_path resolved to project root! "
+            f"This would modify {PROJECT_TODO}. Test setup is broken."
+        )
     copy_test_data(tmp_path)
     return tmp_path
 
 
 def test_list_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test list command with test dataset."""
-    os.chdir(test_env_shell)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["list"], test_env_shell)
 
-    # Run Python version
-    os.chdir(test_env_python)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["list"], test_env_python)
 
     # Compare exit codes
@@ -143,13 +175,10 @@ def test_list_with_dataset(test_env_shell, test_env_python, tmp_path):
 
 def test_show_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test show command with test dataset."""
-    os.chdir(test_env_shell)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["show", "1"], test_env_shell)
 
-    # Run Python version
-    os.chdir(test_env_python)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["show", "1"], test_env_python)
 
     # Compare exit codes
@@ -159,7 +188,6 @@ def test_show_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert "#1" in shell_output or "#1" in python_output, "Task #1 not found"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_complete_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test complete command with test dataset - compare final TODO.md."""
     # Create separate copies for shell and Python
@@ -171,13 +199,10 @@ def test_complete_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    os.chdir(shell_env)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["complete", "1"], shell_env)
 
-    # Run Python version
-    os.chdir(python_env)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["complete", "1"], python_env)
 
     # Compare exit codes
@@ -188,7 +213,6 @@ def test_complete_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert match, f"TODO.md files differ after complete:\n{diff}"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_modify_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test modify command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -200,13 +224,10 @@ def test_modify_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    os.chdir(shell_env)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["modify", "1", "Modified task"], shell_env)
 
-    # Run Python version
-    os.chdir(python_env)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["modify", "1", "Modified task"], python_env)
 
     # Compare exit codes
@@ -217,7 +238,6 @@ def test_modify_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert match, f"TODO.md files differ after modify:\n{diff}"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_delete_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test delete command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -229,13 +249,10 @@ def test_delete_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    os.chdir(shell_env)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["delete", "1"], shell_env)
 
-    # Run Python version
-    os.chdir(python_env)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["delete", "1"], python_env)
 
     # Compare exit codes
@@ -246,7 +263,6 @@ def test_delete_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert match, f"TODO.md files differ after delete:\n{diff}"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_archive_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test archive command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -258,13 +274,10 @@ def test_archive_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    os.chdir(shell_env)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["archive", "3"], shell_env)
 
-    # Run Python version
-    os.chdir(python_env)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["archive", "3"], python_env)
 
     # Compare exit codes
@@ -275,7 +288,6 @@ def test_archive_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert match, f"TODO.md files differ after archive:\n{diff}"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_restore_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test restore command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -287,28 +299,31 @@ def test_restore_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    # First delete a task
-    os.chdir(shell_env)
-    run_shell_command(["delete", "5"], shell_env)
-    os.chdir(python_env)
-    run_python_command(["delete", "5"], python_env)
+    # Fix Tasks section header to ## Tasks (shell script requires double hash)
+    for env in [shell_env, python_env]:
+        content = (env / "TODO.md").read_text()
+        content = content.replace("# Tasks", "## Tasks")
+        (env / "TODO.md").write_text(content)
 
-    # Now restore
-    os.chdir(shell_env)
-    shell_output, shell_code = run_shell_command(["restore", "5"], shell_env)
+    # First delete a task (task #5 is already in Deleted section, so delete task #1 instead)
+    # (cwd parameter ensures isolation - no os.chdir needed)
+    run_shell_command(["delete", "1"], shell_env)
+    run_python_command(["delete", "1"], python_env)
 
-    os.chdir(python_env)
-    python_output, python_code = run_python_command(["restore", "5"], python_env)
+    # Now restore (cwd parameter ensures isolation - no os.chdir needed)
+    shell_output, shell_code = run_shell_command(["restore", "1"], shell_env)
+    python_output, python_code = run_python_command(["restore", "1"], python_env)
 
     # Compare exit codes
-    assert shell_code == python_code, f"Exit codes differ: shell={shell_code}, python={python_code}"
+    assert (
+        shell_code == python_code
+    ), f"Exit codes differ: shell={shell_code}, python={python_code}\nShell: {shell_output}\nPython: {python_output}"
 
     # Compare final TODO.md files
     match, diff = compare_todo_files(shell_env / "TODO.md", python_env / "TODO.md")
     assert match, f"TODO.md files differ after restore:\n{diff}"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_undo_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test undo command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -320,17 +335,12 @@ def test_undo_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    # First complete a task
-    os.chdir(shell_env)
+    # First complete a task (cwd parameter ensures isolation - no os.chdir needed)
     run_shell_command(["complete", "3"], shell_env)
-    os.chdir(python_env)
     run_python_command(["complete", "3"], python_env)
 
-    # Now undo
-    os.chdir(shell_env)
+    # Now undo (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["undo", "3"], shell_env)
-
-    os.chdir(python_env)
     python_output, python_code = run_python_command(["undo", "3"], python_env)
 
     # Compare exit codes
@@ -341,7 +351,6 @@ def test_undo_with_dataset(test_env_shell, test_env_python, tmp_path):
     assert match, f"TODO.md files differ after undo:\n{diff}"
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_note_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test note command with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -353,13 +362,10 @@ def test_note_with_dataset(test_env_shell, test_env_python, tmp_path):
     copy_test_data(shell_env)
     copy_test_data(python_env)
 
-    os.chdir(shell_env)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["note", "1", "Test note"], shell_env)
 
-    # Run Python version
-    os.chdir(python_env)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["note", "1", "Test note"], python_env)
 
     # Compare exit codes
@@ -372,13 +378,10 @@ def test_note_with_dataset(test_env_shell, test_env_python, tmp_path):
 
 def test_lint_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test lint command with test dataset."""
-    os.chdir(test_env_shell)
-
-    # Run shell version
+    # Run shell version (cwd parameter ensures isolation - no os.chdir needed)
     shell_output, shell_code = run_shell_command(["lint"], test_env_shell)
 
-    # Run Python version
-    os.chdir(test_env_python)
+    # Run Python version (cwd parameter ensures isolation - no os.chdir needed)
     python_output, python_code = run_python_command(["lint"], test_env_python)
 
     # Compare exit codes
@@ -387,7 +390,6 @@ def test_lint_with_dataset(test_env_shell, test_env_python, tmp_path):
     # Both should report lint results (may differ in format, but should both work)
 
 
-@pytest.mark.xfail(reason="Python version may have formatting differences - needs investigation")
 def test_workflow_sequence_with_dataset(test_env_shell, test_env_python, tmp_path):
     """Test a sequence of commands with test dataset - compare final TODO.md."""
     # Create separate copies
@@ -400,13 +402,12 @@ def test_workflow_sequence_with_dataset(test_env_shell, test_env_python, tmp_pat
     copy_test_data(python_env)
 
     # Sequence: add -> modify -> complete -> undo
-    os.chdir(shell_env)
+    # (cwd parameter ensures isolation - no os.chdir needed)
     run_shell_command(["add", "New task", "#test"], shell_env)
     run_shell_command(["modify", "6", "Modified new task"], shell_env)
     run_shell_command(["complete", "6"], shell_env)
     run_shell_command(["undo", "6"], shell_env)
 
-    os.chdir(python_env)
     run_python_command(["add", "New task", "#test"], python_env)
     run_python_command(["modify", "6", "Modified new task"], python_env)
     run_python_command(["complete", "6"], python_env)

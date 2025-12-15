@@ -57,6 +57,9 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     """Add a new task."""
     file_ops = FileOps(todo_path)
     tasks = file_ops.read_tasks()
+    # Check if original file had blank line after ## Tasks (will become blank between tasks)
+    original_had_blank_after_header = file_ops.tasks_header_has_blank_line
+
     manager = TaskManager(tasks)
 
     # ID Generation
@@ -67,7 +70,54 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
 
     # Create task
     task = manager.add_task(description, tags, task_id=new_id)
-    save_changes(manager, todo_path)
+
+    # For add, match shell script behavior:
+    # - Insert directly after ## Tasks (no blank line after header)
+    # - But preserve original blank line as blank line between tasks
+    file_ops.tasks_header_has_blank_line = False
+    file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
+
+    # After writing, if original had blank after header, ensure blank line between first two tasks
+    # This matches shell script behavior: preserves original structure
+    if original_had_blank_after_header and len(manager.list_tasks()) >= 2:
+        content = Path(todo_path).read_text(encoding="utf-8")
+        lines = content.splitlines()
+
+        # Find ## Tasks header
+        tasks_header_idx = None
+        for i, line in enumerate(lines):
+            if line.strip() == "## Tasks" or line.strip() == "# Tasks":
+                tasks_header_idx = i
+                break
+
+        if tasks_header_idx is not None:
+            # Find first two tasks after header
+            first_task_idx = None
+            second_task_idx = None
+            for i in range(tasks_header_idx + 1, len(lines)):
+                if lines[i].strip().startswith("- ["):
+                    if first_task_idx is None:
+                        first_task_idx = i
+                    elif second_task_idx is None:
+                        second_task_idx = i
+                        break
+
+            # If we have two tasks and no blank line between them, add one
+            if first_task_idx is not None and second_task_idx is not None:
+                # Check if there's already a blank line between them
+                has_blank_between = False
+                for j in range(first_task_idx + 1, second_task_idx):
+                    if lines[j].strip() == "":
+                        has_blank_between = True
+                        break
+
+                if not has_blank_between:
+                    # Insert blank line before second task
+                    lines.insert(second_task_idx, "")
+                    Path(todo_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    # Cache file_ops for future operations
+    _file_ops_cache[todo_path] = file_ops
 
     # Update serial file with new task ID
     # Extract numeric part from task ID
@@ -269,15 +319,63 @@ def archive_command(
 
 def restore_command(task_id: str, todo_path: str = "TODO.md"):
     """Restore task from Deleted or Recently Completed to active Tasks."""
+    from pathlib import Path
+
     manager = get_manager(todo_path)
     try:
-        task = manager.restore_task(task_id)
-        # For restore, match shell script behavior: insert directly after ## Tasks (no blank line)
+        # Read file state BEFORE restore to detect original blank line structure
         file_ops = FileOps(todo_path)
         file_ops.read_tasks()
-        # Override blank line state to match shell restore behavior
+        # Check if original file had blank line after ## Tasks (will become blank between tasks)
+        original_had_blank_after_header = file_ops.tasks_header_has_blank_line
+
+        task = manager.restore_task(task_id)
+
+        # For restore, match shell script behavior:
+        # - Insert directly after ## Tasks (no blank line after header)
+        # - But preserve original blank line as blank line between tasks
         file_ops.tasks_header_has_blank_line = False
         file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
+
+        # After writing, if original had blank after header, ensure blank line between first two tasks
+        # This matches shell script behavior: preserves original structure
+        if original_had_blank_after_header:
+            content = Path(todo_path).read_text(encoding="utf-8")
+            lines = content.splitlines()
+
+            # Find ## Tasks header
+            tasks_header_idx = None
+            for i, line in enumerate(lines):
+                if line.strip() == "## Tasks" or line.strip() == "# Tasks":
+                    tasks_header_idx = i
+                    break
+
+            if tasks_header_idx is not None:
+                # Find first two tasks after header
+                first_task_idx = None
+                second_task_idx = None
+                for i in range(tasks_header_idx + 1, len(lines)):
+                    if lines[i].strip().startswith("- ["):
+                        if first_task_idx is None:
+                            first_task_idx = i
+                        elif second_task_idx is None:
+                            second_task_idx = i
+                            break
+
+                # If we have two tasks and no blank line between them, add one
+                if first_task_idx is not None and second_task_idx is not None:
+                    # Check if there's already a blank line between them
+                    has_blank_between = False
+                    for j in range(first_task_idx + 1, second_task_idx):
+                        if lines[j].strip() == "":
+                            has_blank_between = True
+                            break
+
+                    if not has_blank_between:
+                        # Insert blank line before second task
+                        lines.insert(second_task_idx, "")
+                        Path(todo_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
+
         print(f"Restored task #{task.id} to Tasks section")
     except ValueError as e:
         print(f"Error: {e}")

@@ -37,4 +37,7 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
-        always_run: true
+        always_run: false
+        # Only run pytest when Python code or test files change
+        # This prevents pytest from blocking formatting-only commits
+        files: ^(todo_ai/|tests/|pyproject\.toml|setup\.py)

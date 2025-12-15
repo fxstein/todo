@@ -119,7 +119,7 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
         shell_line = shell_lines[i] if i < len(shell_lines) else "<MISSING>"
         python_line = python_lines[i] if i < len(python_lines) else "<MISSING>"
         if shell_line != python_line:
-            diff_msg.append(f"Line {i+1}:")
+            diff_msg.append(f"Line {i + 1}:")
             diff_msg.append(f"  Shell:  {shell_line}")
             diff_msg.append(f"  Python: {python_line}")
 

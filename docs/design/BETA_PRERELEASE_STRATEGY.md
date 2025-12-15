@@ -1,8 +1,8 @@
 # Beta and Pre-Release Strategy for todo.ai
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 **Date:** December 15, 2025
-**Status:** PROPOSED
+**Status:** APPROVED
 
 ---
 
@@ -11,6 +11,16 @@
 This document outlines the strategy for implementing beta and pre-release capabilities in todo.ai's release process. Given that todo.ai is transitioning from a shell script to a Python-based tool with MCP server capabilities and cloud/AI integration, a robust pre-release strategy is essential for managing risk, gathering feedback, and ensuring quality.
 
 **Recommendation:** Implement a multi-tier release strategy with alpha, beta, and release candidate phases before stable releases.
+
+**Document Version History:**
+- v1.0: Initial strategy (December 15, 2025)
+- v1.1: Incorporated review findings (December 15, 2025)
+  - Fixed TestPyPI dependency resolution
+  - Replaced bash version parsing with Python
+  - Clarified human gate requirements for all releases
+  - Added MCP headless testing strategy
+  - Implemented feature flag utility
+  - Enhanced GitHub release process
 
 ---
 
@@ -143,6 +153,29 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 - Disable in stable unless explicitly enabled
 - Example: `TODOAI_EXPERIMENTAL_MCP_V2=1`
 
+**Implementation:**
+```python
+# todo_ai/core/config.py - Add FeatureFlag utility
+
+import os
+from enum import Enum
+
+class FeatureFlag(Enum):
+    """Feature flags for experimental functionality."""
+    EXPERIMENTAL_MCP_V2 = "TODOAI_EXPERIMENTAL_MCP_V2"
+    BETA_BULK_OPERATIONS = "TODOAI_BETA_BULK_OPS"
+    DEBUG_MODE = "TODOAI_DEBUG"
+
+def is_feature_enabled(flag: FeatureFlag) -> bool:
+    """Check if a feature flag is enabled via environment variable."""
+    return os.getenv(flag.value, "0").lower() in ("1", "true", "yes", "on")
+
+# Usage in code:
+# if is_feature_enabled(FeatureFlag.EXPERIMENTAL_MCP_V2):
+#     # Use new MCP protocol features
+#     pass
+```
+
 ### 2.5 AI/LLM Tool Best Practices
 
 **OpenAI Plugin Evolution:**
@@ -172,6 +205,11 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 **Audience:** Maintainers, contributors
 **Testing:** Automated tests + manual workflows
 **Changes Allowed:** Breaking changes, API redesign
+
+**Release Process:**
+- **Human Gate Required:** All alpha releases must follow the two-phase release process (Prepare → Human Review → Execute)
+- **AI Summary:** Required for all releases including alphas
+- **Justification:** Prevents accidental publication of unstable code to Test PyPI
 
 **Criteria for Beta:**
 - All automated tests passing
@@ -250,8 +288,8 @@ v1.0.0
 
 **Alpha Channel:**
 ```bash
-# From test PyPI (recommended)
-uv tool install --index-url https://test.pypi.org/simple/ --prerelease=allow todo-ai
+# From test PyPI (recommended - using extra-index-url to resolve dependencies)
+uv tool install --index-url https://pypi.org/simple/ --extra-index-url https://test.pypi.org/simple/ --prerelease=allow todo-ai
 
 # From Git tag
 uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
@@ -259,9 +297,11 @@ uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
 # Alternative: pipx
 pipx install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
 
-# Alternative: pip
-pip install --pre --index-url https://test.pypi.org/simple/ todo-ai
+# Alternative: pip (with correct dependency resolution)
+pip install --pre --index-url https://pypi.org/simple/ --extra-index-url https://test.pypi.org/simple/ todo-ai
 ```
+
+**Note:** Alpha uses `--extra-index-url` for Test PyPI to ensure dependencies (e.g., `rich`, `click`) resolve from the main PyPI repository while installing the alpha package from Test PyPI.
 
 **Beta Channel:**
 ```bash
@@ -460,6 +500,19 @@ jobs:
         with:
           files: dist/*
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+          # Generate release notes showing changes since last stable (not just last pre-release)
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Update release notes for beta/rc to provide full context
+      - name: Enhance Pre-release Notes
+        if: steps.prerelease.outputs.is_prerelease == 'true'
+        run: |
+          # Add context about changes since last stable release
+          gh release view ${{ github.ref_name }} --json body --jq .body > notes.md
+          echo -e "\n---\n**Note:** This is a pre-release. See [CHANGELOG.md](https://github.com/fxstein/todo.ai/blob/main/CHANGELOG.md) for complete changes since last stable version.\n" >> notes.md
+          gh release edit ${{ github.ref_name }} --notes-file notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -473,25 +526,70 @@ jobs:
 
 ### 4.3 Version Management
 
-**Update `pyproject.toml` dynamically:**
+**Single Source of Truth:** Use `pyproject.toml` as the authoritative version source.
+
+**Recommended Approach:** Use Python's `packaging` library for reliable version parsing and manipulation instead of bash regex/sed.
+
+**Implementation:**
 
 ```bash
-# release/release.sh function
+# release/release.sh function - calls Python script for version management
 update_version_files() {
     local git_tag="$1"
     local pypi_version="$2"
 
-    # Update pyproject.toml (PEP 440 format)
-    sed -i.bak 's/^version = .*/version = "'$pypi_version'"/' pyproject.toml
+    # Use Python script for safe version updates
+    python3 -c "
+from pathlib import Path
+import re
+from packaging.version import Version
 
-    # Update todo.ai shell script (SemVer format)
-    sed -i.bak 's/^VERSION=.*/VERSION="'${git_tag#v}'"/' todo.ai
+git_tag = '$git_tag'
+pypi_version = '$pypi_version'
 
-    # Update todo_ai/__init__.py (PEP 440 format)
-    sed -i.bak 's/^__version__ = .*/__version__ = "'$pypi_version'"/' todo_ai/__init__.py
+# Validate version format
+try:
+    Version(pypi_version)
+except Exception as e:
+    print(f'Invalid version: {e}')
+    exit(1)
 
-    rm -f pyproject.toml.bak todo.ai.bak todo_ai/__init__.py.bak
+# Update pyproject.toml (PEP 440 format)
+pyproject = Path('pyproject.toml')
+content = pyproject.read_text()
+content = re.sub(r'^version = .*', f'version = \"{pypi_version}\"', content, flags=re.MULTILINE)
+pyproject.write_text(content)
+
+# Update todo.ai shell script (SemVer format)
+todo_script = Path('todo.ai')
+content = todo_script.read_text()
+content = re.sub(r'^VERSION=.*', f'VERSION=\"{git_tag.lstrip(\"v\")}\"', content, flags=re.MULTILINE)
+todo_script.write_text(content)
+
+# Update todo_ai/__init__.py (PEP 440 format)
+init_file = Path('todo_ai/__init__.py')
+content = init_file.read_text()
+content = re.sub(r'^__version__ = .*', f'__version__ = \"{pypi_version}\"', content, flags=re.MULTILINE)
+init_file.write_text(content)
+
+print(f'Updated versions: Git={git_tag}, PyPI={pypi_version}')
+"
 }
+```
+
+**Alternative:** Use `bump-my-version` tool:
+```bash
+# Install bump-my-version
+uv pip install bump-my-version
+
+# Configure in pyproject.toml
+# [tool.bumpversion]
+# current_version = "1.0.0"
+# files = ["pyproject.toml", "todo.ai", "todo_ai/__init__.py"]
+
+# Usage
+bump-my-version bump patch  # 1.0.0 -> 1.0.1
+bump-my-version bump --new-version 1.0.0b1  # Set to beta
 ```
 
 ### 4.4 Documentation Updates
@@ -576,11 +674,23 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 | Ubuntu 20.04+ | ✓ | ✓ | ✓ |
 | Windows WSL2 | ✓ | ✓ | ✓ |
 
+**MCP Server Testing:**
+- **Automated Testing:** Implement headless MCP client test suite
+  - Test JSON-RPC protocol compliance
+  - Verify tool schemas and responses
+  - Test against MCP protocol specification
+  - Independent of specific client implementation (Cursor/Claude Desktop)
+- **Manual Testing:** Real-world usage with Cursor and Claude Desktop
+  - Verify UI integration
+  - Test user workflows
+  - Collect feedback on usability
+
 **Exit Criteria:**
 - No critical bugs reported for 1 week
 - Positive feedback from 5+ beta testers
 - Migration tested with real data
 - Documentation reviewed
+- MCP automated tests passing
 
 ### 5.3 Release Candidate Testing
 
@@ -926,7 +1036,26 @@ GITHUB_TOKEN            # Automatically provided by Actions
 
 ---
 
-**Document Status:** PROPOSED
-**Next Steps:** Review with maintainers, approve strategy, implement infrastructure
+## Appendix C: Review Findings & Mitigations
+
+This strategy incorporates findings from the December 15, 2025 review:
+
+| Issue | Risk Level | Mitigation |
+|-------|-----------|------------|
+| TestPyPI dependency resolution | **Critical** | Use `--extra-index-url` instead of `--index-url` |
+| Manual version parsing fragility | **High** | Use Python `packaging` library instead of bash regex |
+| Human gate for pre-releases | **Medium** | Mandate two-phase process for all releases including alpha |
+| MCP manual-only testing | **Medium** | Implement headless JSON-RPC protocol test suite |
+| Feature flag implementation | **Low** | Add FeatureFlag utility class in config.py |
+
+**Validation Status:** Strategy approved for implementation with mitigations applied.
+
+**Review Document:** See `docs/design/BETA_STRATEGY_REVIEW.md` for complete analysis.
+
+---
+
+**Document Status:** APPROVED (v1.1)
+**Next Steps:** Implement infrastructure changes (Phase 1)
 **Owner:** Release Engineering Team
 **Reviewers:** Project Maintainers, Community
+**Last Updated:** December 15, 2025

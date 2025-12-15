@@ -153,3 +153,64 @@ View with: `./todo.ai show <task-id>`
     # Old relationships should still be there
     assert "depends-on" in rels_1_updated
     assert "blocks" in rels_1_updated
+
+
+def test_interleaved_content_capture(tmp_path):
+    """Phase 10: Test that interleaved content (non-task lines) is captured."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+  > Note for task 1
+# This is a comment between tasks
+- [ ] **#2** Task 2
+  > Note for task 2
+
+# Another comment
+- [ ] **#3** Task 3
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    # Verify tasks are parsed
+    assert len(tasks) == 3
+
+    # Verify interleaved content is captured
+    # Task 1 should have comment after it
+    assert "1" in ops.interleaved_content
+    assert "# This is a comment between tasks" in ops.interleaved_content["1"]
+
+    # Task 2 should have comment after it (blank lines are not captured)
+    assert "2" in ops.interleaved_content
+    interleaved_2 = ops.interleaved_content["2"]
+    assert "# Another comment" in interleaved_2
+    # Blank lines are NOT captured (handled by existing logic)
+
+    # Task 3 should have no interleaved content (it's the last task)
+    assert "3" not in ops.interleaved_content or len(ops.interleaved_content.get("3", [])) == 0
+
+
+def test_interleaved_content_excludes_blank_lines(tmp_path):
+    """Phase 10: Test that blank lines are NOT captured as interleaved content (handled by existing logic)."""
+    content = """## Tasks
+- [ ] **#1** Task 1
+
+- [ ] **#2** Task 2
+# Comment after task 2
+- [ ] **#3** Task 3
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    assert len(tasks) == 3
+
+    # Verify blank lines are NOT captured (they're handled by existing blank line logic)
+    assert "1" not in ops.interleaved_content or "" not in ops.interleaved_content.get("1", [])
+
+    # Verify non-blank interleaved content (comments) IS captured
+    assert "2" in ops.interleaved_content
+    assert "# Comment after task 2" in ops.interleaved_content["2"]

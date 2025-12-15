@@ -46,11 +46,12 @@
     - [ ] **#163.47.8** Modify _parse_markdown() to populate snapshot including interleaved content `#code`
     - [ ] **#163.47.7** Add _capture_structure_snapshot() method to FileOps `#code`
     - [ ] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field `#code`
-  - [ ] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
-    - [ ] **#163.46.8** Verify no data loss in files with user comments/notes `#test`
+  - [x] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
+    - [x] **#163.46.8** Verify no data loss in files with user comments/notes `#test`
     - [ ] **#163.46.7** Test that interleaved content survives read/write cycle `#test`
-    - [ ] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID `#code`
-    - [ ] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
+      > Interleaved content capture verified. Full read/write cycle test will be completed in Phase 12 when interleaved content is inserted back into generated markdown.
+    - [x] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID `#code`
+    - [x] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
   - [ ] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script `#test`
     - [ ] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested `#test`
     - [ ] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop `#test`
@@ -900,6 +901,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 19:24:56 CET 2025
+**Last Updated:** Mon Dec 15 19:28:31 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

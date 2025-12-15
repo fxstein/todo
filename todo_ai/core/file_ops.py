@@ -39,6 +39,10 @@ class FileOps:
         self.tasks_had_blank_between: bool = (
             False  # Track if original file had blank lines between tasks in Tasks section
         )
+        # Interleaved content (non-task lines in Tasks section) - Phase 10
+        # Key: task_id (of preceding task), Value: list[str] (lines of comments/whitespace)
+        # Preserves user comments, notes, or other content between tasks
+        self.interleaved_content: dict[str, list[str]] = {}
 
         # Ensure config directory exists
         if not self.config_dir.exists():
@@ -137,6 +141,7 @@ class FileOps:
         self.footer_lines = []
         self.metadata_lines = []
         self.relationships = {}  # Will be populated during parsing
+        self.interleaved_content = {}  # Reset interleaved content for each parse
 
         # Regex patterns
         # Match [ ], [x], or [D] checkboxes
@@ -363,6 +368,19 @@ class FileOps:
             if current_task and line_stripped.startswith(">"):
                 note_content = line_stripped[1:].strip()
                 current_task.add_note(note_content)
+                continue
+
+            # Phase 10: Capture interleaved content (non-task lines in Tasks section)
+            # This includes comments or other markdown content between tasks
+            # Note: Blank lines are handled by existing blank line logic, not captured here
+            # (They will be handled properly in Phase 12 with the snapshot system)
+            if current_section in TASK_SECTIONS and current_task and line_stripped:
+                # We're in a task section and have a current task
+                # This line is not a task, not a note, not a section header, not metadata, and not blank
+                # Capture it as interleaved content keyed by the preceding task ID
+                if current_task.id not in self.interleaved_content:
+                    self.interleaved_content[current_task.id] = []
+                self.interleaved_content[current_task.id].append(line)
                 continue
 
             # Ignore empty lines inside task sections to clean up output?

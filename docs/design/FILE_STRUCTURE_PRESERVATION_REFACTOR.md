@@ -179,6 +179,8 @@ class FileStructureSnapshot:
     # Interleaved content (non-task lines in Tasks section)
     # Key: task_id (of preceding task), Value: tuple[str, ...] (lines of comments/whitespace)
     # Preserves user comments, notes, or other content between tasks
+    # Note: Using dict[str, tuple] instead of list[str] for immutability (frozen dataclass requirement)
+    # Alternative considered: Token Stream (list of Chunks: Task/Header/RawContent), but dict is simpler
     interleaved_content: dict[str, tuple[str, ...]]
 ```
 
@@ -202,6 +204,9 @@ class FileOps:
 
         # Structure snapshot - captured once, never modified
         self._structure_snapshot: FileStructureSnapshot | None = None
+        self._snapshot_mtime: float = 0.0  # File modification time when snapshot was captured
+        # Used to detect external file modifications (e.g., user edits in editor)
+        # If file mtime > snapshot_mtime, snapshot is stale and must be recaptured
 
         # Relationships (can change as tasks are modified)
         self.relationships: dict[str, dict[str, list[str]]] = {}
@@ -270,7 +275,9 @@ class FileOps:
 
         # ... parsing logic to detect all structure elements ...
         # IMPORTANT: Capture non-task lines (comments, notes) between tasks
+        # The parser must STOP discarding unknown lines to achieve 100% parity with sed-like behavior
         # Store them keyed by preceding task_id to preserve position
+        # This ensures user comments like "# NOTE: Urgent" between tasks are preserved
 
         return FileStructureSnapshot(
             tasks_header_format=tasks_header_format or "## Tasks",
@@ -550,9 +557,12 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
 **Issue:** Boolean flags (e.g., `blank_between_tasks`) imply uniform formatting, but real files may be inconsistent.
 
 **Decision:** Adopt **Smart Normalization** as default behavior:
-- If inconsistent blank lines detected, use *dominant* pattern (>50% threshold)
+- If inconsistent blank lines detected during parsing, use *dominant* pattern
+- **Threshold:** If >50% of task pairs have blank lines between them, enforce blank lines for all
+- If <50% have blank lines, enforce no blank lines for all (normalize to majority)
 - Document as known deviation from strict parity (acceptable trade-off for file health)
 - Shell script preserves inconsistencies; Python normalizes for maintainability
+- This ensures files become cleaner over time while maintaining reasonable parity
 
 ## Risk Assessment
 

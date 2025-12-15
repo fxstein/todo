@@ -369,8 +369,8 @@ def test_generate_markdown_uses_snapshot(tmp_path):
     assert task1_idx < comment_idx < task2_idx
 
 
-def test_generate_markdown_fallback_to_old_state(tmp_path):
-    """Phase 12: Test that _generate_markdown falls back to old state when snapshot is None (dual mode)."""
+def test_generate_markdown_requires_snapshot(tmp_path):
+    """Phase 13: Test that _generate_markdown requires snapshot (no fallback)."""
     content = """## Tasks
 - [ ] **#1** Task 1
 """
@@ -380,17 +380,9 @@ def test_generate_markdown_fallback_to_old_state(tmp_path):
     ops = FileOps(str(todo_path))
     tasks = ops.read_tasks()
 
-    # Manually set old state variables
-    ops.tasks_header_format = "## Tasks"
-    ops.header_lines = []
-    ops.footer_lines = []
-
-    # Generate markdown without snapshot (None)
-    generated = ops._generate_markdown(tasks, None)
-
-    # Verify old state variables are used
-    assert "## Tasks" in generated
-    assert "**#1** Task 1" in generated
+    # Generate markdown without snapshot (None) - should raise ValueError
+    with pytest.raises(ValueError, match="Structure snapshot must be available"):
+        ops._generate_markdown(tasks, None)
 
 
 def test_interleaved_content_insertion_in_generation(tmp_path):

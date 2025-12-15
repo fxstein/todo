@@ -53,16 +53,10 @@ def save_changes(manager: TaskManager, todo_path: str = "TODO.md") -> None:
         _file_ops_cache[todo_path] = file_ops
     else:
         # Re-read to get latest file state (in case file was modified externally)
-        # This ensures we have the correct original_tasks_header_has_blank_line
+        # Phase 13: Structure is now preserved via snapshot, no state restoration needed
         file_ops.read_tasks()
     tasks = manager.list_tasks()
-    # Always restore original blank line state for normal operations (not add/restore)
-    # This ensures blank lines are preserved across operations
-    if hasattr(file_ops, "original_tasks_header_has_blank_line"):
-        file_ops.tasks_header_has_blank_line = file_ops.original_tasks_header_has_blank_line
-        # Clear override flag for normal operations
-        if hasattr(file_ops, "_blank_line_overridden"):
-            delattr(file_ops, "_blank_line_overridden")
+    # Phase 13: Structure preservation is handled automatically by snapshot
     file_ops.write_tasks(tasks)
 
 
@@ -79,8 +73,12 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
         file_ops.read_tasks()
 
     tasks = file_ops.read_tasks()
-    # Check if original file had blank line after ## Tasks (will become blank between tasks)
-    original_had_blank_after_header = file_ops.tasks_header_has_blank_line
+    # Phase 13: Get blank line state from snapshot instead of old state variables
+    original_had_blank_after_header = (
+        file_ops._structure_snapshot.blank_after_tasks_header
+        if file_ops._structure_snapshot
+        else False
+    )
 
     manager = TaskManager(tasks)
 
@@ -93,11 +91,8 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     # Create task
     task = manager.add_task(description, tags, task_id=new_id)
 
-    # For add, match shell script behavior:
-    # - Insert directly after ## Tasks (no blank line after header)
-    # - But preserve original blank line as blank line between tasks
-    file_ops.tasks_header_has_blank_line = False
-    file_ops._blank_line_overridden = True  # Mark as explicitly overridden
+    # Phase 13: Structure preservation is handled by snapshot automatically
+    # Manual file editing will be removed in Phase 14
     file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
 
     # After writing, if original had blank after header, ensure blank line between first two tasks
@@ -139,13 +134,7 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
                     lines.insert(second_task_idx, "")
                     Path(todo_path).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
-    # Restore original blank line state for future operations
-    # This ensures subsequent operations (modify, complete, undo) preserve blank lines correctly
-    if hasattr(file_ops, "original_tasks_header_has_blank_line"):
-        file_ops.tasks_header_has_blank_line = file_ops.original_tasks_header_has_blank_line
-    # Clear override flag so normal operations work correctly
-    if hasattr(file_ops, "_blank_line_overridden"):
-        delattr(file_ops, "_blank_line_overridden")
+    # Phase 13: Structure preservation is handled automatically by snapshot
 
     # Update serial file with new task ID
     # Extract numeric part from task ID
@@ -354,16 +343,17 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
         # Read file state BEFORE restore to detect original blank line structure
         file_ops = FileOps(todo_path)
         file_ops.read_tasks()
-        # Check if original file had blank line after ## Tasks (will become blank between tasks)
-        original_had_blank_after_header = file_ops.tasks_header_has_blank_line
+        # Phase 13: Get blank line state from snapshot instead of old state variables
+        original_had_blank_after_header = (
+            file_ops._structure_snapshot.blank_after_tasks_header
+            if file_ops._structure_snapshot
+            else False
+        )
 
         task = manager.restore_task(task_id)
 
-        # For restore, match shell script behavior:
-        # - Insert directly after ## Tasks (no blank line after header)
-        # - But preserve original blank line as blank line between tasks
-        file_ops.tasks_header_has_blank_line = False
-        file_ops._blank_line_overridden = True  # Mark as explicitly overridden
+        # Phase 13: Structure preservation is handled by snapshot automatically
+        # Manual file editing will be removed in Phase 14
         file_ops.write_tasks(manager.list_tasks(), preserve_blank_line_state=False)
 
         # After writing, if original had blank after header, ensure blank line between first two tasks

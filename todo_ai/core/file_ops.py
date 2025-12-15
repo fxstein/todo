@@ -59,15 +59,6 @@ class FileOps:
         self.has_original_header: bool = (
             False  # Track if file had a header before first task section
         )
-        self.tasks_header_has_blank_line: bool = (
-            False  # Track if original file had blank line after Tasks header
-        )
-        self.original_tasks_header_has_blank_line: bool = (
-            False  # Preserve original blank line state (never changes)
-        )
-        self._blank_line_overridden: bool = (
-            False  # Temporary override flag for add/restore operations
-        )
         self.tasks_had_blank_between: bool = (
             False  # Track if original file had blank lines between tasks in Tasks section
         )
@@ -119,45 +110,16 @@ class FileOps:
 
         Args:
             tasks: List of tasks to write
-            preserve_blank_line_state: If True, check current file state before writing
-                to preserve blank line format (helps match shell script behavior)
-                Note: This is kept for backward compatibility during Phase 12 dual mode.
+            preserve_blank_line_state: Deprecated parameter kept for backward compatibility.
+                Structure is now always preserved via snapshot.
         """
-        # Phase 12: Use snapshot if available, otherwise fall back to old logic
+        # Phase 13: Ensure snapshot is available (should always be set by read_tasks())
         if self._structure_snapshot is None:
             # Fallback: read once to get snapshot
             self.read_tasks()
 
-        # Before writing, check current file state for blank line after ## Tasks
-        # This helps match shell script behavior (e.g., restore inserts directly)
-        # Phase 12: Keep this for dual mode compatibility
-        if preserve_blank_line_state and self.todo_path.exists() and self.tasks_header_format:
-            try:
-                current_content = self.todo_path.read_text(encoding="utf-8")
-                current_lines = current_content.splitlines()
-                for i, line in enumerate(current_lines):
-                    if (
-                        line == self.tasks_header_format
-                        or line.strip() == self.tasks_header_format.strip()
-                    ):
-                        if i + 1 < len(current_lines):
-                            next_line = current_lines[i + 1]
-                            # If current file has no blank line (task follows directly),
-                            # don't add one (matches shell restore/add behavior)
-                            if next_line.strip().startswith("- ["):
-                                self.tasks_header_has_blank_line = False
-                                break
-                            elif next_line.strip() == "":
-                                # Check if line after blank is a task
-                                if i + 2 < len(current_lines) and current_lines[
-                                    i + 2
-                                ].strip().startswith("- ["):
-                                    self.tasks_header_has_blank_line = True
-                                    break
-                        break
-            except Exception:
-                # If we can't read the file, use existing detection
-                pass
+        if self._structure_snapshot is None:
+            raise ValueError("Structure snapshot must be available for writing tasks")
 
         content = self._generate_markdown(tasks, self._structure_snapshot)
         self.todo_path.write_text(content, encoding="utf-8")
@@ -217,7 +179,7 @@ class FileOps:
         in_metadata_section = False
         in_metadata_section = False
 
-        for line_idx, line in enumerate(lines):
+        for line in lines:
             line_stripped = line.strip()
 
             # Check for single # Tasks section (common format)
@@ -228,14 +190,7 @@ class FileOps:
                 # If this is the first line (no header), mark that we had no original header
                 if not seen_tasks_section and len(self.header_lines) == 0:
                     self.has_original_header = False
-                # Check if next line is blank (preserve blank line format)
-                if line_idx + 1 < len(lines):
-                    next_line = lines[line_idx + 1]
-                    if next_line.strip() == "":
-                        self.tasks_header_has_blank_line = True
-                        self.original_tasks_header_has_blank_line = True
-                    else:
-                        self.original_tasks_header_has_blank_line = False
+                # Blank line detection now handled by snapshot
                 # Don't add to header_lines - it's the tasks section header, not a header line
                 # We'll write it separately in _generate_markdown
                 current_section = "Tasks"
@@ -259,17 +214,7 @@ class FileOps:
                     # Check if this is Tasks section and next line is blank or a task
                     if section_name == "Tasks":
                         self.tasks_header_format = line
-                        # Reset blank line detection - we'll check the next line
-                        self.tasks_header_has_blank_line = False
-                        if line_idx + 1 < len(lines):
-                            next_line = lines[line_idx + 1]
-                            if next_line.strip() == "":
-                                self.tasks_header_has_blank_line = True
-                                self.original_tasks_header_has_blank_line = True
-                            # If next line is a task (starts with "- ["), no blank line after header
-                            elif next_line.strip().startswith("- ["):
-                                self.tasks_header_has_blank_line = False
-                                self.original_tasks_header_has_blank_line = False
+                        # Blank line detection now handled by snapshot
                     current_section = section_name
                     seen_tasks_section = True
                     current_task = None
@@ -684,69 +629,35 @@ class FileOps:
 
         lines: list[str] = []
 
-        # Phase 12: Use snapshot if available, otherwise fall back to old state variables (dual mode)
-        use_snapshot = snapshot is not None
+        # Phase 13: Always use snapshot (no fallback)
+        if snapshot is None:
+            raise ValueError("Structure snapshot must be available for generation")
 
-        # 1. Header (use snapshot or preserved)
-        if use_snapshot and snapshot is not None:
-            if snapshot.header_lines:
-                lines.extend(snapshot.header_lines)
-                if lines and lines[-1].strip() != "":
-                    lines.append("")
-            elif snapshot.has_original_header:
-                # Default header if file had one originally
-                lines.extend(
-                    [
-                        "# todo.ai ToDo List",
-                        "",
-                        "> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**",
-                        "",
-                    ]
-                )
-        else:
-            # Old logic (dual mode)
-            if self.header_lines:
-                lines.extend(self.header_lines)
-                if lines and lines[-1].strip() != "":
-                    lines.append("")
-            elif not self.tasks_header_format and self.has_original_header:
-                lines = [
+        # 1. Header (use snapshot)
+        if snapshot.header_lines:
+            lines.extend(snapshot.header_lines)
+            if lines and lines[-1].strip() != "":
+                lines.append("")
+        elif snapshot.has_original_header:
+            # Default header if file had one originally
+            lines.extend(
+                [
                     "# todo.ai ToDo List",
                     "",
                     "> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**",
                     "",
                 ]
-                if lines and lines[-1].strip() != "":
-                    lines.append("")
-
-        # 2. Tasks Section - use snapshot or preserved format
-        if use_snapshot and snapshot is not None:
-            tasks_header = snapshot.tasks_header_format
-            lines.append(tasks_header)
-            if snapshot.blank_after_tasks_header and active_tasks:
+            )
+            if lines and lines[-1].strip() != "":
                 lines.append("")
-        else:
-            # Old logic (dual mode)
-            if self.tasks_header_format:
-                lines.append(self.tasks_header_format)
-                # Match shell script behavior with old state variables
-                if self.tasks_header_has_blank_line is False and hasattr(
-                    self, "_blank_line_overridden"
-                ):
-                    blank_after_header = False
-                elif (
-                    hasattr(self, "original_tasks_header_has_blank_line")
-                    and self.original_tasks_header_has_blank_line
-                ):
-                    blank_after_header = True
-                else:
-                    blank_after_header = self.tasks_header_has_blank_line
-                if blank_after_header and active_tasks:
-                    lines.append("")
-            else:
-                lines.append("## Tasks")
-                if active_tasks:
-                    lines.append("")
+
+        # 2. Tasks Section - Phase 13: Always use snapshot (no fallback)
+        if snapshot is None:
+            raise ValueError("Structure snapshot must be available for generation")
+        tasks_header = snapshot.tasks_header_format
+        lines.append(tasks_header)
+        if snapshot.blank_after_tasks_header and active_tasks:
+            lines.append("")
 
         def format_task(t: Task) -> str:
             # Determine checkbox
@@ -784,62 +695,28 @@ class FileOps:
             return line
 
         # Add tasks
-        # Phase 12: Use snapshot for blank lines between tasks, otherwise use old logic (dual mode)
-        if use_snapshot and snapshot is not None:
-            blank_between_tasks = snapshot.blank_between_tasks
-        else:
-            # Old logic: Check if we need to preserve blank lines between tasks
-            preserve_task_blanks = False
-            if not self.tasks_header_has_blank_line and len(active_tasks) > 1:
-                if self.todo_path.exists():
-                    try:
-                        current_content = self.todo_path.read_text(encoding="utf-8")
-                        current_lines = current_content.splitlines()
-                        in_tasks = False
-                        for i, line in enumerate(current_lines):
-                            if line == self.tasks_header_format or (
-                                self.tasks_header_format
-                                and line.strip() == self.tasks_header_format.strip()
-                            ):
-                                in_tasks = True
-                                continue
-                            if in_tasks and line.strip().startswith("- ["):
-                                if i + 1 < len(current_lines):
-                                    next_line = current_lines[i + 1]
-                                    if next_line.strip() == "":
-                                        if i + 2 < len(current_lines) and current_lines[
-                                            i + 2
-                                        ].strip().startswith("- ["):
-                                            preserve_task_blanks = True
-                                            break
-                            elif in_tasks and line.strip().startswith("## "):
-                                break
-                    except Exception:
-                        pass
-            blank_between_tasks = preserve_task_blanks
+        # Phase 13: Always use snapshot for blank lines between tasks
+        if snapshot is None:
+            raise ValueError("Structure snapshot must be available for generation")
+        blank_between_tasks = snapshot.blank_between_tasks
 
         # Phase 12: Generate tasks with interleaved content insertion
         for i, t in enumerate(active_tasks):
             lines.append(format_task(t))
-            # Phase 12: Insert interleaved content if any (preserves user comments/notes)
-            if use_snapshot and snapshot is not None and t.id in snapshot.interleaved_content:
+            # Phase 13: Insert interleaved content if any (preserves user comments/notes)
+            if t.id in snapshot.interleaved_content:
                 lines.extend(snapshot.interleaved_content[t.id])
             # Add blank line between tasks if snapshot/old logic indicates
             if blank_between_tasks and i < len(active_tasks) - 1:
                 lines.append("")
 
         # Add blank line after Tasks section if there are tasks AND other sections exist
-        if use_snapshot and snapshot is not None:
-            if (
-                snapshot.blank_after_tasks_section
-                and active_tasks
-                and (archived_tasks or deleted_tasks)
-            ):
-                lines.append("")
-        elif not use_snapshot:
-            # Old logic
-            if active_tasks and (archived_tasks or deleted_tasks):
-                lines.append("")
+        if (
+            snapshot.blank_after_tasks_section
+            and active_tasks
+            and (archived_tasks or deleted_tasks)
+        ):
+            lines.append("")
 
         # 3. Recently Completed Section
         if archived_tasks:
@@ -869,11 +746,7 @@ class FileOps:
                 lines.append(format_task(t))
 
         # 5. Task Metadata Section (if relationships exist or section was present)
-        metadata_lines_to_use = (
-            snapshot.metadata_lines
-            if (use_snapshot and snapshot is not None)
-            else self.metadata_lines
-        )
+        metadata_lines_to_use = snapshot.metadata_lines
         if self.relationships or metadata_lines_to_use:
             if lines[-1].strip() != "":
                 lines.append("")
@@ -901,10 +774,8 @@ class FileOps:
                 if metadata_lines_to_use:
                     lines.extend(metadata_lines_to_use)
 
-        # 6. Footer (use snapshot or preserved)
-        footer_lines_to_use = (
-            snapshot.footer_lines if (use_snapshot and snapshot is not None) else self.footer_lines
-        )
+        # 6. Footer (use snapshot)
+        footer_lines_to_use = snapshot.footer_lines
         if footer_lines_to_use:
             # Ensure spacing
             if lines[-1].strip() != "":

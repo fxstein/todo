@@ -3,6 +3,26 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization`
+  - [ ] **#169.3** Phase 3: Cleanup and documentation `#cicd`
+    - [ ] **#169.3.4** Update development docs with new workflow `#cicd` `#docs`
+    - [ ] **#169.3.3** Verify all checks pass in CI and locally `#cicd` `#testing`
+    - [ ] **#169.3.2** Update CICD_OPTIMIZATION_ASSESSMENT.md with results `#cicd`
+    - [ ] **#169.3.1** Archive scripts/pre-commit-hook.sh to docs/archive/ `#cicd`
+  - [ ] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd`
+    - [ ] **#169.2.6** Test pre-commit hooks locally `#cicd` `#testing`
+    - [ ] **#169.2.5** Add detect-secrets hook for security `#cicd`
+    - [ ] **#169.2.4** Add codespell hook for spelling checks `#cicd`
+    - [ ] **#169.2.3** Add todo.ai --lint hook to pre-commit config `#cicd`
+    - [ ] **#169.2.2** Add ascii-guard hook to pre-commit config `#cicd`
+    - [ ] **#169.2.1** Restrict pytest hook to tests/unit only `#cicd`
+  - [ ] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd`
+    - [ ] **#169.1.6** Test new CI workflow with PR and main branch `#cicd` `#testing`
+    - [ ] **#169.1.5** Enable caching for pre-commit and uv `#cicd`
+    - [ ] **#169.1.4** Remove redundant ruff/mypy steps from CI `#cicd`
+    - [ ] **#169.1.3** Add Python 3.13 and 3.14 to main branch matrix `#cicd`
+    - [ ] **#169.1.2** Implement smart matrix (PR=single env, main=full matrix) `#cicd`
+    - [ ] **#169.1.1** Split CI workflow into quality and test jobs `#cicd`
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
@@ -901,6 +921,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 22:59:22 CET 2025
+**Last Updated:** Tue Dec 16 00:57:17 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

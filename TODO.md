@@ -21,12 +21,12 @@
     - [ ] **#163.51.7** Add unit tests for FileStructureSnapshot `#test`
     - [ ] **#163.51.6** Update documentation `#docs`
     - [ ] **#163.51.5** Remove unused methods and parameters `#code`
-  - [ ] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands `#code`
-    - [ ] **#163.50.10** Run full test suite, verify parity tests pass `#test`
-    - [ ] **#163.50.9** Remove preserve_blank_line_state parameter from write_tasks() `#code`
-    - [ ] **#163.50.8** Remove state restoration logic from all commands `#code`
-    - [ ] **#163.50.7** Remove manual file editing from restore_command() `#code`
-    - [ ] **#163.50.6** Remove manual file editing from add_command() `#code`
+  - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands `#code`
+    - [x] **#163.50.10** Run full test suite, verify parity tests pass `#test`
+    - [x] **#163.50.9** Remove preserve_blank_line_state parameter from write_tasks() `#code`
+    - [x] **#163.50.8** Remove state restoration logic from all commands `#code`
+    - [x] **#163.50.7** Remove manual file editing from restore_command() `#code`
+    - [x] **#163.50.6** Remove manual file editing from add_command() `#code`
   - [x] **#163.49** Phase 13: Remove Old State Variables (Breaking) - Remove mutable state variables and override logic `#code`
     - [x] **#163.49.10** Run full test suite, fix any regressions `#test`
     - [x] **#163.49.9** Remove all override logic from _generate_markdown() `#code`
@@ -901,6 +901,6 @@
 
 ---
 
-**Last Updated:** Mon Dec 15 19:47:04 CET 2025
+**Last Updated:** Mon Dec 15 20:00:04 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

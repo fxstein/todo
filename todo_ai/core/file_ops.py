@@ -105,15 +105,13 @@ class FileOps:
         content = self.todo_path.read_text(encoding="utf-8")
         return self._parse_markdown(content)
 
-    def write_tasks(self, tasks: list[Task], preserve_blank_line_state: bool = True) -> None:
+    def write_tasks(self, tasks: list[Task]) -> None:
         """Write tasks to TODO.md using preserved structure snapshot.
 
         Args:
             tasks: List of tasks to write
-            preserve_blank_line_state: Deprecated parameter kept for backward compatibility.
-                Structure is now always preserved via snapshot.
         """
-        # Phase 13: Ensure snapshot is available (should always be set by read_tasks())
+        # Phase 14: Ensure snapshot is available (should always be set by read_tasks())
         if self._structure_snapshot is None:
             # Fallback: read once to get snapshot
             self.read_tasks()

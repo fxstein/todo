@@ -95,10 +95,10 @@ Adopt **Smart Normalization** as the default behavior, but document it as a know
    * **Update `FileOps._parse_markdown` to capture non-task lines in the Tasks section instead of discarding them.**
    * **Store these lines in a temporary structure to ensure they survive a read/write cycle.**
 
-2.  **Phase 2: Immutable Snapshot with Validation**
-    *   Implement `FileStructureSnapshot` as proposed.
-    *   Add `interleaved_content` storage to the snapshot.
-    *   Implement `mtime` validation in the `FileOps` cache.
+2. **Phase 2: Immutable Snapshot with Validation**
+   * **Implement `FileStructureSnapshot` as proposed.**
+   * **Add `interleaved_content` storage to the snapshot.**
+   * **Implement `mtime` validation in the `FileOps` cache.**
 
-3.  **Phase 3: Migration**
-    *   Proceed with the proposed removal of mutable state variables.
+3. **Phase 3: Migration**
+   * **Proceed with the proposed removal of mutable state variables.**

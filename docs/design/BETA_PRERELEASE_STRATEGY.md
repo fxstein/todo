@@ -563,7 +563,7 @@ pyproject.write_text(content)
 # Update todo.ai shell script (SemVer format)
 todo_script = Path('todo.ai')
 content = todo_script.read_text()
-content = re.sub(r'^VERSION=.*', f'VERSION=\"{git_tag.lstrip(\"v\")}\"', content, flags=re.MULTILINE)
+content = re.sub(r'^VERSION=.*', f'VERSION=\"{git_tag.removeprefix(\"v\")}\"', content, flags=re.MULTILINE)
 todo_script.write_text(content)
 
 # Update todo_ai/__init__.py (PEP 440 format)

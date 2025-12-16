@@ -11,6 +11,7 @@
   - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
   - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
 - [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
+  - [x] **#173.12** Remove --no-verify from release script (ETERNALLY FORBIDDEN) `#critical`
   - [x] **#173.11** Fix pre-commit hook handling - committed files don't include hook fixes `#bug`
     > Root cause: Pre-commit hooks ran AFTER staging, fixed files in working dir, but retry logic committed unfixed version from index. Fix: Run pre-commit BEFORE staging to let hooks fix files first, then stage clean files.
   - [x] **#173.10** Fix todo.bash formatting issues causing CI failures `#bug`
@@ -1052,6 +1053,6 @@
 
 ---
 
-**Last Updated:** Wed Dec 17 00:29:40 CET 2025
+**Last Updated:** Wed Dec 17 00:32:15 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

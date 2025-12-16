@@ -1371,15 +1371,18 @@ Includes release summary from ${SUMMARY_FILE}"
                 [[ -n "$file" ]] && git add "$file"
             done <<< "$unstaged"
 
-            # Retry commit with --no-verify (hooks already ran)
-            if ! git commit --no-verify -m "$commit_message" > /dev/null 2>&1; then
+            # Retry commit - hooks will run again, which is correct
+            # If hooks modify files again, we'll fail and require manual intervention
+            if ! git commit -m "$commit_message" > /dev/null 2>&1; then
                 echo -e "${RED}❌ Error: Failed to commit version changes${NC}"
                 echo -e "${RED}   → Git commit failed even after re-staging${NC}"
+                echo -e "${RED}   → Pre-commit hooks may still be modifying files${NC}"
                 echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
-                log_release_step "COMMIT ERROR" "Failed to commit version changes after re-staging"
+                echo -e "${RED}   → This indicates a deeper issue that needs investigation${NC}"
+                log_release_step "COMMIT ERROR" "Failed to commit version changes after re-staging - hooks may still be modifying files"
                 exit 1
             fi
-            log_release_step "VERSION COMMITTED" "Version change committed successfully (retried after hook modifications)"
+            log_release_step "VERSION COMMITTED" "Version change committed successfully (retried with hook modifications)"
         else
             # Commit failed for another reason
             echo -e "${RED}❌ Error: Failed to commit version changes${NC}"

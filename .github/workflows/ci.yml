@@ -50,14 +50,14 @@ jobs:
             !**/dist/**
         continue-on-error: true
 
-  test:
-    name: ${{ matrix.python-version == '3.14' && format('🔬 Comprehensive Tests - Python {0} ({1})', matrix.python-version, matrix.os) || format('⚡ Quick Tests - Python {0} ({1})', matrix.python-version, matrix.os) }}
+  test-comprehensive:
+    name: Comprehensive Tests
+    if: github.event_name == 'push'
     strategy:
       fail-fast: false
       matrix:
-        # Smart Matrix: Conditional based on event type
-        os: ${{ github.event_name == 'pull_request' && fromJSON('["ubuntu-latest"]') || fromJSON('["ubuntu-latest", "macos-latest", "windows-latest"]') }}
-        python-version: ${{ github.event_name == 'pull_request' && fromJSON('["3.12"]') || fromJSON('["3.10", "3.11", "3.12", "3.13", "3.14"]') }}
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.14"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -85,12 +85,97 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Run unit tests (Python < 3.14 on main)
-        if: matrix.python-version != '3.14' && github.event_name == 'push'
+      - name: Run full test suite
+        run: uv run pytest --cov=todo_ai --cov-report=xml --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+
+  test-quick:
+    name: Quick Tests
+    if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Zsh (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run unit tests
         run: uv run pytest tests/unit --cov=todo_ai --cov-report=xml --cov-report=term
 
-      - name: Run full test suite (Python 3.14 on main, or PRs)
-        if: matrix.python-version == '3.14' || github.event_name == 'pull_request'
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+
+  test-pr:
+    name: PR Tests
+    if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.12"]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Zsh (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Run full test suite
         run: uv run pytest --cov=todo_ai --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov

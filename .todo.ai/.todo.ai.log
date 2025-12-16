@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 01:16:40 | fxstein | NOTE | 171 | Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
+2025-12-16 01:14:17 | fxstein | COMPLETE | 171 | Improve CI/CD job grouping and naming
 2025-12-16 01:14:10 | fxstein | NOTE | 171 | Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
 2025-12-16 01:14:09 | fxstein | ADD | 171 | Improve CI/CD job grouping and naming
 2025-12-16 01:10:42 | fxstein | COMPLETE | 170 | Further optimize CI/CD: Granular test strategy

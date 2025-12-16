@@ -122,7 +122,7 @@ To update an existing installation, run: `./todo.ai update`
 It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo.ai/ must always be committed together
 Always ask for user confirmation before archiving completed tasks using todo.ai
-NEVER modify TODO.md direclty using sed or similar - ALWAYS use todo.ai to manipulate it.
+NEVER modify TODO.md directly using sed or similar - ALWAYS use todo.ai to manipulate it.
 ```
 
 **ascii-guard version:**

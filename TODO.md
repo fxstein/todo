@@ -20,6 +20,7 @@
     - [x] **#169.2.4** Add codespell hook for spelling checks `#cicd`
       > Added codespell from codespell-project/codespell@v2.3.0, ignores: crate,nd,te,wil
     - [x] **#169.2.3** Add todo.ai --lint hook to pre-commit config `#cicd`
+      > todo.ai --lint hook disabled in pre-commit: requires zsh which is not available in CI quality job
       > Added todo.ai --lint as local hook, runs only on TODO.md changes
     - [x] **#169.2.2** Add ascii-guard hook to pre-commit config `#cicd`
       > ASCII-guard hook temporarily disabled due to pipx Python environment exec format error - needs investigation
@@ -936,6 +937,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:03:12 CET 2025
+**Last Updated:** Tue Dec 16 01:04:15 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

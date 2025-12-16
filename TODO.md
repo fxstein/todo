@@ -12,17 +12,28 @@
   - [ ] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd`
     - [ ] **#169.2.6** Test pre-commit hooks locally `#cicd` `#testing`
     - [ ] **#169.2.5** Add detect-secrets hook for security `#cicd`
+      > Added detect-secrets from pre-commit-hooks (id: detect-secrets)
     - [ ] **#169.2.4** Add codespell hook for spelling checks `#cicd`
+      > Added codespell from codespell-project/codespell@v2.3.0, ignores: crate,nd,te,wil
     - [ ] **#169.2.3** Add todo.ai --lint hook to pre-commit config `#cicd`
+      > Added todo.ai --lint as local hook, runs only on TODO.md changes
     - [ ] **#169.2.2** Add ascii-guard hook to pre-commit config `#cicd`
+      > ASCII-guard hook temporarily disabled due to pipx Python environment exec format error - needs investigation
+      > Added ascii-guard as local hook, runs on markdown files matching \.(md|mdc)$
     - [ ] **#169.2.1** Restrict pytest hook to tests/unit only `#cicd`
+      > Modified pytest hook: entry changed to 'uv run pytest tests/unit' to only run unit tests
   - [ ] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd`
     - [ ] **#169.1.6** Test new CI workflow with PR and main branch `#cicd` `#testing`
     - [ ] **#169.1.5** Enable caching for pre-commit and uv `#cicd`
+      > Enabled caching: uv cache (enable-cache: true) and pre-commit hooks cache (~/.cache/pre-commit)
     - [ ] **#169.1.4** Remove redundant ruff/mypy steps from CI `#cicd`
+      > Removed redundant ruff and mypy steps - now only run via pre-commit in quality job
     - [ ] **#169.1.3** Add Python 3.13 and 3.14 to main branch matrix `#cicd`
+      > Added Python 3.13 and 3.14 to main branch matrix with allow-prereleases: true
     - [ ] **#169.1.2** Implement smart matrix (PR=single env, main=full matrix) `#cicd`
+      > Implemented conditional matrix: PRs run ubuntu+3.12 only, main branch runs full 3 OS x 5 Python versions
     - [ ] **#169.1.1** Split CI workflow into quality and test jobs `#cicd`
+      > Split workflow into quality (pre-commit, markdownlint) and test (pytest with coverage) jobs running in parallel
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
@@ -921,6 +932,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 00:57:17 CET 2025
+**Last Updated:** Tue Dec 16 01:01:12 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

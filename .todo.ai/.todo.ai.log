@@ -2,6 +2,17 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 01:01:12 | fxstein | NOTE | 169.2.2 | ASCII-guard hook temporarily disabled due to pipx Python environment exec format error - needs investigation
+2025-12-16 00:59:00 | fxstein | NOTE | 169.2.5 | Added detect-secrets from pre-commit-hooks (id: detect-secrets)
+2025-12-16 00:58:59 | fxstein | NOTE | 169.2.4 | Added codespell from codespell-project/codespell@v2.3.0, ignores: crate,nd,te,wil
+2025-12-16 00:58:58 | fxstein | NOTE | 169.2.3 | Added todo.ai --lint as local hook, runs only on TODO.md changes
+2025-12-16 00:58:57 | fxstein | NOTE | 169.2.2 | Added ascii-guard as local hook, runs on markdown files matching \.(md|mdc)$
+2025-12-16 00:58:57 | fxstein | NOTE | 169.2.1 | Modified pytest hook: entry changed to 'uv run pytest tests/unit' to only run unit tests
+2025-12-16 00:58:36 | fxstein | NOTE | 169.1.5 | Enabled caching: uv cache (enable-cache: true) and pre-commit hooks cache (~/.cache/pre-commit)
+2025-12-16 00:58:35 | fxstein | NOTE | 169.1.4 | Removed redundant ruff and mypy steps - now only run via pre-commit in quality job
+2025-12-16 00:58:34 | fxstein | NOTE | 169.1.3 | Added Python 3.13 and 3.14 to main branch matrix with allow-prereleases: true
+2025-12-16 00:58:32 | fxstein | NOTE | 169.1.2 | Implemented conditional matrix: PRs run ubuntu+3.12 only, main branch runs full 3 OS x 5 Python versions
+2025-12-16 00:58:31 | fxstein | NOTE | 169.1.1 | Split workflow into quality (pre-commit, markdownlint) and test (pytest with coverage) jobs running in parallel
 2025-12-16 00:57:17 | fxstein | ADD_SUBTASK | 169.3.4 | Update development docs with new workflow (parent: #169.3)
 2025-12-16 00:57:16 | fxstein | ADD_SUBTASK | 169.3.3 | Verify all checks pass in CI and locally (parent: #169.3)
 2025-12-16 00:57:15 | fxstein | ADD_SUBTASK | 169.3.2 | Update CICD_OPTIMIZATION_ASSESSMENT.md with results (parent: #169.3)

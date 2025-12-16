@@ -315,9 +315,9 @@ def test_restore_with_dataset(test_env_shell, test_env_python, tmp_path):
     python_output, python_code = run_python_command(["restore", "1"], python_env)
 
     # Compare exit codes
-    assert (
-        shell_code == python_code
-    ), f"Exit codes differ: shell={shell_code}, python={python_code}\nShell: {shell_output}\nPython: {python_output}"
+    assert shell_code == python_code, (
+        f"Exit codes differ: shell={shell_code}, python={python_code}\nShell: {shell_output}\nPython: {python_output}"
+    )
 
     # Compare final TODO.md files
     match, diff = compare_todo_files(shell_env / "TODO.md", python_env / "TODO.md")

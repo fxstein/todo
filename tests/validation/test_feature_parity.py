@@ -212,9 +212,9 @@ def test_show_command_parity(test_env, tmp_path):
 
     # Both should show task details
     assert "#1" in shell_output or "#1" in python_output, "Task ID not found"
-    assert (
-        "Task to show" in shell_output or "Task to show" in python_output
-    ), "Task description not found"
+    assert "Task to show" in shell_output or "Task to show" in python_output, (
+        "Task description not found"
+    )
 
 
 def test_version_command_parity(test_env, tmp_path):

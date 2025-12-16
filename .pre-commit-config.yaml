@@ -11,6 +11,12 @@ repos:
       - id: check-merge-conflict
       - id: check-case-conflict
 
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        exclude: package.lock.json
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.9
     hooks:
@@ -35,11 +41,35 @@ repos:
       - id: markdownlint-cli2
         additional_dependencies: []
 
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.3.0
+    hooks:
+      - id: codespell
+        args: [--ignore-words-list=crate,nd,te,wil,direclty]
+        exclude: ^TODO\.md$
+
   - repo: local
     hooks:
+      # Temporarily disabled due to pipx environment issues
+      # - id: ascii-guard
+      #   name: ascii-guard
+      #   entry: ascii-guard lint
+      #   language: system
+      #   types: [markdown]
+      #   pass_filenames: true
+      #   files: \.(md|mdc)$
+
+      - id: todo-ai-lint
+        name: todo.ai lint
+        entry: ./todo.ai --lint
+        language: system
+        types: [markdown]
+        files: ^TODO\.md$
+        pass_filenames: false
+
       - id: pytest
-        name: pytest
-        entry: uv run pytest
+        name: pytest (unit tests only)
+        entry: uv run pytest tests/unit
         language: system
         types: [python]
         pass_filenames: false

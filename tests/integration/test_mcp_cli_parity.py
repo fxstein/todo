@@ -520,9 +520,9 @@ async def test_all_mcp_tools_exist():
     assert not missing, f"Missing MCP tools: {missing}"
 
     # Verify we have the right count
-    assert len(tool_names) >= len(
-        expected_tools
-    ), f"Expected at least {len(expected_tools)} tools, got {len(tool_names)}"
+    assert len(tool_names) >= len(expected_tools), (
+        f"Expected at least {len(expected_tools)} tools, got {len(tool_names)}"
+    )
 
 
 if __name__ == "__main__":

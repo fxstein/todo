@@ -363,9 +363,9 @@ Only in Python:   {len(normalized_python - normalized_shell)}
 
         # 3. Generate comprehensive report
         report = f"""
-{'='*60}
+{"=" * 60}
 FINAL PARITY AUDIT REPORT (Task #163.44.6)
-{'='*60}
+{"=" * 60}
 
 1. SHELL → PYTHON CLI PARITY
    Shell commands:  {len(shell_commands)}
@@ -385,17 +385,17 @@ FINAL PARITY AUDIT REPORT (Task #163.44.6)
    CLI parity:  {"✅ PASS" if cli_parity == 100.0 else f"❌ FAIL ({cli_parity:.1f}%)"}
    MCP parity:  {"✅ PASS" if len(mcp_tools) >= 27 else f"❌ FAIL ({len(mcp_tools)} tools)"}
 
-{'='*60}
+{"=" * 60}
 FINAL VERDICT: {"✅ 100% FEATURE PARITY ACHIEVED" if cli_parity == 100.0 and len(mcp_tools) >= 27 else "❌ PARITY NOT ACHIEVED"}
-{'='*60}
+{"=" * 60}
 """
 
         print(report)
 
         # Final assertion
-        assert (
-            cli_parity == 100.0 and len(mcp_tools) >= 27
-        ), "Feature parity not achieved. See report above for details."
+        assert cli_parity == 100.0 and len(mcp_tools) >= 27, (
+            "Feature parity not achieved. See report above for details."
+        )
 
 
 if __name__ == "__main__":

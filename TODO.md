@@ -3,10 +3,10 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#174** Set up PyPI project for todo-ai package `#release`
+- [x] **#174** Set up PyPI project for todo-ai package `#release`
   > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
   > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
-  - [ ] **#174.7** Test first beta release with trusted publisher `#testing`
+  - [x] **#174.7** Test first beta release with trusted publisher `#testing`
   - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure`
   - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
   - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
@@ -41,7 +41,7 @@
       > Monitor GitHub Issues/Discussions for feedback. Track beta success metrics: testers, downloads, bugs, feedback sentiment. Engage with testers
     - [ ] **#172.4.2** Announce to GitHub watchers `#documentation`
       > Create GitHub Discussion or update release notes. Use beta announcement template from strategy doc. Highlight what's new, testing needs, known issues
-    - [ ] **#172.4.1** Create v3.0.0b1 release `#release`
+    - [x] **#172.4.1** Create v3.0.0b1 release `#release`
       > FAILED ATTEMPT: Multiple release script bugs found: auto-commit issues, tag verification failures, dirty working directory. PyPI setup also missing. Tag v3.0.0b1 deleted, version reverted. Created task#173 (release bugs) and task#174 (PyPI setup) to fix before retry.
       > Preparing v3.0.0b1 beta release - first real test of beta release system
       > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
@@ -1047,6 +1047,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 20:12:10 CET 2025
+**Last Updated:** Tue Dec 16 23:17:23 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

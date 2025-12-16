@@ -3,6 +3,10 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure`
+  - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure`
+  - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure`
+  - [x] **#175.1** Add pre-commit hook to detect forbidden flags `#infrastructure`
 - [x] **#174** Set up PyPI project for todo-ai package `#release`
   > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
   > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
@@ -1053,6 +1057,6 @@
 
 ---
 
-**Last Updated:** Wed Dec 17 00:32:15 CET 2025
+**Last Updated:** Wed Dec 17 00:42:05 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

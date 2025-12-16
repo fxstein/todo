@@ -14,6 +14,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check for forbidden flags
+        run: |
+          # Build the forbidden flag using string concatenation to avoid self-detection
+          FORBIDDEN="--no-""verify"
+          echo "Checking for forbidden flag: ${FORBIDDEN}"
+
+          if grep -r "$FORBIDDEN" release/ .github/ scripts/ 2>/dev/null; then
+            echo ""
+            echo "❌ CRITICAL: Found forbidden flag '$FORBIDDEN' in codebase"
+            echo "This flag is ETERNALLY FORBIDDEN."
+            echo "It bypasses all pre-commit hooks and safety checks."
+            echo "No automated process may use it without explicit human approval."
+            exit 1
+          fi
+
+          echo "✅ No forbidden flags found"
+
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:

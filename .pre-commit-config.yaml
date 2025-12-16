@@ -50,6 +50,14 @@ repos:
 
   - repo: local
     hooks:
+      - id: check-forbidden-flags
+        name: check-forbidden-flags
+        entry: ./scripts/check-forbidden-flags.sh
+        language: system
+        types: [shell, yaml]
+        pass_filenames: true
+        files: ^(release/|\.github/|scripts/)
+
       # Temporarily disabled due to pipx environment issues
       # - id: ascii-guard
       #   name: ascii-guard

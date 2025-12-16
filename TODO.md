@@ -26,6 +26,7 @@
     - [ ] **#172.4.2** Announce to GitHub watchers `#documentation`
       > Create GitHub Discussion or update release notes. Use beta announcement template from strategy doc. Highlight what's new, testing needs, known issues
     - [ ] **#172.4.1** Create v3.0.0b1 release `#release`
+      > Preparing v3.0.0b1 beta release - first real test of beta release system
       > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
   - [ ] **#172.3** Phase 3: Documentation & Cursor Rules `#documentation`
     > Phase 3 complete: Cursor AI rules with decision trees, updated release process docs, beta testing guide, CHANGELOG.md with examples. Testing tasks 172.3.6-8 remain.
@@ -1035,6 +1036,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 13:18:31 CET 2025
+**Last Updated:** Tue Dec 16 13:35:09 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

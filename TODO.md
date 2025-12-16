@@ -6,8 +6,10 @@
 - [ ] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization`
   - [ ] **#169.3** Phase 3: Cleanup and documentation `#cicd`
     - [ ] **#169.3.4** Update development docs with new workflow `#cicd` `#docs`
-    - [ ] **#169.3.3** Verify all checks pass in CI and locally `#cicd` `#testing`
-    - [ ] **#169.3.2** Update CICD_OPTIMIZATION_ASSESSMENT.md with results `#cicd`
+      > Updated DEVELOPMENT_GUIDELINES.md with CI/CD pipeline details, smart matrix strategy, and test distribution table
+    - [x] **#169.3.3** Verify all checks pass in CI and locally `#cicd` `#testing`
+      > All pre-commit hooks pass locally, GitHub Actions CI running with new workflow
+    - [x] **#169.3.2** Update CICD_OPTIMIZATION_ASSESSMENT.md with results `#cicd`
       > Added Implementation Results section documenting all changes, impacts, and current status
     - [x] **#169.3.1** Archive scripts/pre-commit-hook.sh to docs/archive/ `#cicd`
       > Moved scripts/pre-commit-hook.sh to docs/archive/pre-commit-hook.sh.archived
@@ -934,6 +936,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:02:07 CET 2025
+**Last Updated:** Tue Dec 16 01:03:00 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

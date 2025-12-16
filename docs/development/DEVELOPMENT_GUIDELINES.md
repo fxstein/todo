@@ -30,19 +30,64 @@
 # 1. Make changes to todo.ai (zsh version)
 vim todo.ai
 
-# 2. Test locally
+# 2. Test locally with pre-commit hooks
 ./todo.ai list
-
-# 3. Commit (todo.bash not in git until release)
 git add todo.ai
+# Pre-commit will run: ruff, mypy, unit tests, spelling, secrets detection
+
+# 3. Commit (pre-commit hooks run automatically)
 git commit -m "feat: add new feature"
 
-# 4. Release process handles bash conversion
+# 4. Push to trigger CI/CD
+git push
+# → PR: Runs quality check + unit tests (ubuntu + Python 3.12)
+# → Main: Runs full matrix (3 OS × 5 Python versions)
+
+# 5. Release process handles bash conversion
 ./release/release.sh --prepare
 # → Creates todo.bash automatically
 # → Tests both versions
 # → Shows diff summary
 ```
+
+### CI/CD Pipeline
+
+**Smart Matrix Strategy:**
+
+- **Pull Requests**: Fast feedback with minimal testing
+  - Quality check (linting, typing, spelling, secrets)
+  - Test suite on `ubuntu-latest` + Python 3.12 only
+  - ~5-10 minutes total
+- **Main Branch**: Comprehensive testing
+  - Same quality checks
+  - Test suite on 3 OS × 5 Python versions (3.10, 3.11, 3.12, 3.13, 3.14)
+  - ~20-30 minutes total
+
+**Local Pre-commit Hooks:**
+
+- Trailing whitespace, end-of-file fixes
+- YAML/JSON validation
+- Ruff (linting + formatting)
+- Mypy (type checking, excluding tests)
+- Markdownlint
+- Codespell (spelling)
+- Detect-secrets (security)
+- `todo.ai --lint` (TODO.md validation)
+- Pytest (unit tests only - fast!)
+
+**What Runs Where:**
+
+| Check | Local | PR CI | Main CI |
+|-------|-------|-------|---------|
+| Ruff | ✅ | ✅ | ✅ |
+| Mypy | ✅ | ✅ | ✅ |
+| Spelling | ✅ | ✅ | ✅ |
+| Secrets | ✅ | ✅ | ✅ |
+| Unit tests | ✅ | ✅ | ✅ |
+| Integration tests | ❌ | ✅ | ✅ |
+| E2E tests | ❌ | ✅ | ✅ |
+| Multi-OS | ❌ | ❌ | ✅ |
+| Multi-Python | ❌ | ❌ | ✅ |
 
 ### File Status
 

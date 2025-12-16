@@ -127,11 +127,15 @@ Perfect for AI agents - just works.
 
 ## Installation
 
-### Modern Python Version (v3.0+) - Recommended
+### Stable Release (Recommended)
 
-Install via pipx for standard CLI and MCP Server support:
+Install via uv (recommended) or pipx for standard CLI and MCP Server support:
 
 ```bash
+# Using uv (recommended - faster, more reliable)
+uv tool install todo-ai
+
+# Alternative: pipx
 pipx install todo-ai
 ```
 
@@ -142,6 +146,53 @@ This installs two commands:
 **Documentation:**
 - [Python Migration Guide](docs/user/PYTHON_MIGRATION_GUIDE.md) - How to upgrade from v2.x (Shell).
 - [MCP Setup Guide](docs/user/MCP_SETUP.md) - How to set up Cursor AI integration.
+
+### Beta Testing (Help Us Test)
+
+Want to try upcoming features before they're released? Install the latest beta:
+
+```bash
+# Using uv (recommended)
+uv tool install --prerelease=allow todo-ai
+
+# Alternative: pipx
+pipx install --pre todo-ai
+```
+
+Beta releases let you test new features and provide feedback before stable release. See [Release Channels](#release-channels) below for more information.
+
+<details>
+<summary>Alternative Installation Methods</summary>
+
+**Using pip:**
+```bash
+pip install todo-ai              # Stable
+pip install --pre todo-ai        # Beta
+```
+
+> **Recommendation:** Use `uv tool` or `pipx` for isolated installations that won't conflict with other Python packages.
+
+</details>
+
+### Development Version
+
+Install from Git to get the latest unreleased code:
+
+```bash
+# Using uv (recommended)
+uv tool install git+https://github.com/fxstein/todo.ai.git@main
+
+# Alternative: pipx
+pipx install git+https://github.com/fxstein/todo.ai.git@main
+```
+
+### Release Channels
+
+- **Stable:** Fully tested, production-ready releases (recommended)
+- **Beta:** Feature-complete pre-releases for testing (7+ days before stable for major releases)
+- **Development:** Latest code from main branch (may have bugs)
+
+See [CHANGELOG.md](CHANGELOG.md) for version history and release notes.
 
 ### Legacy Shell Script (v2.x)
 
@@ -169,6 +220,10 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash
 
 **Python (v3.0+):**
 ```bash
+# Using uv (recommended)
+uv tool upgrade todo-ai
+
+# Alternative: pipx
 pipx upgrade todo-ai
 ```
 
@@ -181,6 +236,10 @@ pipx upgrade todo-ai
 
 **Python (v3.0+):**
 ```bash
+# Using uv (recommended)
+uv tool uninstall todo-ai
+
+# Alternative: pipx
 pipx uninstall todo-ai
 ```
 

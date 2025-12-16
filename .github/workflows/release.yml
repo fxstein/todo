@@ -21,6 +21,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Detect pre-release type
+        id: prerelease
+        run: |
+          TAG="${{ github.ref_name }}"
+          # Simple regex: if tag ends with 'b' + digits, it's a beta
+          if [[ "$TAG" =~ b[0-9]+$ ]]; then
+            echo "type=beta" >> $GITHUB_OUTPUT
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "type=stable" >> $GITHUB_OUTPUT
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install uv
         uses: astral-sh/setup-uv@v3
         with:
@@ -53,6 +66,6 @@ jobs:
           # Don't generate notes - release.sh already created the release with notes
           # This action will attach files to the existing release created by release.sh
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

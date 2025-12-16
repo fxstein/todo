@@ -393,6 +393,92 @@ calculate_next_version() {
     echo "${major}.${minor}.${patch}"
 }
 
+# Determine next beta version by querying GitHub releases
+# Returns version like "1.0.0b1", "1.0.0b2", etc.
+determine_beta_version() {
+    local base_version="$1"  # e.g., "1.0.0"
+
+    # Query GitHub for existing beta releases matching this base version
+    # Format: v1.0.0b1, v1.0.0b2, etc.
+    local existing_betas=$(gh release list --limit 100 --json tagName --jq '.[].tagName' 2>/dev/null | grep "^v${base_version}b[0-9]\+$" || echo "")
+
+    if [[ -z "$existing_betas" ]]; then
+        # No betas found for this version - use b1
+        echo "${base_version}b1"
+        log_release_step "BETA VERSION" "No existing betas found for ${base_version}, using b1"
+        return 0
+    fi
+
+    # Find highest beta number
+    local highest_beta=0
+    while IFS= read -r tag; do
+        # Extract beta number from tag (e.g., v1.0.0b2 -> 2)
+        local beta_num=$(echo "$tag" | sed -E "s/^v${base_version}b([0-9]+)$/\1/")
+        if [[ "$beta_num" =~ ^[0-9]+$ ]] && [[ $beta_num -gt $highest_beta ]]; then
+            highest_beta=$beta_num
+        fi
+    done <<< "$existing_betas"
+
+    # Increment for next beta
+    local next_beta=$((highest_beta + 1))
+    echo "${base_version}b${next_beta}"
+    log_release_step "BETA VERSION" "Found existing betas up to b${highest_beta} for ${base_version}, using b${next_beta}"
+}
+
+# Detect and enforce beta requirement for major releases
+# Returns 0 if OK to proceed, 1 if blocked
+detect_and_enforce_beta_requirement() {
+    local current_version="$1"
+    local new_version="$2"
+    local is_beta_release="$3"  # "true" or "false"
+
+    # Extract major version numbers
+    local current_major=$(echo "$current_version" | cut -d'.' -f1)
+    local new_major=$(echo "$new_version" | cut -d'.' -f1)
+
+    # Check if this is a major version bump
+    if [[ "$new_major" -le "$current_major" ]]; then
+        # Not a major bump - no beta required
+        return 0
+    fi
+
+    # This is a major bump
+    log_release_step "MAJOR RELEASE DETECTED" "Major version bump: ${current_version} → ${new_version}"
+
+    # If creating a beta release, always allow
+    if [[ "$is_beta_release" == "true" ]]; then
+        log_release_step "BETA RELEASE" "Creating beta for major version ${new_version}"
+        return 0
+    fi
+
+    # If creating stable release, check if beta exists
+    echo -e "${BLUE}🔍 Checking for existing beta releases for v${new_version}...${NC}"
+    local existing_betas=$(gh release list --limit 100 --json tagName --jq '.[].tagName' 2>/dev/null | grep "^v${new_version}b[0-9]\+$" || echo "")
+
+    if [[ -z "$existing_betas" ]]; then
+        # No beta found - BLOCK release
+        echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${RED}❌ ERROR: Major release requires beta testing first${NC}"
+        echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        echo -e "${YELLOW}This is a major version bump (${current_version} → ${new_version}).${NC}"
+        echo -e "${YELLOW}Major releases MUST have at least one beta release.${NC}"
+        echo ""
+        echo -e "${GREEN}To create a beta:${NC}"
+        echo -e "${GREEN}  ./release/release.sh --prepare --beta${NC}"
+        echo ""
+        echo -e "${YELLOW}After beta testing, run prepare again for stable release.${NC}"
+        echo ""
+        log_release_step "BETA REQUIRED ERROR" "Major release ${new_version} blocked - no beta exists. User must create beta first."
+        return 1
+    fi
+
+    # Beta exists - allow proceed
+    echo -e "${GREEN}✓ Found existing beta release(s) for v${new_version}${NC}"
+    log_release_step "BETA VERIFIED" "Beta exists for major version ${new_version}, proceeding with stable release"
+    return 0
+}
+
 # Get GitHub repository URL
 get_repo_url() {
     local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
@@ -569,6 +655,7 @@ main() {
     local MODE="prepare"  # Default to prepare mode
     local SUMMARY_FILE=""
     local PREPARE_STATE_FILE="release/.prepare_state"
+    local BETA_RELEASE=false  # Default to stable release
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -589,13 +676,21 @@ main() {
                 MODE="execute"
                 shift
                 ;;
+            --beta)
+                BETA_RELEASE=true
+                shift
+                ;;
             *)
                 echo -e "${RED}Unknown option: $1${NC}"
-                echo "Usage: $0 [--prepare|--execute] [--summary <file>]"
+                echo "Usage: $0 [--prepare|--execute] [--summary <file>] [--beta]"
                 echo ""
                 echo "Modes:"
                 echo "  --prepare  Analyze commits and generate release preview (default)"
                 echo "  --execute  Execute prepared release (no prompts)"
+                echo ""
+                echo "Options:"
+                echo "  --beta     Create beta/pre-release (e.g., v1.0.0b1)"
+                echo "  --summary  Include AI-generated summary from file"
                 exit 1
                 ;;
         esac
@@ -797,8 +892,23 @@ main() {
     esac
 
     # Calculate next version
-    NEW_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
-    echo -e "${GREEN}📌 Proposed new version: ${NEW_VERSION}${NC}"
+    local BASE_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
+
+    # Determine if this is a beta or stable release
+    local RELEASE_TYPE="stable"
+    if [[ "$BETA_RELEASE" == true ]]; then
+        RELEASE_TYPE="beta"
+        NEW_VERSION=$(determine_beta_version "$BASE_VERSION")
+        echo -e "${YELLOW}📌 Beta release: ${NEW_VERSION}${NC}"
+    else
+        NEW_VERSION="$BASE_VERSION"
+        echo -e "${GREEN}📌 Proposed new version: ${NEW_VERSION}${NC}"
+
+        # Enforce beta requirement for major releases
+        if ! detect_and_enforce_beta_requirement "$CURRENT_VERSION" "$NEW_VERSION" "false"; then
+            exit 1
+        fi
+    fi
     echo ""
 
     # Log release start with all details
@@ -806,6 +916,7 @@ main() {
 - Current version (GitHub): ${CURRENT_VERSION}
 - File version (todo.ai): ${file_version}
 - Proposed version: ${NEW_VERSION}
+- Release type: ${RELEASE_TYPE}
 - Bump type: ${BUMP_TYPE}
 - Last tag: ${LAST_TAG}
 - Summary file: ${SUMMARY_FILE:-none}"
@@ -853,6 +964,20 @@ main() {
     fi
     log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash"
 
+    # Determine if this is a major release
+    local current_major=$(echo "$CURRENT_VERSION" | cut -d'.' -f1)
+    local new_major=$(echo "$BASE_VERSION" | cut -d'.' -f1)
+    local IS_MAJOR="false"
+    if [[ "$new_major" -gt "$current_major" ]]; then
+        IS_MAJOR="true"
+    fi
+
+    # Get prepared_at timestamp
+    local PREPARED_AT=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
+
+    # Get prepared_by user
+    local PREPARED_BY=$(get_github_user)
+
     # Save prepare state for execute mode
     # Note: RELEASE_NOTES_FILE is NOT saved - it will be regenerated during execute
     # to ensure RELEASE_SUMMARY.md is the single source of truth
@@ -863,19 +988,35 @@ CURRENT_VERSION=$CURRENT_VERSION
 LAST_TAG=$LAST_TAG
 SUMMARY_FILE=$SUMMARY_FILE
 summary_needs_commit=$summary_needs_commit
+RELEASE_TYPE=$RELEASE_TYPE
+BASE_VERSION=$BASE_VERSION
+IS_MAJOR=$IS_MAJOR
+PREPARED_AT=$PREPARED_AT
+PREPARED_BY=$PREPARED_BY
+GIT_TAG=v${NEW_VERSION}
 EOF
-    log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION}"
+    log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION} (${RELEASE_TYPE})"
 
     # Display execution command
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}✅ Release preview prepared successfully!${NC}"
     echo ""
     echo -e "${GREEN}📋 Version: ${CURRENT_VERSION} → ${NEW_VERSION}${NC}"
-    echo -e "${GREEN}📋 Type: ${BUMP_TYPE} release${NC}"
+    if [[ "$RELEASE_TYPE" == "beta" ]]; then
+        echo -e "${YELLOW}📋 Type: Beta pre-release (${BUMP_TYPE})${NC}"
+        echo -e "${YELLOW}📋 Base version: ${BASE_VERSION}${NC}"
+    else
+        echo -e "${GREEN}📋 Type: Stable ${BUMP_TYPE} release${NC}"
+    fi
     echo -e "${GREEN}📋 Commits: ${commit_count}${NC}"
     echo ""
     echo -e "${GREEN}To execute this release, run:${NC}"
     echo -e "${GREEN}  ./release/release.sh --execute${NC}"
+    if [[ "$RELEASE_TYPE" == "beta" ]]; then
+        echo ""
+        echo -e "${YELLOW}After beta testing, create stable release with:${NC}"
+        echo -e "${YELLOW}  ./release/release.sh --prepare${NC}"
+    fi
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
     return 0

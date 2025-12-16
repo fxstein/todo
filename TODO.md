@@ -4,6 +4,7 @@
 
 ## Tasks
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
+  > Starting Phase 1 implementation: Core Beta Infrastructure
   > Simplified 2-tier beta strategy (Beta→Stable). Eliminates Alpha/RC/TestPyPI/FeatureFlags. Auto-enforces major release beta requirement. PEP 440 format only. See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0
   - [ ] **#172.5** Phase 5: Stable Release `#release`
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
@@ -64,22 +65,23 @@
     - [ ] **#172.2.1** Implement beta maturity warnings (never blocks) `#release` `#validation`
       > Find latest beta from GitHub, calculate days since published. Warn if <7 days (major) or <2 days (minor). Always proceed - warning only. Display clear message with recommendation
   - [ ] **#172.1** Phase 1: Core Beta Infrastructure `#release` `#infrastructure`
+    > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
     > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
     - [ ] **#172.1.8** Test major release blocking without beta `#testing`
       > Try to prepare 3.0.0 stable without beta. Verify script blocks with error message showing remediation (create beta first)
     - [ ] **#172.1.7** Test beta release creation (v3.0.0b1) `#testing`
       > Run prepare --beta and execute. Verify PyPI marks as pre-release. Test install: uv tool install --prerelease=allow todo-ai
-    - [ ] **#172.1.6** Update documentation with beta installation instructions `#documentation`
+    - [x] **#172.1.6** Update documentation with beta installation instructions `#documentation`
       > Add installation commands to README.md: uv tool install --prerelease=allow todo-ai. Include pipx/pip alternatives in collapsible section
-    - [ ] **#172.1.5** Update GitHub Actions for simple pre-release detection `#release` `#cicd`
+    - [x] **#172.1.5** Update GitHub Actions for simple pre-release detection `#release` `#cicd`
       > Update .github/workflows/release.yml: Add regex detection (b[0-9]+$), set is_prerelease flag, single PyPI target. Reduces from ~25 to ~15 steps
-    - [ ] **#172.1.4** Update .prepare_state to include release_type `#release` `#script`
+    - [x] **#172.1.4** Update .prepare_state to include release_type `#release` `#script`
       > Add release_type, base_version, is_major, prepared_at, prepared_by to .prepare_state JSON. Execute phase will read all context from this file
-    - [ ] **#172.1.3** Implement major release enforcement (block if no beta exists) `#release` `#script` `#validation`
+    - [x] **#172.1.3** Implement major release enforcement (block if no beta exists) `#release` `#script` `#validation`
       > Compare major version vs last stable. If major bump AND preparing stable: check if beta exists. If no beta: block with error and show how to create beta. If beta exists: allow proceed
-    - [ ] **#172.1.2** Implement beta version auto-detection (query GitHub) `#release` `#script`
+    - [x] **#172.1.2** Implement beta version auto-detection (query GitHub) `#release` `#script`
       > Query GitHub releases for existing betas (e.g., v1.0.0b*). If none: use b1. If exist: find highest number, increment by 1. Return version like 1.0.0b3
-    - [ ] **#172.1.1** Add --beta flag parsing to release.sh `#release` `#script`
+    - [x] **#172.1.1** Add --beta flag parsing to release.sh `#release` `#script`
       > Parse --beta flag in release.sh, store in variable for use in prepare phase. Update help text to show new flag option
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
@@ -1021,6 +1023,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 12:35:50 CET 2025
+**Last Updated:** Tue Dec 16 12:55:44 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

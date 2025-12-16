@@ -696,12 +696,16 @@ convert_to_bash() {
 
     if [[ ! -f "$converter_script" ]]; then
         echo -e "${RED}❌ Error: Converter script not found: $converter_script${NC}"
+        echo -e "${RED}   → The bash conversion script is missing${NC}"
+        echo -e "${RED}   → Check that release/convert_zsh_to_bash.sh exists${NC}"
         return 1
     fi
 
     # Run converter
     if ! bash "$converter_script"; then
         echo -e "${RED}❌ Error: Conversion failed${NC}"
+        echo -e "${RED}   → The zsh to bash conversion encountered errors${NC}"
+        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for syntax errors${NC}"
         return 1
     fi
 
@@ -1029,6 +1033,8 @@ main() {
     # Convert to bash version
     if ! convert_to_bash; then
         echo -e "${RED}❌ Error: Bash conversion failed${NC}"
+        echo -e "${RED}   → See error details above for specifics${NC}"
+        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for issues${NC}"
         log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
         exit 1
     fi
@@ -1242,16 +1248,22 @@ execute_release() {
     # Verify all files were updated correctly
     if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai 2>/dev/null; then
         echo -e "${RED}❌ Error: Version update failed in todo.ai${NC}"
+        echo -e "${RED}   → The VERSION variable was not updated correctly${NC}"
+        echo -e "${RED}   → Check todo.ai file for sed errors or file permissions${NC}"
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo.ai to ${NEW_VERSION}"
         exit 1
     fi
     if ! grep -q "^version = \"${NEW_VERSION}\"" pyproject.toml 2>/dev/null; then
         echo -e "${RED}❌ Error: Version update failed in pyproject.toml${NC}"
+        echo -e "${RED}   → The version field was not updated correctly${NC}"
+        echo -e "${RED}   → Check pyproject.toml file for sed errors or file permissions${NC}"
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in pyproject.toml to ${NEW_VERSION}"
         exit 1
     fi
     if ! grep -q "^__version__ = \"${NEW_VERSION}\"" todo_ai/__init__.py 2>/dev/null; then
         echo -e "${RED}❌ Error: Version update failed in todo_ai/__init__.py${NC}"
+        echo -e "${RED}   → The __version__ variable was not updated correctly${NC}"
+        echo -e "${RED}   → Check todo_ai/__init__.py file for sed errors or file permissions${NC}"
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo_ai/__init__.py to ${NEW_VERSION}"
         exit 1
     fi
@@ -1321,7 +1333,10 @@ Includes release summary from ${SUMMARY_FILE}"
     # Verify tag points to commit with correct version
     if ! git show "$TAG":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
         echo -e "${RED}❌ Error: Tag verification failed${NC}"
-        echo "Tag does not point to commit with correct version in todo.ai or pyproject.toml"
+        echo -e "${RED}   → Tag $TAG does not point to commit with correct version${NC}"
+        echo -e "${RED}   → Expected VERSION=\"${NEW_VERSION}\" in todo.ai${NC}"
+        echo -e "${RED}   → This indicates a git commit/tag mismatch${NC}"
+        echo -e "${RED}   → Run: git tag -d $TAG && retry release${NC}"
         log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - tag doesn't point to commit with VERSION=${NEW_VERSION} in todo.ai or pyproject.toml"
         exit 1
     fi
@@ -1340,14 +1355,20 @@ Includes release summary from ${SUMMARY_FILE}"
     # Verify assets exist
     if [[ ! -f "todo.ai" ]]; then
         echo -e "${RED}❌ Error: todo.ai not found${NC}"
+        echo -e "${RED}   → The main script file is missing${NC}"
+        echo -e "${RED}   → Ensure you're running from the repository root${NC}"
         exit 1
     fi
     if [[ ! -f "todo.bash" ]]; then
         echo -e "${RED}❌ Error: todo.bash not found (should have been created by prepare step)${NC}"
+        echo -e "${RED}   → The bash conversion was not completed${NC}"
+        echo -e "${RED}   → Run prepare again: ./release/release.sh --prepare${NC}"
         exit 1
     fi
     if [[ ! -f "install.sh" ]]; then
         echo -e "${RED}❌ Error: install.sh not found${NC}"
+        echo -e "${RED}   → The installer script is missing${NC}"
+        echo -e "${RED}   → Ensure you're running from the repository root${NC}"
         exit 1
     fi
 

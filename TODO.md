@@ -3,9 +3,9 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization`
-  - [ ] **#169.3** Phase 3: Cleanup and documentation `#cicd`
-    - [ ] **#169.3.4** Update development docs with new workflow `#cicd` `#docs`
+- [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization`
+  - [x] **#169.3** Phase 3: Cleanup and documentation `#cicd`
+    - [x] **#169.3.4** Update development docs with new workflow `#cicd` `#docs`
       > Updated DEVELOPMENT_GUIDELINES.md with CI/CD pipeline details, smart matrix strategy, and test distribution table
     - [x] **#169.3.3** Verify all checks pass in CI and locally `#cicd` `#testing`
       > All pre-commit hooks pass locally, GitHub Actions CI running with new workflow
@@ -13,7 +13,7 @@
       > Added Implementation Results section documenting all changes, impacts, and current status
     - [x] **#169.3.1** Archive scripts/pre-commit-hook.sh to docs/archive/ `#cicd`
       > Moved scripts/pre-commit-hook.sh to docs/archive/pre-commit-hook.sh.archived
-  - [ ] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd`
+  - [x] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd`
     - [x] **#169.2.6** Test pre-commit hooks locally `#cicd` `#testing`
     - [x] **#169.2.5** Add detect-secrets hook for security `#cicd`
       > Added detect-secrets from pre-commit-hooks (id: detect-secrets)
@@ -26,8 +26,8 @@
       > Added ascii-guard as local hook, runs on markdown files matching \.(md|mdc)$
     - [x] **#169.2.1** Restrict pytest hook to tests/unit only `#cicd`
       > Modified pytest hook: entry changed to 'uv run pytest tests/unit' to only run unit tests
-  - [ ] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd`
-    - [ ] **#169.1.6** Test new CI workflow with PR and main branch `#cicd` `#testing`
+  - [x] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd`
+    - [x] **#169.1.6** Test new CI workflow with PR and main branch `#cicd` `#testing`
     - [x] **#169.1.5** Enable caching for pre-commit and uv `#cicd`
       > Enabled caching: uv cache (enable-cache: true) and pre-commit hooks cache (~/.cache/pre-commit)
     - [x] **#169.1.4** Remove redundant ruff/mypy steps from CI `#cicd`
@@ -936,6 +936,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:03:00 CET 2025
+**Last Updated:** Tue Dec 16 01:03:12 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -75,13 +75,13 @@ After thorough analysis, the original 4-tier approach has been simplified to a 2
 │   ├── Target: PyPI (pre-release flag)
 │   ├── Purpose: External testing, feedback gathering
 │   ├── Duration: 7+ days for major, 2-3 days for minor (recommended)
-│   └── Installation: uv tool install --prerelease=allow todo-ai
+│   └── Installation: uv tool install --prerelease=allow ai-todo
 │
 └── Stable (production)
     ├── Format: v1.0.0
     ├── Target: PyPI (stable)
     ├── Purpose: General availability
-    └── Installation: uv tool install todo-ai
+    └── Installation: uv tool install ai-todo
 ```
 
 **The following sections provide the background rationale for why beta releases matter and industry best practices that informed this strategy.**
@@ -173,8 +173,8 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 
 **PyPI Behavior:**
 - Automatically detects pre-releases
-- Users must explicitly opt-in: `pip install --pre todo-ai`
-- `pip install todo-ai` only installs stable versions
+- Users must explicitly opt-in: `pip install --pre ai-todo`
+- `pip install ai-todo` only installs stable versions
 
 **Recommendation for todo.ai:** Use PEP 440 format for Python package, SemVer for git tags.
 
@@ -325,10 +325,10 @@ v1.0.0     # Stable
 **Beta Channel (Pre-Release):**
 ```bash
 # Latest beta from PyPI (recommended)
-uv tool install --prerelease=allow todo-ai
+uv tool install --prerelease=allow ai-todo
 
 # Specific beta version
-uv tool install todo-ai==1.0.0b1
+uv tool install ai-todo==1.0.0b1
 
 # From Git tag (for testing unreleased code)
 uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0b1
@@ -337,13 +337,13 @@ uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0b1
 **Stable Channel (Production):**
 ```bash
 # Latest stable (recommended)
-uv tool install todo-ai
+uv tool install ai-todo
 
 # Specific stable version
-uv tool install todo-ai==1.0.0
+uv tool install ai-todo==1.0.0
 
 # Upgrade to latest stable
-uv tool upgrade todo-ai
+uv tool upgrade ai-todo
 ```
 
 **Alternative Installation Tools:**
@@ -353,16 +353,16 @@ uv tool upgrade todo-ai
 
 ```bash
 # Beta with pipx
-pipx install --pre todo-ai
+pipx install --pre ai-todo
 
 # Stable with pipx
-pipx install todo-ai
+pipx install ai-todo
 
 # Beta with pip
-pip install --pre todo-ai
+pip install --pre ai-todo
 
 # Stable with pip
-pip install todo-ai
+pip install ai-todo
 ```
 </details>
 
@@ -543,26 +543,26 @@ pypi_version="${git_tag#v}"  # → "1.0.0b1"
 ### Stable Release (Recommended)
 ```bash
 # Using uv (recommended)
-uv tool install todo-ai
+uv tool install ai-todo
 
 # Alternative: pipx
-pipx install todo-ai
+pipx install ai-todo
 
 # Alternative: pip
-pip install todo-ai
+pip install ai-todo
 ```
 
 ### Beta Testing
 Help test upcoming features:
 ```bash
 # Using uv (recommended)
-uv tool install --prerelease=allow todo-ai
+uv tool install --prerelease=allow ai-todo
 
 # Alternative: pipx
-pipx install --pre todo-ai
+pipx install --pre ai-todo
 
 # Alternative: pip
-pip install --pre todo-ai
+pip install --pre ai-todo
 ```
 
 ### Development Version
@@ -646,7 +646,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 ## 🚀 What's New
 - Full Python implementation with MCP server support
 - 100% command parity with shell version
-- Installable via uv: `uv tool install --prerelease=allow todo-ai`
+- Installable via uv: `uv tool install --prerelease=allow ai-todo`
 
 ## ⚠️ Beta Status
 This is a **pre-release** version. While extensively tested, we recommend:
@@ -656,7 +656,7 @@ This is a **pre-release** version. While extensively tested, we recommend:
 
 ## 🧪 Help Us Test
 We need your help to make 1.0.0 stable amazing:
-1. Install: `uv tool install --prerelease=allow todo-ai` (or use pipx/pip)
+1. Install: `uv tool install --prerelease=allow ai-todo` (or use pipx/pip)
 2. Try it: Use it for real work
 3. Report: Share feedback on GitHub Discussions
 
@@ -674,7 +674,7 @@ We need your help to make 1.0.0 stable amazing:
 
 ---
 
-**Install:** `uv tool install --prerelease=allow todo-ai`
+**Install:** `uv tool install --prerelease=allow ai-todo`
 **Report Issues:** https://github.com/fxstein/todo.ai/issues
 **Discuss:** https://github.com/fxstein/todo.ai/discussions
 ```
@@ -723,17 +723,17 @@ We need your help to make 1.0.0 stable amazing:
 
 ```bash
 # Install specific version (recommended: uv)
-uv tool install todo-ai==1.0.0
+uv tool install ai-todo==1.0.0
 
 # Upgrade to latest stable
-uv tool upgrade todo-ai
+uv tool upgrade ai-todo
 
 # Downgrade if issues
 uv tool uninstall todo-ai
-uv tool install todo-ai==0.9.5
+uv tool install ai-todo==0.9.5
 
 # Alternative: pipx
-pipx install todo-ai==1.0.0
+pipx install ai-todo==1.0.0
 pipx upgrade todo-ai
 pipx install --force todo-ai==0.9.5
 ```
@@ -915,17 +915,17 @@ Given that todo.ai has:
 **Install Beta:**
 ```bash
 # Install latest beta (recommended: uv)
-uv tool install --prerelease=allow todo-ai
+uv tool install --prerelease=allow ai-todo
 
 # Install specific beta
-uv tool install todo-ai==1.0.0b1
+uv tool install ai-todo==1.0.0b1
 
 # Upgrade to latest stable
-uv tool upgrade todo-ai
+uv tool upgrade ai-todo
 
 # Alternative: pipx
-pipx install --pre todo-ai
-pipx install todo-ai==1.0.0b1
+pipx install --pre ai-todo
+pipx install ai-todo==1.0.0b1
 pipx upgrade todo-ai
 ```
 

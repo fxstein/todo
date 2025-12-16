@@ -40,7 +40,7 @@ This guide explains how to set up PyPI's Trusted Publisher feature for todo.ai, 
 
 1. Go to https://pypi.org/manage/projects/
 2. Click "Your projects"
-3. Look for "todo-ai" to verify name is available
+3. Look for "ai-todo" to verify name is available
 4. The project will be created automatically on first successful publish
 
 **Option B: Create via first release**
@@ -61,7 +61,7 @@ If the project doesn't exist yet:
 1. Go to https://pypi.org/manage/account/publishing/
 2. Scroll to "Add a new pending publisher"
 3. Fill in the form:
-   - **PyPI Project Name:** `todo-ai`
+   - **PyPI Project Name:** `ai-todo`
    - **Owner:** `fxstein`
    - **Repository name:** `todo.ai`
    - **Workflow name:** `release.yml`
@@ -74,7 +74,7 @@ If the project doesn't exist yet:
 
 If the project already exists:
 
-1. Go to https://pypi.org/manage/project/todo-ai/settings/publishing/
+1. Go to https://pypi.org/manage/project/ai-todo/settings/publishing/
 2. Scroll to "Add a new publisher"
 3. Fill in the form:
    - **Owner:** `fxstein`
@@ -137,7 +137,7 @@ After completing Steps 1-3, test with the beta release:
 
 **Monitor progress:**
 - GitHub Actions: https://github.com/fxstein/todo.ai/actions
-- PyPI Project: https://pypi.org/project/todo-ai/
+- PyPI Project: https://pypi.org/project/ai-todo/
 
 ---
 
@@ -182,8 +182,8 @@ permissions:
 
 **Fix:**
 - Wait 2-5 minutes
-- Check https://pypi.org/project/todo-ai/
-- Try: `pip index versions todo-ai`
+- Check https://pypi.org/project/ai-todo/
+- Try: `pip index versions ai-todo`
 
 ---
 
@@ -216,7 +216,7 @@ After completing this setup:
 2. ✅ Retry v3.0.0b1 beta release
 3. ✅ Monitor GitHub Actions for successful publish
 4. ✅ Verify package appears on PyPI
-5. ✅ Test installation: `uv tool install --prerelease=allow todo-ai`
+5. ✅ Test installation: `uv tool install --prerelease=allow ai-todo`
 
 ---
 

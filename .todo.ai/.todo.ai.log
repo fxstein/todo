@@ -2,6 +2,7 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 18:00:00 | fxstein | NOTE | 174 | Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
 2025-12-16 17:48:39 | fxstein | COMPLETE | 174.6 | Update GitHub Actions workflow to use OIDC authentication
 2025-12-16 17:47:45 | fxstein | ADD_SUBTASK | 174.7 | Test first beta release with trusted publisher (parent: #174)
 2025-12-16 17:47:44 | fxstein | ADD_SUBTASK | 174.6 | Update GitHub Actions workflow to use OIDC authentication (parent: #174)

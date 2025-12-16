@@ -1,5 +1,5 @@
 [project]
-name = "todo-ai"
+name = "ai-todo"
 version = "3.0.0"
 description = "AI-Agent First TODO List Tracker with MCP and CLI interfaces"
 readme = "README.md"

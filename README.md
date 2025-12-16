@@ -133,10 +133,10 @@ Install via uv (recommended) or pipx for standard CLI and MCP Server support:
 
 ```bash
 # Using uv (recommended - faster, more reliable)
-uv tool install todo-ai
+uv tool install ai-todo
 
 # Alternative: pipx
-pipx install todo-ai
+pipx install ai-todo
 ```
 
 This installs two commands:
@@ -153,10 +153,10 @@ Want to try upcoming features before they're released? Install the latest beta:
 
 ```bash
 # Using uv (recommended)
-uv tool install --prerelease=allow todo-ai
+uv tool install --prerelease=allow ai-todo
 
 # Alternative: pipx
-pipx install --pre todo-ai
+pipx install --pre ai-todo
 ```
 
 Beta releases let you test new features and provide feedback before stable release. See [Release Channels](#release-channels) below for more information.
@@ -166,8 +166,8 @@ Beta releases let you test new features and provide feedback before stable relea
 
 **Using pip:**
 ```bash
-pip install todo-ai              # Stable
-pip install --pre todo-ai        # Beta
+pip install ai-todo              # Stable
+pip install --pre ai-todo        # Beta
 ```
 
 > **Recommendation:** Use `uv tool` or `pipx` for isolated installations that won't conflict with other Python packages.
@@ -237,10 +237,10 @@ pipx upgrade todo-ai
 **Python (v3.0+):**
 ```bash
 # Using uv (recommended)
-uv tool uninstall todo-ai
+uv tool uninstall ai-todo
 
 # Alternative: pipx
-pipx uninstall todo-ai
+pipx uninstall ai-todo
 ```
 
 **Legacy Shell:**

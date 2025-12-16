@@ -4,6 +4,7 @@
 
 ## Tasks
 - [ ] **#174** Set up PyPI project for todo-ai package `#release`
+  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
   > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
   - [ ] **#174.7** Test first beta release with trusted publisher `#testing`
   - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure`
@@ -1042,6 +1043,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 17:48:39 CET 2025
+**Last Updated:** Tue Dec 16 18:00:00 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

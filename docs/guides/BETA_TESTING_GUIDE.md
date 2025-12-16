@@ -17,28 +17,28 @@ Beta releases are feature-complete pre-releases that need real-world testing bef
 
 ```bash
 # Install latest beta
-uv tool install --prerelease=allow todo-ai
+uv tool install --prerelease=allow ai-todo
 
 # Upgrade to latest beta
-uv tool upgrade todo-ai
+uv tool upgrade ai-todo
 
 # Switch back to stable
-uv tool uninstall todo-ai
-uv tool install todo-ai
+uv tool uninstall ai-todo
+uv tool install ai-todo
 ```
 
 ### Using pipx
 
 ```bash
 # Install latest beta
-pipx install --pre todo-ai
+pipx install --pre ai-todo
 
 # Upgrade to latest beta
-pipx upgrade todo-ai
+pipx upgrade ai-todo
 
 # Switch back to stable
-pipx uninstall todo-ai
-pipx install todo-ai
+pipx uninstall ai-todo
+pipx install ai-todo
 ```
 
 ### Check Your Version
@@ -195,12 +195,12 @@ If you encounter issues and need to switch back:
 
 ```bash
 # Using uv
-uv tool uninstall todo-ai
-uv tool install todo-ai
+uv tool uninstall ai-todo
+uv tool install ai-todo
 
 # Using pipx
-pipx uninstall todo-ai
-pipx install todo-ai
+pipx uninstall ai-todo
+pipx install ai-todo
 ```
 
 Your TODO.md is safe - it's just a text file. The tool never modifies data in a destructive way.

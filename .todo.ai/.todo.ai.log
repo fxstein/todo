@@ -2,6 +2,15 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 17:48:39 | fxstein | COMPLETE | 174.6 | Update GitHub Actions workflow to use OIDC authentication
+2025-12-16 17:47:45 | fxstein | ADD_SUBTASK | 174.7 | Test first beta release with trusted publisher (parent: #174)
+2025-12-16 17:47:44 | fxstein | ADD_SUBTASK | 174.6 | Update GitHub Actions workflow to use OIDC authentication (parent: #174)
+2025-12-16 17:47:44 | fxstein | ADD_SUBTASK | 174.5 | Register GitHub as trusted publisher on PyPI (parent: #174)
+2025-12-16 17:47:37 | fxstein | MODIFY | 174.1 | Create PyPI project 'todo-ai' (or verify name available)
+2025-12-16 17:47:31 | fxstein | DELETE | 174.4 | Test PyPI authentication with manual upload
+2025-12-16 17:47:31 | fxstein | DELETE | 174.3 | Add PYPI_API_TOKEN to GitHub secrets
+2025-12-16 17:47:31 | fxstein | DELETE | 174.2 | Generate PyPI API token with upload permissions
+2025-12-16 17:47:25 | fxstein | NOTE | 174 | Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
 2025-12-16 16:35:17 | fxstein | COMPLETE | 173 | Fix release script bugs found during v3.0.0b1 attempt
 2025-12-16 16:35:11 | fxstein | COMPLETE | 173.3 | Fix prepare side effects - leaves dirty working directory
 2025-12-16 16:35:11 | fxstein | COMPLETE | 173.2 | Fix tag verification - fails even when versions are correct

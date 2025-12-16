@@ -4,10 +4,11 @@
 
 ## Tasks
 - [ ] **#174** Set up PyPI project for todo-ai package `#release`
-  - [ ] **#174.4** Test PyPI authentication with manual upload `#testing`
-  - [ ] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup`
-  - [ ] **#174.2** Generate PyPI API token with upload permissions `#setup`
-  - [ ] **#174.1** Create PyPI account and todo-ai project (if not exists) `#setup`
+  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
+  - [ ] **#174.7** Test first beta release with trusted publisher `#testing`
+  - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure`
+  - [ ] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
+  - [ ] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
 - [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
   - [x] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug`
   - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug`
@@ -894,6 +895,9 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
+  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
+  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
     - [D] **#163.51.4** Remove unused methods and parameters `#code` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.51.3** Update documentation `#docs` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.51.2** Add unit tests for FileStructureSnapshot `#test` (deleted 2025-12-15, expires 2026-01-14)
@@ -936,9 +940,6 @@
   - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
 - [D] #163 Test task for complete fix `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
-- [D] **#159** Test task with fixed serial logic (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#65** Test task for no-coordination mode (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#158** Test task for ID tracking bug fix (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
@@ -948,21 +949,15 @@
   - [D] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#136** Global fix test `#test` (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#156** Clean bash test `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#154** Test note management commands `#testing` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#151** Test fix level 0 `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#150.1.1** Test level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#150.1** Test level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#150** Test main task (level 0) `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#148.1.2** Test delete on level 2 `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#148.1.1** Level 2 sub-subtask (MODIFIED to verify fix works) `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#148.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-- [D] **#148** Test parent task `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
@@ -1047,6 +1042,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 16:35:17 CET 2025
+**Last Updated:** Tue Dec 16 17:48:39 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

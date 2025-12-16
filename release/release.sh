@@ -1346,8 +1346,11 @@ Includes release summary from ${SUMMARY_FILE}"
             echo -e "${BLUE}   Re-staging modified files and retrying commit...${NC}"
             log_release_step "HOOK MODIFICATIONS" "Pre-commit hooks modified: ${unstaged}"
 
-            # Re-stage files that hooks modified
-            git add $unstaged || true
+            # Re-stage files that hooks modified (properly handle newlines)
+            # Use while loop to read each file and add it individually
+            while IFS= read -r file; do
+                [[ -n "$file" ]] && git add "$file"
+            done <<< "$unstaged"
 
             # Retry commit with --no-verify (hooks already ran)
             if ! git commit --no-verify -m "$commit_message" > /dev/null 2>&1; then

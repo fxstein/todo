@@ -8,8 +8,8 @@
   > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
   - [ ] **#174.7** Test first beta release with trusted publisher `#testing`
   - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure`
-  - [ ] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
-  - [ ] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
+  - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
+  - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
 - [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
   - [x] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug`
   - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug`
@@ -1043,6 +1043,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 18:00:00 CET 2025
+**Last Updated:** Tue Dec 16 18:01:17 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

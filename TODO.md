@@ -11,6 +11,7 @@
   - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
   - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
 - [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
+  - [x] **#173.7** Fix pre-commit hook timing - hooks modify files after staging `#bug`
   - [x] **#173.6** Investigate and handle uv.lock modifications during release `#bug`
   - [x] **#173.5** Add commit success verification after git commit `#bug`
   - [x] **#173.4** Fix commit error handling - remove error masking on line 1324 `#bug`
@@ -1046,6 +1047,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 20:04:50 CET 2025
+**Last Updated:** Tue Dec 16 20:12:10 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

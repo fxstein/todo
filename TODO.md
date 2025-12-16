@@ -3,6 +3,84 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
+  > Simplified 2-tier beta strategy (Beta→Stable). Eliminates Alpha/RC/TestPyPI/FeatureFlags. Auto-enforces major release beta requirement. PEP 440 format only. See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0
+  - [ ] **#172.5** Phase 5: Stable Release `#release`
+    > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
+    - [ ] **#172.5.5** Celebrate! 🎉 `#milestone`
+      > Acknowledge contributors, reflect on learnings, plan for future improvements. Enjoy the successful implementation of beta release strategy!
+    - [ ] **#172.5.4** Update all documentation `#documentation`
+      > Update README, CHANGELOG, installation guides. Remove beta references, mark stable as current. Update version badges and links
+    - [ ] **#172.5.3** Major announcement `#documentation`
+      > Create GitHub Release announcement. Post to GitHub Discussions. Update README with stable installation. Consider blog post or social media announcement
+    - [ ] **#172.5.2** Create v3.0.0 stable release `#release`
+      > Run ./release/release.sh --prepare (without --beta), review release notes, execute. Verify GitHub Actions publishes to PyPI as stable release
+    - [ ] **#172.5.1** Verify beta testing period met `#validation`
+      > Check 7+ days have passed since beta. Review feedback, verify no critical bugs. Script will warn if too soon but allow proceed
+  - [ ] **#172.4** Phase 4: First Beta Release `#release` `#testing`
+    > Goal: Validate the process works end-to-end. Deliverable: First beta release created, announced, feedback collected, iterations made as needed
+    - [ ] **#172.4.4** Iterate with b2, b3 as needed `#release`
+      > If issues found, fix and release b2, b3, etc. Test beta increment logic works correctly. Continue until beta is stable enough for production
+    - [ ] **#172.4.3** Collect feedback from early adopters `#testing`
+      > Monitor GitHub Issues/Discussions for feedback. Track beta success metrics: testers, downloads, bugs, feedback sentiment. Engage with testers
+    - [ ] **#172.4.2** Announce to GitHub watchers `#documentation`
+      > Create GitHub Discussion or update release notes. Use beta announcement template from strategy doc. Highlight what's new, testing needs, known issues
+    - [ ] **#172.4.1** Create v3.0.0b1 release `#release`
+      > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
+  - [ ] **#172.3** Phase 3: Documentation & Cursor Rules `#documentation`
+    > Goal: Complete user-facing documentation and Cursor rules. Deliverable: Updated README, AI agent rules, testing guide, migration guide from old process
+    - [ ] **#172.3.8** User acceptance testing `#testing`
+      > Get feedback from real users on documentation clarity. Test complete workflow from docs. Verify new users can follow beta testing guide successfully
+    - [ ] **#172.3.7** Test documentation accuracy `#testing` `#documentation`
+      > Follow all installation commands in README. Verify beta testing guide steps work. Check all links and examples are correct
+    - [ ] **#172.3.6** Test AI agent follows decision trees correctly `#testing` `#ai`
+      > Test Cursor AI makes correct decisions for major/minor/patch releases. Verify it checks CI/CD, enforces beta for majors, shows correct error messages
+    - [ ] **#172.3.5** Add changelog format examples `#documentation`
+      > Add examples to CHANGELOG.md showing beta/stable release format. Include version numbering examples (b1, b2, stable). Follow Keep a Changelog format
+    - [ ] **#172.3.4** Create beta testing guide for users `#documentation`
+      > Create guide for beta testers: how to install, what to test, how to report issues, what to expect. Include testing matrix (platforms, shells, Python versions)
+    - [ ] **#172.3.3** Update release process documentation `#documentation`
+      > Update release/RELEASE_PROCESS.md and Cursor rules with new --beta workflow. Add examples, commands, decision trees. Document two-phase process integration
+    - [ ] **#172.3.2** Add Cursor AI rules for release decision making `#documentation` `#ai`
+      > Create .cursor/rules/todo.ai-beta-releases.mdc with AI decision trees. When to use beta vs stable, error handling rules, major/minor/patch logic. See Section 4 of strategy doc
+    - [ ] **#172.3.1** Update README.md with simplified installation `#documentation`
+      > Add Stable/Beta/Development installation sections. Primary method: uv tool. Collapse pipx/pip alternatives in <details>. Add release channels description
+  - [ ] **#172.2** Phase 2: Hardening & Validation `#release` `#validation`
+    > Goal: Add comprehensive validation and safety checks. Deliverable: Beta maturity warnings, 6+ pre-flight checks, clear error messages, all edge cases handled
+    - [ ] **#172.2.8** Test beta increment (b1→b2→b3) `#testing`
+      > Create b1, then b2, then b3 for same version. Verify auto-increment logic works correctly. Check no duplicate versions created
+    - [ ] **#172.2.7** Test pre-flight validation failures `#testing`
+      > Trigger each validation failure: missing prepare state, failing CI/CD, uncommitted changes, missing GitHub auth, missing build deps. Verify clear error messages
+    - [ ] **#172.2.6** Test beta maturity warnings `#testing`
+      > Create beta, try stable release <7 days later. Verify warning displayed but release proceeds. Test major vs minor recommendations
+    - [ ] **#172.2.5** Test all error paths and validation gates `#testing`
+      > Test each validation failure scenario. Verify error messages are clear and actionable. Test edge cases
+    - [ ] **#172.2.4** Add beta version increment logic `#release` `#script`
+      > Automatic beta numbering. Extract number from existing betas, add 1. Prevents duplicate versions. Logs decision clearly
+    - [ ] **#172.2.3** Enhance error messages with remediation steps `#release` `#documentation`
+      > Add actionable remediation steps to all error messages. Pattern: Error description, what caused it, how to fix it. User-friendly language
+    - [ ] **#172.2.2** Add 6+ pre-flight validation checks `#release` `#validation`
+      > Check: prepare state exists, CI/CD passing, no uncommitted changes, GitHub authenticated, build dependencies available, beta maturity. Clear ✅/❌ status for each with remediation
+    - [ ] **#172.2.1** Implement beta maturity warnings (never blocks) `#release` `#validation`
+      > Find latest beta from GitHub, calculate days since published. Warn if <7 days (major) or <2 days (minor). Always proceed - warning only. Display clear message with recommendation
+  - [ ] **#172.1** Phase 1: Core Beta Infrastructure `#release` `#infrastructure`
+    > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
+    - [ ] **#172.1.8** Test major release blocking without beta `#testing`
+      > Try to prepare 3.0.0 stable without beta. Verify script blocks with error message showing remediation (create beta first)
+    - [ ] **#172.1.7** Test beta release creation (v3.0.0b1) `#testing`
+      > Run prepare --beta and execute. Verify PyPI marks as pre-release. Test install: uv tool install --prerelease=allow todo-ai
+    - [ ] **#172.1.6** Update documentation with beta installation instructions `#documentation`
+      > Add installation commands to README.md: uv tool install --prerelease=allow todo-ai. Include pipx/pip alternatives in collapsible section
+    - [ ] **#172.1.5** Update GitHub Actions for simple pre-release detection `#release` `#cicd`
+      > Update .github/workflows/release.yml: Add regex detection (b[0-9]+$), set is_prerelease flag, single PyPI target. Reduces from ~25 to ~15 steps
+    - [ ] **#172.1.4** Update .prepare_state to include release_type `#release` `#script`
+      > Add release_type, base_version, is_major, prepared_at, prepared_by to .prepare_state JSON. Execute phase will read all context from this file
+    - [ ] **#172.1.3** Implement major release enforcement (block if no beta exists) `#release` `#script` `#validation`
+      > Compare major version vs last stable. If major bump AND preparing stable: check if beta exists. If no beta: block with error and show how to create beta. If beta exists: allow proceed
+    - [ ] **#172.1.2** Implement beta version auto-detection (query GitHub) `#release` `#script`
+      > Query GitHub releases for existing betas (e.g., v1.0.0b*). If none: use b1. If exist: find highest number, increment by 1. Return version like 1.0.0b3
+    - [ ] **#172.1.1** Add --beta flag parsing to release.sh `#release` `#script`
+      > Parse --beta flag in release.sh, store in variable for use in prepare phase. Update help text to show new flag option
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
@@ -943,6 +1021,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:29:11 CET 2025
+**Last Updated:** Tue Dec 16 12:35:50 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

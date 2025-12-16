@@ -11,6 +11,7 @@
   - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
   - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
 - [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
+  - [x] **#173.10** Fix todo.bash formatting issues causing CI failures `#bug`
   - [x] **#173.9** Auto-detect RELEASE_SUMMARY.md in prepare phase `#bug`
   - [x] **#173.8** Fix pathspec issue in pre-commit hook re-staging logic `#bug`
   - [x] **#173.7** Fix pre-commit hook timing - hooks modify files after staging `#bug`
@@ -1049,6 +1050,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 23:23:45 CET 2025
+**Last Updated:** Wed Dec 17 00:17:38 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

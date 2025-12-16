@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 2.7.2
+# Version: 2.7.3
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="2.7.2"
+VERSION="2.7.3"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -2006,6 +2006,29 @@ validate_command_args() {
     return 0
 }
 
+# Helper function to check if there's a blank line after the Tasks header
+# Returns 0 (true) if blank line exists, 1 (false) otherwise
+check_blank_after_tasks_header() {
+    local tasks_line=$1
+    local next_line_num=$((tasks_line + 1))
+    local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
+
+    # If there's no next line, no blank line
+    if [[ $next_line_num -gt $max_lines ]]; then
+        return 1
+    fi
+
+    # Get the next line
+    local next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
+
+    # Check if it's blank (empty or only whitespace)
+    if [[ -z "$next_line" ]] || [[ "$next_line" =~ ^[[:space:]]*$ ]]; then
+        return 0  # Blank line exists
+    else
+        return 1  # No blank line
+    fi
+}
+
 # Function to add todo item
 add_todo() {
     local text="$1"
@@ -2043,16 +2066,29 @@ add_todo() {
     # Add to Tasks section
     local tasks_line=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
     if [[ -n "$tasks_line" ]]; then
+        # Determine insertion point: after header, or after blank line if it exists
+        local insert_line=$tasks_line
+        if check_blank_after_tasks_header "$tasks_line"; then
+            insert_line=$((tasks_line + 1))  # Insert after blank line
+        fi
+
         # Use awk or a simpler approach for macOS compatibility
         if [[ "$(uname)" == "Darwin" ]]; then
-            # Insert after the ## Tasks line with proper newline
+            # Insert at the determined line with proper newline
             local temp_file=$(mktemp)
-            head -n "$tasks_line" "$TODO_FILE" > "$temp_file"
+            head -n "$insert_line" "$TODO_FILE" > "$temp_file"
             echo "$task_line" >> "$temp_file"
-            tail -n +$((tasks_line + 1)) "$TODO_FILE" >> "$temp_file"
+            tail -n +$((insert_line + 1)) "$TODO_FILE" >> "$temp_file"
             mv "$temp_file" "$TODO_FILE"
         else
-            sed_inplace "/^## Tasks$/a$task_line" "$TODO_FILE"
+            # For Linux, use sed to insert at the correct line
+            if [[ $insert_line -eq $tasks_line ]]; then
+                # Insert directly after header (no blank line)
+                sed_inplace "/^## Tasks$/a$task_line" "$TODO_FILE"
+            else
+                # Insert after blank line (which is at tasks_line + 1)
+                sed_inplace "${insert_line}a$task_line" "$TODO_FILE"
+            fi
         fi
     fi
     update_footer
@@ -2620,11 +2656,11 @@ modify_todo() {
 
     # Extract existing tags from current line (tags are in backticks after the task text)
     local existing_tags=""
-    if echo "$current_line" | grep -q '\`#'; then
+    if echo "$current_line" | grep -q '`#'; then
         # Extract tags (everything in backticks)
         existing_tags=$(echo "$current_line" | sed 's/.*\(`#[^`]*`\).*/\1/' | sed 's/`//g')
         # Handle multiple tags
-        local all_tags=$(echo "$current_line" | grep -o '\`#[^`]*`' | sed 's/`//g' | tr '\n' ' ' | sed 's/ $//')
+        local all_tags=$(echo "$current_line" | grep -o '`#[^`]*`' | sed 's/`//g' | tr '\n' ' ' | sed 's/ $//')
         if [[ -n "$all_tags" ]]; then
             existing_tags="$all_tags"
         fi
@@ -3361,15 +3397,28 @@ restore_task() {
     # Add to Tasks section
     local tasks_section=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
     if [[ -n "$tasks_section" ]]; then
-        # Insert after the "## Tasks" line
+        # Determine insertion point: after header, or after blank line if it exists
+        local insert_line=$tasks_section
+        if check_blank_after_tasks_header "$tasks_section"; then
+            insert_line=$((tasks_section + 1))  # Insert after blank line
+        fi
+
+        # Insert at the determined line
         if [[ "$(uname)" == "Darwin" ]]; then
             local temp_file=$(mktemp)
-            head -n "$tasks_section" "$TODO_FILE" > "$temp_file"
+            head -n "$insert_line" "$TODO_FILE" > "$temp_file"
             echo "$task_line" >> "$temp_file"
-            tail -n +$((tasks_section + 1)) "$TODO_FILE" >> "$temp_file"
+            tail -n +$((insert_line + 1)) "$TODO_FILE" >> "$temp_file"
             mv "$temp_file" "$TODO_FILE"
         else
-            sed_inplace "${tasks_section}a$task_line" "$TODO_FILE"
+            # For Linux, use sed to insert at the correct line
+            if [[ $insert_line -eq $tasks_section ]]; then
+                # Insert directly after header (no blank line)
+                sed_inplace "/^## Tasks$/a$task_line" "$TODO_FILE"
+            else
+                # Insert after blank line (which is at tasks_section + 1)
+                sed_inplace "${insert_line}a$task_line" "$TODO_FILE"
+            fi
         fi
     else
         echo "Error: Tasks section not found"

@@ -55,15 +55,28 @@ def test_no_forbidden_flags():
 
 def test_check_forbidden_flags_script_exists():
     """Verify that the check-forbidden-flags.sh script exists and is executable."""
+    import platform
+
     project_root = Path(__file__).parent.parent.parent
     script_path = project_root / "scripts" / "check-forbidden-flags.sh"
 
     assert script_path.exists(), "check-forbidden-flags.sh script is missing"
-    assert script_path.stat().st_mode & 0o111, "check-forbidden-flags.sh is not executable"
+
+    # Only check executable bit on Unix-like systems
+    if platform.system() != "Windows":
+        assert script_path.stat().st_mode & 0o111, "check-forbidden-flags.sh is not executable"
 
 
 def test_check_forbidden_flags_script_works():
     """Verify that the check-forbidden-flags.sh script runs successfully."""
+    import platform
+
+    import pytest
+
+    # Skip on Windows - bash scripts don't work natively
+    if platform.system() == "Windows":
+        pytest.skip("Bash scripts not supported on Windows")
+
     project_root = Path(__file__).parent.parent.parent
     script_path = project_root / "scripts" / "check-forbidden-flags.sh"
 

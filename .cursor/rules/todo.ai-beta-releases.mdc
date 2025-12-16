@@ -132,6 +132,7 @@ Monitor:
 ❌ Never create major stable release without beta
 ❌ Never work around errors
 ❌ Never skip the human review gate
+❌ **NEVER use `--no-verify` on git commits** - This is ETERNALLY FORBIDDEN without explicit human approval. It defeats the purpose of pre-commit hooks and bypasses all safety checks.
 
 ## Version Number References
 

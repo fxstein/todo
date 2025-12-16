@@ -2,6 +2,9 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 01:10:42 | fxstein | COMPLETE | 170 | Further optimize CI/CD: Granular test strategy
+2025-12-16 01:09:47 | fxstein | NOTE | 170 | Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
+2025-12-16 01:09:46 | fxstein | ADD | 170 | Further optimize CI/CD: Granular test strategy
 2025-12-16 01:04:15 | fxstein | NOTE | 169.2.3 | todo.ai --lint hook disabled in pre-commit: requires zsh which is not available in CI quality job
 2025-12-16 01:03:11 | fxstein | COMPLETE | 169.1.1 | Split CI workflow into quality and test jobs
 2025-12-16 01:03:11 | fxstein | COMPLETE | 169.1.2 | Implement smart matrix (PR=single env, main=full matrix)

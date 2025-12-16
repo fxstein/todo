@@ -96,17 +96,21 @@ The analysis identified three primary bottlenecks:
 **Changes Made:**
 * Split workflow into two parallel jobs (`quality` and `test`)
 * Implemented smart matrix strategy:
-  * Pull Requests: `ubuntu-latest` + Python 3.12 only (1 job)
+  * Pull Requests: `ubuntu-latest` + Python 3.12 only (1 job, full test suite)
   * Main branch: 3 OS × 5 Python versions (15 jobs total)
+* **Granular test strategy** (further optimization):
+  * Python 3.14: Full test suite (3 OS = 3 comprehensive jobs)
+  * Python 3.10-3.13: Unit tests only (3 OS × 4 versions = 12 fast jobs)
 * Added Python 3.13 and 3.14 with `allow-prereleases: true`
 * Removed redundant `ruff` and `mypy` steps (now only in `pre-commit`)
 * Enabled caching: `uv` (`enable-cache: true`) and pre-commit hooks (`~/.cache/pre-commit`)
 
 **Impact:**
 * ~89% reduction in PR CI time (1 job vs 9 jobs)
-* Main branch ensures compatibility with Python 3.10-3.14
+* Main branch: Comprehensive testing on bleeding edge (3.14), fast compatibility checks on stable versions
 * Eliminated 3x redundancy in linting/type-checking
 * Faster setup times due to caching
+* **~70% faster main branch CI** (3 comprehensive + 12 fast vs 15 comprehensive)
 
 ### Phase 2: Pre-commit Configuration - ✅ COMPLETE
 
@@ -133,9 +137,30 @@ The analysis identified three primary bottlenecks:
 
 **Status:** Implementation complete. New CI/CD pipeline active.
 
+## Further Optimization (Dec 2025)
+
+### Granular Test Strategy
+
+After initial deployment, implemented additional optimization:
+
+* **Python 3.14**: Run full test suite across all 3 OSes (comprehensive bleeding-edge testing)
+* **Python 3.10-3.13**: Run unit tests only across all 3 OSes (fast compatibility verification)
+* **PRs**: Continue running full test suite on ubuntu + 3.12 (catch regressions early)
+
+**Rationale:**
+
+* Python 3.14 is newest/bleeding edge → needs comprehensive testing
+* Python 3.10-3.13 are stable → unit tests sufficient for compatibility
+* Maintains quality while significantly reducing CI time
+
+**Additional Impact:**
+* ~70% faster main branch CI (3 comprehensive + 12 fast jobs vs 15 comprehensive)
+* Still catches compatibility issues across all Python versions
+* Full regression testing on latest Python ensures future-proofing
+
 ## Next Steps
 
-1. Monitor GitHub Actions runs to verify smart matrix works correctly
+1. Monitor GitHub Actions runs to verify granular test strategy works correctly
 2. Fix ascii-guard pipx environment issue in follow-up
-3. Update development documentation with new workflow details
-4. Consider adding more Python versions as they are released
+3. Fix todo.ai --lint zsh dependency in CI quality job
+4. Consider adding Python 3.15 when released

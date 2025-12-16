@@ -85,7 +85,12 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Run tests with coverage
+      - name: Run unit tests (Python < 3.14 on main)
+        if: matrix.python-version != '3.14' && github.event_name == 'push'
+        run: uv run pytest tests/unit --cov=todo_ai --cov-report=xml --cov-report=term
+
+      - name: Run full test suite (Python 3.14 on main, or PRs)
+        if: matrix.python-version == '3.14' || github.event_name == 'pull_request'
         run: uv run pytest --cov=todo_ai --cov-report=xml --cov-report=term
 
       - name: Upload coverage to Codecov

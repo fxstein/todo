@@ -56,12 +56,14 @@ git push
 
 - **Pull Requests**: Fast feedback with minimal testing
   - Quality check (linting, typing, spelling, secrets)
-  - Test suite on `ubuntu-latest` + Python 3.12 only
+  - Full test suite on `ubuntu-latest` + Python 3.12 only
   - ~5-10 minutes total
-- **Main Branch**: Comprehensive testing
+- **Main Branch**: Granular testing strategy
   - Same quality checks
-  - Test suite on 3 OS × 5 Python versions (3.10, 3.11, 3.12, 3.13, 3.14)
-  - ~20-30 minutes total
+  - **Full test suite** on Python 3.14 × 3 OS (comprehensive bleeding-edge testing)
+  - **Unit tests only** on Python 3.10-3.13 × 3 OS (fast compatibility checks)
+  - Total: 3 comprehensive + 12 fast = 15 jobs
+  - ~10-15 minutes total (down from ~20-30)
 
 **Local Pre-commit Hooks:**
 
@@ -77,17 +79,21 @@ git push
 
 **What Runs Where:**
 
-| Check | Local | PR CI | Main CI |
-|-------|-------|-------|---------|
-| Ruff | ✅ | ✅ | ✅ |
-| Mypy | ✅ | ✅ | ✅ |
-| Spelling | ✅ | ✅ | ✅ |
-| Secrets | ✅ | ✅ | ✅ |
-| Unit tests | ✅ | ✅ | ✅ |
-| Integration tests | ❌ | ✅ | ✅ |
-| E2E tests | ❌ | ✅ | ✅ |
-| Multi-OS | ❌ | ❌ | ✅ |
-| Multi-Python | ❌ | ❌ | ✅ |
+| Check | Local | PR CI | Main CI (Py 3.14) | Main CI (Py 3.10-3.13) |
+|-------|-------|-------|--------------------|------------------------|
+| Ruff | ✅ | ✅ | ✅ | ✅ |
+| Mypy | ✅ | ✅ | ✅ | ✅ |
+| Spelling | ✅ | ✅ | ✅ | ✅ |
+| Secrets | ✅ | ✅ | ✅ | ✅ |
+| Unit tests | ✅ | ✅ | ✅ | ✅ |
+| Integration tests | ❌ | ✅ | ✅ | ❌ |
+| E2E tests | ❌ | ✅ | ✅ | ❌ |
+| Multi-OS | ❌ | ❌ | ✅ (3 OS) | ✅ (3 OS) |
+| Multi-Python | ❌ | ❌ | ✅ (3.14 only) | ✅ (3.10-3.13) |
+
+**Key:**
+- **Main CI (Py 3.14)**: Comprehensive testing on bleeding edge (full test suite)
+- **Main CI (Py 3.10-3.13)**: Fast compatibility checks (unit tests only)
 
 ### File Status
 

@@ -3,6 +3,8 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization`
+  > Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
 - [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization`
   - [x] **#169.3** Phase 3: Cleanup and documentation `#cicd`
     - [x] **#169.3.4** Update development docs with new workflow `#cicd` `#docs`
@@ -937,6 +939,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:04:15 CET 2025
+**Last Updated:** Tue Dec 16 01:10:43 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -768,6 +768,12 @@ main() {
     echo -e "${BLUE}🚀 Preparing release preview...${NC}"
     echo ""
 
+    # Auto-detect RELEASE_SUMMARY.md if --summary not provided
+    if [[ -z "$SUMMARY_FILE" ]] && [[ -f "release/RELEASE_SUMMARY.md" ]]; then
+        SUMMARY_FILE="release/RELEASE_SUMMARY.md"
+        echo -e "${BLUE}📄 Auto-detected release summary: $SUMMARY_FILE${NC}"
+    fi
+
     # Clean up artifacts from previous prepare attempts to ensure idempotency
     if [[ -f "todo.bash" ]]; then
         # Check if todo.bash is uncommitted (indicates it's from a failed prepare)

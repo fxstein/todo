@@ -46,6 +46,69 @@ Current version format in `todo.ai`:
 VERSION="1.0.0"
 ```
 
+## Beta and Stable Releases
+
+`todo.ai` uses a **2-tier release strategy** for managing risk and gathering feedback:
+
+### Release Channels
+
+- **Beta (Pre-Release):** Testing channel for new features (format: `v1.0.0b1`, `v1.0.0b2`, etc.)
+- **Stable (Production):** Production-ready releases (format: `v1.0.0`)
+
+### When to Use Beta Releases
+
+**REQUIRED:**
+- **Major releases** (e.g., 2.0.0 → 3.0.0) MUST have at least one beta first
+  - The release script automatically enforces this requirement
+  - Recommended testing period: 7+ days
+
+**RECOMMENDED:**
+- Significant new features or refactoring
+- Changes that could impact existing workflows
+- Recommended testing period: 2-3 days for minor releases
+
+**NOT NEEDED:**
+- Patch releases (bug fixes)
+- Documentation-only changes
+
+### Beta Release Commands
+
+```bash
+# Prepare beta release
+./release/release.sh --prepare --beta
+
+# Review release notes, then execute
+./release/release.sh --execute
+
+# Result: v1.0.0b1, v1.0.0b2, etc.
+```
+
+### Stable Release Commands
+
+```bash
+# Prepare stable release (default)
+./release/release.sh --prepare
+
+# Review release notes, then execute
+./release/release.sh --execute
+
+# Result: v1.0.0
+```
+
+### Beta Testing
+
+Users can install beta releases to help test:
+
+```bash
+# Using uv (recommended)
+uv tool install --prerelease=allow todo-ai
+
+# Using pipx
+pipx install --pre todo-ai
+```
+
+After beta testing period, create stable release with the same commands (without `--beta` flag).
+
 ## Intelligent Automated Release Process
 
 ### Using AI Agents (Cursor)
@@ -57,19 +120,24 @@ Release todo.ai
 ```
 
 The agent will automatically:
-1. **Generate a human-readable release summary** by analyzing commits since the last release
+1. **Check CI/CD status** - Ensures all tests pass before proceeding
+2. **Determine release type:**
+   - **Major bump:** Agent will check if beta exists, create beta if needed
+   - **Minor bump:** Agent will ask if you want beta or stable
+   - **Patch bump:** Agent will proceed directly to stable
+3. **Generate a human-readable release summary** by analyzing commits since the last release
    - Review commit messages to understand changes
    - Write a 2-3 paragraph summary highlighting key improvements and user-facing benefits
    - Save the summary to `release/RELEASE_SUMMARY.md`
-2. **Run the intelligent release script** with the summary: `./release/release.sh --summary release/RELEASE_SUMMARY.md`
+4. **Run the intelligent release script** with the summary: `./release/release.sh --prepare [--beta] --summary release/RELEASE_SUMMARY.md`
    - The script includes the AI-generated summary at the top of the release notes
    - Automatically analyzes commits and determines version bump
    - Generates detailed release notes from commits
-3. **Show you the generated release notes** (including the summary)
-4. **Ask for approval** before proceeding
-5. **Execute the release** automatically after approval
+5. **Show you the generated release notes** (including the summary and release type)
+6. **STOP and wait for approval** before executing
+7. **Execute the release** only after you say "execute release"
 
-**Cursor rules** are configured so agents know to generate a summary and use the intelligent release script when you request a release.
+**Cursor rules** are configured so agents follow the beta release decision tree automatically when you request a release.
 
 ### Quick Release (Manual)
 

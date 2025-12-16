@@ -1,0 +1,140 @@
+- # Beta Release Strategy - AI Agent Decision Rules
+
+**CRITICAL: Follow this decision tree exactly for all releases.**
+
+## When User Says "Prepare Release" or "Release todo.ai"
+
+### Step 1: Check CI/CD Status (MANDATORY)
+
+```bash
+./scripts/wait-for-ci.sh
+```
+
+- **If fails:** STOP. Tell user to fix CI/CD first. DO NOT proceed.
+- **If passes:** Continue to Step 2.
+
+### Step 2: Determine Version Bump Type
+
+Analyze commits since last release to determine: MAJOR, MINOR, or PATCH
+
+### Step 3: Apply Release Rules
+
+**For MAJOR bumps (e.g., 2.0.0 → 3.0.0):**
+
+1. Check if beta exists: `gh release list | grep "v3.0.0b"`
+2. **If no beta:**
+   - STOP and say: "This is a major release. You must create a beta first."
+   - Command: `./release/release.sh --prepare --beta`
+   - DO NOT proceed with stable release
+3. **If beta exists:**
+   - Check days since beta published
+   - **If < 7 days:** Inform user but allow proceed
+   - **If >= 7 days:** Proceed normally
+   - Command: `./release/release.sh --prepare`
+
+**For MINOR bumps (e.g., 2.0.0 → 2.1.0):**
+
+Ask user to choose:
+- a) Create beta first (safer, recommended for significant features)
+- b) Release stable directly (faster, for small additions)
+
+Respect user choice.
+
+**For PATCH bumps (e.g., 2.0.0 → 2.0.1):**
+
+Proceed directly to stable (no beta needed).
+
+Command: `./release/release.sh --prepare`
+
+### Step 4: Show Preview and STOP
+
+After running prepare:
+
+1. Display version information
+2. Display release type (beta or stable)
+3. Say: "Review the release notes, then tell me 'execute release' when ready."
+4. **WAIT FOR USER** - Never auto-execute
+
+### Step 5: Execute (Only When User Says "Execute Release")
+
+```bash
+./release/release.sh --execute
+```
+
+**Monitor execution:**
+- If SUCCESS: Report success (see templates below)
+- If ERROR: STOP immediately, report error, DO NOT continue
+
+## Success Message Templates
+
+### For Beta Releases:
+
+```
+✅ Beta release v1.0.0b1 published successfully!
+
+Install: uv tool install --prerelease=allow todo-ai
+Recommended testing: 7+ days for major, 2-3 days for minor
+
+Monitor:
+- GitHub Actions: https://github.com/fxstein/todo.ai/actions
+- PyPI: https://pypi.org/project/todo-ai/
+```
+
+### For Stable Releases:
+
+```
+✅ Stable release v1.0.0 published successfully!
+
+Install: uv tool install todo-ai
+
+Monitor:
+- GitHub Actions: https://github.com/fxstein/todo.ai/actions
+- PyPI: https://pypi.org/project/todo-ai/
+```
+
+## Error Handling (CRITICAL)
+
+**If ANY error occurs during release:**
+
+1. **STOP IMMEDIATELY** - Do not continue
+2. **Report clearly:**
+   ```
+   ❌ ERROR: [What failed]
+
+   Error message: [Actual error output]
+   Step: [Which step failed]
+
+   An error occurred during release. How should we proceed?
+   ```
+3. **NO WORKAROUNDS** - Do not attempt to fix automatically
+4. **WAIT FOR USER** - Ask how to proceed
+
+## Commands Reference
+
+```bash
+# Prepare beta release
+./release/release.sh --prepare --beta
+
+# Prepare stable release (default)
+./release/release.sh --prepare
+
+# Execute either type (reads from .prepare_state)
+./release/release.sh --execute
+
+# Override version number
+./release/release.sh --set-version 1.0.0
+```
+
+## What NOT to Do
+
+❌ Never auto-execute after prepare
+❌ Never bypass CI/CD failures
+❌ Never create major stable release without beta
+❌ Never work around errors
+❌ Never skip the human review gate
+
+## Version Number References
+
+**MUST use `task#nn` format** (e.g., `task#172`) when referencing todo.ai task numbers in commit messages.
+
+**NEVER use `#nn` format** for task numbers - this causes GitHub to auto-link to issues/PRs.

@@ -29,6 +29,7 @@
     - [ ] **#172.4.1** Create v3.0.0b1 release `#release`
       > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
   - [ ] **#172.3** Phase 3: Documentation & Cursor Rules `#documentation`
+    > Phase 3 complete: Cursor AI rules with decision trees, updated release process docs, beta testing guide, CHANGELOG.md with examples. Testing tasks 172.3.6-8 remain.
     > Goal: Complete user-facing documentation and Cursor rules. Deliverable: Updated README, AI agent rules, testing guide, migration guide from old process
     - [ ] **#172.3.8** User acceptance testing `#testing`
       > Get feedback from real users on documentation clarity. Test complete workflow from docs. Verify new users can follow beta testing guide successfully
@@ -36,15 +37,15 @@
       > Follow all installation commands in README. Verify beta testing guide steps work. Check all links and examples are correct
     - [ ] **#172.3.6** Test AI agent follows decision trees correctly `#testing` `#ai`
       > Test Cursor AI makes correct decisions for major/minor/patch releases. Verify it checks CI/CD, enforces beta for majors, shows correct error messages
-    - [ ] **#172.3.5** Add changelog format examples `#documentation`
+    - [x] **#172.3.5** Add changelog format examples `#documentation`
       > Add examples to CHANGELOG.md showing beta/stable release format. Include version numbering examples (b1, b2, stable). Follow Keep a Changelog format
-    - [ ] **#172.3.4** Create beta testing guide for users `#documentation`
+    - [x] **#172.3.4** Create beta testing guide for users `#documentation`
       > Create guide for beta testers: how to install, what to test, how to report issues, what to expect. Include testing matrix (platforms, shells, Python versions)
-    - [ ] **#172.3.3** Update release process documentation `#documentation`
+    - [x] **#172.3.3** Update release process documentation `#documentation`
       > Update release/RELEASE_PROCESS.md and Cursor rules with new --beta workflow. Add examples, commands, decision trees. Document two-phase process integration
-    - [ ] **#172.3.2** Add Cursor AI rules for release decision making `#documentation` `#ai`
+    - [x] **#172.3.2** Add Cursor AI rules for release decision making `#documentation` `#ai`
       > Create .cursor/rules/todo.ai-beta-releases.mdc with AI decision trees. When to use beta vs stable, error handling rules, major/minor/patch logic. See Section 4 of strategy doc
-    - [ ] **#172.3.1** Update README.md with simplified installation `#documentation`
+    - [x] **#172.3.1** Update README.md with simplified installation `#documentation`
       > Add Stable/Beta/Development installation sections. Primary method: uv tool. Collapse pipx/pip alternatives in <details>. Add release channels description
   - [ ] **#172.2** Phase 2: Hardening & Validation `#release` `#validation`
     > Phase 2 partial: Beta maturity warnings (never blocks), 6+ pre-flight validation checks, beta increment logic. Testing tasks 172.2.3, 172.2.5-8 remain.
@@ -1024,6 +1025,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 12:57:56 CET 2025
+**Last Updated:** Tue Dec 16 13:00:27 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

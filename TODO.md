@@ -4,6 +4,7 @@
 
 ## Tasks
 - [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement`
+  > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
   > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
   > Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
 - [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization`
@@ -942,6 +943,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:16:40 CET 2025
+**Last Updated:** Tue Dec 16 01:18:30 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

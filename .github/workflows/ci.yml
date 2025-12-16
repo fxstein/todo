@@ -52,6 +52,7 @@ jobs:
 
   test-comprehensive:
     name: Comprehensive Tests
+    needs: quality
     if: github.event_name == 'push'
     strategy:
       fail-fast: false
@@ -98,6 +99,7 @@ jobs:
 
   test-quick:
     name: Quick Tests
+    needs: quality
     if: github.event_name == 'push'
     strategy:
       fail-fast: false
@@ -143,6 +145,7 @@ jobs:
 
   test-pr:
     name: PR Tests
+    needs: quality
     if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false

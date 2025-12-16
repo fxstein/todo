@@ -4,4 +4,4 @@ The new architecture includes a `todo-ai` CLI command that maintains full compat
 
 Key improvements include 10x faster performance for large TODO files, comprehensive validation and error messages, automated migration system for upgrades, GitHub Issues coordination support, and cross-platform compatibility (macOS, Linux, Windows WSL2). The implementation uses modern Python tooling with uv for package management, includes pre-commit hooks for code quality, and maintains backward compatibility with existing TODO.md files.
 
-This is a beta release to gather feedback on the Python refactor before stable release. The shell script (v2.x) remains available but is now legacy. Install with `uv tool install --prerelease=allow todo-ai` and report any issues via `todo-ai report-bug`. After 7+ days of testing and feedback, we'll release v3.0.0 stable.
+This is a beta release to gather feedback on the Python refactor before stable release. The shell script (v2.x) remains available but is now legacy. Install with `uv tool install --prerelease=allow todo-ai` and report any issues via `todo-ai report-bug`.

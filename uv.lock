@@ -3,6 +3,54 @@ revision = 3
 requires-python = ">=3.10"
 
 [[package]]
+name = "ai-todo"
+version = "3.0.0"
+source = { editable = "." }
+dependencies = [
+    { name = "click" },
+    { name = "mcp" },
+    { name = "pygithub" },
+    { name = "pyyaml" },
+    { name = "requests" },
+]
+
+[package.optional-dependencies]
+dev = [
+    { name = "ascii-guard" },
+    { name = "build" },
+    { name = "mypy" },
+    { name = "pre-commit" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "pytest-cov" },
+    { name = "ruff" },
+    { name = "twine" },
+    { name = "types-pyyaml" },
+    { name = "types-requests" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "ascii-guard", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "build", marker = "extra == 'dev'", specifier = ">=1.0.0" },
+    { name = "click", specifier = ">=8.0.0" },
+    { name = "mcp", specifier = ">=0.1.0" },
+    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
+    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
+    { name = "pygithub", specifier = ">=1.59.0" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
+    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
+    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
+    { name = "pyyaml", specifier = ">=6.0" },
+    { name = "requests", specifier = ">=2.28.0" },
+    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0.0" },
+    { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0" },
+    { name = "types-requests", marker = "extra == 'dev'", specifier = ">=2.28.0" },
+]
+provides-extras = ["dev"]
+
+[[package]]
 name = "annotated-types"
 version = "0.7.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1625,54 +1673,6 @@ sdist = { url = "https://files.pythonhosted.org/packages/ba/b8/73a0e6a6e079a9d9c
 wheels = [
     { url = "https://files.pythonhosted.org/packages/d9/52/1064f510b141bd54025f9b55105e26d1fa970b9be67ad766380a3c9b74b0/starlette-0.50.0-py3-none-any.whl", hash = "sha256:9e5391843ec9b6e472eed1365a78c8098cfceb7a74bfd4d6b1c0c0095efb3bca", size = 74033, upload-time = "2025-11-01T15:25:25.461Z" },
 ]
-
-[[package]]
-name = "todo-ai"
-version = "3.0.0"
-source = { editable = "." }
-dependencies = [
-    { name = "click" },
-    { name = "mcp" },
-    { name = "pygithub" },
-    { name = "pyyaml" },
-    { name = "requests" },
-]
-
-[package.optional-dependencies]
-dev = [
-    { name = "ascii-guard" },
-    { name = "build" },
-    { name = "mypy" },
-    { name = "pre-commit" },
-    { name = "pytest" },
-    { name = "pytest-asyncio" },
-    { name = "pytest-cov" },
-    { name = "ruff" },
-    { name = "twine" },
-    { name = "types-pyyaml" },
-    { name = "types-requests" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "ascii-guard", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-    { name = "build", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "click", specifier = ">=8.0.0" },
-    { name = "mcp", specifier = ">=0.1.0" },
-    { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0.0" },
-    { name = "pygithub", specifier = ">=1.59.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=7.0.0" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
-    { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
-    { name = "pyyaml", specifier = ">=6.0" },
-    { name = "requests", specifier = ">=2.28.0" },
-    { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
-    { name = "twine", marker = "extra == 'dev'", specifier = ">=5.0.0" },
-    { name = "types-pyyaml", marker = "extra == 'dev'", specifier = ">=6.0" },
-    { name = "types-requests", marker = "extra == 'dev'", specifier = ">=2.28.0" },
-]
-provides-extras = ["dev"]
 
 [[package]]
 name = "tomli"

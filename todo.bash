@@ -1,14 +1,14 @@
 #!/bin/bash
 # todo - AI-Agent First TODO List Tracker
-#
+# 
 # Copyright 2025 Oliver Ratzesberger
-#
+# 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
-#
+# 
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
+# 
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 2.7.3
+# Version: 3.0.0b1
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -33,7 +33,7 @@ sed_inplace() {
         use_extended_regex=true
         shift
     fi
-
+    
     if [[ "$(uname)" == "Darwin" ]]; then
         if [[ "$use_extended_regex" == "true" ]]; then
             sed -i '' -E "$@"
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="2.7.3"
+VERSION="3.0.0b1"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -73,7 +73,7 @@ get_config_file() {
 }
 
 # Read YAML config value (supports nested keys like coordination.type)
-#
+# 
 # IMPORTANT YAML PARSING POLICY:
 # ==============================
 # This function and ALL YAML operations in this script ALWAYS use sed fallback when YAML parsers are missing.
@@ -85,12 +85,12 @@ get_config_value() {
     local key="$1"  # e.g., "mode" or "coordination.type"
     local config_file=$(get_config_file)
     local default="${2:-}"
-
+    
     if [[ ! -f "$config_file" ]]; then
         echo "$default"
         return 0
     fi
-
+    
     # Try yq first (best YAML parser)
     if command -v yq >/dev/null 2>&1; then
         local value=$(yq eval ".$key" "$config_file" 2>/dev/null || echo "")
@@ -99,7 +99,7 @@ get_config_value() {
             return 0
         fi
     fi
-
+    
     # Fallback to Python if available (with yaml module)
     if command -v python3 >/dev/null 2>&1 && python3 -c "import yaml" 2>/dev/null; then
         local value=$(python3 <<EOF
@@ -131,12 +131,12 @@ EOF
             return 0
         fi
     fi
-
+    
     # Fallback to sed for nested keys (e.g., coordination.type, coordination.issue_number)
     if [[ "$key" =~ ^([^.]+)\.(.+)$ ]]; then
         local parent_key="${BASH_REMATCH[1]}"  # BASH_CONVERT: BASH_REMATCH[1]
         local child_key="${BASH_REMATCH[2]}"   # BASH_CONVERT: BASH_REMATCH[2]
-
+        
         # Find the parent section (e.g., "coordination:")
         local in_section=false
         while IFS= read -r line; do
@@ -145,12 +145,12 @@ EOF
                 in_section=true
                 continue
             fi
-
+            
             # If we hit another top-level key, we've left the section
             if [[ "$in_section" == true ]] && [[ "$line" =~ ^[a-z_]+: ]]; then
                 break
             fi
-
+            
             # If we're in the section, look for the child key
             if [[ "$in_section" == true ]] && [[ "$line" =~ ^[[:space:]]+${child_key}:[[:space:]]*(.+)$ ]]; then
                 local value="${BASH_REMATCH[1]}"  # BASH_CONVERT: BASH_REMATCH[1]
@@ -163,7 +163,7 @@ EOF
             fi
         done < "$config_file"
     fi
-
+    
     # Handle simple keys (not nested) - check after nested key handling
     # Use string contains check instead of regex for better compatibility
     if [[ "$key" != *.* ]]; then
@@ -174,7 +174,7 @@ EOF
             return 0
         fi
     fi
-
+    
     echo "$default"
 }
 
@@ -186,14 +186,14 @@ get_numbering_mode() {
 # Validate configuration
 validate_config() {
     local config_file=$(get_config_file)
-
+    
     if [[ ! -f "$config_file" ]]; then
         # No config file is valid (defaults to single-user)
         return 0
     fi
-
+    
     local mode=$(get_numbering_mode)
-
+    
     # Check mode is valid
     case "$mode" in
         "single-user"|"multi-user"|"branch"|"enhanced")
@@ -204,7 +204,7 @@ validate_config() {
             return 1
             ;;
     esac
-
+    
     # Validate coordination settings if enhanced mode or single-user mode with coordination
     if [[ "$mode" == "enhanced" ]] || [[ "$mode" == "single-user" ]]; then
         local coord_type=$(get_config_value "coordination.type" "")
@@ -232,7 +232,7 @@ validate_config() {
             esac
         fi
     fi
-
+    
     return 0
 }
 
@@ -241,29 +241,29 @@ create_mode_backup() {
     local backup_dir="$(pwd)/.todo.ai/backups"
     local timestamp=$(date +"%Y%m%d%H%M%S")
     local backup_name="mode-switch-${timestamp}"
-
+    
     # Ensure backup directory exists
     mkdir -p "$backup_dir" 2>/dev/null || return 1
-
+    
     # Create backup of TODO.md and config.yaml
     local backup_todo="${backup_dir}/${backup_name}.TODO.md"
     local backup_config="${backup_dir}/${backup_name}.config.yaml"
     local backup_serial="${backup_dir}/${backup_name}.serial"
-
+    
     # Copy files
     if [[ -f "$TODO_FILE" ]]; then
         cp "$TODO_FILE" "$backup_todo" 2>/dev/null || return 1
     fi
-
+    
     local config_file=$(get_config_file)
     if [[ -f "$config_file" ]]; then
         cp "$config_file" "$backup_config" 2>/dev/null || return 1
     fi
-
+    
     if [[ -f "$SERIAL_FILE" ]]; then
         cp "$SERIAL_FILE" "$backup_serial" 2>/dev/null || return 1
     fi
-
+    
     echo "$backup_name"
     return 0
 }
@@ -271,25 +271,25 @@ create_mode_backup() {
 # Rollback from backup
 rollback_from_backup() {
     local backup_name="$1"
-
+    
     if [[ -z "$backup_name" ]]; then
         echo "Error: Please provide backup name"
         echo "Usage: ./todo.ai rollback-mode <backup-name>"
         echo "List backups: ./todo.ai list-mode-backups"
         return 1
     fi
-
+    
     local backup_dir="$(pwd)/.todo.ai/backups"
     local backup_todo="${backup_dir}/${backup_name}.TODO.md"
     local backup_config="${backup_dir}/${backup_name}.config.yaml"
     local backup_serial="${backup_dir}/${backup_name}.serial"
-
+    
     # Check if backup exists
     if [[ ! -f "$backup_todo" ]]; then
         echo "Error: Backup '$backup_name' not found"
         return 1
     fi
-
+    
     # Restore files
     if [[ -f "$backup_todo" ]]; then
         cp "$backup_todo" "$TODO_FILE" 2>/dev/null || {
@@ -297,7 +297,7 @@ rollback_from_backup() {
             return 1
         }
     fi
-
+    
     local config_file=$(get_config_file)
     if [[ -f "$backup_config" ]]; then
         cp "$backup_config" "$config_file" 2>/dev/null || {
@@ -308,14 +308,14 @@ rollback_from_backup() {
         # If backup has no config but current has one, remove it
         rm -f "$config_file" 2>/dev/null || true
     fi
-
+    
     if [[ -f "$backup_serial" ]]; then
         cp "$backup_serial" "$SERIAL_FILE" 2>/dev/null || {
             echo "Error: Could not restore serial file"
             return 1
         }
     fi
-
+    
     echo "✅ Rollback complete: restored from backup '$backup_name'"
     return 0
 }
@@ -323,12 +323,12 @@ rollback_from_backup() {
 # List mode backups
 list_mode_backups() {
     local backup_dir="$(pwd)/.todo.ai/backups"
-
+    
     if [[ ! -d "$backup_dir" ]]; then
         echo "No backups found"
         return 0
     fi
-
+    
     local backups=()
     for backup_file in "$backup_dir"/mode-switch-*.TODO.md; do
         if [[ -f "$backup_file" ]]; then
@@ -336,12 +336,12 @@ list_mode_backups() {
             backups+=("$backup_name")
         fi
     done
-
+    
     if [[ ${#backups[@]} -eq 0 ]]; then
         echo "No mode switch backups found"
         return 0
     fi
-
+    
     echo "Mode switch backups:"
     echo ""
     for backup in "${backups[@]}"; do
@@ -354,12 +354,12 @@ list_mode_backups() {
 # Get GitHub user ID (first 7 characters)
 get_github_user_id() {
     local user_id=""
-
+    
     # Try GitHub CLI first
     if command -v gh >/dev/null 2>&1; then
         user_id=$(gh api user --jq '.login' 2>/dev/null || echo "")
     fi
-
+    
     # Fallback to Git config
     if [[ -z "$user_id" ]]; then
         # Try git config user.name
@@ -369,19 +369,19 @@ get_github_user_id() {
             user_id=$(echo "$git_user" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]' | cut -c1-7)
         fi
     fi
-
+    
     # Final fallback
     if [[ -z "$user_id" ]]; then
         # Use system username as last resort
         local sys_user=$(whoami 2>/dev/null || echo "user")
         user_id=$(echo "$sys_user" | tr '[:upper:]' '[:lower:]' | tr -cd '[:alnum:]' | cut -c1-7)
     fi
-
+    
     # Ensure we have something (at least 1 char)
     if [[ -z "$user_id" ]]; then
         user_id="user"
     fi
-
+    
     # Take first 7 characters
     echo "${user_id:0:7}"
 }
@@ -389,27 +389,27 @@ get_github_user_id() {
 # Get current Git branch name (first 7 characters)
 get_branch_name() {
     local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-
+    
     if [[ -z "$branch" ]] || [[ "$branch" == "HEAD" ]]; then
         echo "main"  # Default branch name
         return 0
     fi
-
+    
     # Take first 7 characters, remove non-alphanumeric
     branch=$(echo "$branch" | tr -cd '[:alnum:]_' | cut -c1-7)
-
+    
     # Ensure we have something
     if [[ -z "$branch" ]]; then
         branch="main"
     fi
-
+    
     echo "$branch"
 }
 
 # Assign task number based on current mode
 assign_task_number() {
     local mode=$(get_numbering_mode)
-
+    
     case "$mode" in
         "single-user")
             # Mode 1: Simple sequential numbering (with optional coordination)
@@ -438,7 +438,7 @@ assign_task_number() {
 assign_task_number_single_user() {
     # Check if coordination is configured for single-user mode
     local coord_type=$(get_config_value "coordination.type" "none")
-
+    
     case "$coord_type" in
         "github-issues")
             assign_task_number_single_user_github_issues || increment_serial
@@ -457,19 +457,19 @@ assign_task_number_single_user() {
 assign_task_number_single_user_github_issues() {
     local issue_num=$(get_config_value "coordination.issue_number" "")
     local repo_url=$(git config --get remote.origin.url 2>/dev/null | sed 's/\.git$//' | sed 's/.*github\.com[:/]//' || echo "")
-
+    
     if [[ -z "$issue_num" ]] || [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
         return 1  # Trigger fallback
     fi
-
+    
     # Check GitHub CLI authentication
     if ! gh auth status >/dev/null 2>&1; then
         return 1  # Trigger fallback
     fi
-
+    
     # Get latest comment from issue
     local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
-
+    
     # Get coordinator value from issue comment
     local coordinator_value=0
     if [[ -n "$latest_comment" ]]; then
@@ -479,24 +479,24 @@ assign_task_number_single_user_github_issues() {
             coordinator_value=$extracted_num
         fi
     fi
-
+    
     # Get highest task number from TODO.md (checks both prefixed and non-prefixed tasks)
     local highest_task_num=$(get_highest_task_number)
-
+    
     # Use max(coordinator_value, highest_task_num) + 1 to ensure no duplicates
     local max_value=$coordinator_value
     if [[ $highest_task_num -gt $max_value ]]; then
         max_value=$highest_task_num
     fi
-
+    
     local new_num=$((max_value + 1))
-
+    
     # If coordinator was behind, log a warning
     if [[ $coordinator_value -lt $highest_task_num ]]; then
         echo "⚠️  Warning: Coordinator value ($coordinator_value) was behind TODO.md highest ($highest_task_num)" >&2
         echo "   Using max value: $max_value, next task: $new_num" >&2
     fi
-
+    
     # Append new number as comment (with retry on conflicts)
     local max_retries=3
     local retry=0
@@ -507,7 +507,7 @@ assign_task_number_single_user_github_issues() {
             echo "$new_num"
             return 0
         fi
-
+        
         # Check if number changed (concurrent update) - get latest comment by sorting
         local updated_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
         local updated_num=$(echo "$updated_comment" | grep -oE '[0-9]+' | tail -1)
@@ -525,7 +525,7 @@ assign_task_number_single_user_github_issues() {
             return 1
         fi
     done
-
+    
     # Max retries reached, fallback
     return 1
 }
@@ -534,18 +534,18 @@ assign_task_number_single_user_github_issues() {
 assign_task_number_single_user_counterapi() {
     local namespace=$(get_config_value "coordination.namespace" "")
     local counter_name="task-counter"
-
+    
     if [[ -z "$namespace" ]] || ! command -v curl >/dev/null 2>&1; then
         return 1  # Trigger fallback
     fi
-
+    
     # Increment atomically via CounterAPI
     local response=$(curl -s -X POST "https://api.counterapi.dev/v1/${namespace}/${counter_name}/up" 2>/dev/null || echo "")
-
+    
     if [[ -z "$response" ]]; then
         return 1  # Trigger fallback
     fi
-
+    
     # Parse response (expect JSON with "value" field)
     local new_num=""
     if command -v jq >/dev/null 2>&1; then
@@ -553,11 +553,11 @@ assign_task_number_single_user_counterapi() {
     elif command -v python3 >/dev/null 2>&1; then
         new_num=$(echo "$response" | python3 -c "import sys, json; print(json.load(sys.stdin).get('value', ''))" 2>/dev/null || echo "")
     fi
-
+    
     if [[ -z "$new_num" ]] || ! [[ "$new_num" =~ ^[0-9]+$ ]]; then
         return 1  # Trigger fallback
     fi
-
+    
     # Check against TODO.md highest number and use max if needed
     local highest_task_num=$(get_highest_task_number)
     if [[ $highest_task_num -gt $new_num ]]; then
@@ -572,7 +572,7 @@ assign_task_number_single_user_counterapi() {
             # In practice, this is fine since CounterAPI ensures atomicity for concurrent requests
         fi
     fi
-
+    
     # Return plain number (no prefix)
     echo "$new_num"
     return 0
@@ -582,13 +582,13 @@ assign_task_number_single_user_counterapi() {
 assign_task_number_multi_user() {
     local user_prefix=$(get_github_user_id)
     local todo_file="$TODO_FILE"
-
+    
     # Find highest task number for this user prefix
     local highest=0
-
+    
     # Construct pattern variable for zsh regex compatibility
     local pattern="\\*\\*#${user_prefix}-([0-9]+)\\*\\*"
-
+    
     while IFS= read -r line; do
         # Match task IDs like fxstein-50 in TODO.md
         # Use pattern variable for zsh compatibility
@@ -599,7 +599,7 @@ assign_task_number_multi_user() {
             fi
         fi
     done < "$todo_file"
-
+    
     local next_num=$((highest + 1))
     echo "${user_prefix}-${next_num}"
 }
@@ -608,13 +608,13 @@ assign_task_number_multi_user() {
 assign_task_number_branch() {
     local branch_prefix=$(get_branch_name)
     local todo_file="$TODO_FILE"
-
+    
     # Find highest task number for this branch prefix
     local highest=0
-
+    
     # Construct pattern variable for zsh regex compatibility
     local pattern="\\*\\*#${branch_prefix}-([0-9]+)\\*\\*"
-
+    
     while IFS= read -r line; do
         # Match task IDs like feature-50 in TODO.md
         # Use pattern variable for zsh compatibility
@@ -625,7 +625,7 @@ assign_task_number_branch() {
             fi
         fi
     done < "$todo_file"
-
+    
     local next_num=$((highest + 1))
     echo "${branch_prefix}-${next_num}"
 }
@@ -634,7 +634,7 @@ assign_task_number_branch() {
 assign_task_number_enhanced() {
     local coord_type=$(get_config_value "coordination.type" "none")
     local fallback_mode=$(get_config_value "coordination.fallback" "multi-user")
-
+    
     case "$coord_type" in
         "github-issues")
             assign_task_number_enhanced_github_issues || assign_task_number_enhanced_fallback "$fallback_mode"
@@ -653,20 +653,20 @@ assign_task_number_enhanced() {
 assign_task_number_enhanced_github_issues() {
     local issue_num=$(get_config_value "coordination.issue_number" "")
     local repo_url=$(git config --get remote.origin.url 2>/dev/null | sed 's/\.git$//' | sed 's/.*github\.com[:/]//' || echo "")
-
+    
     if [[ -z "$issue_num" ]] || [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
         return 1  # Trigger fallback
     fi
-
+    
     # Check GitHub CLI authentication
     if ! gh auth status >/dev/null 2>&1; then
         return 1  # Trigger fallback
     fi
-
+    
     # Get latest comment from issue (comments are returned in chronological order, so get last one)
     # Sort by created_at to ensure we get the newest comment, or use last element if already sorted
     local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
-
+    
     # Get coordinator value from issue comment
     local coordinator_value=0
     if [[ -n "$latest_comment" ]]; then
@@ -676,24 +676,24 @@ assign_task_number_enhanced_github_issues() {
             coordinator_value=$extracted_num
         fi
     fi
-
+    
     # Get highest task number from TODO.md (checks both prefixed and non-prefixed tasks)
     local highest_task_num=$(get_highest_task_number)
-
+    
     # Use max(coordinator_value, highest_task_num) + 1 to ensure no duplicates
     local max_value=$coordinator_value
     if [[ $highest_task_num -gt $max_value ]]; then
         max_value=$highest_task_num
     fi
-
+    
     local new_num=$((max_value + 1))
-
+    
     # If coordinator was behind, log a warning
     if [[ $coordinator_value -lt $highest_task_num ]]; then
         echo "⚠️  Warning: Coordinator value ($coordinator_value) was behind TODO.md highest ($highest_task_num)" >&2
         echo "   Using max value: $max_value, next task: $new_num" >&2
     fi
-
+    
     # Append new number as comment (with retry on conflicts)
     local max_retries=3
     local retry=0
@@ -705,7 +705,7 @@ assign_task_number_enhanced_github_issues() {
             echo "${user_prefix}-${new_num}"
             return 0
         fi
-
+        
         # Check if number changed (concurrent update) - get latest comment by sorting
         local updated_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
         local updated_num=$(echo "$updated_comment" | grep -oE '[0-9]+' | tail -1)
@@ -719,7 +719,7 @@ assign_task_number_enhanced_github_issues() {
             return 1
         fi
     done
-
+    
     # Max retries reached, fallback
     return 1
 }
@@ -728,18 +728,18 @@ assign_task_number_enhanced_github_issues() {
 assign_task_number_enhanced_counterapi() {
     local namespace=$(get_config_value "coordination.namespace" "")
     local counter_name="task-counter"
-
+    
     if [[ -z "$namespace" ]] || ! command -v curl >/dev/null 2>&1; then
         return 1  # Trigger fallback
     fi
-
+    
     # Increment atomically via CounterAPI
     local response=$(curl -s -X POST "https://api.counterapi.dev/v1/${namespace}/${counter_name}/up" 2>/dev/null || echo "")
-
+    
     if [[ -z "$response" ]]; then
         return 1  # Trigger fallback
     fi
-
+    
     # Parse response (expect JSON with "value" field)
     local new_num=""
     if command -v jq >/dev/null 2>&1; then
@@ -747,11 +747,11 @@ assign_task_number_enhanced_counterapi() {
     elif command -v python3 >/dev/null 2>&1; then
         new_num=$(echo "$response" | python3 -c "import sys, json; print(json.load(sys.stdin).get('value', ''))" 2>/dev/null || echo "")
     fi
-
+    
     if [[ -z "$new_num" ]] || ! [[ "$new_num" =~ ^[0-9]+$ ]]; then
         return 1  # Trigger fallback
     fi
-
+    
     # Get user prefix for formatting
     local user_prefix=$(get_github_user_id)
     echo "${user_prefix}-${new_num}"
@@ -761,7 +761,7 @@ assign_task_number_enhanced_counterapi() {
 # Enhanced mode: Fallback to simpler mode
 assign_task_number_enhanced_fallback() {
     local fallback_mode="$1"
-
+    
     case "$fallback_mode" in
         "multi-user")
             assign_task_number_multi_user
@@ -780,13 +780,13 @@ assign_task_number_enhanced_fallback() {
 resolve_task_reference() {
     local input="$1"
     local mode=$(get_numbering_mode)
-
+    
     # If already has prefix (format: prefix-number), use as-is
     if [[ "$input" =~ ^[a-z0-9]{1,7}-[0-9]+$ ]]; then
         echo "$input"
         return 0
     fi
-
+    
     # If just a number, add prefix based on mode
     if [[ "$input" =~ ^[0-9]+$ ]]; then
         case "$mode" in
@@ -807,7 +807,7 @@ resolve_task_reference() {
                 ;;
         esac
     fi
-
+    
     # Invalid format
     echo "ERROR: Invalid task ID format: $input" >&2
     return 1
@@ -816,25 +816,25 @@ resolve_task_reference() {
 # Extract numeric part from task ID (removes prefix if present)
 extract_task_number() {
     local task_id="$1"
-
+    
     # If has prefix (format: prefix-number), extract number
     if [[ "$task_id" =~ ^[a-z0-9]{1,7}-([0-9]+)$ ]]; then
         echo "${match[1]}"
         return 0
     fi
-
+    
     # If has subtask format (prefix-number.subtask), extract both parts
     if [[ "$task_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)$ ]]; then
         echo "${match[1]}.${match[2]}"
         return 0
     fi
-
+    
     # If just number or number.subtask, return as-is
     if [[ "$task_id" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
         echo "$task_id"
         return 0
     fi
-
+    
     # Invalid format
     return 1
 }
@@ -843,7 +843,7 @@ extract_task_number() {
 generate_new_task_id() {
     local numeric_part="$1"
     local mode="$2"
-
+    
     # Extract parent and subtask numbers if present
     local parent_num=""
     local subtask_num=""
@@ -855,7 +855,7 @@ generate_new_task_id() {
     else
         return 1
     fi
-
+    
     # Generate prefix based on mode
     local prefix=""
     case "$mode" in
@@ -872,7 +872,7 @@ generate_new_task_id() {
             return 1
             ;;
     esac
-
+    
     # Build new ID
     if [[ -z "$prefix" ]]; then
         # Single-user: no prefix
@@ -895,37 +895,37 @@ generate_new_task_id() {
 renumber_tasks_for_mode() {
     local old_mode="$1"
     local new_mode="$2"
-
+    
     if [[ ! -f "$TODO_FILE" ]]; then
         return 1
     fi
-
+    
     # Build ID mapping: old_id -> new_id
     declare -A id_mapping
-
+    
     # Collect all task IDs from TODO.md
     local temp_file=$(mktemp)
     local tasks_found=0
-
+    
     # Find all task IDs in TODO.md (handle both prefixed and non-prefixed formats)
     while IFS= read -r line; do
         # Match task IDs in format: **#task_id** or **#prefix-task_id**
         # Handle both main tasks and subtasks
         if [[ "$line" =~ \*\*#([0-9a-z.\-]+)\*\* ]]; then
             local full_task_id="${BASH_REMATCH[1]}"  # BASH_CONVERT: BASH_REMATCH[1]
-
+            
             # Extract numeric part (removes prefix if present)
             local numeric_part=$(extract_task_number "$full_task_id" 2>/dev/null)
             if [[ -z "$numeric_part" ]]; then
                 continue
             fi
-
+            
             # Generate new ID based on new mode
             local new_id=$(generate_new_task_id "$numeric_part" "$new_mode" 2>/dev/null)
             if [[ -z "$new_id" ]]; then
                 continue
             fi
-
+            
             # Add to mapping if IDs differ
             if [[ "$full_task_id" != "$new_id" ]]; then
                 id_mapping["$full_task_id"]="$new_id"
@@ -933,64 +933,64 @@ renumber_tasks_for_mode() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $tasks_found -eq 0 ]]; then
         rm -f "$temp_file"
         return 0  # No tasks to renumber
     fi
-
+    
     # Create new TODO.md with renumbered tasks
     local new_file=$(mktemp)
     local renumbered_count=0
-
+    
     while IFS= read -r line || [[ -n "$line" ]]; do
         local new_line="$line"
         local line_changed=false
-
+        
         # Skip empty lines
         if [[ -z "$new_line" ]]; then
             echo "" >> "$new_file"
             continue
         fi
-
+        
         # Replace task IDs in task lines (**#task_id**)
         for old_id in "${!id_mapping[@]}"; do
             local new_id="${id_mapping[$old_id]}"
-
+            
             # Escape old_id for sed (escape special regex characters)
             local escaped_old_id=$(echo "$old_id" | sed 's/[[\.*^$()+?{|]/\\&/g')
-
+            
             # Replace in task definition: **#old_id**
             if echo "$new_line" | grep -q "\*\*#${escaped_old_id}\*\*"; then
                 new_line=$(echo "$new_line" | sed "s/\*\*#${escaped_old_id}\*\*/\*\*#${new_id}\*\*/g")
                 line_changed=true
             fi
-
+            
             # Replace in relationships and notes (plain text references)
             # Match: #old_id (standalone or in lists)
             if echo "$new_line" | grep -q "#${escaped_old_id}\([^0-9a-z-]\|$\)"; then
                 new_line=$(echo "$new_line" | sed "s/#${escaped_old_id}\([^0-9a-z-]\|$\)/#${new_id}\1/g")
                 line_changed=true
             fi
-
+            
             # Replace in relationship comments (HTML comments)
             if echo "$new_line" | grep -q "${escaped_old_id}:"; then
                 new_line=$(echo "$new_line" | sed "s/${escaped_old_id}:/${new_id}:/g")
                 line_changed=true
             fi
         done
-
+        
         if [[ "$line_changed" == true ]]; then
             renumbered_count=$((renumbered_count + 1))
         fi
-
+        
         echo "$new_line" >> "$new_file"
     done < "$TODO_FILE"
-
+    
     # Replace original file
     mv "$new_file" "$TODO_FILE"
     rm -f "$temp_file"
-
+    
     if [[ $renumbered_count -gt 0 ]]; then
         update_footer
         return 0
@@ -1005,7 +1005,7 @@ switch_mode() {
     local force=false
     local renumber=false
     local original_args=("$@")
-
+    
     # Parse options
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -1025,7 +1025,7 @@ switch_mode() {
                 ;;
         esac
     done
-
+    
     if [[ -z "$new_mode" ]]; then
         echo "Error: Please specify a mode to switch to"
         echo "Usage: ./todo.ai switch-mode <mode> [--force] [--renumber]"
@@ -1035,7 +1035,7 @@ switch_mode() {
         echo "  --renumber   Renumber existing tasks to match new mode"
         return 1
     fi
-
+    
     # Validate mode
     case "$new_mode" in
         "single-user"|"multi-user"|"branch"|"enhanced")
@@ -1046,16 +1046,16 @@ switch_mode() {
             return 1
             ;;
     esac
-
+    
     # Get current mode
     local current_mode=$(get_numbering_mode)
-
+    
     # Check if already in requested mode
     if [[ "$current_mode" == "$new_mode" ]]; then
         echo "Already in mode: $new_mode"
         return 0
     fi
-
+    
     # Create backup before switching
     echo "Creating backup before mode switch..."
     local backup_name=$(create_mode_backup)
@@ -1065,14 +1065,14 @@ switch_mode() {
     fi
     echo "✅ Backup created: $backup_name"
     echo ""
-
+    
     # Validate configuration for new mode
     local config_file=$(get_config_file)
     local config_dir=$(dirname "$config_file")
-
+    
     # Ensure config directory exists
     mkdir -p "$config_dir" 2>/dev/null || return 1
-
+    
     # Update or create config file
     if [[ -f "$config_file" ]]; then
         # Update existing config file
@@ -1168,7 +1168,7 @@ display:
   user_reference_style: number-only
 EOF
     fi
-
+    
     # Validate new configuration
     if ! validate_config; then
         echo "Error: Invalid configuration after mode switch"
@@ -1176,7 +1176,7 @@ EOF
         rollback_from_backup "$backup_name" >/dev/null 2>&1 || true
         return 1
     fi
-
+    
     # Optionally renumber tasks
     if [[ "$renumber" == true ]]; then
         echo ""
@@ -1190,10 +1190,10 @@ EOF
         fi
         echo ""
     fi
-
+    
     # Log the action
     log_todo_action "MODE_SWITCH" "$current_mode → $new_mode" "Switched from $current_mode to $new_mode"
-
+    
     echo "✅ Mode switched: $current_mode → $new_mode"
     echo ""
     if [[ "$renumber" == false ]]; then
@@ -1206,7 +1206,7 @@ EOF
     echo ""
     echo "💾 Backup saved as: $backup_name"
     echo "   To rollback: ./todo.ai rollback-mode $backup_name"
-
+    
     return 0
 }
 
@@ -1217,22 +1217,22 @@ increment_serial() {
     if [[ ! -d "$serial_dir" ]]; then
         mkdir -p "$serial_dir" 2>/dev/null || return 1
     fi
-
+    
     # Get current value from serial file
     local serial_value=0
     if [[ -f "$SERIAL_FILE" ]]; then
         serial_value=$(cat "$SERIAL_FILE")
     fi
-
+    
     # Get highest ID from TODO.md (handles actual tasks, ignoring examples in notes)
     local todo_highest=$(get_highest_task_number)
-
+    
     # Use the maximum of serial file and TODO.md, then increment
     local max_id=$serial_value
     if [[ $todo_highest -gt $max_id ]]; then
         max_id=$todo_highest
     fi
-
+    
     local next=$((max_id + 1))
     echo "$next" > "$SERIAL_FILE"
     echo "$next"
@@ -1252,29 +1252,29 @@ log_todo_action() {
     if [[ ! -d "$log_dir" ]]; then
         mkdir -p "$log_dir" 2>/dev/null || return 1
     fi
-
+    
     local action="$1"
     local task_id="$2"
     local description="$3"
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     local git_user=$(git config --get user.name 2>/dev/null || echo "unknown")
-
+    
     # Create log entry in format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
     local log_entry="$timestamp | $git_user | $action | $task_id | $description"
-
+    
     # Create temporary file with header preserved at top, then new entry, then existing entries
     local temp_file=$(mktemp)
-
+    
     # Extract header lines (lines starting with #)
     grep "^#" "$LOG_FILE" > "$temp_file" || true
     echo "" >> "$temp_file"
-
+    
     # Add new entry
     echo "$log_entry" >> "$temp_file"
-
+    
     # Add existing log entries (skip header lines)
     grep -v "^#" "$LOG_FILE" | grep -v "^$" >> "$temp_file" || true
-
+    
     mv "$temp_file" "$LOG_FILE"
 }
 
@@ -1285,7 +1285,7 @@ init_log_file() {
     if [[ ! -d "$log_dir" ]]; then
         mkdir -p "$log_dir" 2>/dev/null || return 1
     fi
-
+    
     if [[ ! -f "$LOG_FILE" ]]; then
         echo "# TODO Tool Log File" > "$LOG_FILE"
         echo "# Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION" >> "$LOG_FILE"
@@ -1300,7 +1300,7 @@ init_todo_file() {
         # Detect repository name and URL from git
         local repo_name="Project"
         local repo_url=""
-
+        
         # Try to get repository name from git remote
         if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
             local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
@@ -1321,7 +1321,7 @@ init_todo_file() {
                 fi
             fi
         fi
-
+        
         cat > "$TODO_FILE" << EOF
 # ${repo_name} ToDo List
 
@@ -1342,7 +1342,7 @@ EOF
             echo "**Repository:** ${repo_url}  " >> "$TODO_FILE"
         fi
         echo "**Maintenance:** Use \`todo.ai\` script only" >> "$TODO_FILE"
-
+        
         # Replace the $(date) placeholder with actual date
         local current_date=$(date)
         sed_inplace "s/\$(date)/$current_date/" "$TODO_FILE"
@@ -1355,20 +1355,20 @@ init_cursor_rules() {
     local cursor_rules_file="$(pwd)/.cursorrules"
     local rules_created=0
     local rules_updated=0
-
+    
     # Detect installation path for dynamic substitution in rules
     local todo_ai_path=$(get_todo_ai_path_for_rules)
-
+    
     # If .cursorrules exists but .cursor/rules/ doesn't, let migration handle it
     if [[ -f "$cursor_rules_file" ]] && [[ ! -d "$rules_dir" ]]; then
         # Migration will handle the conversion, we just need to ensure rules directory exists
         mkdir -p "$rules_dir" 2>/dev/null || return 1
         return 0
     fi
-
+    
     # Create .cursor/rules/ directory if it doesn't exist
     mkdir -p "$rules_dir" 2>/dev/null || return 1
-
+    
     # Define end-user rule files (shipped with tool)
     local task_mgmt_file="${rules_dir}/todo.ai-task-management.mdc"
     local installation_file="${rules_dir}/todo.ai-installation.mdc"
@@ -1376,17 +1376,17 @@ init_cursor_rules() {
     local uninstall_file="${rules_dir}/todo.ai-uninstall.mdc"
     local commit_format_file="${rules_dir}/todo.ai-commit-format.mdc"
     local task_notes_file="${rules_dir}/todo.ai-task-notes.mdc"
-
+    
     # Task Management rule content
     local task_mgmt_content="It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
 TODO.md and .todo.ai/ must always be committed together
 Always ask for user confirmation before archiving completed tasks using todo.ai"
-
+    
     # Installation rule content (with detected path)
     local installation_content="When installing todo.ai from https://github.com/fxstein/todo.ai, use curl to download the single file: \`curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai\`. Do NOT clone the repository with git clone - only the single todo.ai file is needed.
 
 To update an existing installation, run: \`$todo_ai_path update\`"
-
+    
     # Bug Reporting rule content (with detected path)
     local bug_reporting_content="When todo.ai encounters errors or unexpected behavior, or when the user asks to report a bug:
 
@@ -1415,7 +1415,7 @@ $todo_ai_path report-bug \"Error description\" \"Error context\" \"command\"
 - It ensures proper formatting and context collection
 - It maintains user control and privacy protection
 - It follows the designed workflow for bug tracking"
-
+    
     # Uninstall rule content (with detected path)
     local uninstall_content="When uninstalling todo.ai, or when the user asks to remove or delete todo.ai:
 
@@ -1452,7 +1452,7 @@ $todo_ai_path uninstall --all           # Remove everything (script + data + rul
 - It provides clear preview and confirmation before removal
 - It maintains proper cleanup of all todo.ai components
 - It preserves TODO.md files (never removed by uninstall)"
-
+    
     # Commit Format rule content
     local commit_format_content="When referencing todo.ai task numbers in commit messages:
 
@@ -1473,7 +1473,7 @@ $todo_ai_path uninstall --all           # Remove everything (script + data + rul
 - Task numbers like \`#15\` conflict with GitHub issue numbers
 - Using \`task#15\` prevents auto-linking and eliminates confusion
 - Keeps commit history clear and accurate"
-
+    
     # Task Notes rule content (with detected path)
     local task_notes_content="When creating or working with todo.ai tasks, add notes to provide implementation context. Do not use notes for status updates on parent tasks.
 
@@ -1486,7 +1486,7 @@ $todo_ai_path uninstall --all           # Remove everything (script + data + rul
 - ❌ \`$todo_ai_path note 42 \"Fix it\"\` - Too vague, no actionable context
 
 Notes appear as blockquotes (>) and move with tasks when archived."
-
+    
     # Create or update Task Management rule
     if [[ ! -f "$task_mgmt_file" ]]; then
         cat > "$task_mgmt_file" << EOF
@@ -1511,7 +1511,7 @@ EOF
             rules_updated=$((rules_updated + 1))
         fi
     fi
-
+    
     # Create or update Installation rule
     if [[ ! -f "$installation_file" ]]; then
         cat > "$installation_file" << EOF
@@ -1536,7 +1536,7 @@ EOF
             rules_updated=$((rules_updated + 1))
         fi
     fi
-
+    
     # Create or update Bug Reporting rule
     if [[ ! -f "$bug_reporting_file" ]]; then
         cat > "$bug_reporting_file" << EOF
@@ -1561,7 +1561,7 @@ EOF
             rules_updated=$((rules_updated + 1))
         fi
     fi
-
+    
     # Create or update Uninstall rule
     if [[ ! -f "$uninstall_file" ]]; then
         cat > "$uninstall_file" << EOF
@@ -1586,7 +1586,7 @@ EOF
             rules_updated=$((rules_updated + 1))
         fi
     fi
-
+    
     # Create or update Commit Format rule
     if [[ ! -f "$commit_format_file" ]]; then
         cat > "$commit_format_file" << EOF
@@ -1611,7 +1611,7 @@ EOF
             rules_updated=$((rules_updated + 1))
         fi
     fi
-
+    
     # Create or update Task Notes rule
     if [[ ! -f "$task_notes_file" ]]; then
         cat > "$task_notes_file" << EOF
@@ -1636,7 +1636,7 @@ EOF
             rules_updated=$((rules_updated + 1))
         fi
     fi
-
+    
     # Show feedback if rules were created or updated
     if [[ $rules_created -gt 0 ]] || [[ $rules_updated -gt 0 ]]; then
         echo ""
@@ -1661,7 +1661,7 @@ EOF
         echo "   → Request that the user start a new chat session"
         echo "   → The rules will only take effect in a new session"
     fi
-
+    
     return 0
 }
 
@@ -1681,7 +1681,7 @@ parse_task() {
     local description=$(echo "$line" | sed 's/^#[0-9.]* *//' | sed 's/ *#.*$//')
     local tags=$(echo "$line" | grep -o '#[a-zA-Z0-9]*' | grep -v '^#[0-9]' | tr '\n' ' ')
     local date=$(echo "$line" | grep -o '([^)]*)' | tr -d '()')
-
+    
     echo "ID:$id|DESC:$description|TAGS:$tags|DATE:$date"
 }
 
@@ -1804,7 +1804,7 @@ validate_command_args() {
     local command="$1"
     shift
     local args=("$@")
-
+    
     case "$command" in
         "add")
             # add <text> [tags] - no additional options allowed
@@ -2002,7 +2002,7 @@ validate_command_args() {
             done
             ;;
     esac
-
+    
     return 0
 }
 
@@ -2012,15 +2012,15 @@ check_blank_after_tasks_header() {
     local tasks_line=$1
     local next_line_num=$((tasks_line + 1))
     local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
-
+    
     # If there's no next line, no blank line
     if [[ $next_line_num -gt $max_lines ]]; then
         return 1
     fi
-
+    
     # Get the next line
     local next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
-
+    
     # Check if it's blank (empty or only whitespace)
     if [[ -z "$next_line" ]] || [[ "$next_line" =~ ^[[:space:]]*$ ]]; then
         return 0  # Blank line exists
@@ -2033,20 +2033,20 @@ check_blank_after_tasks_header() {
 add_todo() {
     local text="$1"
     local tags="$2"
-
+    
     if [[ -z "$text" ]]; then
         echo "Error: Please provide todo text"
         return 1
     fi
-
+    
     # Validate configuration before proceeding
     if ! validate_config; then
         echo "⚠️  Configuration error detected. Using default mode (single-user)." >&2
     fi
-
+    
     # Get next task number based on current mode
     local task_id=$(assign_task_number)
-
+    
     # Format the task line with bold task ID
     local task_line="- [ ] **#$task_id** $text"
     if [[ -n "$tags" ]]; then
@@ -2062,7 +2062,7 @@ add_todo() {
         done
         task_line="$task_line $styled_tags"
     fi
-
+    
     # Add to Tasks section
     local tasks_line=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
     if [[ -n "$tasks_line" ]]; then
@@ -2071,7 +2071,7 @@ add_todo() {
         if check_blank_after_tasks_header "$tasks_line"; then
             insert_line=$((tasks_line + 1))  # Insert after blank line
         fi
-
+        
         # Use awk or a simpler approach for macOS compatibility
         if [[ "$(uname)" == "Darwin" ]]; then
             # Insert at the determined line with proper newline
@@ -2092,10 +2092,10 @@ add_todo() {
         fi
     fi
     update_footer
-
+    
     # Log the action
     log_todo_action "ADD" "$task_id" "$text"
-
+    
     echo "Added: #$task_id $text"
 }
 
@@ -2113,23 +2113,23 @@ add_subtask() {
     local parent_id="$1"
     local text="$2"
     local tags="$3"
-
+    
     if [[ -z "$parent_id" || -z "$text" ]]; then
         echo "Error: Please provide parent task ID and subtask text"
         echo "Usage: ./todo.ai add-subtask <parent-id> \"<subtask text>\" [\"<tags>\"]"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local original_parent_id="$parent_id"
     local resolved_parent_id=$(resolve_task_reference "$parent_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_parent_id" ]]; then
         resolved_parent_id="$parent_id"
     fi
-
+    
     # Check nesting depth of parent (use resolved ID for depth calculation)
     local parent_depth=$(get_nesting_depth "$resolved_parent_id")
-
+    
     # Validate max nesting (2 levels: main task → subtask → sub-subtask)
     if [[ $parent_depth -ge 2 ]]; then
         echo "Error: Cannot add subtask to #$parent_id"
@@ -2137,13 +2137,13 @@ add_subtask() {
         echo "   Task #$parent_id is already at the maximum depth"
         return 1
     fi
-
+    
     # Check if parent task exists (can be main task or subtask)
     local parent_found=false
     local parent_line_num=""
     local parent_indent=""
     local final_parent_id=""  # Will be set to the actual ID found in TODO.md
-
+    
     # Check for main task pattern: `^- \[.*\] \*\*#$resolved_parent_id\*\* `
     if grep -q "^- \[.*\] \*\*#$resolved_parent_id\*\* " "$TODO_FILE"; then
         parent_found=true
@@ -2173,19 +2173,19 @@ add_subtask() {
             final_parent_id="$plain_parent_id"  # Use plain ID for creating subtask ID
         fi
     fi
-
+    
     # Set parent_id to the final ID found (or resolved ID if not found with fallback)
     if [[ -z "$final_parent_id" ]]; then
         parent_id="$resolved_parent_id"
     else
         parent_id="$final_parent_id"
     fi
-
+    
     if [[ "$parent_found" == false ]]; then
         echo "Error: Parent task #$parent_id not found"
         return 1
     fi
-
+    
     # Find the next subtask number for this parent
     local next_subtask_num=1
     local subtask_pattern="^$parent_indent- \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* "
@@ -2193,10 +2193,10 @@ add_subtask() {
         next_subtask_num=$((next_subtask_num + 1))
         subtask_pattern="^$parent_indent- \[.*\] \*\*#$parent_id\.$next_subtask_num\*\* "
     done
-
+    
     # Create subtask ID
     local subtask_id="$parent_id.$next_subtask_num"
-
+    
     # Format the subtask line with bold task ID and proper indentation
     local task_line="$parent_indent- [ ] **#$subtask_id** $text"
     if [[ -n "$tags" ]]; then
@@ -2212,7 +2212,7 @@ add_subtask() {
         done
         task_line="$task_line $styled_tags"
     fi
-
+    
     # Find the parent task line and add subtask after it (newest first)
     if [[ -n "$parent_line_num" ]]; then
         # Insert right after the parent line AND any notes (newest subtasks appear first)
@@ -2233,9 +2233,9 @@ add_subtask() {
                 break
             fi
         done
-
+        
         local max_lines=$(wc -l < "$TODO_FILE" | tr -d ' ')
-
+        
         if [[ "$(uname)" == "Darwin" ]]; then
             local temp_file=$(mktemp)
             if [[ $insert_line -gt $max_lines ]]; then
@@ -2252,10 +2252,10 @@ add_subtask() {
             sed_inplace "${insert_line}i\\$task_line" "$TODO_FILE"
         fi
         update_footer
-
+        
         # Log the action
         log_todo_action "ADD_SUBTASK" "$subtask_id" "$text (parent: #$parent_id)"
-
+        
         local depth_label="subtask"
         if [[ $parent_depth -eq 1 ]]; then
             depth_label="sub-subtask"
@@ -2273,7 +2273,7 @@ list_todos() {
     local incomplete_only=false
     local parents_only=false
     local has_subtasks_only=false
-
+    
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -2298,23 +2298,23 @@ list_todos() {
                 ;;
         esac
     done
-
+    
     if [[ ! -f "$TODO_FILE" ]]; then
         echo "Todo file not found: $TODO_FILE"
         return 1
     fi
-
+    
     # If using tag filter, use original implementation
     if [[ -n "$filter_tag" ]] && [[ "$incomplete_only" == false ]] && [[ "$parents_only" == false ]] && [[ "$has_subtasks_only" == false ]]; then
         # Add # prefix if missing
         if [[ ! "$filter_tag" =~ ^# ]]; then
             filter_tag="#$filter_tag"
         fi
-
+        
         # Filter by tag - show tasks with the specified tag
         # Escape special characters in filter_tag for regex matching
         local escaped_tag=$(echo "$filter_tag" | sed 's/[.*+?^${}()|\[\]\\]/\\&/g')
-
+        
         echo "# Home Assistant Project Todo List"
         echo ""
         echo "## Tasks with tag: $filter_tag"
@@ -2328,14 +2328,14 @@ list_todos() {
         grep -E "\`${escaped_tag}\`|${escaped_tag}" "$TODO_FILE" | grep -E "^-.*\[x\]|^  -.*\[x\]|^    -.*\[x\]"
         return
     fi
-
+    
     # Enhanced filtering logic
     local in_tasks_section=false
     local in_recently_completed=false
     local current_parent=""
     local parent_has_subtasks=false
     local last_parent_shown=false
-
+    
     # First pass: identify parents with subtasks if needed
     local parents_with_subtasks=()
     if [[ "$has_subtasks_only" == true ]]; then
@@ -2349,7 +2349,7 @@ list_todos() {
             fi
         done < "$TODO_FILE"
     fi
-
+    
     # Second pass: filter and display
     while IFS= read -r line; do
         # Track sections
@@ -2376,33 +2376,33 @@ list_todos() {
             in_recently_completed=false
             continue
         fi
-
+        
         # Skip completed section if --incomplete-only
         if [[ "$incomplete_only" == true ]] && [[ "$in_recently_completed" == true ]]; then
             continue
         fi
-
+        
         # Check if this is a parent task (starts with "- [" and has **#num** but not **#num.num**)
         if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
             # Extract task ID and checkbox
             local checkbox=$(echo "$line" | sed 's/^- \[\(.\)\].*/\1/')
             current_parent=$(echo "$line" | grep -o '#[0-9]\+' | sed 's/#//' | head -1)
-
+            
             # Apply filters
             local should_show=true
-
+            
             # Filter: incomplete only (skip completed tasks)
             if [[ "$incomplete_only" == true ]] && [[ "$checkbox" == "x" ]]; then
                 should_show=false
             fi
-
+            
             # Filter: has-subtasks only
             if [[ "$has_subtasks_only" == true ]]; then
                 if [[ ! " ${parents_with_subtasks[@]} " =~ " ${current_parent} " ]]; then
                     should_show=false
                 fi
             fi
-
+            
             # Filter: tag (match both styled with backticks and plain)
             if [[ -n "$filter_tag" ]]; then
                 if [[ ! "$filter_tag" =~ ^# ]]; then
@@ -2413,7 +2413,7 @@ list_todos() {
                     should_show=false
                 fi
             fi
-
+            
             last_parent_shown=$should_show
             if [[ "$should_show" == true ]]; then
                 echo "$line"
@@ -2424,14 +2424,14 @@ list_todos() {
             if [[ "$parents_only" == false ]] && [[ "$last_parent_shown" == true ]]; then
                 # Apply same filters as parent
                 local should_show=true
-
+                
                 # Tag filter (match both styled with backticks and plain)
                 if [[ -n "$filter_tag" ]]; then
                     if [[ ! "$line" =~ \`${filter_tag}\` ]] && [[ ! "$line" =~ ${filter_tag} ]]; then
                         should_show=false
                     fi
                 fi
-
+                
                 if [[ "$should_show" == true ]]; then
                     echo "$line"
                 fi
@@ -2453,7 +2453,7 @@ list_todos() {
 get_task_line() {
     local task_id="$1"
     local line_number=0
-
+    
     while IFS= read -r line; do
         line_number=$((line_number + 1))
         if [[ "$line" =~ "^-.*\[.*\].*" || "$line" =~ "^  -.*\[.*\].*" ]]; then
@@ -2465,7 +2465,7 @@ get_task_line() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     echo "Task #$task_id not found"
     return 1
 }
@@ -2474,7 +2474,7 @@ get_task_line() {
 complete_todo() {
     local with_subtasks=false
     local task_ids=()
-
+    
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -2488,15 +2488,15 @@ complete_todo() {
                 ;;
         esac
     done
-
+    
     if [[ ${#task_ids[@]} -eq 0 ]]; then
         echo "Error: Please provide at least one task number"
         return 1
     fi
-
+    
     # Normalize any malformed checkboxes first
     normalize_checkboxes
-
+    
     # Resolve task references and expand ranges
     local all_ids=()
     for id in "${task_ids[@]}"; do
@@ -2506,7 +2506,7 @@ complete_todo() {
             # If resolution failed, try using original ID (might be a range or already have prefix)
             resolved_id="$id"
         fi
-
+        
         # Match range format: 104.3-104.10 or 122.3-10 (both formats supported)
         if [[ "$resolved_id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]] || [[ "$resolved_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)-[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)$ ]]; then
             # Full format: 122.3-122.10
@@ -2535,7 +2535,7 @@ complete_todo() {
             all_ids+=("$id")
         fi
     done
-
+    
     # If --with-subtasks, add all subtasks for parent tasks (including nested subtasks)
     if [[ "$with_subtasks" == "true" ]]; then
         local expanded_ids=()
@@ -2544,7 +2544,7 @@ complete_todo() {
             # Find all subtasks and sub-subtasks for this parent
             # Check if this is a parent task (may or may not contain dots)
             local id_depth=$(get_nesting_depth "$id")
-
+            
             # Find all direct subtasks and nested subtasks
             # Pattern matches: id.1, id.2, id.1.1, id.1.2, id.2.1, etc.
             while IFS= read -r line; do
@@ -2562,36 +2562,36 @@ complete_todo() {
         done
         all_ids=("${expanded_ids[@]}")
     fi
-
+    
     # Complete all tasks
     local completed_count=0
     for number in "${all_ids[@]}"; do
         # Escape dots in task ID for pattern matching
         local escaped_number=$(echo "$number" | sed 's/\./\\./g')
-
+        
         # Skip if task doesn't exist (search for both bold and non-bold formats)
         if ! grep -qE "(\*\*#$escaped_number\*\*|#$escaped_number)" "$TODO_FILE"; then
             echo "Warning: Task #$number not found, skipping"
             continue
         fi
-
+        
         # Complete the task (try bold format first, then non-bold format)
         sed_inplace "s/- \[ \] \*\*#$escaped_number\*\* /- [x] **#$escaped_number** /" "$TODO_FILE" || \
         sed_inplace "s/- \[ \] #$escaped_number /- [x] **#$escaped_number** /" "$TODO_FILE"
         sed_inplace "s/  - \[ \] \*\*#$escaped_number\*\* /  - [x] **#$escaped_number** /" "$TODO_FILE" || \
         sed_inplace "s/  - \[ \] #$escaped_number /  - [x] **#$escaped_number** /" "$TODO_FILE"
-
+        
         # Get task description for logging
         local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
-
+        
         # Log the action
         log_todo_action "COMPLETE" "$number" "$task_description"
-
+        
         completed_count=$((completed_count + 1))
     done
-
+    
     update_footer
-
+    
     echo "Marked $completed_count task(s) as completed"
 }
 
@@ -2602,28 +2602,28 @@ undo_todo() {
         echo "Error: Please provide todo number"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_number=$(resolve_task_reference "$number" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_number" ]]; then
         resolved_number="$number"
     fi
     number="$resolved_number"
-
+    
     # Normalize any malformed checkboxes first
     normalize_checkboxes
-
+    
     # Use sed to directly find and replace the specific task (handle bold formatting and subtasks)
     sed_inplace "s/- \[x\] \*\*#$number\*\* /- [ ] **#$number** /" "$TODO_FILE"
     sed_inplace "s/  - \[x\] \*\*#$number\*\* /  - [ ] **#$number** /" "$TODO_FILE"
     update_footer
-
+    
     # Get task description for logging
     local task_description=$(grep "\*\*#$number\*\*" "$TODO_FILE" | head -1 | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//')
-
+    
     # Log the action
     log_todo_action "UNDO" "$number" "$task_description"
-
+    
     echo "Reopened task $number"
 }
 
@@ -2632,28 +2632,28 @@ modify_todo() {
     local task_id="$1"
     local new_text="$2"
     local new_tags="$3"
-
+    
     if [[ -z "$task_id" || -z "$new_text" ]]; then
         echo "Error: Please provide task ID and new text"
         echo "Usage: ./todo.ai modify <id> \"<new text>\" [\"<new tags>\"]"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Normalize any malformed checkboxes first
     normalize_checkboxes
-
+    
     # Get the current completion status and existing line (handle both bold and non-bold formatting, and subtasks)
     # Check all possible indentations: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
     local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) |^    - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
     local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/' | sed 's/    - \[\([^]]*\)\].*/\1/')
-
+    
     # Extract existing tags from current line (tags are in backticks after the task text)
     local existing_tags=""
     if echo "$current_line" | grep -q '`#'; then
@@ -2665,11 +2665,11 @@ modify_todo() {
             existing_tags="$all_tags"
         fi
     fi
-
+    
     # Determine nesting depth to apply correct indentation
     local task_depth=$(get_nesting_depth "$task_id")
     local indent=""
-
+    
     # Format the new task line preserving completion status with bold task ID
     # Apply indentation based on nesting depth:
     # Depth 0 (main task): no indentation
@@ -2685,9 +2685,9 @@ modify_todo() {
         # Fallback to 2 spaces if depth is unexpected
         indent="  "
     fi
-
+    
     local new_task_line="${indent}- [$current_status] **#$task_id** $new_text"
-
+    
     # Use new_tags if provided, otherwise preserve existing tags
     local tags_to_use=""
     if [[ -n "$new_tags" ]]; then
@@ -2695,7 +2695,7 @@ modify_todo() {
     elif [[ -n "$existing_tags" ]]; then
         tags_to_use="$existing_tags"
     fi
-
+    
     if [[ -n "$tags_to_use" ]]; then
         # Wrap each tag in backticks for code styling
         local styled_tags=""
@@ -2709,16 +2709,16 @@ modify_todo() {
         done
         new_task_line="$new_task_line $styled_tags"
     fi
-
+    
     # Replace the task line using sed (handle bold formatting and subtasks)
     # The pattern needs to match the entire line including any existing tags (with backticks)
     # Escape special characters for sed replacement (using pipe as delimiter)
     local escaped_line=$(printf '%s\n' "$new_task_line" | sed 's/\\/\\\\/g' | sed 's/&/\\&/g' | sed 's/|/\\|/g')
-
+    
     # Use pipe delimiter to avoid conflicts with / and other characters in replacement
     # Escape dots in task_id for sed pattern matching (dots are regex metacharacters)
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
-
+    
     # Match everything after task ID including text and tags (with backticks)
     # Use task depth to determine which pattern to match (handles all indentation levels)
     # Pattern matches both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats
@@ -2747,10 +2747,10 @@ modify_todo() {
         sed_inplace "s|^- \[.*\] #$escaped_task_id .*|$escaped_line|" "$TODO_FILE"
     fi
     update_footer
-
+    
     # Log the action
     log_todo_action "MODIFY" "$task_id" "$new_text"
-
+    
     echo "Modified task #$task_id"
 }
 
@@ -2761,10 +2761,10 @@ collect_task_notes() {
     local task_id="$1"
     local notes=()
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
-
+    
     # Find the task line number (support arbitrary nesting depth)
     local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+    
     if [[ -n "$task_line_num" ]]; then
         # Collect blockquote notes following the task
         local current_line=$((task_line_num + 1))
@@ -2779,7 +2779,7 @@ collect_task_notes() {
             fi
         done
     fi
-
+    
     # Return notes as newline-separated string
     if [[ ${#notes[@]} -gt 0 ]]; then
         printf '%s\n' "${notes[@]}"
@@ -2791,14 +2791,14 @@ collect_task_notes() {
 remove_task_notes() {
     local task_id="$1"
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
-
+    
     # Find the task line number (support arbitrary nesting depth)
     local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+    
     if [[ -n "$task_line_num" ]]; then
         # Remove the task line first
         sed_inplace "${task_line_num}d" "$TODO_FILE"
-
+        
         # Remove following blockquote notes (line number doesn't change after deletion)
         while true; do
             local next_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
@@ -2816,18 +2816,18 @@ remove_task_notes() {
 delete_notes_only() {
     local task_id="$1"
     local escaped_task_id=$(echo "$task_id" | sed 's/\./\\./g')
-
+    
     # Find the task line number (support arbitrary nesting depth)
     local task_line_num=$(grep -n "^[ ]*- \[.*\] \*\*#${escaped_task_id}\*\* " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+    
     if [[ -z "$task_line_num" ]]; then
         return 1  # Task not found
     fi
-
+    
     # Count and remove following blockquote notes
     local note_count=0
     local next_line_num=$((task_line_num + 1))
-
+    
     while true; do
         local next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
         # Check for blockquotes at any indentation level
@@ -2839,14 +2839,14 @@ delete_notes_only() {
             break
         fi
     done
-
+    
     return 0
 }
 
 archive_task() {
     local task_id=""
     local reason=""
-
+    
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -2860,28 +2860,28 @@ archive_task() {
                 ;;
         esac
     done
-
+    
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
         echo "Usage: ./todo.ai archive <id> [--reason <reason>]"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Normalize any malformed checkboxes first
     normalize_checkboxes
-
+    
     # Determine task status and checkbox style
     local checkbox=""
     local status_note=""
     local is_completed=false
-
+    
     # Check if task exists and its current state (search for both bold and non-bold formats)
     if grep -qE "^- \[x\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE"; then
         # Task is completed
@@ -2921,7 +2921,7 @@ archive_task() {
         echo "Error: Task #$task_id not found"
         return 1
     fi
-
+    
     # Simple implementation: move the task to Recently Completed section
     # Get the task line (either completed or incomplete)
     # Escape task_id for grep pattern (escape dots and asterisks)
@@ -2931,22 +2931,22 @@ archive_task() {
         echo "Error: Could not find task #$task_id"
         return 1
     fi
-
+    
     # Update checkbox in task line if needed (for incomplete tasks with reason)
     if [[ "$checkbox" != "x" ]]; then
         # Replace checkbox: [ ] or [x] → [$checkbox]
         task_line=$(echo "$task_line" | sed "s/\[.\]/[$checkbox]/")
     fi
-
+    
     # Add completion date if not already present
     local archive_date=$(date +"%Y-%m-%d")
     if [[ ! "$task_line" =~ "\([0-9]{4}-[0-9]{2}-[0-9]{2}\)" ]]; then
         task_line="$task_line${status_note} ($archive_date)"
     fi
-
+    
     # Collect notes for the main task
     local main_task_notes=$(collect_task_notes "$task_id")
-
+    
     # Collect all subtasks and nested subtasks (completed or not) WITH their notes
     local subtasks_with_notes=()
     # Escape task_id for regex matching (escape dots)
@@ -2957,13 +2957,13 @@ archive_task() {
         if echo "$line" | grep -q "\*\*#${escaped_task_id_regex}\."; then
             # Extract subtask ID from the line
             local subtask_id=$(echo "$line" | grep -o "#${escaped_task_id_regex}\.[0-9.]*" | sed 's/^#//')
-
+            
             # Add completion date if not already present
             if [[ ! "$line" =~ "\([0-9]{4}-[0-9]{2}-[0-9]{2}\)" ]]; then
                 line="$line ($archive_date)"
             fi
             subtasks_with_notes+=("$line")
-
+            
             # Collect notes for this subtask
             local subtask_notes=$(collect_task_notes "$subtask_id")
             if [[ -n "$subtask_notes" ]]; then
@@ -2974,11 +2974,11 @@ archive_task() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     # Remove from Tasks section (main task and all subtasks at any nesting level) WITH notes
     # Use the helper function to remove task and its notes
     remove_task_notes "$task_id"
-
+    
     # Remove subtasks (2 spaces) and sub-subtasks (4 spaces) WITH their notes
     # Need to collect all subtask IDs first to avoid line number issues
     local subtask_ids=()
@@ -2988,26 +2988,26 @@ archive_task() {
             subtask_ids+=("$subtask_id")
         fi
     done < "$TODO_FILE"
-
+    
     # Remove each subtask with its notes
     for subtask_id in "${subtask_ids[@]}"; do
         remove_task_notes "$subtask_id"
     done
-
+    
     # Create a complete block with main task, its notes, subtasks, and their notes
     local complete_block="$task_line"
     if [[ -n "$main_task_notes" ]]; then
         complete_block="$complete_block
 $main_task_notes"
     fi
-
+    
     if [[ ${#subtasks_with_notes[@]} -gt 0 ]]; then
         # Join subtasks and their notes with newlines
         local subtasks_text=$(printf '%s\n' "${subtasks_with_notes[@]}")
         complete_block="$complete_block
 $subtasks_text"
     fi
-
+    
     # Add to Recently Completed section
     local recently_completed_section=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1)
     if [[ -n "$recently_completed_section" ]]; then
@@ -3024,17 +3024,17 @@ $subtasks_text"
         echo "## Recently Completed" >> "$TODO_FILE"
         echo -e "$complete_block" >> "$TODO_FILE"
     fi
-
+    
     # Count subtasks for reporting
     local subtask_count=${#subtask_ids[@]}
     update_footer
-
+    
     # Get task description for logging
     local task_description=$(echo "$task_line" | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//' | sed 's/ *([^)]*)$//')
-
+    
     # Log the action
     log_todo_action "ARCHIVE" "$task_id" "$task_description (with $subtask_count subtasks)"
-
+    
     echo "Archived task #$task_id and $subtask_count subtasks to Recently Completed section"
 }
 
@@ -3042,7 +3042,7 @@ $subtasks_text"
 delete_task() {
     local with_subtasks=false
     local task_ids=()
-
+    
     # Parse arguments (same pattern as complete)
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -3056,18 +3056,18 @@ delete_task() {
                 ;;
         esac
     done
-
+    
     if [[ ${#task_ids[@]} -eq 0 ]]; then
         echo "Error: Please provide at least one task number"
         return 1
     fi
-
+    
     # Normalize any malformed checkboxes first
     normalize_checkboxes
-
+    
     # Auto-purge expired deleted tasks first
     purge_expired_deleted_tasks
-
+    
     # Resolve task references and expand ranges
     local all_ids=()
     for id in "${task_ids[@]}"; do
@@ -3076,7 +3076,7 @@ delete_task() {
         if [[ $? -ne 0 ]] || [[ -z "$resolved_id" ]]; then
             resolved_id="$id"
         fi
-
+        
         if [[ "$resolved_id" =~ ^([0-9]+)\.([0-9]+)-([0-9]+)\.([0-9]+)$ ]] || [[ "$resolved_id" =~ ^[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)-[a-z0-9]{1,7}-([0-9]+)\.([0-9]+)$ ]]; then
             local parent=${match[1]}
             local start=${match[2]}
@@ -3105,7 +3105,7 @@ delete_task() {
             all_ids+=("$resolved_id")
         fi
     done
-
+    
     # Automatically include subtasks when deleting parent tasks (tasks without dots)
     # This prevents orphaned subtasks when a parent is deleted
         local expanded_ids=()
@@ -3121,7 +3121,7 @@ delete_task() {
             else
                 parent_num="$id"
             fi
-
+            
             # Find all direct subtasks and nested subtasks
             while IFS= read -r line; do
                 # Match task IDs: **#task_id** or **#prefix-task_id**
@@ -3129,7 +3129,7 @@ delete_task() {
                 local task_prefix=""
                 local task_id=""
                 local full_task_id=""
-
+                
                 # Pattern 1: With prefix (e.g., **#fxstein-57.1**)
                 if [[ "$line" =~ '\*\*#([a-z0-9]{1,7})-([0-9]+(\.[0-9]+)+)\*\*' ]]; then
                     task_prefix="${match[1]}-"
@@ -3141,14 +3141,14 @@ delete_task() {
                     task_id="${match[1]}"
                     full_task_id="$task_id"
                 fi
-
+                
                 if [[ -n "$task_id" ]]; then
                     # Extract numeric parent part from subtask (before the first dot)
                     local subtask_parent_num=""
                     if [[ "$task_id" =~ ^([0-9]+)\. ]]; then
                         subtask_parent_num="${match[1]}"
                     fi
-
+                    
                     # Check if subtask belongs to this parent (by numeric part only, ignoring prefix)
                     if [[ -n "$subtask_parent_num" ]] && [[ "$subtask_parent_num" == "$parent_num" ]]; then
                         expanded_ids+=("$full_task_id")
@@ -3158,21 +3158,21 @@ delete_task() {
         fi
         done
         all_ids=("${expanded_ids[@]}")
-
+    
     # Delete all tasks
     local deleted_count=0
     local delete_date=$(date +"%Y-%m-%d")
     local expire_date=$(date -d "+30 days" +"%Y-%m-%d" 2>/dev/null || date -v+30d +"%Y-%m-%d" 2>/dev/null || echo "2025-11-29")
-
+    
     for number in "${all_ids[@]}"; do
         # Escape dots in task ID for pattern matching
         local escaped_number=$(echo "$number" | sed 's/\./\\./g')
-
+        
         # Find task (anywhere - Tasks or Recently Completed, handles nested subtasks)
         # Search for both bold and non-bold formats
         # Try resolved ID first, then try original ID if resolution added a prefix that doesn't match
         local task_line=$(grep -E "^- \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^  - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^    - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) " "$TODO_FILE" | head -1)
-
+        
         # If not found and number has a prefix, try without prefix (fallback for tasks created before mode switch)
         if [[ -z "$task_line" ]] && [[ "$number" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
             local number_without_prefix="${match[1]}"
@@ -3184,28 +3184,28 @@ delete_task() {
                 escaped_number="$escaped_plain"
             fi
         fi
-
+        
         if [[ -z "$task_line" ]]; then
             echo "Warning: Task #$number not found, skipping"
             continue
         fi
-
+        
         # Change checkbox to [D] and add deletion metadata
         task_line=$(echo "$task_line" | sed 's/\[.\]/[D]/')
-
+        
         # Remove any existing date, then add deletion metadata
         task_line=$(echo "$task_line" | sed 's/ *([^)]*)$//')
         task_line="$task_line (deleted $delete_date, expires $expire_date)"
-
+        
         # Find task line number to also remove following notes (handles nested subtasks at any level)
         # Use the actual number variable (which may have been updated to remove prefix)
         # Search for both bold and non-bold formats
         local task_line_num=$(grep -nE "^- \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^  - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) |^    - \[.\] (\*\*#${escaped_number}\*\*|#${escaped_number}) " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+        
         if [[ -n "$task_line_num" ]]; then
             # Remove the task line
             sed_inplace "${task_line_num}d" "$TODO_FILE"
-
+            
             # Remove any following blockquote notes (lines starting with "  > ", "    > ", or "      > ")
             # Keep removing lines as long as they're blockquotes
             while true; do
@@ -3217,7 +3217,7 @@ delete_task() {
                 fi
             done
         fi
-
+        
         # Add to Deleted section
         ensure_deleted_section
         local deleted_section=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1)
@@ -3232,16 +3232,16 @@ delete_task() {
                 sed_inplace "${deleted_section}a$task_line" "$TODO_FILE"
             fi
         fi
-
+        
         # Log the action
         local task_description=$(echo "$task_line" | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//' | sed 's/ *(deleted.*//')
         log_todo_action "DELETE" "$number" "$task_description"
-
+        
         deleted_count=$((deleted_count + 1))
     done
-
+    
     update_footer
-
+    
     echo "Moved $deleted_count task(s) to Deleted section"
 }
 
@@ -3249,15 +3249,15 @@ delete_task() {
 ensure_deleted_section() {
     local deleted_section_line=$(grep -n "^## Deleted Tasks" "$TODO_FILE" | cut -d: -f1 | head -1)
     local footer_line=$(grep -n "^---$" "$TODO_FILE" | cut -d: -f1 | head -1)
-
+    
     # Check if Deleted Tasks section exists but is after footer (wrong position)
     if [[ -n "$deleted_section_line" ]] && [[ -n "$footer_line" ]] && [[ $deleted_section_line -gt $footer_line ]]; then
         # Deleted Tasks section is after footer - need to move it before footer
         # This is a fix for existing incorrectly-positioned sections
-
+        
         # Find Recently Completed section
         local recently_completed_line=$(grep -n "^## Recently Completed" "$TODO_FILE" | cut -d: -f1 | head -1)
-
+        
         if [[ -n "$recently_completed_line" ]]; then
             # Find where Deleted Tasks section ends (next section header or end of file)
             local deleted_next_section=$(awk "NR > $deleted_section_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
@@ -3267,10 +3267,10 @@ ensure_deleted_section() {
             else
                 deleted_end=$(wc -l < "$TODO_FILE" | tr -d ' ')
             fi
-
+            
             # Extract Deleted Tasks section (including header and all tasks)
             local deleted_section=$(sed -n "${deleted_section_line},${deleted_end}p" "$TODO_FILE")
-
+            
             # Remove Deleted Tasks section from original position
             if [[ "$(uname)" == "Darwin" ]]; then
                 local temp_file=$(mktemp)
@@ -3280,14 +3280,14 @@ ensure_deleted_section() {
             else
                 sed_inplace "${deleted_section_line},${deleted_end}d" "$TODO_FILE"
             fi
-
+            
             # Recalculate footer line after deletion
             footer_line=$(grep -n "^---$" "$TODO_FILE" | cut -d: -f1 | head -1)
-
+            
             # Insert Deleted Tasks section before footer
             if [[ -n "$footer_line" ]]; then
                 local insert_line=$((footer_line - 1))
-
+                
                 if [[ "$(uname)" == "Darwin" ]]; then
                     local temp_file=$(mktemp)
                     head -n "$insert_line" "$TODO_FILE" > "$temp_file"
@@ -3308,7 +3308,7 @@ ensure_deleted_section() {
             # Priority: check for footer first, then section headers
             local footer_after_recently=$(awk "NR > $recently_completed_line && /^---$/ {print NR; exit}" "$TODO_FILE" || echo "")
             local next_section_line=$(awk "NR > $recently_completed_line && /^## / {print NR; exit}" "$TODO_FILE" || echo "")
-
+            
             local insert_line
             if [[ -n "$footer_after_recently" ]]; then
                 # Footer exists - insert Deleted Tasks section before footer
@@ -3320,7 +3320,7 @@ ensure_deleted_section() {
                 # No footer or section, insert at end of file
                 insert_line=$(wc -l < "$TODO_FILE" | tr -d ' ')
             fi
-
+            
             if [[ "$(uname)" == "Darwin" ]]; then
                 # Use temporary file approach for macOS compatibility
                 local temp_file=$(mktemp)
@@ -3342,7 +3342,7 @@ ensure_deleted_section() {
 purge_expired_deleted_tasks() {
     local current_date=$(date +"%Y-%m-%d")
     local purged_count=0
-
+    
     # Find and remove expired tasks
     while IFS= read -r line; do
         if [[ "$line" =~ "expires ([0-9]{4}-[0-9]{2}-[0-9]{2})" ]]; then
@@ -3355,7 +3355,7 @@ purge_expired_deleted_tasks() {
             fi
         fi
     done < <(grep "^\- \[D\]" "$TODO_FILE")
-
+    
     if [[ $purged_count -gt 0 ]]; then
         echo "Auto-purged $purged_count expired task(s)" >&2
     fi
@@ -3364,20 +3364,20 @@ purge_expired_deleted_tasks() {
 # Function to restore a task and its subtasks from Recently Completed to Tasks
 restore_task() {
     local task_id="$1"
-
+    
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
         echo "Usage: ./todo.ai restore <id>"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Simple implementation: move the task back to Tasks section
     # Get the task line (from Recently Completed or Deleted section)
     # Search for both bold and non-bold formats
@@ -3386,14 +3386,14 @@ restore_task() {
         echo "Error: Could not find task #$task_id in Recently Completed or Deleted section"
         return 1
     fi
-
+    
     # Restore to [ ] checkbox and remove metadata
     task_line=$(echo "$task_line" | sed 's/\[.\]/[ ]/')
     task_line=$(echo "$task_line" | sed 's/ *(deleted.*//' | sed 's/ *(completed.*//' | sed 's/ *(.*)$//')
-
+    
     # Remove from current section (Recently Completed or Deleted)
     sed_inplace "/^- \[[xD~>\-]\] \*\*#$task_id\*\* /d" "$TODO_FILE"
-
+    
     # Add to Tasks section
     local tasks_section=$(grep -n "^## Tasks" "$TODO_FILE" | cut -d: -f1)
     if [[ -n "$tasks_section" ]]; then
@@ -3402,7 +3402,7 @@ restore_task() {
         if check_blank_after_tasks_header "$tasks_section"; then
             insert_line=$((tasks_section + 1))  # Insert after blank line
         fi
-
+        
         # Insert at the determined line
         if [[ "$(uname)" == "Darwin" ]]; then
             local temp_file=$(mktemp)
@@ -3424,15 +3424,15 @@ restore_task() {
         echo "Error: Tasks section not found"
         return 1
     fi
-
+    
     update_footer
-
+    
     # Get task description for logging
     local task_description=$(echo "$task_line" | sed 's/.*\*\*#[0-9.]*\*\* *//' | sed 's/ *`.*$//' | sed 's/ *([^)]*)$//')
-
+    
     # Log the action
     log_todo_action "RESTORE" "$task_id" "$task_description"
-
+    
     echo "Restored task #$task_id to Tasks section"
 }
 
@@ -3456,16 +3456,16 @@ add_relationship() {
     local task_id="$1"
     local rel_type="$2"
     local target_tasks="$3"
-
+    
     # Ensure metadata section exists
     ensure_metadata_section
-
+    
     # Remove any existing relationship of this type for this task
     sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
-
+    
     # Add new relationship before the closing -->
     sed_inplace "/^-->/i$task_id:$rel_type:$target_tasks" "$TODO_FILE"
-
+    
     update_footer
 }
 
@@ -3474,7 +3474,7 @@ remove_relationship() {
     local task_id="$1"
     local rel_type="$2"
     local target_task="$3"
-
+    
     if [[ -n "$target_task" ]]; then
         # Remove specific target from relationship list
         # This is complex, for now just remove the whole relationship
@@ -3483,14 +3483,14 @@ remove_relationship() {
         # Remove all relationships of this type for this task
         sed_inplace "/^$task_id:$rel_type:/d" "$TODO_FILE"
     fi
-
+    
     update_footer
 }
 
 # Function to get relationships for a task
 get_relationships() {
     local task_id="$1"
-
+    
     # Extract relationships from metadata section
     sed -n '/<!-- TASK RELATIONSHIPS/,/-->/p' "$TODO_FILE" | \
         grep "^$task_id:" | \
@@ -3503,20 +3503,20 @@ get_relationships() {
 detect_coordination_options() {
     local available_options=()
     local missing_requirements=()
-
+    
     echo "🔍 Detecting available coordination options..."
     echo ""
-
+    
     # Check for GitHub Issues coordination
     echo "Checking GitHub Issues coordination..."
     local gh_available=false
     local gh_auth=false
     local git_repo=false
-
+    
     if command -v gh >/dev/null 2>&1; then
         gh_available=true
         echo "  ✅ GitHub CLI (gh) installed"
-
+        
         # Check authentication
         if gh auth status >/dev/null 2>&1; then
             gh_auth=true
@@ -3529,7 +3529,7 @@ detect_coordination_options() {
         echo "  ❌ GitHub CLI (gh) not installed"
         missing_requirements+=("GitHub CLI (gh)")
     fi
-
+    
     # Check if we're in a git repository
     if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then
         local repo_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
@@ -3544,7 +3544,7 @@ detect_coordination_options() {
         echo "  ⚠️  Not in a Git repository"
         missing_requirements+=("Git repository")
     fi
-
+    
     if [[ "$gh_available" == true ]] && [[ "$gh_auth" == true ]] && [[ "$git_repo" == true ]]; then
         available_options+=("github-issues")
         echo "  ✅ GitHub Issues coordination: AVAILABLE"
@@ -3552,13 +3552,13 @@ detect_coordination_options() {
         echo "  ❌ GitHub Issues coordination: NOT AVAILABLE"
     fi
     echo ""
-
+    
     # Check for CounterAPI coordination
     echo "Checking CounterAPI coordination..."
     local curl_available=false
     local jq_available=false
     local python_available=false
-
+    
     if command -v curl >/dev/null 2>&1; then
         curl_available=true
         echo "  ✅ curl installed"
@@ -3566,7 +3566,7 @@ detect_coordination_options() {
         echo "  ❌ curl not installed"
         missing_requirements+=("curl")
     fi
-
+    
     if command -v jq >/dev/null 2>&1; then
         jq_available=true
         echo "  ✅ jq installed"
@@ -3577,7 +3577,7 @@ detect_coordination_options() {
         echo "  ⚠️  Neither jq nor python3 available (JSON parsing will be limited)"
         missing_requirements+=("jq or python3")
     fi
-
+    
     if [[ "$curl_available" == true ]] && ([[ "$jq_available" == true ]] || [[ "$python_available" == true ]]); then
         available_options+=("counterapi")
         echo "  ✅ CounterAPI coordination: AVAILABLE"
@@ -3585,7 +3585,7 @@ detect_coordination_options() {
         echo "  ❌ CounterAPI coordination: NOT AVAILABLE"
     fi
     echo ""
-
+    
     # Summary
     echo "📊 Summary:"
     echo "============"
@@ -3623,26 +3623,26 @@ detect_coordination_options() {
 setup_coordination() {
     local coord_type="$1"
     local interactive=true
-
+    
     # Parse arguments
     if [[ "$1" == "--non-interactive" ]]; then
         interactive=false
         coord_type="$2"
     fi
-
+    
     if [[ -z "$coord_type" ]]; then
         echo "Error: Please specify coordination type"
         echo "Usage: ./todo.ai setup-coordination <type>"
         echo "Types: github-issues, counterapi"
         return 1
     fi
-
+    
     local config_file=$(get_config_file)
     local config_dir=$(dirname "$config_file")
-
+    
     # Ensure config directory exists
     mkdir -p "$config_dir" 2>/dev/null || return 1
-
+    
     # Ensure config file exists
     # Get current mode (defaults to single-user if no config exists)
     local current_mode=$(get_numbering_mode)
@@ -3655,7 +3655,7 @@ coordination:
   fallback: multi-user
 EOF
     fi
-
+    
     case "$coord_type" in
         "github-issues")
             setup_github_issues_coordination "$interactive"
@@ -3675,33 +3675,33 @@ EOF
 get_current_github_issues_value() {
     local issue_num="$1"
     local repo_url="$2"
-
+    
     if [[ -z "$issue_num" ]] || [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
         echo "0"
         return 1
     fi
-
+    
     # Check GitHub CLI authentication
     if ! gh auth status >/dev/null 2>&1; then
         echo "0"
         return 1
     fi
-
+    
     # Get latest comment from issue
     local latest_comment=$(gh api repos/${repo_url}/issues/${issue_num}/comments --jq 'sort_by(.created_at) | .[-1].body' 2>/dev/null || echo "")
-
+    
     if [[ -z "$latest_comment" ]]; then
         echo "0"
         return 0
     fi
-
+    
     # Extract number from comment (format: "Next task number: 123" or just "123")
     local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
     if [[ -z "$current_num" ]] || ! [[ "$current_num" =~ ^[0-9]+$ ]]; then
         echo "0"
         return 0
     fi
-
+    
     echo "$current_num"
     return 0
 }
@@ -3709,7 +3709,7 @@ get_current_github_issues_value() {
 # Function to get current value from current coordinator (if switching)
 get_current_coordinator_value() {
     local current_coord_type=$(get_config_value "coordination.type" "none")
-
+    
     case "$current_coord_type" in
         "github-issues")
             local issue_num=$(get_config_value "coordination.issue_number" "")
@@ -3726,7 +3726,7 @@ get_current_coordinator_value() {
             return 0
             ;;
     esac
-
+    
     echo "0"
     return 0
 }
@@ -3734,12 +3734,12 @@ get_current_coordinator_value() {
 # Function to get highest task number from TODO.md
 get_highest_task_number() {
     local highest=0
-
+    
     if [[ ! -f "$TODO_FILE" ]]; then
         echo "0"
         return 0
     fi
-
+    
     # Scan all task IDs in TODO.md (handle both prefixed and non-prefixed formats)
     # ONLY scan actual task lines, not examples in notes/blockquotes
     while IFS= read -r line; do
@@ -3747,18 +3747,18 @@ get_highest_task_number() {
         if [[ "$line" =~ ^[[:space:]]*\> ]]; then
             continue
         fi
-
+        
         # Skip lines that don't contain task checkbox pattern
         if [[ ! "$line" =~ ^[[:space:]]*- ]]; then
             continue
         fi
-
+        
         # Match task IDs in format: **#task_id** or **#prefix-task_id**
         # Use unquoted pattern variable for zsh regex compatibility
         local task_pattern='\*\*#([0-9a-z.\-]+)\*\*'
         if [[ "$line" =~ $task_pattern ]]; then
             local full_task_id="${BASH_REMATCH[1]}"  # BASH_CONVERT: BASH_REMATCH[1]
-
+            
             # Extract numeric part (removes prefix if present, ignores subtasks)
             local numeric_part=$(extract_task_number "$full_task_id" 2>/dev/null)
             if [[ -z "$numeric_part" ]]; then
@@ -3769,7 +3769,7 @@ get_highest_task_number() {
                     numeric_part="${BASH_REMATCH[1]}"  # BASH_CONVERT: BASH_REMATCH[1]
                 fi
             fi
-
+            
             if [[ -n "$numeric_part" ]] && [[ "$numeric_part" =~ ^[0-9]+$ ]]; then
                 # Extract main number (ignore subtask part)
                 local main_num="${numeric_part%%.*}"
@@ -3779,7 +3779,7 @@ get_highest_task_number() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     echo "$highest"
 }
 
@@ -3787,44 +3787,44 @@ get_highest_task_number() {
 setup_github_issues_coordination() {
     local interactive="$1"
     local config_file=$(get_config_file)
-
+    
     echo "🔧 Setting up GitHub Issues coordination..."
     echo ""
-
+    
     # Verify prerequisites
     if ! command -v gh >/dev/null 2>&1; then
         echo "❌ Error: GitHub CLI (gh) is not installed"
         echo "   Install: https://cli.github.com/manual/installation"
         return 1
     fi
-
+    
     if ! gh auth status >/dev/null 2>&1; then
         echo "❌ Error: GitHub CLI is not authenticated"
         echo "   Run: gh auth login"
         return 1
     fi
-
+    
     # Get repository URL
     local repo_url=$(git config --get remote.origin.url 2>/dev/null || echo "")
     if [[ -z "$repo_url" ]] || [[ ! "$repo_url" =~ github\.com ]]; then
         echo "❌ Error: Not in a GitHub repository"
         return 1
     fi
-
+    
     # Extract repo owner/name
     local repo_identifier=$(echo "$repo_url" | sed 's/\.git$//' | sed 's/.*github\.com[:/]//')
-
+    
     echo "Repository: $repo_identifier"
     echo ""
-
+    
     # Auto-detect existing coordination issue or create new one
     local issue_title="todo.ai Task Number Coordination"
     local issue_number=""
-
+    
     echo "Searching for existing coordination issue..."
     # Search for issues with the coordination title (check both open and closed issues)
     local existing_issues=$(gh issue list --repo "$repo_identifier" --state all --search "todo.ai Task Number Coordination" --json number,title --jq '.[].number' 2>/dev/null || echo "")
-
+    
     if [[ -n "$existing_issues" ]]; then
         # Use the first matching issue
         issue_number=$(echo "$existing_issues" | head -1)
@@ -3835,12 +3835,12 @@ setup_github_issues_coordination() {
         echo ""
         echo "Creating new GitHub issue for task coordination..."
         local issue_body="This issue is used by todo.ai for atomic task number coordination.
-
+        
 Do not manually comment on this issue - it is managed automatically by todo.ai."
-
+        
         # gh issue create returns a URL like: https://github.com/owner/repo/issues/123
         local issue_output=$(gh issue create --repo "$repo_identifier" --title "$issue_title" --body "$issue_body" 2>&1)
-
+        
         # Extract issue number from URL (format: https://github.com/owner/repo/issues/123)
         if [[ "$issue_output" =~ /issues/([0-9]+)$ ]] || [[ "$issue_output" =~ issues/([0-9]+) ]]; then
             issue_number="${match[1]}"
@@ -3848,35 +3848,35 @@ Do not manually comment on this issue - it is managed automatically by todo.ai."
             # Fallback: just extract any number from output
             issue_number=$(echo "$issue_output" | grep -oE '[0-9]+' | tail -1)
         fi
-
+        
         if [[ -z "$issue_number" ]]; then
             echo "❌ Error: Failed to create GitHub issue"
             echo "   Output: $issue_output"
             return 1
         fi
-
+        
         echo "✅ Created issue #$issue_number"
     fi
-
+    
     # Initialize issue with max(highest_task_number, current_coordinator_value) + 1 if it has no comments
     echo ""
     echo "Checking issue comments..."
     local existing_comments=$(gh api repos/${repo_identifier}/issues/${issue_number}/comments --jq 'length' 2>/dev/null || echo "0")
-
+    
     # Always check and sync with TODO.md highest number, even if issue has comments
     local highest_num=$(get_highest_task_number)
     local current_coord_value=$(get_current_coordinator_value)
-
+    
     # Get max of highest_num and current_coord_value
     local max_value=$highest_num
     if [[ $current_coord_value -gt $max_value ]]; then
         max_value=$current_coord_value
     fi
-
+    
     if [[ "$existing_comments" == "0" ]] || [[ -z "$existing_comments" ]]; then
         # No comments yet - initialize with max of highest task number from TODO.md and current coordinator value
         local start_num=$((max_value + 1))
-
+        
         if [[ $highest_num -gt 0 ]] || [[ $current_coord_value -gt 0 ]]; then
             echo "   Found existing tasks in TODO.md (highest: #$highest_num)"
             if [[ $current_coord_value -gt 0 ]]; then
@@ -3887,7 +3887,7 @@ Do not manually comment on this issue - it is managed automatically by todo.ai."
             echo "   No existing tasks found - starting from 1"
             start_num=1
         fi
-
+        
         # Post initial comment with starting number
         if ! gh api -X POST repos/${repo_identifier}/issues/${issue_number}/comments --field "body=Next task number: $start_num" >/dev/null 2>&1; then
             echo "⚠️  Warning: Failed to initialize issue with starting number"
@@ -3901,13 +3901,13 @@ Do not manually comment on this issue - it is managed automatically by todo.ai."
         local current_num=$(echo "$latest_comment" | grep -oE '[0-9]+' | tail -1)
         if [[ -n "$current_num" ]]; then
             echo "   Current task number in coordination: $current_num"
-
+            
             # If coordinator is behind TODO.md, update it
             if [[ $current_num -lt $highest_num ]]; then
                 local sync_num=$((max_value + 1))
                 echo "   ⚠️  Coordinator ($current_num) is behind TODO.md highest ($highest_num)"
                 echo "   Updating coordination to: $sync_num"
-
+                
                 # Post sync comment with correct number
                 if gh api -X POST repos/${repo_identifier}/issues/${issue_number}/comments --field "body=Next task number: $sync_num" >/dev/null 2>&1; then
                     echo "   ✅ Coordinator synced to: $sync_num"
@@ -3918,7 +3918,7 @@ Do not manually comment on this issue - it is managed automatically by todo.ai."
         fi
     fi
     echo ""
-
+    
     # Update config file
     if command -v yq >/dev/null 2>&1; then
         yq eval ".coordination.type = \"github-issues\"" -i "$config_file" 2>/dev/null
@@ -3955,7 +3955,7 @@ coordination:\\
   type: none\\
   fallback: multi-user" "$config_file"
         fi
-
+        
         # Update coordination.type
         if grep -q "^  type:" "$config_file"; then
             sed_inplace "s/^  type:.*/  type: github-issues/" "$config_file"
@@ -3964,12 +3964,12 @@ coordination:\\
             sed_inplace "/^coordination:/a\\
   type: github-issues" "$config_file"
         fi
-
+        
     # Remove namespace if it exists (switching from counterapi)
     if grep -q "^  namespace:" "$config_file"; then
         sed_inplace "/^  namespace:/d" "$config_file"
     fi
-
+    
     # Update or add issue_number
     if grep -q "^  issue_number:" "$config_file"; then
         sed_inplace "s/^  issue_number:.*/  issue_number: $issue_number/" "$config_file"
@@ -3979,7 +3979,7 @@ coordination:\\
   issue_number: $issue_number" "$config_file"
     fi
     fi
-
+    
     echo ""
     echo "✅ GitHub Issues coordination configured"
     echo "   Issue: #$issue_number"
@@ -3991,21 +3991,21 @@ coordination:\\
 setup_counterapi_coordination() {
     local interactive="$1"
     local config_file=$(get_config_file)
-
+    
     echo "🔧 Setting up CounterAPI coordination..."
     echo ""
-
+    
     # Verify prerequisites
     if ! command -v curl >/dev/null 2>&1; then
         echo "❌ Error: curl is not installed"
         return 1
     fi
-
+    
     if ! command -v jq >/dev/null 2>&1 && ! command -v python3 >/dev/null 2>&1; then
         echo "❌ Error: jq or python3 required for JSON parsing"
         return 1
     fi
-
+    
     # Get namespace
     local namespace=""
     if [[ "$interactive" == true ]]; then
@@ -4017,7 +4017,7 @@ setup_counterapi_coordination() {
                 repo_name="${match[2]%.git}"
             fi
         fi
-
+        
         local default_namespace="${repo_name:-todo-ai-$(date +%s)}"
         printf "Enter CounterAPI namespace [$default_namespace]: "
         read -r namespace
@@ -4029,18 +4029,18 @@ setup_counterapi_coordination() {
             return 1
         fi
     fi
-
+    
     # Validate namespace (should be alphanumeric with hyphens/underscores)
     if [[ ! "$namespace" =~ ^[a-z0-9_-]+$ ]]; then
         echo "❌ Error: Namespace must contain only lowercase letters, numbers, hyphens, and underscores"
         return 1
     fi
-
+    
     # Test CounterAPI connection
     echo ""
     echo "Testing CounterAPI connection..."
     local test_response=$(curl -s -X POST "https://api.counterapi.dev/v1/${namespace}/test-counter/up" 2>/dev/null || echo "")
-
+    
     if [[ -z "$test_response" ]]; then
         echo "⚠️  Warning: Could not reach CounterAPI"
         printf "Continue anyway? (y/N): "
@@ -4051,21 +4051,21 @@ setup_counterapi_coordination() {
     else
         echo "✅ CounterAPI connection successful"
     fi
-
+    
     # Initialize counter with max(highest_task_number, current_coordinator_value) + 1
     echo ""
     echo "Initializing counter with max of TODO.md and current coordinator..."
     local highest_num=$(get_highest_task_number)
     local current_coord_value=$(get_current_coordinator_value)
-
+    
     # Get max of highest_num and current_coord_value
     local max_value=$highest_num
     if [[ $current_coord_value -gt $max_value ]]; then
         max_value=$current_coord_value
     fi
-
+    
     local start_num=$((max_value + 1))
-
+    
     if [[ $highest_num -gt 0 ]] || [[ $current_coord_value -gt 0 ]]; then
         echo "   Found existing tasks in TODO.md (highest: #$highest_num)"
         if [[ $current_coord_value -gt 0 ]]; then
@@ -4079,7 +4079,7 @@ setup_counterapi_coordination() {
         start_num=1
     fi
     echo ""
-
+    
     # Update config file
     # NOTE: We ALWAYS use sed fallback when YAML parsers are missing - never show errors
     if command -v yq >/dev/null 2>&1; then
@@ -4113,7 +4113,7 @@ EOF
             return 0
         fi
     fi
-
+    
     # Fallback to sed for simple coordination updates (always available)
     # Ensure coordination section exists
     if ! grep -q "^coordination:" "$config_file"; then
@@ -4123,7 +4123,7 @@ coordination:\\
   type: none\\
   fallback: multi-user" "$config_file"
     fi
-
+    
     # Update coordination.type
     if grep -q "^  type:" "$config_file"; then
         sed_inplace "s/^  type:.*/  type: counterapi/" "$config_file"
@@ -4132,7 +4132,7 @@ coordination:\\
         sed_inplace "/^coordination:/a\\
   type: counterapi" "$config_file"
     fi
-
+    
     # Update or add namespace
     if grep -q "^  namespace:" "$config_file"; then
         sed_inplace "s/^  namespace:.*/  namespace: $namespace/" "$config_file"
@@ -4141,12 +4141,12 @@ coordination:\\
         sed_inplace "/^  type: counterapi/a\\
   namespace: $namespace" "$config_file"
     fi
-
+    
     # Remove issue_number if it exists (switching from github-issues)
     if grep -q "^  issue_number:" "$config_file"; then
         sed_inplace "/^  issue_number:/d" "$config_file"
     fi
-
+    
     echo ""
     echo "✅ CounterAPI coordination configured"
     echo "   Namespace: $namespace"
@@ -4160,7 +4160,7 @@ setup_wizard() {
     echo ""
     echo "This wizard will guide you through configuring todo.ai for your needs."
     echo ""
-
+    
     # Step 1: Detect current system capabilities
     echo "Step 1: Detecting system capabilities..."
     echo ""
@@ -4169,7 +4169,7 @@ setup_wizard() {
         echo "⚠️  No coordination options available - using simpler modes"
     fi
     echo ""
-
+    
     # Step 2: Select mode
     echo "Step 2: Select numbering mode"
     echo ""
@@ -4182,7 +4182,7 @@ setup_wizard() {
     printf "Enter mode [1]: "
     read -r mode_choice
     mode_choice=${mode_choice:-1}
-
+    
     local selected_mode=""
     case "$mode_choice" in
         1) selected_mode="single-user" ;;
@@ -4194,11 +4194,11 @@ setup_wizard() {
             return 1
             ;;
     esac
-
+    
     echo ""
     echo "✅ Selected mode: $selected_mode"
     echo ""
-
+    
     # Step 3: Switch to selected mode
     echo "Step 3: Switching to $selected_mode mode..."
     if ! switch_mode "$selected_mode" --force; then
@@ -4206,12 +4206,12 @@ setup_wizard() {
         return 1
     fi
     echo ""
-
+    
     # Step 4: Set up coordination if enhanced mode
     if [[ "$selected_mode" == "enhanced" ]]; then
         echo "Step 4: Setting up coordination..."
         echo ""
-
+        
         # Detect available options
         local available=()
         if command -v gh >/dev/null 2>&1 && gh auth status >/dev/null 2>&1 && \
@@ -4219,12 +4219,12 @@ setup_wizard() {
            git config --get remote.origin.url 2>/dev/null | grep -q github\.com; then
             available+=("github-issues")
         fi
-
+        
         if command -v curl >/dev/null 2>&1 && \
            (command -v jq >/dev/null 2>&1 || command -v python3 >/dev/null 2>&1); then
             available+=("counterapi")
         fi
-
+        
         if [[ ${#available[@]} -eq 0 ]]; then
             echo "⚠️  No coordination services available"
             echo "   Enhanced mode will fall back to multi-user mode"
@@ -4248,7 +4248,7 @@ setup_wizard() {
             printf "Enter choice [$index]: "
             read -r coord_choice
             coord_choice=${coord_choice:-$index}
-
+            
             if [[ $coord_choice -ge 1 ]] && [[ $coord_choice -le ${#available[@]} ]]; then
                 local selected_coord="${available[$((coord_choice - 1))]}"
                 echo ""
@@ -4261,7 +4261,7 @@ setup_wizard() {
             echo ""
         fi
     fi
-
+    
     # Step 5: Summary
     echo "✅ Setup complete!"
     echo ""
@@ -4274,7 +4274,7 @@ setup_wizard() {
 # Function to show current configuration
 show_config() {
     local config_file=$(get_config_file)
-
+    
     if [[ ! -f "$config_file" ]]; then
         echo "No configuration file found."
         echo "Using default mode: single-user"
@@ -4282,7 +4282,7 @@ show_config() {
         echo "To create a config file, use: ./todo.ai switch-mode <mode>"
         return 0
     fi
-
+    
     echo "Current Configuration:"
     echo "======================"
     cat "$config_file"
@@ -4293,25 +4293,25 @@ show_config() {
 # Function to show a task with its relationships
 show_task() {
     local task_id="$1"
-
+    
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
         echo "Usage: ./todo.ai show <id>"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
-
+    
     # Find and display the task (try resolved ID first, then fall back to original if not found)
     # Support arbitrary nesting depth by matching any amount of leading spaces
     # Use [.*] instead of [.] to handle checkbox variations (including malformed ones)
     # Search for both bold and non-bold formats
     local task_line=$(grep -E "^[ ]*- \[.*\] (\*\*#$resolved_task_id\*\*|#$resolved_task_id) " "$TODO_FILE" | head -1)
-
+    
     # Fallback: if resolved ID not found and it has a prefix, try original plain number
     if [[ -z "$task_line" ]] && [[ "$resolved_task_id" != "$task_id" ]] && [[ "$resolved_task_id" =~ ^[a-z0-9]{1,7}-([0-9]+(\.[0-9]+)?)$ ]]; then
         local plain_number="${match[1]}"
@@ -4322,20 +4322,20 @@ show_task() {
     else
         task_id="$resolved_task_id"  # Use resolved ID for display
     fi
-
+    
     if [[ -z "$task_line" ]]; then
         echo "Error: Task #$task_id not found"
         return 1
     fi
-
+    
     echo "$task_line"
-
+    
     # Get line number for note detection
     # Support arbitrary nesting depth by matching any amount of leading spaces
     # Use [.*] instead of [.] to handle checkbox variations (including malformed ones)
     # Search for both bold and non-bold formats
     local task_line_num=$(grep -nE "^[ ]*- \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+    
     # Display notes if they exist (blockquotes immediately after task)
     # Support arbitrary nesting depth by matching any amount of leading spaces
     if [[ -n "$task_line_num" ]]; then
@@ -4347,7 +4347,7 @@ show_task() {
             next_line=$(sed -n "${next_line_num}p" "$TODO_FILE")
         done
     fi
-
+    
     # Find and display subtasks with their notes if this is a parent
     if [[ "$task_id" != *.* ]]; then
         # First, collect all subtasks
@@ -4355,24 +4355,24 @@ show_task() {
         while IFS= read -r subtask; do
             subtask_lines+=("$subtask")
         done < <(grep "^  - \[.\] \*\*#$task_id\." "$TODO_FILE")
-
+        
         # Display each subtask with its notes and sub-subtasks
         for subtask_line in "${subtask_lines[@]}"; do
             echo "$subtask_line"
-
+            
             # Extract subtask ID from the line
             local subtask_id=$(echo "$subtask_line" | grep -o "#${task_id}\.[0-9.]*" | sed 's/^#//')
-
+            
             # Display notes for this subtask
             local subtask_notes=$(collect_task_notes "$subtask_id")
             if [[ -n "$subtask_notes" ]]; then
                 echo "$subtask_notes"
             fi
-
+            
             # Display sub-subtasks for this subtask
             while IFS= read -r subsubtask; do
                 echo "$subsubtask"
-
+                
                 # Extract sub-subtask ID and display its notes
                 local subsubtask_id=$(echo "$subsubtask" | grep -o "#${subtask_id}\.[0-9.]*" | sed 's/^#//')
                 local subsubtask_notes=$(collect_task_notes "$subsubtask_id")
@@ -4382,7 +4382,7 @@ show_task() {
             done < <(grep "^    - \[.\] \*\*#${subtask_id}\." "$TODO_FILE")
         done
     fi
-
+    
     # Display relationships if any exist
     local has_relationships=false
     while IFS=: read -r rel_type targets; do
@@ -4401,7 +4401,7 @@ show_task() {
             echo "  ↳ $formatted_type: $targets"
         fi
     done < <(get_relationships "$task_id")
-
+    
     if [[ "$has_relationships" == false ]]; then
         echo "  (No relationships)"
     fi
@@ -4412,7 +4412,7 @@ relate_task() {
     local task_id=""
     local rel_type=""
     local targets=""
-
+    
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -4447,7 +4447,7 @@ relate_task() {
                 ;;
         esac
     done
-
+    
     if [[ -z "$task_id" ]] || [[ -z "$rel_type" ]] || [[ -z "$targets" ]]; then
         echo "Error: Missing required parameters"
         echo "Usage: ./todo.ai relate <id> --<relation-type> <target-ids>"
@@ -4460,26 +4460,26 @@ relate_task() {
         echo "  --duplicate-of <id>    Task is duplicate of another"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Verify task exists (search for both bold and non-bold formats)
     if ! grep -qE "(\*\*#$task_id\*\*|#$task_id)" "$TODO_FILE"; then
         echo "Error: Task #$task_id not found"
         return 1
     fi
-
+    
     # Add the relationship
     add_relationship "$task_id" "$rel_type" "$targets"
-
+    
     # Log the action
     log_todo_action "RELATE" "$task_id" "$rel_type: $targets"
-
+    
     echo "Added relationship: #$task_id $rel_type $targets"
 }
 
@@ -4487,36 +4487,36 @@ relate_task() {
 add_note() {
     local task_id="$1"
     local note_text="$2"
-
+    
     if [[ -z "$task_id" ]] || [[ -z "$note_text" ]]; then
         echo "Error: Please provide task ID and note text"
         echo "Usage: ./todo.ai note <id> <note-text>"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Verify task exists (support arbitrary nesting depth)
     # Search for both bold and non-bold formats
     local task_line_num=$(grep -nE "^[ ]*- \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+    
     if [[ -z "$task_line_num" ]]; then
         echo "Error: Task #$task_id not found"
         return 1
     fi
-
+    
     # Format note as blockquote with proper indentation
     # Detect indentation from task line to support arbitrary nesting depth
     local task_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
     local indent=""
     # Extract leading spaces before the dash
     indent=$(echo "$task_line" | sed 's/^\([[:space:]]*\)-.*/\1/')
-
+    
     # Create blockquote note with proper formatting for multi-line text
     # Split note_text by newlines and add indent + "> " to each line
     local formatted_note=""
@@ -4526,7 +4526,7 @@ add_note() {
         fi
         formatted_note="${formatted_note}${indent}  > ${line}"
     done <<< "$note_text"
-
+    
     # Insert note after the task line
     if [[ "$(uname)" == "Darwin" ]]; then
         local temp_file=$(mktemp)
@@ -4539,60 +4539,60 @@ add_note() {
         local escaped_note=$(echo "$formatted_note" | sed ':a;N;$!ba;s/\n/\\n/g')
         sed_inplace "${task_line_num}a\\${escaped_note}" "$TODO_FILE"
     fi
-
+    
     update_footer
-
+    
     # Log the action
     log_todo_action "NOTE" "$task_id" "$note_text"
-
+    
     echo "Added note to task #$task_id"
 }
 
 # Delete all notes from a task
 delete_note() {
     local task_id="$1"
-
+    
     if [[ -z "$task_id" ]]; then
         echo "Error: Please provide task ID"
         echo "Usage: ./todo.ai delete-note <id>"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Check if task exists and has notes
     local notes=$(collect_task_notes "$task_id")
     if [[ -z "$notes" ]]; then
         echo "Error: Task #$task_id has no notes to delete"
         return 1
     fi
-
+    
     # Count note lines
     local note_count=$(echo "$notes" | wc -l | tr -d ' ')
-
+    
     # Show confirmation prompt
     echo "Task #$task_id has $note_count line(s) of notes."
     printf "Delete all notes from task #$task_id? (y/N) "
     read -r reply
-
+    
     if [[ ! "$reply" =~ ^[Yy]$ ]]; then
         echo "Cancelled - notes not deleted"
         return 0
     fi
-
+    
     # Delete the notes
     delete_notes_only "$task_id"
-
+    
     update_footer
-
+    
     # Log the action
     log_todo_action "DELETE_NOTE" "$task_id" "Deleted $note_count line(s) of notes"
-
+    
     echo "Deleted notes from task #$task_id"
 }
 
@@ -4600,20 +4600,20 @@ delete_note() {
 update_note() {
     local task_id="$1"
     local new_note_text="$2"
-
+    
     if [[ -z "$task_id" ]] || [[ -z "$new_note_text" ]]; then
         echo "Error: Please provide task ID and new note text"
         echo "Usage: ./todo.ai update-note <id> <new-note-text>"
         return 1
     fi
-
+    
     # Resolve task reference (auto-add prefix for number-only references)
     local resolved_task_id=$(resolve_task_reference "$task_id" 2>/dev/null)
     if [[ $? -ne 0 ]] || [[ -z "$resolved_task_id" ]]; then
         resolved_task_id="$task_id"
     fi
     task_id="$resolved_task_id"
-
+    
     # Check if task exists and has notes
     local old_notes=$(collect_task_notes "$task_id")
     if [[ -z "$old_notes" ]]; then
@@ -4621,40 +4621,40 @@ update_note() {
         echo "Hint: Use './todo.ai note $task_id \"text\"' to add notes"
         return 1
     fi
-
+    
     # Count old and new note lines
     local old_count=$(echo "$old_notes" | wc -l | tr -d ' ')
     local new_count=$(echo "$new_note_text" | wc -l)
-
+    
     # Show preview
     echo "Task #$task_id currently has $old_count line(s) of notes."
     echo "New note will have $new_count line(s)."
     printf "Replace notes for task #$task_id? (y/N) "
     read -r reply
-
+    
     if [[ ! "$reply" =~ ^[Yy]$ ]]; then
         echo "Cancelled - notes not updated"
         return 0
     fi
-
+    
     # Delete old notes (without confirmation since we already confirmed)
     delete_notes_only "$task_id"
-
+    
     # Add new notes using existing add_note logic
     # We need to manually do what add_note does but without the existence check
-
+    
     # Find task and get indentation (search for both bold and non-bold formats)
     local task_line_num=$(grep -nE "^[ ]*- \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1 | cut -d: -f1)
-
+    
     if [[ -z "$task_line_num" ]]; then
         echo "Error: Task #$task_id not found"
         return 1
     fi
-
+    
     local task_line=$(sed -n "${task_line_num}p" "$TODO_FILE")
     local indent=""
     indent=$(echo "$task_line" | sed 's/^\([[:space:]]*\)-.*/\1/')
-
+    
     # Format new note with proper multi-line handling
     local formatted_note=""
     while IFS= read -r line || [[ -n "$line" ]]; do
@@ -4663,7 +4663,7 @@ update_note() {
         fi
         formatted_note="${formatted_note}${indent}  > ${line}"
     done <<< "$new_note_text"
-
+    
     # Insert new note after the task line
     if [[ "$(uname)" == "Darwin" ]]; then
         local temp_file=$(mktemp)
@@ -4676,32 +4676,32 @@ update_note() {
         local escaped_note=$(echo "$formatted_note" | sed ':a;N;$!ba;s/\n/\\n/g')
         sed_inplace "${task_line_num}a\\${escaped_note}" "$TODO_FILE"
     fi
-
+    
     update_footer
-
+    
     # Log the action
     log_todo_action "UPDATE_NOTE" "$task_id" "Updated note (was $old_count lines, now $new_count lines)"
-
+    
     echo "Updated note for task #$task_id"
 }
 
 # Function to lint (identify) formatting issues
 lint_todo() {
     local issues_found=0
-
+    
     echo "🔍 Checking TODO.md for formatting issues..."
     echo ""
-
+    
     # Track which section we're in (skip Archived and Deleted)
     local in_tasks=false
     local in_recently_completed=false
     local in_deleted=false
     local skip_line=false
-
+    
     # Check for indentation issues
     echo "📋 Checking indentation:"
     local indent_issues=0
-
+    
     # Find subtasks that are not properly indented (should start with "  -")
     while IFS= read -r line; do
         # Detect section headers
@@ -4727,12 +4727,12 @@ lint_todo() {
             in_deleted=false
             skip_line=true
         fi
-
+        
         # Skip archived and deleted tasks
         if [[ "$skip_line" == true ]]; then
             continue
         fi
-
+        
         # Only check tasks in the "Tasks" section
         if [[ "$in_tasks" == true ]]; then
         if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
@@ -4742,24 +4742,24 @@ lint_todo() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $indent_issues -eq 0 ]]; then
         echo "  ✅ All subtasks properly indented"
     else
         echo "  📊 Found $indent_issues indentation issues"
     fi
     echo ""
-
+    
     # Check for malformed checkboxes
     echo "☑️  Checking checkboxes:"
     local checkbox_issues=0
-
+    
     # Reset section tracking
     in_tasks=false
     in_recently_completed=false
     in_deleted=false
     skip_line=false
-
+    
     # Find malformed checkboxes
     while IFS= read -r line; do
         # Detect section headers
@@ -4785,12 +4785,12 @@ lint_todo() {
             in_deleted=false
             skip_line=true
         fi
-
+        
         # Skip archived and deleted tasks
         if [[ "$skip_line" == true ]]; then
             continue
         fi
-
+        
         # Only check tasks in the "Tasks" section
         if [[ "$in_tasks" == true ]]; then
         if [[ "$line" =~ "^- \[.*\] " || "$line" =~ "^  - \[.*\] " ]]; then
@@ -4803,25 +4803,25 @@ lint_todo() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $checkbox_issues -eq 0 ]]; then
         echo "  ✅ All checkboxes properly formatted"
     else
         echo "  📊 Found $checkbox_issues checkbox issues"
     fi
     echo ""
-
+    
     # Check for orphaned subtasks (subtasks without parent tasks)
     echo "🔗 Checking for orphaned subtasks:"
     local orphan_issues=0
     local seen_parents=()
-
+    
     # Reset section tracking
     in_tasks=false
     in_recently_completed=false
     in_deleted=false
     skip_line=false
-
+    
     # First pass: collect all parent task IDs (only in Tasks section)
     while IFS= read -r line; do
         # Detect section headers
@@ -4847,7 +4847,7 @@ lint_todo() {
             in_deleted=false
             skip_line=true
         fi
-
+        
         # Only collect parents from Tasks section
         if [[ "$in_tasks" == true ]]; then
         if [[ "$line" == "- ["*"**#"*"**"* ]] && [[ "$line" != *"**#"*"."*"**"* ]]; then
@@ -4858,13 +4858,13 @@ lint_todo() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     # Reset section tracking for second pass
     in_tasks=false
     in_recently_completed=false
     in_deleted=false
     skip_line=false
-
+    
     # Second pass: check all subtasks have parents (only in Tasks section)
     while IFS= read -r line; do
         # Detect section headers
@@ -4890,12 +4890,12 @@ lint_todo() {
             in_deleted=false
             skip_line=true
         fi
-
+        
         # Skip archived and deleted tasks
         if [[ "$skip_line" == true ]]; then
             continue
         fi
-
+        
         # Only check subtasks in Tasks section
         if [[ "$in_tasks" == true ]]; then
             if [[ "$line" =~ '\*\*#([a-z0-9-]*[0-9]+)\.([0-9]+)\*\*' ]]; then
@@ -4909,26 +4909,26 @@ lint_todo() {
         fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $orphan_issues -eq 0 ]]; then
         echo "  ✅ No orphaned subtasks"
     else
         echo "  📊 Found $orphan_issues orphaned subtasks"
     fi
     echo ""
-
+    
     # Check for duplicate task IDs
     echo "🔢 Checking for duplicate task IDs:"
     local duplicate_issues=0
     local task_ids=()
     local duplicates=()
-
+    
     # Reset section tracking
     in_tasks=false
     in_recently_completed=false
     in_deleted=false
     skip_line=false
-
+    
     while IFS= read -r line; do
         # Detect section headers
         if [[ "$line" == "## Tasks" ]]; then
@@ -4953,12 +4953,12 @@ lint_todo() {
             in_deleted=false
             skip_line=true
         fi
-
+        
         # Skip archived and deleted tasks
         if [[ "$skip_line" == true ]]; then
             continue
         fi
-
+        
         # Only check tasks in the "Tasks" section
         if [[ "$in_tasks" == true ]]; then
             # Match task IDs: **#task_id** or **#prefix-task_id**
@@ -4977,28 +4977,28 @@ lint_todo() {
         fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $duplicate_issues -eq 0 ]]; then
         echo "  ✅ No duplicate task IDs"
     else
         echo "  📊 Found $duplicate_issues duplicate task IDs"
     fi
     echo ""
-
+    
     # Check for empty lines in task sections
     echo "📄 Checking for problematic empty lines:"
     local empty_line_issues=0
-
+    
     # Reset section tracking
     in_tasks=false
     in_recently_completed=false
     in_deleted=false
     skip_line=false
     local line_num=0
-
+    
     while IFS= read -r line; do
         line_num=$((line_num + 1))
-
+        
         # Detect section headers
         if [[ "$line" == "## Tasks" ]]; then
             in_tasks=true
@@ -5034,14 +5034,14 @@ lint_todo() {
             fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $empty_line_issues -eq 0 ]]; then
         echo "  ✅ No problematic empty lines"
     else
         echo "  📊 Found $empty_line_issues empty line issues"
     fi
     echo ""
-
+    
     # Summary
     if [[ $issues_found -eq 0 ]]; then
         echo "🎉 No formatting issues found! TODO.md is properly formatted."
@@ -5055,7 +5055,7 @@ lint_todo() {
 # Function to detect and resolve task ID conflicts
 resolve_conflicts() {
     local dry_run=false
-
+    
     # Check for --dry-run flag
     if [[ "$1" == "--dry-run" ]]; then
         dry_run=true
@@ -5064,14 +5064,14 @@ resolve_conflicts() {
         echo "🔧 Resolving task ID conflicts..."
     fi
     echo ""
-
+    
     local conflicts_resolved=0
-
+    
     # Step 1: Detect duplicate task IDs
     local task_ids=()
     local duplicates=()
     local duplicate_lines=()  # Store line numbers for duplicates
-
+    
     local line_num=0
     while IFS= read -r line; do
         line_num=$((line_num + 1))
@@ -5081,7 +5081,7 @@ resolve_conflicts() {
         local task_pattern='\*\*#([^ ]+)\*\*'
         if [[ "$line" =~ $task_pattern ]]; then
             local task_id="${match[1]}"
-
+            
             # Check if this task ID has been seen before
             local found_duplicate=false
             for existing_id in "${task_ids[@]}"; do
@@ -5102,36 +5102,36 @@ resolve_conflicts() {
                     break
                 fi
             done
-
+            
             # Add to seen IDs
             if [[ "$found_duplicate" == false ]]; then
                 task_ids+=("$task_id")
             fi
         fi
     done < "$TODO_FILE"
-
+    
     if [[ ${#duplicates[@]} -eq 0 ]]; then
         echo "✅ No duplicate task IDs found"
         return 0
     fi
-
+    
     echo "📊 Found ${#duplicates[@]} duplicate task ID(s):"
     for dup_id in "${duplicates[@]}"; do
         echo "  - #$dup_id"
     done
     echo ""
-
+    
     # Step 2: Create mapping from old duplicate IDs to new IDs
     # Strategy: Keep first occurrence, renumber subsequent ones
     declare -A id_mapping  # old_id -> new_id
     local mode=$(get_numbering_mode)
-
+    
     for dup_id in "${duplicates[@]}"; do
         # Find all occurrences of this duplicate
         local occurrences=()
         local first_line_num=""
         local occurrence_count=0
-
+        
         line_num=0
         while IFS= read -r line; do
             line_num=$((line_num + 1))
@@ -5147,17 +5147,17 @@ resolve_conflicts() {
                 occurrence_count=$((occurrence_count + 1))
             fi
         done < "$TODO_FILE"
-
+        
         # Renumber each duplicate occurrence (except the first)
         local occurrence_index=1
         for dup_line_num in "${occurrences[@]}"; do
             # Generate new ID based on mode
             local new_id=""
-
+            
             # Extract numeric part and prefix if any
             local numeric_part=""
             local prefix_part=""
-
+            
             if [[ "$dup_id" =~ ^([a-z0-9]{1,7}-)?([0-9]+)(\.([0-9]+))?$ ]]; then
                 prefix_part="${match[1]}"
                 numeric_part="${match[2]}"
@@ -5187,7 +5187,7 @@ resolve_conflicts() {
                 # Fallback: append occurrence index
                 new_id="${dup_id}-dup${occurrence_index}"
             fi
-
+            
             # Make sure new_id doesn't conflict with existing IDs
             local conflict=true
             local conflict_index=1
@@ -5217,13 +5217,13 @@ resolve_conflicts() {
                     fi
                 done
             done
-
+            
             # Add to mapping
             id_mapping["${dup_line_num}|${dup_id}"]="$new_id"
             occurrence_index=$((occurrence_index + 1))
         done
     done
-
+    
     # Step 3: Apply renumbering
     if [[ "$dry_run" == true ]]; then
         echo "📋 Would renumber the following tasks:"
@@ -5234,7 +5234,7 @@ resolve_conflicts() {
             local line_num=$(echo "$key" | cut -d'|' -f1 | tr -d '"' | tr -d "'" | tr -d '[:space:]')
             local old_id=$(echo "$key" | cut -d'|' -f2- | tr -d '"' | tr -d "'")
             local new_id="${id_mapping[$key]}"
-
+            
             # Validate line_num is a number
             if [[ "$line_num" =~ ^[0-9]+$ ]]; then
                 local task_line=$(sed -n "${line_num}p" "$TODO_FILE")
@@ -5249,16 +5249,16 @@ resolve_conflicts() {
     else
         # Create backup before making changes
         local backup_name=$(create_mode_backup 2>/dev/null || echo "")
-
+        
         # Apply changes by reading file and replacing IDs
         local temp_file=$(mktemp)
         local line_num=0
-
+        
         while IFS= read -r line; do
             line_num=$((line_num + 1))
             local new_line="$line"
             local line_changed=false
-
+            
             # Check if this line needs renumbering
             # Use zsh-compatible syntax for associative array keys
             for key in "${!id_mapping[@]}"; do
@@ -5266,7 +5266,7 @@ resolve_conflicts() {
                 # Strip any quotes and whitespace from dup_line_num
                 local dup_line_num=$(echo "$key" | cut -d'|' -f1 | tr -d '"' | tr -d "'" | tr -d '[:space:]')
                 local old_id=$(echo "$key" | cut -d'|' -f2- | tr -d '"' | tr -d "'")
-
+                
                 # Validate dup_line_num is a number before comparing
                 if [[ "$dup_line_num" =~ ^[0-9]+$ ]] && [[ "$line_num" == "$dup_line_num" ]]; then
                     local new_id="${id_mapping[$key]}"
@@ -5278,7 +5278,7 @@ resolve_conflicts() {
                     break
                 fi
             done
-
+            
             # Also update references to old IDs in relationships, notes, etc.
             if [[ "$line_changed" == false ]]; then
                 # Use zsh-compatible syntax for associative array keys
@@ -5295,24 +5295,24 @@ resolve_conflicts() {
                     fi
                 done
             fi
-
+            
             echo "$new_line" >> "$temp_file"
         done < "$TODO_FILE"
-
+        
         # Replace original file
         mv "$temp_file" "$TODO_FILE"
-
+        
         update_footer
-
+        
         # Log the action
         log_todo_action "RESOLVE_CONFLICTS" "${#duplicates[@]}" "Resolved ${#duplicates[@]} duplicate task ID(s)"
-
+        
         if [[ -n "$backup_name" ]]; then
             echo ""
             echo "💾 Backup created: $backup_name"
         fi
     fi
-
+    
     echo ""
     if [[ "$dry_run" == true ]]; then
         echo "💡 Run './todo.ai resolve-conflicts' to apply these changes"
@@ -5326,7 +5326,7 @@ resolve_conflicts() {
 # Function to reformat (fix) formatting issues
 reformat_todo() {
     local dry_run=false
-
+    
     # Check for --dry-run flag
     if [[ "$1" == "--dry-run" ]]; then
         dry_run=true
@@ -5335,13 +5335,13 @@ reformat_todo() {
         echo "🔧 Applying formatting fixes..."
     fi
     echo ""
-
+    
     local fixes_applied=0
-
+    
     # Fix indentation issues
     echo "📋 Fixing indentation:"
     local indent_fixes=0
-
+    
     # Find subtasks that are not properly indented
     while IFS= read -r line; do
         if [[ "$line" =~ "^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* " ]]; then
@@ -5357,7 +5357,7 @@ reformat_todo() {
             fixes_applied=$((fixes_applied + 1))
         fi
     done < "$TODO_FILE"
-
+    
     if [[ $indent_fixes -eq 0 ]]; then
         echo "  ✅ No indentation issues found"
     else
@@ -5368,11 +5368,11 @@ reformat_todo() {
         fi
     fi
     echo ""
-
+    
     # Fix checkbox issues
     echo "☑️  Fixing checkboxes:"
     local checkbox_fixes=0
-
+    
     # Check if there are malformed checkboxes
     if grep -q "\[  \]\|\[   \]\|\[    \]\|\[\]" "$TODO_FILE"; then
         if [[ "$dry_run" == true ]]; then
@@ -5388,7 +5388,7 @@ reformat_todo() {
         checkbox_fixes=$((checkbox_fixes + 1))
         fixes_applied=$((fixes_applied + 1))
     fi
-
+    
     if [[ $checkbox_fixes -eq 0 ]]; then
         echo "  ✅ No checkbox issues found"
     else
@@ -5399,7 +5399,7 @@ reformat_todo() {
         fi
     fi
     echo ""
-
+    
     # Summary
     if [[ "$dry_run" == true ]]; then
         echo "💡 Run './todo.ai --reformat' to apply these fixes"
@@ -5419,16 +5419,16 @@ edit_todo() {
 view_log() {
     local filter="$1"
     local lines="$2"
-
+    
     if [[ ! -f "$LOG_FILE" ]]; then
         echo "No log file found at $LOG_FILE"
         return 1
     fi
-
+    
     echo "📋 TODO Tool Log"
     echo "================="
     echo ""
-
+    
     if [[ -n "$filter" ]]; then
         echo "Filtering by: $filter"
         echo ""
@@ -5443,22 +5443,22 @@ check_version() {
     if ! command -v curl >/dev/null 2>&1; then
         return 0
     fi
-
+    
     # Try to get version from remote script
     local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "^# Version:" | head -1 | sed 's/.*Version:[ ]*\([0-9.]*\).*/\1/' || echo "")
-
+    
     if [[ -z "$remote_version" ]]; then
         # Try alternative extraction method
         remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
     fi
-
+    
     if [[ -n "$remote_version" && "$remote_version" != "$VERSION" ]]; then
         echo ""
         echo "💡 Update available: $VERSION → $remote_version"
         echo "   Run './todo.ai update' to update to latest version"
         return 1
     fi
-
+    
     return 0
 }
 
@@ -5474,7 +5474,7 @@ init_backups_dir() {
 # Function to get script path
 get_script_path() {
     local script_path
-
+    
     # Strategy 1: Try zsh-specific absolute path (works when script is executed directly)
     if [[ -f "${0:a}" ]] && [[ "${0:a}" =~ ^/ ]]; then
         script_path="${0:a}"
@@ -5495,12 +5495,12 @@ get_script_path() {
     else
         return 1
     fi
-
+    
     # Ensure we found a valid path
     if [[ -z "$script_path" ]] || [[ ! -f "$script_path" ]]; then
         return 1
     fi
-
+    
     # Ensure absolute path
     if [[ ! "$script_path" =~ ^/ ]]; then
         script_path="$(cd "$(dirname "$script_path")" 2>/dev/null && pwd)/$(basename "$script_path")"
@@ -5509,12 +5509,12 @@ get_script_path() {
             script_path=$(realpath "$script_path" 2>/dev/null || echo "$script_path")
         fi
     fi
-
+    
     # Final verification
     if [[ -z "$script_path" ]] || [[ ! -f "$script_path" ]] || [[ ! "$script_path" =~ ^/ ]]; then
         return 1
     fi
-
+    
     echo "$script_path"
 }
 
@@ -5537,13 +5537,13 @@ get_todo_ai_path_for_rules() {
             fi
         fi
     fi
-
+    
     # If in developer repo, use relative path (current behavior)
     if [[ "$is_dev_repo" == true ]]; then
         echo "./todo.ai"
         return 0
     fi
-
+    
     # Strategy 1: Check if tool is in PATH (works for global installs)
     if command -v todo.ai >/dev/null 2>&1; then
         local path_location=$(which todo.ai 2>/dev/null || command -v todo.ai 2>/dev/null)
@@ -5555,14 +5555,14 @@ get_todo_ai_path_for_rules() {
             fi
         fi
     fi
-
+    
     # Strategy 2: Check if script is in current directory (project-specific install)
     local current_dir="$(pwd)"
     if [[ -f "${current_dir}/todo.ai" ]]; then
         echo "./todo.ai"
         return 0
     fi
-
+    
     # Strategy 3: Use script's own location (most reliable fallback)
     local script_path
     script_path=$(get_script_path) || {
@@ -5574,7 +5574,7 @@ get_todo_ai_path_for_rules() {
             return 0
         fi
     }
-
+    
     # Convert absolute path to relative if possible
     if [[ "$script_path" =~ ^"${current_dir}"/(.+) ]]; then
         # Script is within current directory - use relative path
@@ -5595,27 +5595,27 @@ list_backups() {
         echo "Error: Cannot access backups directory"
         return 1
     }
-
+    
     # Check if any backups exist using find to avoid glob expansion issues
     local backup_files=$(find "$backups_dir" -maxdepth 1 -name "todo.ai.*" -type f 2>/dev/null)
     if [[ -z "$backup_files" ]]; then
         echo "No backups available"
         return 0
     fi
-
+    
     echo "Available backups:"
     echo ""
-
+    
     # Sort by modification time (newest first)
     local sorted_backups=($(echo "$backup_files" | xargs ls -t 2>/dev/null))
-
+    
     local index=1
     for backup in "${sorted_backups[@]}"; do
         local filename=$(basename "$backup")
         local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
         local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
         local date_str=$(stat -f "%Sm" -t "%Y-%m-%d %H:%M:%S" "$backup" 2>/dev/null || stat -c "%y" "$backup" 2>/dev/null | cut -d'.' -f1 || echo "unknown")
-
+        
         if [[ $index -eq 1 ]]; then
             echo "  [$index] $timestamp (v$version) - $date_str [LATEST]"
         else
@@ -5634,23 +5634,23 @@ rollback() {
         echo "Error: Cannot access backups directory"
         return 1
     }
-
+    
     local script_path
     script_path=$(get_script_path) || {
         echo "Error: Cannot locate todo.ai script"
         return 1
     }
-
+    
     local backup_files=$(find "$backups_dir" -maxdepth 1 -name "todo.ai.*" -type f 2>/dev/null)
     if [[ -z "$backup_files" ]]; then
         echo "Error: No backups available"
         return 1
     fi
-
+    
     local sorted_backups=($(echo "$backup_files" | xargs ls -t 2>/dev/null))
-
+    
     local target_backup=""
-
+    
     if [[ $# -eq 0 ]]; then
         # Default: rollback to latest backup
         target_backup="${sorted_backups[1]}"
@@ -5670,30 +5670,30 @@ rollback() {
             local filename=$(basename "$backup")
             local timestamp=$(echo "$filename" | sed 's/todo\.ai\.//')
             local version=$(grep -i "VERSION=" "$backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
-
+            
             if [[ "$timestamp" == "$search_term" ]] || [[ "$version" == "$search_term" ]]; then
                 target_backup="$backup"
                 break
             fi
         done
-
+        
         if [[ -z "$target_backup" ]]; then
             echo "Error: No backup found matching '$search_term'"
             echo "Use './todo.ai backups' to see available backups"
             return 1
         fi
     fi
-
+    
     if [[ ! -f "$target_backup" ]]; then
         echo "Error: Backup file not found"
         return 1
     fi
-
+    
     # Confirm rollback
     local backup_version=$(grep -i "VERSION=" "$target_backup" 2>/dev/null | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
     local current_version="$VERSION"
     local backup_name=$(basename "$target_backup")
-
+    
     echo "⚠️  Rollback Warning:"
     echo "   Current version: $current_version"
     echo "   Backup version:  $backup_version"
@@ -5706,19 +5706,19 @@ rollback() {
         echo "Rollback cancelled"
         return 0
     fi
-
+    
     # Create a backup of current version before rollback
     local timestamp=$(date +"%Y%m%d%H%M%S")
     cp "$script_path" "$backups_dir/todo.ai.$timestamp" 2>/dev/null || true
-
+    
     # Restore from backup
     cp "$target_backup" "$script_path" || {
         echo "Error: Failed to restore backup"
         return 1
     }
-
+    
     chmod +x "$script_path"
-
+    
     echo "✅ Rolled back to version $backup_version"
     echo "   Current version backed up as: todo.ai.$timestamp"
 }
@@ -5731,36 +5731,36 @@ update_tool() {
         echo "Error: Cannot locate todo.ai script"
         return 1
     }
-
+    
     local backups_dir
     backups_dir=$(init_backups_dir) || {
         echo "Error: Cannot create backups directory"
         return 1
     }
-
+    
     echo "🔄 Updating todo.ai..."
-
+    
     if ! command -v curl >/dev/null 2>&1; then
         echo "Error: curl is required to update todo.ai"
         echo "Please download manually from: $REPO_URL"
         return 1
     fi
-
+    
     # Check if already at latest version
     local remote_version=$(curl -s "$SCRIPT_URL" | grep -i "VERSION=" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "")
-
+    
     # If version matches, check content hash to detect changes even with same version
     if [[ -n "$remote_version" ]] && [[ "$remote_version" == "$VERSION" ]]; then
         local local_hash=""
         local remote_hash=""
-
+        
         # Download remote file temporarily to compute hash
         local temp_check_file=$(mktemp)
         if curl -s -o "$temp_check_file" "$SCRIPT_URL" && [[ -s "$temp_check_file" ]] && grep -q "todo - AI-Agent First TODO List Tracker" "$temp_check_file"; then
             # Verify we're not comparing the same file
             local script_realpath=$(realpath "$script_path" 2>/dev/null || echo "$script_path")
             local temp_realpath=$(realpath "$temp_check_file" 2>/dev/null || echo "$temp_check_file")
-
+            
             # If somehow they're the same file, skip hash comparison and proceed with update
             if [[ "$script_realpath" == "$temp_realpath" ]] || [[ ! -f "$script_path" ]]; then
                 rm -f "$temp_check_file"
@@ -5780,15 +5780,15 @@ update_tool() {
                     local_hash=$(md5 -q "$script_path" 2>/dev/null)
                     remote_hash=$(md5 -q "$temp_check_file" 2>/dev/null)
                 fi
-
+                
                 rm -f "$temp_check_file"
-
+                
                 # If hashes couldn't be computed, proceed with update to be safe
                 if [[ -z "$local_hash" ]] || [[ -z "$remote_hash" ]]; then
                     echo "⚠️  Could not compute hashes - proceeding with update to be safe"
                 fi
             fi
-
+            
             # If hashes are available and match, files are identical - skip update
             # But only if we verified the files are different (checked above)
             if [[ "$script_realpath" != "$temp_realpath" ]] && [[ -n "$local_hash" ]] && [[ -n "$remote_hash" ]] && [[ "$local_hash" == "$remote_hash" ]]; then
@@ -5832,7 +5832,7 @@ update_tool() {
             return 0
         fi
     fi
-
+    
     # Download latest version
     local temp_file=$(mktemp)
     if curl -s -o "$temp_file" "$SCRIPT_URL"; then
@@ -5842,18 +5842,18 @@ update_tool() {
             local timestamp=$(date +"%Y%m%d%H%M%S")
             local current_version="$VERSION"
             local backup_file="$backups_dir/todo.ai.$timestamp"
-
+            
             # Backup current version
             cp "$script_path" "$backup_file" 2>/dev/null || {
                 echo "Warning: Failed to create backup, continuing with update..."
             }
-
+            
             # Get new version before replacing
             local new_version=$(grep -i "VERSION=" "$temp_file" | head -1 | sed 's/.*VERSION="\([^"]*\)".*/\1/' || echo "unknown")
-
+            
             # Make new version executable
             chmod +x "$temp_file"
-
+            
             # CRITICAL FIX: Execute new version's code BEFORE replacing old version
             # This ensures new version's update logic, migrations, and cursor rules updates run
             echo ""
@@ -5861,7 +5861,7 @@ update_tool() {
             local current_dir=$(pwd)
             local script_dir=$(dirname "$script_path")
             cd "$script_dir" 2>/dev/null || true
-
+            
             # Execute new version's script directly (not via PATH or current directory)
             # This ensures the new script's code executes, not the old version
             # 1. Migrations (runs automatically at startup via run_migrations)
@@ -5869,18 +5869,18 @@ update_tool() {
             # The new version's code will execute with its own logic, not the old version's
             # Suppress stdout (version info) but allow stderr (migration/cursor rules messages) through
             /bin/zsh "$temp_file" version >/dev/null || true
-
+            
             # Now replace the old version with the new version
             mv "$temp_file" "$script_path"
-
+            
             cd "$current_dir" 2>/dev/null || true
-
+            
             echo "✅ Updated todo.ai to version $new_version"
             if [[ -f "$backup_file" ]]; then
                 echo "   Backup saved as: $(basename "$backup_file") (v$current_version)"
                 echo "   Use './todo.ai rollback' to restore previous version"
             fi
-
+            
             return 0
         else
             echo "Error: Downloaded file appears invalid"
@@ -5918,11 +5918,11 @@ version_compare() {
     local version1="$1"
     local version2="$2"
     local operator="$3"
-
+    
     # Convert versions to comparable format (1.3.5 -> 1003005)
     local v1_num=$(echo "$version1" | awk -F. '{printf "%d%03d%03d", $1, $2, $3}')
     local v2_num=$(echo "$version2" | awk -F. '{printf "%d%03d%03d", $1, $2, $3}')
-
+    
     case "$operator" in
         ">=") [[ $v1_num -ge $v2_num ]] ;;
         ">")  [[ $v1_num -gt $v2_num ]] ;;
@@ -5940,19 +5940,19 @@ run_migrations() {
     # This ensures migrations run in the user's working directory, not the script's directory
     local migrations_dir="${ORIGINAL_WORKING_DIR}/.todo.ai/migrations"
     local lock_file="${migrations_dir}/.migrations_lock"
-
+    
     # Lock to prevent concurrent execution
     if [[ -f "$lock_file" ]]; then
         # Another instance is running migrations, skip
         return 0
     fi
-
+    
     # Create migrations directory if it doesn't exist
     mkdir -p "$migrations_dir" 2>/dev/null || return 1
-
+    
     # Create lock file
     touch "$lock_file" 2>/dev/null || return 1
-
+    
     # Find the highest already-executed migration version to determine "from" version
     local last_migrated_version=""
     if [[ -d "$migrations_dir" ]]; then
@@ -5975,13 +5975,13 @@ run_migrations() {
             fi
         done < <(find "$migrations_dir" -maxdepth 1 -name "v*_*.migrated" -type f 2>/dev/null)
     fi
-
+    
     # Collect pending migrations
     local pending_migrations=()
     local highest_pending_version=""
     for migration in "${MIGRATIONS[@]}"; do
         IFS='|' read -r target_version migration_id description function_name <<< "$migration"
-
+        
         # Check if this migration applies to current or earlier version
         if version_compare "$current_version" "$target_version" ">="; then
             # Check if already executed
@@ -5997,7 +5997,7 @@ run_migrations() {
             fi
         fi
     done
-
+    
     # Display migration info if there are pending migrations
     if [[ ${#pending_migrations[@]} -gt 0 ]]; then
         # Determine from version: use last migrated version, or assume it's lower than first pending
@@ -6017,22 +6017,22 @@ run_migrations() {
             # This is an approximation - actual previous version might be lower
             from_version="$lowest_pending_version"
         fi
-
+        
         # Determine to version: use current version, or highest pending if higher
         local to_version="$current_version"
         if [[ -n "$highest_pending_version" ]] && version_compare "$highest_pending_version" "$current_version" ">"; then
             # This shouldn't happen in normal cases, but handle it
             to_version="$highest_pending_version"
         fi
-
+        
         # Display migration info
         echo "🔄 Running migrations: $from_version → $to_version" >&2
     fi
-
+    
     # Process each migration
     for migration in "${MIGRATIONS[@]}"; do
         IFS='|' read -r target_version migration_id description function_name <<< "$migration"
-
+        
         # Check if this migration applies to current or earlier version
         if version_compare "$current_version" "$target_version" ">="; then
             # Check if already executed
@@ -6049,7 +6049,7 @@ run_migrations() {
             fi
         fi
     done
-
+    
     # Remove lock file
     rm -f "$lock_file" 2>/dev/null || true
 }
@@ -6075,7 +6075,7 @@ is_private_repo() {
     if [[ -z "$repo_url" ]]; then
         return 1
     fi
-
+    
     # Check if we can access repository metadata (basic check)
     if command -v gh >/dev/null 2>&1; then
         local repo_info=$(gh repo view "$repo_url" --json isPrivate 2>/dev/null)
@@ -6086,7 +6086,7 @@ is_private_repo() {
             fi
         fi
     fi
-
+    
     # Default: assume public if we can't determine
     return 1
 }
@@ -6096,12 +6096,12 @@ collect_error_context() {
     local error_message="$1"
     local error_context="$2"
     local command="$3"
-
+    
     # Collect system information
     local os_info=$(uname -srm 2>/dev/null || echo "Unknown")
     local shell_info="$SHELL $(echo $SHELL | xargs -I{} {} --version 2>/dev/null | head -1 || echo '')"
     local version_info="$VERSION"
-
+    
     # Collect git information
     local git_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "N/A")
     local git_status=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
@@ -6111,7 +6111,7 @@ collect_error_context() {
     fi
     local git_commit=$(git rev-parse --short HEAD 2>/dev/null || echo "N/A")
     local git_info="Branch: $git_branch | Status: $git_dirty | Commit: $git_commit"
-
+    
     # Collect TODO.md state
     local todo_count=0
     local todo_mode="unknown"
@@ -6127,19 +6127,19 @@ collect_error_context() {
         todo_coordination="none"
     fi
     local todo_info="Active tasks: $todo_count | Mode: $todo_mode | Coordination: $todo_coordination"
-
+    
     # Collect environment info
     local env_term="${TERM:-unknown}"
     local env_editor="${EDITOR:-unknown}"
     local env_lang="${LANG:-unknown}"
     local env_info="TERM=$env_term | EDITOR=$env_editor | LANG=$env_lang"
-
+    
     # Collect recent commands from log
     local recent_commands=""
     if [[ -f "$LOG_FILE" ]]; then
         recent_commands=$(grep -v "^#" "$LOG_FILE" 2>/dev/null | grep "COMMAND:" | head -n 5 | sed 's/.*COMMAND: //' || echo "")
     fi
-
+    
     # Collect recent logs (first 50 log entries from top of file, skipping header lines)
     # NOTE: Log file is sorted in descending order (newest entries at the top)
     # So we use head with grep to skip header lines (# comments) and get the most recent entries
@@ -6147,17 +6147,17 @@ collect_error_context() {
     if [[ -f "$LOG_FILE" ]]; then
         recent_logs=$(grep -v "^#" "$LOG_FILE" 2>/dev/null | head -n 50 || echo "")
     fi
-
+    
     # Sanitize logs (remove sensitive info)
     recent_logs=$(echo "$recent_logs" | sed 's/password[=:][^[:space:]]*/password=***/gi' || echo "$recent_logs")
     recent_logs=$(echo "$recent_logs" | sed 's/token[=:][^[:space:]]*/token=***/gi' || echo "$recent_logs")
     recent_logs=$(echo "$recent_logs" | sed 's/api[_-]key[=:][^[:space:]]*/api-key=***/gi' || echo "$recent_logs")
-
+    
     # Sanitize commands (remove sensitive info)
     recent_commands=$(echo "$recent_commands" | sed 's/password[=:][^[:space:]]*/password=***/gi' || echo "$recent_commands")
     recent_commands=$(echo "$recent_commands" | sed 's/token[=:][^[:space:]]*/token=***/gi' || echo "$recent_commands")
     recent_commands=$(echo "$recent_commands" | sed 's/api[_-]key[=:][^[:space:]]*/api-key=***/gi' || echo "$recent_commands")
-
+    
     # Collect repository info (sanitized for private repos)
     local repo_url=$(get_bug_report_repo)
     local repo_info=""
@@ -6167,7 +6167,7 @@ collect_error_context() {
         # Private repo - don't include repo identifier
         repo_info="Git Repository: [private repository]"
     fi
-
+    
     # Build context object (we'll use this in generate_bug_report)
     # Use ###FIELD_SEP### as field separator to avoid conflicts with log content which contains pipes
     echo "ERROR_MESSAGE:$error_message###FIELD_SEP###ERROR_CONTEXT:$error_context###FIELD_SEP###COMMAND:$command###FIELD_SEP###OS:$os_info###FIELD_SEP###SHELL:$shell_info###FIELD_SEP###VERSION:$version_info###FIELD_SEP###GIT:$git_info###FIELD_SEP###TODO:$todo_info###FIELD_SEP###ENV:$env_info###FIELD_SEP###RECENT_COMMANDS:$recent_commands###FIELD_SEP###LOGS:$recent_logs###FIELD_SEP###REPO:$repo_info"
@@ -6177,19 +6177,19 @@ collect_error_context() {
 collect_logs() {
     local max_lines="${1:-50}"
     local log_content=""
-
+    
     # Collect from .todo.ai/.todo.ai.log
     # NOTE: Log file is sorted in descending order (newest entries at the top)
     # So we use head with grep to skip header lines (# comments) and get the most recent entries
     if [[ -f "$LOG_FILE" ]]; then
         log_content=$(grep -v "^#" "$LOG_FILE" 2>/dev/null | head -n "$max_lines" || echo "")
     fi
-
+    
     # Sanitize sensitive information
     log_content=$(echo "$log_content" | sed 's/password[=:][^[:space:]]*/password=***/gi' || echo "$log_content")
     log_content=$(echo "$log_content" | sed 's/token[=:][^[:space:]]*/token=***/gi' || echo "$log_content")
     log_content=$(echo "$log_content" | sed 's/api[_-]key[=:][^[:space:]]*/api-key=***/gi' || echo "$log_content")
-
+    
     echo "$log_content"
 }
 
@@ -6198,10 +6198,10 @@ categorize_error() {
     local error_message="$1"
     local error_context="$2"
     local labels="bug"  # Always include 'bug' label
-
+    
     # Convert to lowercase for pattern matching
     local error_lower=$(echo "$error_message $error_context" | tr '[:upper:]' '[:lower:]')
-
+    
     # Error type labels
     if echo "$error_lower" | grep -qE 'segfault|segmentation fault|core dump|signal 11'; then
         labels="$labels,crash"
@@ -6212,7 +6212,7 @@ categorize_error() {
     elif echo "$error_lower" | grep -qE 'github|api|coordination|gh cli|issue.*not found'; then
         labels="$labels,coordination"
     fi
-
+    
     # OS-specific labels
     if uname -s | grep -qi 'darwin'; then
         labels="$labels,macos"
@@ -6223,14 +6223,14 @@ categorize_error() {
             labels="$labels,linux"
         fi
     fi
-
+    
     # Shell-specific labels
     if echo "$SHELL" | grep -qi 'zsh'; then
         labels="$labels,zsh"
     elif echo "$SHELL" | grep -qi 'bash'; then
         labels="$labels,bash"
     fi
-
+    
     echo "$labels"
 }
 
@@ -6239,10 +6239,10 @@ generate_bug_report() {
     local error_message="$1"
     local error_context="$2"
     local command="${3:-unknown}"
-
+    
     # Collect context
     local context=$(collect_error_context "$error_message" "$error_context" "$command")
-
+    
     # Parse context (using ###FIELD_SEP### as field separator to avoid conflicts with log pipes)
     local os_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^OS:/) {print substr($i, 4); exit}}')
     local shell_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^SHELL:/) {print substr($i, 7); exit}}')
@@ -6252,26 +6252,26 @@ generate_bug_report() {
     local todo_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^TODO:/) {print substr($i, 6); exit}}')
     local env_info=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^ENV:/) {print substr($i, 5); exit}}')
     local recent_commands=$(echo "$context" | awk -F'###FIELD_SEP###' '{for(i=1;i<=NF;i++) if($i ~ /^RECENT_COMMANDS:/) {print substr($i, 17); exit}}')
-
+    
     # Collect logs directly to preserve newlines (don't parse from context string)
     # Use a temporary file to preserve all newlines correctly
     local temp_logs=$(mktemp)
     collect_logs 50 > "$temp_logs"
     local logs=$(cat "$temp_logs")
     rm -f "$temp_logs"
-
+    
     # Format shell version (clean up)
     local shell_version=$(echo "$shell_info" | awk '{print $NF}' | head -1)
     if [[ -z "$shell_version" ]]; then
         shell_version="unknown"
     fi
-
+    
     # Get current date/time
     local current_date=$(date '+%Y-%m-%d %H:%M:%S')
-
+    
     # Get todo.ai path for bug report (use detected path)
     local todo_ai_path=$(get_todo_ai_path_for_rules 2>/dev/null || echo "./todo.ai")
-
+    
     # Build bug report with GitHub callout blocks and better formatting
     local bug_report="## 🐛 Bug Report
 
@@ -6310,13 +6310,13 @@ $error_context
 | **OS** | $os_info |
 | **Shell** | $shell_version |
 | **Version** | $version_info |"
-
+    
     # Add repo info if available
     if [[ -n "$repo_info" ]]; then
         bug_report="$bug_report
 | **Repository** | $repo_info |"
     fi
-
+    
     bug_report="$bug_report
 
 ---
@@ -6372,7 +6372,7 @@ $logs
 ---
 
 <sub>🤖 Reported automatically by todo.ai v$version_info</sub>"
-
+    
     echo "$bug_report"
 }
 
@@ -6380,22 +6380,22 @@ $logs
 calculate_similarity() {
     local text1="$1"
     local text2="$2"
-
+    
     # Convert to lowercase and extract words
     local words1=$(echo "$text1" | tr '[:upper:]' '[:lower:]' | tr -s '[:space:]' '\n' | sort -u)
     local words2=$(echo "$text2" | tr '[:upper:]' '[:lower:]' | tr -s '[:space:]' '\n' | sort -u)
-
+    
     # Count common words and total unique words
     local common_words=$(comm -12 <(echo "$words1") <(echo "$words2") | wc -l | tr -d ' ')
     local total_unique=$(comm -3 <(echo "$words1") <(echo "$words2") | wc -l | tr -d ' ')
     local total_words=$(comm <(echo "$words1") <(echo "$words2") | wc -l | tr -d ' ')
-
+    
     # Calculate similarity percentage (simple Jaccard-like)
     if [[ $total_unique -eq 0 ]] && [[ $common_words -gt 0 ]]; then
         echo "100"
         return
     fi
-
+    
     # Calculate similarity without bc (fallback for systems without bc)
     if command -v bc >/dev/null 2>&1; then
         local similarity=$(echo "scale=0; $common_words * 100 / ($total_unique + $common_words)" | bc 2>/dev/null || echo "0")
@@ -6416,61 +6416,61 @@ check_for_duplicate_issues() {
     local title="$1"
     local body="$2"
     local repo_url="$3"
-
+    
     if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
                 echo ""
         return 1
     fi
-
+    
     # Check GitHub CLI authentication
     if ! gh auth status >/dev/null 2>&1; then
         echo ""
         return 1
     fi
-
+    
     # Search for issues with similar titles (extract keywords from title)
     local keywords=$(echo "$title" | tr '[:upper:]' '[:lower:]' | grep -oE '[a-z]+' | head -5 | tr '\n' ' ' | sed 's/ $//')
-
+    
     if [[ -z "$keywords" ]]; then
         echo ""
         return 1
     fi
-
+    
     # Search for issues (limit to last 30 days)
     # Note: Don't include body in initial search as it may contain control characters that break JSON parsing
     local issues_json=$(gh issue list --repo "$repo_url" --search "in:title $keywords" --limit 10 --json number,title,state,createdAt 2>/dev/null || echo "[]")
-
+    
     if [[ -z "$issues_json" ]] || [[ "$issues_json" == "[]" ]]; then
         echo ""
         return 1
     fi
-
+    
     # Parse issues and check similarity
     local duplicates=""
-
+    
     # Use jq if available, otherwise fall back to basic parsing
     if command -v jq >/dev/null 2>&1; then
         # Use jq for proper JSON parsing
         local issues_count=$(echo "$issues_json" | jq '. | length' 2>/dev/null || echo "0")
-
+        
         for ((i=0; i<issues_count; i++)); do
             local issue_number=$(echo "$issues_json" | jq -r ".[$i].number" 2>/dev/null || echo "")
             local issue_title=$(echo "$issues_json" | jq -r ".[$i].title" 2>/dev/null || echo "")
-
+            
             if [[ -z "$issue_number" ]] || [[ -z "$issue_title" ]] || [[ "$issue_number" == "null" ]] || [[ "$issue_title" == "null" ]]; then
                 continue
             fi
-
+            
             # Normalize titles for comparison (strip "Bug: " prefix from issue title)
             local normalized_issue_title=$(echo "$issue_title" | sed 's/^Bug: *//')
             local normalized_title="$title"
-
+            
             # Calculate similarity for title
             local title_similarity=$(calculate_similarity "$normalized_title" "$normalized_issue_title")
-
+            
             # Use title similarity (body comparison skipped to avoid JSON parsing issues)
             local max_similarity=$title_similarity
-
+            
             # If similarity >= threshold, consider it a duplicate
             if [[ $max_similarity -ge $BUG_REPORT_THRESHOLD ]]; then
                 if [[ -z "$duplicates" ]]; then
@@ -6483,7 +6483,7 @@ check_for_duplicate_issues() {
     else
         # Fallback to basic parsing (less reliable)
         local issues_count=$(echo "$issues_json" | grep -o '"number"' | wc -l | tr -d ' ')
-
+        
         for ((i=0; i<issues_count; i++)); do
             # Try to extract using awk (more reliable than grep+cut)
             local issue_data=$(echo "$issues_json" | awk -v i="$i" 'BEGIN{RS="},? ?{";FS=","} NR==i+1 {
@@ -6496,35 +6496,35 @@ check_for_duplicate_issues() {
                     }
                 }
             }' | head -1)
-
+            
             # Simple extraction - this is less reliable but better than before
             local issue_number=$(echo "$issues_json" | awk -v i="$i" '{
                 gsub(/.*"number": ?/, "", $0)
                 match($0, /[0-9]+/)
                 if(RSTART>0) print substr($0, RSTART, RLENGTH)
             }' | sed -n "$((i+1))p")
-
+            
             if [[ -z "$issue_number" ]] || ! [[ "$issue_number" =~ ^[0-9]+$ ]]; then
                 continue
             fi
-
+            
             # Extract title (basic approach - get text between "title":" and next "
             local issue_title=$(echo "$issues_json" | grep -o "\"title\":\"[^\"]*\"" | sed -n "$((i+1))p" | sed 's/"title":"//' | sed 's/"$//')
-
+            
             if [[ -z "$issue_title" ]]; then
                 continue
             fi
-
+            
             # Normalize titles for comparison (strip "Bug: " prefix from issue title)
             local normalized_issue_title=$(echo "$issue_title" | sed 's/^Bug: *//')
             local normalized_title="$title"
-
+            
             # Calculate similarity for title
             local title_similarity=$(calculate_similarity "$normalized_title" "$normalized_issue_title")
-
+            
             # Use title similarity only (body parsing is too complex without jq)
             local max_similarity=$title_similarity
-
+            
             # If similarity >= threshold, consider it a duplicate
             if [[ $max_similarity -ge $BUG_REPORT_THRESHOLD ]]; then
                 if [[ -z "$duplicates" ]]; then
@@ -6535,7 +6535,7 @@ check_for_duplicate_issues() {
             fi
         done
     fi
-
+    
     if [[ -n "$duplicates" ]]; then
         echo -e "$duplicates"
             return 0
@@ -6551,27 +6551,27 @@ create_new_issue() {
     local body="$2"
     local repo_url="$3"
     local labels="${4:-bug}"
-
+    
     if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
         echo "Error: GitHub CLI not available or repository not configured"
         return 1
     fi
-
+    
     # Check GitHub CLI authentication
     if ! gh auth status >/dev/null 2>&1; then
         echo "Error: GitHub CLI not authenticated. Run 'gh auth login' first"
         return 1
     fi
-
+    
     # Create temporary file for body
     local temp_body=$(mktemp)
     echo "$body" > "$temp_body"
-
+    
     # Add auto-reported label if not already present
     if [[ "$labels" != *"auto-reported"* ]]; then
         labels="$labels,auto-reported"
     fi
-
+    
     # Create issue with suggested labels
     echo "Creating issue with labels: $labels"
     if gh issue create --repo "$repo_url" --title "$title" --body-file "$temp_body" --label "$labels" 2>&1 | tee /tmp/gh-output; then
@@ -6598,18 +6598,18 @@ reply_to_existing_issue() {
     local issue_number="$1"
     local body="$2"
     local repo_url="$3"
-
+    
     if [[ -z "$repo_url" ]] || ! command -v gh >/dev/null 2>&1; then
         echo "Error: GitHub CLI not available or repository not configured"
         return 1
     fi
-
+    
     # Check GitHub CLI authentication
     if ! gh auth status >/dev/null 2>&1; then
         echo "Error: GitHub CLI not authenticated. Run 'gh auth login' first"
         return 1
     fi
-
+    
     # Create "me too" message
     local me_too_message="## Me Too - Same Issue Encountered
 
@@ -6623,11 +6623,11 @@ $body
 
 ---
 *Reported automatically by todo.ai*"
-
+    
     # Create temporary file for comment
     local temp_comment=$(mktemp)
     echo "$me_too_message" > "$temp_comment"
-
+    
     # Add comment to issue
     if gh issue comment "$issue_number" --repo "$repo_url" --body-file "$temp_comment" >/dev/null 2>&1; then
         echo "✅ Added 'me too' comment to issue #$issue_number"
@@ -6646,15 +6646,15 @@ handle_duplicate_detection() {
     local body="$2"
     local repo_url="$3"
     local labels="${4:-bug}"
-
+    
     # Check for duplicates
     local duplicates=$(check_for_duplicate_issues "$title" "$body" "$repo_url")
-
+    
     if [[ -n "$duplicates" ]]; then
         echo ""
         echo "Similar issues found:"
         echo ""
-
+        
         # Display duplicates and collect issue numbers
         local count=1
         local issue_numbers=()
@@ -6665,17 +6665,17 @@ handle_duplicate_detection() {
                 count=$((count + 1))
             fi
         done <<< "$duplicates"
-
+        
         echo ""
         printf "Would you like to add a 'me too' comment to an existing issue? (y/N) "
         read -r reply
-
+        
         if [[ "$reply" =~ ^[Yy]$ ]]; then
             # Ask which issue
             echo ""
             printf "Enter issue number to reply to: "
             read -r selected_num
-
+            
             if [[ -n "$selected_num" ]] && [[ "$selected_num" =~ ^[0-9]+$ ]]; then
                 if reply_to_existing_issue "$selected_num" "$body" "$repo_url"; then
                     return 0
@@ -6708,39 +6708,39 @@ suggest_bug_report() {
     local error_message="$1"
     local error_context="$2"
     local command="${3:-unknown}"
-
+    
     # Check if bug reporting is enabled
     if [[ "$BUG_REPORT_ENABLED" != "true" ]]; then
         return 0
     fi
-
+    
     # Get repository URL
     local repo_url=$(get_bug_report_repo)
     if [[ -z "$repo_url" ]]; then
         echo "⚠️  Cannot report bug: No GitHub repository configured"
         return 1
     fi
-
+    
     # Generate bug report
     local bug_report=$(generate_bug_report "$error_message" "$error_context" "$command")
-
+    
     # Categorize error and get suggested labels
     local labels=$(categorize_error "$error_message" "$error_context")
-
+    
     # Extract title from error message (first line, max 100 chars)
     local title="[Bug]: $(echo "$error_message" | head -1 | cut -c1-90)"
-
+    
     # Detect if running in AI agent context
     local is_ai_agent=false
     if [[ -n "$CURSOR_AI" ]] || [[ -n "$AI_AGENT" ]] || [[ -n "$GITHUB_ACTIONS" ]]; then
         is_ai_agent=true
     fi
-
+    
     # Show error and preview
     echo ""
     echo "⚠️  An error occurred: $error_message"
     echo ""
-
+    
     if [[ "$is_ai_agent" == "true" ]]; then
         echo "🤖 AI Agent detected - Bug report will be submitted automatically"
         echo ""
@@ -6756,7 +6756,7 @@ suggest_bug_report() {
         echo "⏳ Auto-submitting in 2 seconds..."
         sleep 2
         echo "✓ Proceeding with bug report submission"
-
+        
         # Proceed automatically - no prompt needed
         handle_duplicate_detection "$title" "$bug_report" "$repo_url" "$labels"
     else
@@ -6774,16 +6774,16 @@ suggest_bug_report() {
         echo ""
         echo "📋 Suggested labels: $labels"
         echo ""
-
+        
         # Always require confirmation for humans
         printf "Report this bug? (y/N) "
         read -r reply
-
+        
         if [[ ! "$reply" =~ ^[Yy]$ ]]; then
             echo "Bug report cancelled by user"
             return 0
         fi
-
+        
         # User confirmed - proceed with duplicate check and reporting
         handle_duplicate_detection "$title" "$bug_report" "$repo_url" "$labels"
     fi
@@ -6794,14 +6794,14 @@ report_bug() {
     local error_description="$1"
     local error_context="${2:-}"
     local command="${3:-}"
-
+    
     if [[ -z "$error_description" ]]; then
         local todo_ai_path=$(get_todo_ai_path_for_rules 2>/dev/null || echo "./todo.ai")
         echo "Error: Please provide an error description"
         echo "Usage: $todo_ai_path report-bug \"Error description\" [error context] [command]"
         return 1
     fi
-
+    
     suggest_bug_report "$error_description" "$error_context" "$command"
 }
 
@@ -6810,7 +6810,7 @@ uninstall_tool() {
     local remove_data=false
     local remove_rules=false
     local force=false
-
+    
     # Parse options
     while [[ $# -gt 0 ]]; do
         case "$1" in
@@ -6838,7 +6838,7 @@ uninstall_tool() {
                 ;;
         esac
     done
-
+    
     # Get script path
     local script_path
     script_path=$(get_script_path) || {
@@ -6846,14 +6846,14 @@ uninstall_tool() {
         echo "   It may already be uninstalled."
         return 1
     }
-
+    
     # Detect .todo.ai/ directory (in current working directory)
     local todo_ai_dir="$(pwd)/.todo.ai"
     local has_data_dir=false
     if [[ -d "$todo_ai_dir" ]]; then
         has_data_dir=true
     fi
-
+    
     # Detect Cursor rules created by todo.ai
     local rules_dir="$(pwd)/.cursor/rules"
     local todo_ai_rules=()
@@ -6865,23 +6865,23 @@ uninstall_tool() {
             fi
         done
     fi
-
+    
     # Build what will be removed list
     echo ""
     echo "🗑️  Uninstalling todo.ai"
     echo ""
     echo "The following will be removed:"
-
+    
     local will_remove_script=true
     local will_remove_data=false
     local will_remove_rules=false
-
+    
     if [[ -f "$script_path" ]]; then
         echo "  ✗ Script: $script_path"
     else
         will_remove_script=false
     fi
-
+    
     if [[ "$remove_data" == true ]] && [[ "$has_data_dir" == true ]]; then
         echo "  ✗ Data directory: $todo_ai_dir"
         will_remove_data=true
@@ -6890,7 +6890,7 @@ uninstall_tool() {
     elif [[ "$has_data_dir" == true ]]; then
         echo "  ✓ Data directory: $todo_ai_dir (preserved - use --remove-data to remove)"
     fi
-
+    
     if [[ "$remove_rules" == true ]] && [[ ${#todo_ai_rules[@]} -gt 0 ]]; then
         echo "  ✗ Cursor rules:"
         for rule_file in "${todo_ai_rules[@]}"; do
@@ -6900,16 +6900,16 @@ uninstall_tool() {
     elif [[ ${#todo_ai_rules[@]} -gt 0 ]]; then
         echo "  ✓ Cursor rules: ${#todo_ai_rules[@]} file(s) (preserved - use --remove-rules to remove)"
     fi
-
+    
     # Safety check: ensure we have something to remove
     if [[ "$will_remove_script" == false ]] && [[ "$will_remove_data" == false ]] && [[ "$will_remove_rules" == false ]]; then
         echo ""
         echo "✅ Nothing to remove. Script not found or already uninstalled."
         return 0
     fi
-
+    
     echo ""
-
+    
     # Confirmation (unless --force)
     if [[ "$force" != true ]]; then
         printf "Proceed with uninstall? (y/N) "
@@ -6919,7 +6919,7 @@ uninstall_tool() {
             return 0
         fi
     fi
-
+    
     # Remove script
     if [[ "$will_remove_script" == true ]]; then
         if rm -f "$script_path" 2>/dev/null; then
@@ -6930,7 +6930,7 @@ uninstall_tool() {
             return 1
         fi
     fi
-
+    
     # Remove data directory
     if [[ "$will_remove_data" == true ]]; then
         if rm -rf "$todo_ai_dir" 2>/dev/null; then
@@ -6940,7 +6940,7 @@ uninstall_tool() {
             echo "   You may need to remove it manually"
         fi
     fi
-
+    
     # Remove Cursor rules
     if [[ "$will_remove_rules" == true ]]; then
         local rules_removed=0
@@ -6956,10 +6956,10 @@ uninstall_tool() {
             echo "   You may need to remove them manually from $rules_dir"
         fi
     fi
-
+    
     echo ""
     echo "✅ Uninstall complete!"
-
+    
     return 0
 }
 
@@ -6974,13 +6974,13 @@ uninstall_tool() {
 #     local migration_id="example_fix"
 #     local migrations_dir="$(pwd)/.todo.ai/migrations"
 #     local migration_file="${migrations_dir}/v2.2.0_${migration_id}.migrated"
-#
+#     
 #     if [[ -f "$migration_file" ]]; then
 #         return 0
 #     fi
-#
+#     
 #     # ... migration logic here ...
-#
+#     
 #     mkdir -p "$migrations_dir" 2>/dev/null || return 1
 #     touch "$migration_file" 2>/dev/null || return 1
 #     return 0
@@ -7011,7 +7011,7 @@ if [[ "${1:-}" != "version" && "${1:-}" != "--version" && "${1:-}" != "-v" && \
       "${1:-}" != "--info" ]]; then
     current_mode=$(get_numbering_mode)
     coord_type=$(get_config_value "coordination.type" "none")
-
+    
     if [[ "$current_mode" == "enhanced" ]] || [[ "$current_mode" == "single-user" ]]; then
         # Show mode and coordinator if coordination is configured
         if [[ "$coord_type" != "none" ]] && [[ -n "$coord_type" ]]; then

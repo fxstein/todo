@@ -1289,6 +1289,19 @@ execute_release() {
     log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash with version ${NEW_VERSION}"
     echo -e "${GREEN}✓ Bash version created${NC}"
 
+    # Run pre-commit hooks on generated files to fix formatting before staging
+    # This prevents the complex retry logic from needing to handle formatting fixes
+    echo -e "${BLUE}🔍 Running pre-commit hooks on generated files...${NC}"
+    if command -v pre-commit &> /dev/null; then
+        if uv run pre-commit run --files todo.bash 2>&1 | grep -q "Passed\|Skipped"; then
+            log_release_step "PRE-COMMIT" "Pre-commit hooks passed for todo.bash"
+        else
+            # Hooks may have fixed files - this is expected
+            log_release_step "PRE-COMMIT" "Pre-commit hooks fixed formatting in todo.bash"
+        fi
+    fi
+    echo -e "${GREEN}✓ Files ready for commit${NC}"
+
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"

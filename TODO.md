@@ -3,48 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement`
-  > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
-  > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
-  > Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
-- [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization`
-  > Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
-- [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization`
-  - [x] **#169.3** Phase 3: Cleanup and documentation `#cicd`
-    - [x] **#169.3.4** Update development docs with new workflow `#cicd` `#docs`
-      > Updated DEVELOPMENT_GUIDELINES.md with CI/CD pipeline details, smart matrix strategy, and test distribution table
-    - [x] **#169.3.3** Verify all checks pass in CI and locally `#cicd` `#testing`
-      > All pre-commit hooks pass locally, GitHub Actions CI running with new workflow
-    - [x] **#169.3.2** Update CICD_OPTIMIZATION_ASSESSMENT.md with results `#cicd`
-      > Added Implementation Results section documenting all changes, impacts, and current status
-    - [x] **#169.3.1** Archive scripts/pre-commit-hook.sh to docs/archive/ `#cicd`
-      > Moved scripts/pre-commit-hook.sh to docs/archive/pre-commit-hook.sh.archived
-  - [x] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd`
-    - [x] **#169.2.6** Test pre-commit hooks locally `#cicd` `#testing`
-    - [x] **#169.2.5** Add detect-secrets hook for security `#cicd`
-      > Added detect-secrets from pre-commit-hooks (id: detect-secrets)
-    - [x] **#169.2.4** Add codespell hook for spelling checks `#cicd`
-      > Added codespell from codespell-project/codespell@v2.3.0, ignores: crate,nd,te,wil
-    - [x] **#169.2.3** Add todo.ai --lint hook to pre-commit config `#cicd`
-      > todo.ai --lint hook disabled in pre-commit: requires zsh which is not available in CI quality job
-      > Added todo.ai --lint as local hook, runs only on TODO.md changes
-    - [x] **#169.2.2** Add ascii-guard hook to pre-commit config `#cicd`
-      > ASCII-guard hook temporarily disabled due to pipx Python environment exec format error - needs investigation
-      > Added ascii-guard as local hook, runs on markdown files matching \.(md|mdc)$
-    - [x] **#169.2.1** Restrict pytest hook to tests/unit only `#cicd`
-      > Modified pytest hook: entry changed to 'uv run pytest tests/unit' to only run unit tests
-  - [x] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd`
-    - [x] **#169.1.6** Test new CI workflow with PR and main branch `#cicd` `#testing`
-    - [x] **#169.1.5** Enable caching for pre-commit and uv `#cicd`
-      > Enabled caching: uv cache (enable-cache: true) and pre-commit hooks cache (~/.cache/pre-commit)
-    - [x] **#169.1.4** Remove redundant ruff/mypy steps from CI `#cicd`
-      > Removed redundant ruff and mypy steps - now only run via pre-commit in quality job
-    - [x] **#169.1.3** Add Python 3.13 and 3.14 to main branch matrix `#cicd`
-      > Added Python 3.13 and 3.14 to main branch matrix with allow-prereleases: true
-    - [x] **#169.1.2** Implement smart matrix (PR=single env, main=full matrix) `#cicd`
-      > Implemented conditional matrix: PRs run ubuntu+3.12 only, main branch runs full 3 OS x 5 Python versions
-    - [x] **#169.1.1** Split CI workflow into quality and test jobs `#cicd`
-      > Split workflow into quality (pre-commit, markdownlint) and test (pytest with coverage) jobs running in parallel
 - [x] **#166** Implement utility modules (git, logging) (task#163.13) `#code`
 - [x] **#165** Implement migration system module (task#163.12) `#code`
 - [x] **#164** Implement configuration module (task#163.9) `#code`
@@ -244,6 +202,48 @@
 ------------------
 
 ## Recently Completed
+- [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement` (2025-12-16)
+  > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
+  > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
+  > Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
+- [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization` (2025-12-16)
+  > Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
+- [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization` (2025-12-16)
+  - [x] **#169.3** Phase 3: Cleanup and documentation `#cicd` (2025-12-16)
+    - [x] **#169.3.4** Update development docs with new workflow `#cicd` `#docs` (2025-12-16)
+      > Updated DEVELOPMENT_GUIDELINES.md with CI/CD pipeline details, smart matrix strategy, and test distribution table
+    - [x] **#169.3.3** Verify all checks pass in CI and locally `#cicd` `#testing` (2025-12-16)
+      > All pre-commit hooks pass locally, GitHub Actions CI running with new workflow
+    - [x] **#169.3.2** Update CICD_OPTIMIZATION_ASSESSMENT.md with results `#cicd` (2025-12-16)
+      > Added Implementation Results section documenting all changes, impacts, and current status
+    - [x] **#169.3.1** Archive scripts/pre-commit-hook.sh to docs/archive/ `#cicd` (2025-12-16)
+      > Moved scripts/pre-commit-hook.sh to docs/archive/pre-commit-hook.sh.archived
+  - [x] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd` (2025-12-16)
+    - [x] **#169.2.6** Test pre-commit hooks locally `#cicd` `#testing` (2025-12-16)
+    - [x] **#169.2.5** Add detect-secrets hook for security `#cicd` (2025-12-16)
+      > Added detect-secrets from pre-commit-hooks (id: detect-secrets)
+    - [x] **#169.2.4** Add codespell hook for spelling checks `#cicd` (2025-12-16)
+      > Added codespell from codespell-project/codespell@v2.3.0, ignores: crate,nd,te,wil
+    - [x] **#169.2.3** Add todo.ai --lint hook to pre-commit config `#cicd` (2025-12-16)
+      > todo.ai --lint hook disabled in pre-commit: requires zsh which is not available in CI quality job
+      > Added todo.ai --lint as local hook, runs only on TODO.md changes
+    - [x] **#169.2.2** Add ascii-guard hook to pre-commit config `#cicd` (2025-12-16)
+      > ASCII-guard hook temporarily disabled due to pipx Python environment exec format error - needs investigation
+      > Added ascii-guard as local hook, runs on markdown files matching \.(md|mdc)$
+    - [x] **#169.2.1** Restrict pytest hook to tests/unit only `#cicd` (2025-12-16)
+      > Modified pytest hook: entry changed to 'uv run pytest tests/unit' to only run unit tests
+  - [x] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd` (2025-12-16)
+    - [x] **#169.1.6** Test new CI workflow with PR and main branch `#cicd` `#testing` (2025-12-16)
+    - [x] **#169.1.5** Enable caching for pre-commit and uv `#cicd` (2025-12-16)
+      > Enabled caching: uv cache (enable-cache: true) and pre-commit hooks cache (~/.cache/pre-commit)
+    - [x] **#169.1.4** Remove redundant ruff/mypy steps from CI `#cicd` (2025-12-16)
+      > Removed redundant ruff and mypy steps - now only run via pre-commit in quality job
+    - [x] **#169.1.3** Add Python 3.13 and 3.14 to main branch matrix `#cicd` (2025-12-16)
+      > Added Python 3.13 and 3.14 to main branch matrix with allow-prereleases: true
+    - [x] **#169.1.2** Implement smart matrix (PR=single env, main=full matrix) `#cicd` (2025-12-16)
+      > Implemented conditional matrix: PRs run ubuntu+3.12 only, main branch runs full 3 OS x 5 Python versions
+    - [x] **#169.1.1** Split CI workflow into quality and test jobs `#cicd` (2025-12-16)
+      > Split workflow into quality (pre-commit, markdownlint) and test (pytest with coverage) jobs running in parallel
 - [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd` (2025-12-14)
   > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
   - [x] **#167.9** Phase 3.3: Add documentation automation `#cicd` (2025-12-14)
@@ -943,6 +943,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 01:18:30 CET 2025
+**Last Updated:** Tue Dec 16 01:29:11 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -2,6 +2,10 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 01:29:11 | fxstein | ARCHIVE | 171 | Improve CI/CD job grouping and naming (with 0 subtasks)
+2025-12-16 01:29:06 | fxstein | ARCHIVE | 170 | Further optimize CI/CD: Granular test strategy (with 0 subtasks)
+2025-12-16 01:29:00 | fxstein | ARCHIVE | 169 | Implement CI/CD optimizations from assessment (with 19 subtasks)
+2025-12-16 01:22:08 | fxstein | COMPLETE | 171 | Improve CI/CD job grouping and naming
 2025-12-16 01:18:30 | fxstein | NOTE | 171 | Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
 2025-12-16 01:16:40 | fxstein | NOTE | 171 | Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
 2025-12-16 01:14:17 | fxstein | COMPLETE | 171 | Improve CI/CD job grouping and naming

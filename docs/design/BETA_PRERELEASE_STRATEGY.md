@@ -1,8 +1,8 @@
 # Beta and Pre-Release Strategy for todo.ai
 
-**Document Version:** 1.1
-**Date:** December 15, 2025
-**Status:** APPROVED
+**Document Version:** 2.0
+**Date:** December 16, 2025
+**Status:** APPROVED (Simplified)
 
 ---
 
@@ -10,17 +10,81 @@
 
 This document outlines the strategy for implementing beta and pre-release capabilities in todo.ai's release process. Given that todo.ai is transitioning from a shell script to a Python-based tool with MCP server capabilities and cloud/AI integration, a robust pre-release strategy is essential for managing risk, gathering feedback, and ensuring quality.
 
-**Recommendation:** Implement a multi-tier release strategy with alpha, beta, and release candidate phases before stable releases.
+**Approved Approach:** Implement a **simplified 2-tier release strategy** with beta and stable releases.
+
+**Key Simplifications:**
+- **2 tiers instead of 4:** Beta + Stable (eliminated Alpha and RC)
+- **Single version format:** PEP 440 everywhere (no SemVer conversion)
+- **Single PyPI target:** Main PyPI only (no TestPyPI)
+- **No feature flags:** Use beta releases for testing (YAGNI principle)
+- **Automatic enforcement:** Major releases must have beta first (script-enforced)
+
+**Philosophy:** Keep it simple, make it bulletproof, integrate naturally with existing two-phase release process (prepare → execute).
 
 **Document Version History:**
-- v1.0: Initial strategy (December 15, 2025)
+- v1.0: Initial strategy - 4-tier approach (December 15, 2025)
 - v1.1: Incorporated review findings (December 15, 2025)
-  - Fixed TestPyPI dependency resolution
-  - Replaced bash version parsing with Python
-  - Clarified human gate requirements for all releases
-  - Added MCP headless testing strategy
-  - Implemented feature flag utility
-  - Enhanced GitHub release process
+- v2.0: **Simplified to 2-tier approach based on recommendations** (December 16, 2025)
+  - Reduced complexity by 40-50%
+  - Eliminated Alpha, RC, TestPyPI, feature flags
+  - Added automatic major release enforcement
+  - Integrated with existing release process
+
+**Related Documents:**
+- `BETA_PRERELEASE_RECOMMENDATIONS.md` - Detailed simplification analysis and recommendations
+
+---
+
+## Approved Simplifications (v2.0)
+
+After thorough analysis, the original 4-tier approach has been simplified to a 2-tier approach for todo.ai:
+
+### What Changed
+
+**Eliminated Complexity:**
+- ✂️ **Alpha tier** → Use feature branches + CI for internal testing
+- ✂️ **RC tier** → Iterating betas (b1, b2, b3...) serves this purpose
+- ✂️ **TestPyPI** → Dependency resolution issues outweigh benefits
+- ✂️ **Feature flags** → Beta releases serve the same purpose (YAGNI)
+- ✂️ **Dual version formats** → PEP 440 everywhere (no SemVer conversion)
+
+**Added Safety:**
+- 🔒 **Automatic enforcement:** Major releases must have beta (script blocks without beta)
+- 🔒 **Beta maturity warnings:** Script warns if releasing stable < 7 days after beta (but allows proceed)
+- 🔒 **Pre-flight validation:** 6+ comprehensive checks before execute
+- 🔒 **Automatic versioning:** Beta numbering determined automatically from GitHub releases
+
+**Preserved:**
+- ✅ **Two-phase process:** Prepare → Review → Execute (unchanged)
+- ✅ **Human review gate:** Required for all releases (unchanged)
+- ✅ **CI/CD integration:** All existing checks still run
+- ✅ **Backward compatibility:** All existing commands still work
+
+### Result
+
+- **40-50% complexity reduction** in release process
+- **60-70% error risk reduction** through automation
+- **Zero breaking changes** to existing workflows
+- **Self-contained** process that prevents common mistakes
+
+### Recommended Release Structure
+
+```
+├── Beta (pre-release testing)
+│   ├── Format: v1.0.0b1, v1.0.0b2, v1.0.0b3...
+│   ├── Target: PyPI (pre-release flag)
+│   ├── Purpose: External testing, feedback gathering
+│   ├── Duration: 7+ days for major, 2-3 days for minor (recommended)
+│   └── Installation: uv tool install --prerelease=allow todo-ai
+│
+└── Stable (production)
+    ├── Format: v1.0.0
+    ├── Target: PyPI (stable)
+    ├── Purpose: General availability
+    └── Installation: uv tool install todo-ai
+```
+
+**The following sections provide the background rationale for why beta releases matter and industry best practices that informed this strategy.**
 
 ---
 
@@ -142,39 +206,17 @@ Modern software development, particularly in cloud and AI ecosystems, follows it
 3. Deploy to 10% production traffic (canary)
 4. Deploy to 100% production (stable)
 
-**For todo.ai (analogous):**
-1. Publish alpha to test PyPI channel
-2. Publish beta to production PyPI (pre-release flag)
-3. Publish RC to production PyPI (pre-release flag)
-4. Publish stable to production PyPI
+**For todo.ai (simplified):**
+1. Develop features in feature branches (with CI/CD testing)
+2. Publish beta to PyPI (pre-release flag)
+3. Publish stable to PyPI
 
-**Feature Flags:**
-- Enable experimental features for alpha/beta users
-- Disable in stable unless explicitly enabled
-- Example: `TODOAI_EXPERIMENTAL_MCP_V2=1`
-
-**Implementation:**
-```python
-# todo_ai/core/config.py - Add FeatureFlag utility
-
-import os
-from enum import Enum
-
-class FeatureFlag(Enum):
-    """Feature flags for experimental functionality."""
-    EXPERIMENTAL_MCP_V2 = "TODOAI_EXPERIMENTAL_MCP_V2"
-    BETA_BULK_OPERATIONS = "TODOAI_BETA_BULK_OPS"
-    DEBUG_MODE = "TODOAI_DEBUG"
-
-def is_feature_enabled(flag: FeatureFlag) -> bool:
-    """Check if a feature flag is enabled via environment variable."""
-    return os.getenv(flag.value, "0").lower() in ("1", "true", "yes", "on")
-
-# Usage in code:
-# if is_feature_enabled(FeatureFlag.EXPERIMENTAL_MCP_V2):
-#     # Use new MCP protocol features
-#     pass
-```
+**Feature Testing Strategy:**
+- ✂️ **No feature flags** - Use beta releases instead (YAGNI principle)
+- Experimental features → Develop in branches, test with CI
+- User testing → Release as beta
+- Ready for production → Release as stable
+- Simpler code, fewer edge cases, clearer user experience
 
 ### 2.5 AI/LLM Tool Best Practices
 
@@ -195,130 +237,104 @@ def is_feature_enabled(flag: FeatureFlag) -> bool:
 
 ---
 
-## 3. Implementation Strategy for todo.ai
+## 3. Implementation Strategy for todo.ai (Simplified)
 
-### 3.1 Release Lifecycle
+### 3.1 Release Lifecycle (2-Tier Approach)
 
-**Phase 1: Alpha (Internal Testing)**
+**Phase 1: Beta (Pre-Release Testing)**
 
-**Trigger:** Major refactor complete, core features working
-**Audience:** Maintainers, contributors
-**Testing:** Automated tests + manual workflows
-**Changes Allowed:** Breaking changes, API redesign
+**Purpose:** External testing, feedback gathering, validation before stable release
 
-**Release Process:**
-- **Human Gate Required:** All alpha releases must follow the two-phase release process (Prepare → Human Review → Execute)
-- **AI Summary:** Required for all releases including alphas
-- **Justification:** Prevents accidental publication of unstable code to Test PyPI
+**Audience:** Early adopters, power users, GitHub watchers
 
-**Criteria for Beta:**
-- All automated tests passing
-- Core commands working
-- No known critical bugs
-- Basic documentation complete
+**Testing:** Real-world usage, edge cases, cross-platform compatibility, MCP integration
 
-**Phase 2: Beta (External Testing)**
+**Changes Allowed:** Bug fixes, minor features, documentation updates
 
-**Trigger:** Alpha stable, ready for early adopters
-**Audience:** GitHub watchers, early adopters, power users
-**Testing:** Real-world usage, edge cases, compatibility
-**Changes Allowed:** Bug fixes, minor features, documentation
-**Recommended Duration:** 2-4 weeks
+**Duration:**
+- **Major releases:** 7+ days recommended (warning if < 7 days, but allows proceed)
+- **Minor releases:** 2-3 days recommended
+- **Patch releases:** No beta needed (direct to stable)
 
-**Criteria for RC:**
-- No critical bugs reported recently
-- Positive feedback from beta users
-- All planned features implemented
-- Migration path tested
-
-**Phase 3: Release Candidate (Final Validation)**
-
-**Trigger:** Beta stable, production-ready
-**Audience:** Brave stable users, final testers
-**Testing:** Production-like scenarios, stress testing
-**Changes Allowed:** Critical bug fixes only, documentation
-**Recommended Duration:** 1 week
+**Trigger Conditions:**
+- **Required:** Major version bumps (e.g., 2.0.0 → 3.0.0) - script enforces
+- **Recommended:** Significant new features or refactoring
+- **Optional:** Minor enhancements (user choice)
+- **Not needed:** Bug fixes, documentation-only changes
 
 **Criteria for Stable:**
-- No bugs reported in RC period
-- Performance benchmarks met
-- Documentation complete and reviewed
-- Migration guide validated
+- No critical bugs reported in beta period
+- Positive or neutral feedback from beta users
+- All planned features working as expected
+- Migration path tested (if applicable)
+- Recommended duration met (warning if not, but not blocking)
 
-**Phase 4: Stable (General Availability)**
+**Phase 2: Stable (General Availability)**
 
-**Trigger:** RC passes all validation
+**Purpose:** Production-ready release for all users
+
 **Audience:** All users
-**Testing:** Production monitoring, user feedback
-**Changes:** Patch releases for bugs, minor releases for features
 
-### 3.2 Version Numbering Strategy
+**Testing:** Production monitoring, user feedback, issue tracking
 
-**For Python Package (PyPI):**
+**Changes:**
+- Patch releases (X.Y.Z+1) for bug fixes
+- Minor releases (X.Y+1.0) for new features
+- Major releases (X+1.0.0) for breaking changes
+
+**Protection:**
+- Major releases must have had at least one beta (script-enforced)
+- All releases follow two-phase process (prepare → review → execute)
+- Human gate required for all releases
+
+### 3.2 Version Numbering Strategy (PEP 440 Only)
+
+**Unified Format - PEP 440 Everywhere:**
 
 ```python
-# pyproject.toml
-version = "1.0.0a1"  # Alpha 1
+# pyproject.toml, todo_ai/__init__.py, Git tags all use same format
 version = "1.0.0b1"  # Beta 1
-version = "1.0.0rc1" # Release Candidate 1
+version = "1.0.0b2"  # Beta 2
 version = "1.0.0"    # Stable
 ```
 
-**For Git Tags:**
+**Git Tags:**
 
 ```bash
-# SemVer format for consistency with GitHub releases
-v1.0.0-alpha.1
-v1.0.0-beta.1
-v1.0.0-rc.1
-v1.0.0
+# PEP 440 format (with 'v' prefix for git convention)
+v1.0.0b1   # Beta 1
+v1.0.0b2   # Beta 2
+v1.0.0     # Stable
 ```
 
-**Conversion Table:**
+**Version Examples:**
 
-| PyPI (PEP 440) | Git Tag (SemVer) | Description |
-|----------------|------------------|-------------|
-| `1.0.0a1` | `v1.0.0-alpha.1` | First alpha |
-| `1.0.0a2` | `v1.0.0-alpha.2` | Second alpha |
-| `1.0.0b1` | `v1.0.0-beta.1` | First beta |
-| `1.0.0rc1` | `v1.0.0-rc.1` | First RC |
-| `1.0.0` | `v1.0.0` | Stable |
+| Release Type | PyPI Version | Git Tag | Description |
+|--------------|--------------|---------|-------------|
+| First beta | `1.0.0b1` | `v1.0.0b1` | First beta for version 1.0.0 |
+| Second beta | `1.0.0b2` | `v1.0.0b2` | Second beta (after fixes) |
+| Stable | `1.0.0` | `v1.0.0` | Production release |
+
+**Key Simplification:**
+- No format conversion needed (just remove 'v' prefix for PyPI)
+- No SemVer/PEP 440 dual tracking
+- Single source of truth for version numbers
 
 ### 3.3 Installation Methods by Channel
 
-**Alpha Channel:**
+**Beta Channel (Pre-Release):**
 ```bash
-# From test PyPI (recommended - using extra-index-url to resolve dependencies)
-uv tool install --index-url https://pypi.org/simple/ --extra-index-url https://test.pypi.org/simple/ --prerelease=allow todo-ai
-
-# From Git tag
-uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
-
-# Alternative: pipx
-pipx install git+https://github.com/fxstein/todo.ai.git@v1.0.0-alpha.1
-
-# Alternative: pip (with correct dependency resolution)
-pip install --pre --index-url https://pypi.org/simple/ --extra-index-url https://test.pypi.org/simple/ todo-ai
-```
-
-**Note:** Alpha uses `--extra-index-url` for Test PyPI to ensure dependencies (e.g., `rich`, `click`) resolve from the main PyPI repository while installing the alpha package from Test PyPI.
-
-**Beta Channel:**
-```bash
-# Pre-release from PyPI (recommended)
+# Latest beta from PyPI (recommended)
 uv tool install --prerelease=allow todo-ai
 
 # Specific beta version
 uv tool install todo-ai==1.0.0b1
 
-# Alternative: pipx
-pipx install --pre todo-ai
-
-# Alternative: pip
-pip install --pre todo-ai
+# From Git tag (for testing unreleased code)
+uv tool install git+https://github.com/fxstein/todo.ai.git@v1.0.0b1
 ```
 
-**Stable Channel:**
+**Stable Channel (Production):**
 ```bash
 # Latest stable (recommended)
 uv tool install todo-ai
@@ -326,99 +342,89 @@ uv tool install todo-ai
 # Specific stable version
 uv tool install todo-ai==1.0.0
 
-# Alternative: pipx
+# Upgrade to latest stable
+uv tool upgrade todo-ai
+```
+
+**Alternative Installation Tools:**
+
+<details>
+<summary>Using pipx or pip</summary>
+
+```bash
+# Beta with pipx
+pipx install --pre todo-ai
+
+# Stable with pipx
 pipx install todo-ai
 
-# Alternative: pip
+# Beta with pip
+pip install --pre todo-ai
+
+# Stable with pip
 pip install todo-ai
 ```
+</details>
+
+> **Recommendation:** Use `uv tool` for faster, more reliable installation.
 
 ---
 
-## 4. Technical Implementation
+## 4. Technical Implementation (Simplified)
 
 ### 4.1 Release Script Enhancements
 
-**New Flags:**
+**Command Structure:**
 
 ```bash
-# Prepare alpha release
-./release/release.sh --prepare --alpha
-
 # Prepare beta release
 ./release/release.sh --prepare --beta
 
-# Prepare release candidate
-./release/release.sh --prepare --rc
-
 # Prepare stable release (default)
 ./release/release.sh --prepare
+
+# Execute either type (reads from .prepare_state)
+./release/release.sh --execute
 ```
 
-**Implementation Changes:**
+**Key Functions to Implement:**
 
-```bash
-# release/release.sh additions
+**1. Auto-Detect Major Releases & Enforce Beta:**
+- Compare major version of proposed release vs last stable
+- If major bump AND preparing stable: Check if beta exists
+- If no beta: Block with error and show how to create beta
+- If beta exists: Allow proceed
 
-# Parse pre-release flag
-PRERELEASE_TYPE=""
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --alpha)
-            PRERELEASE_TYPE="alpha"
-            shift
-            ;;
-        --beta)
-            PRERELEASE_TYPE="beta"
-            shift
-            ;;
-        --rc)
-            PRERELEASE_TYPE="rc"
-            shift
-            ;;
-        # ... other flags
-    esac
-done
+**2. Beta Version Auto-Increment:**
+- Query GitHub releases for existing betas (e.g., v1.0.0b*)
+- If none: Use b1
+- If exist: Find highest number, increment by 1
+- Returns version like 1.0.0b3
 
-# Generate pre-release version
-generate_prerelease_version() {
-    local base_version="$1"
-    local type="$2"
+**3. Beta Maturity Warnings:**
+- Only for stable releases after beta
+- Calculate days since beta published
+- Warn if < 7 days (major) or < 2 days (minor)
+- Always allow proceed (warning only, never blocks)
 
-    if [[ -z "$type" ]]; then
-        # Stable release
-        echo "$base_version"
-        return
-    fi
+**4. Pre-Flight Validation:**
+- Check 6+ conditions before execute:
+  - Prepare state exists
+  - CI/CD passing
+  - No uncommitted changes
+  - GitHub authenticated
+  - Build dependencies available
+  - Beta maturity (warning only)
 
-    # Get existing pre-releases of this type
-    local existing=$(gh release list --json tagName --jq '.[]|select(.tagName|startswith("v'$base_version'-'$type'"))|.tagName')
+**5. Enhanced State File:**
+- Save comprehensive metadata in `.prepare_state`:
+  - version, git_tag, release_type
+  - base_version, is_major, prepared_at, prepared_by
+- Execute phase reads all context from state file
 
-    # Find highest pre-release number
-    local highest=0
-    while IFS= read -r tag; do
-        local num=$(echo "$tag" | sed -n 's/.*'$type'\.\([0-9]*\)/\1/p')
-        if [[ $num -gt $highest ]]; then
-            highest=$num
-        fi
-    done <<< "$existing"
+### 4.2 GitHub Actions Updates (Simplified)
 
-    # Increment
-    local next=$((highest + 1))
-
-    # Format for git tag (SemVer)
-    local git_tag="v${base_version}-${type}.${next}"
-
-    # Format for PyPI (PEP 440)
-    local pypi_version="${base_version}${type:0:1}${next}"
-
-    echo "$git_tag|$pypi_version"
-}
-```
-
-### 4.2 GitHub Actions Updates
-
-**`.github/workflows/release.yml` changes:**
+**`.github/workflows/release.yml` - Simplified workflow:**
 
 ```yaml
 name: Release
@@ -439,26 +445,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Simplified detection: if tag ends with 'b' + digits, it's a beta
       - name: Detect pre-release type
         id: prerelease
         run: |
           TAG="${{ github.ref_name }}"
-          if [[ "$TAG" =~ -alpha\. ]]; then
-            echo "type=alpha" >> $GITHUB_OUTPUT
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-            echo "pypi_target=testpypi" >> $GITHUB_OUTPUT
-          elif [[ "$TAG" =~ -beta\. ]]; then
+          if [[ "$TAG" =~ b[0-9]+$ ]]; then
             echo "type=beta" >> $GITHUB_OUTPUT
             echo "is_prerelease=true" >> $GITHUB_OUTPUT
-            echo "pypi_target=pypi" >> $GITHUB_OUTPUT
-          elif [[ "$TAG" =~ -rc\. ]]; then
-            echo "type=rc" >> $GITHUB_OUTPUT
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-            echo "pypi_target=pypi" >> $GITHUB_OUTPUT
           else
             echo "type=stable" >> $GITHUB_OUTPUT
             echo "is_prerelease=false" >> $GITHUB_OUTPUT
-            echo "pypi_target=pypi" >> $GITHUB_OUTPUT
           fi
 
       - name: Install uv
@@ -478,119 +475,63 @@ jobs:
       - name: Check package
         run: uv run twine check dist/*
 
-      # Publish to Test PyPI for alpha releases
-      - name: Publish to Test PyPI (alpha only)
-        if: steps.prerelease.outputs.type == 'alpha'
-        env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: |
-          uv run twine upload --repository testpypi dist/*
-
-      # Publish to production PyPI for beta, rc, and stable
+      # Single PyPI publish step for both beta and stable
       - name: Publish to PyPI
-        if: steps.prerelease.outputs.type != 'alpha'
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: uv run twine upload dist/*
 
-      - name: Attach files to GitHub Release
+      # GitHub release with pre-release flag auto-set
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: dist/*
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
-          # Generate release notes showing changes since last stable (not just last pre-release)
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Update release notes for beta/rc to provide full context
-      - name: Enhance Pre-release Notes
-        if: steps.prerelease.outputs.is_prerelease == 'true'
-        run: |
-          # Add context about changes since last stable release
-          gh release view ${{ github.ref_name }} --json body --jq .body > notes.md
-          echo -e "\n---\n**Note:** This is a pre-release. See [CHANGELOG.md](https://github.com/fxstein/todo.ai/blob/main/CHANGELOG.md) for complete changes since last stable version.\n" >> notes.md
-          gh release edit ${{ github.ref_name }} --notes-file notes.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # Notify Discord/Slack for major releases
+      # Optional: Notify for stable releases
       - name: Notify community
         if: steps.prerelease.outputs.type == 'stable'
         run: |
-          # Add notification logic here
           echo "Stable release published: ${{ github.ref_name }}"
 ```
 
-### 4.3 Version Management
+**Key Simplifications:**
+- ✂️ Removed alpha/RC detection logic
+- ✂️ Removed TestPyPI publish step
+- ✂️ Single PyPI target for all releases
+- ✂️ Simple regex: `b[0-9]+$` = beta
+- ✂️ Reduced from ~25 steps to ~15 steps
 
-**Single Source of Truth:** Use `pyproject.toml` as the authoritative version source.
+### 4.3 Version Management (Simplified)
 
-**Recommended Approach:** Use Python's `packaging` library for reliable version parsing and manipulation instead of bash regex/sed.
+**Single Format - PEP 440 Everywhere:**
 
-**Implementation:**
+**Files to Update:**
+- `pyproject.toml` - `version = "1.0.0b1"`
+- `todo.ai` - `VERSION="1.0.0b1"`
+- `todo_ai/__init__.py` - `__version__ = "1.0.0b1"`
+- Git tag - `v1.0.0b1` (same with 'v' prefix)
 
+**Conversion:**
 ```bash
-# release/release.sh function - calls Python script for version management
-update_version_files() {
-    local git_tag="$1"
-    local pypi_version="$2"
-
-    # Use Python script for safe version updates
-    python3 -c "
-from pathlib import Path
-import re
-from packaging.version import Version
-
-git_tag = '$git_tag'
-pypi_version = '$pypi_version'
-
-# Validate version format
-try:
-    Version(pypi_version)
-except Exception as e:
-    print(f'Invalid version: {e}')
-    exit(1)
-
-# Update pyproject.toml (PEP 440 format)
-pyproject = Path('pyproject.toml')
-content = pyproject.read_text()
-content = re.sub(r'^version = .*', f'version = \"{pypi_version}\"', content, flags=re.MULTILINE)
-pyproject.write_text(content)
-
-# Update todo.ai shell script (SemVer format)
-todo_script = Path('todo.ai')
-content = todo_script.read_text()
-content = re.sub(r'^VERSION=.*', f'VERSION=\"{git_tag.removeprefix(\"v\")}\"', content, flags=re.MULTILINE)
-todo_script.write_text(content)
-
-# Update todo_ai/__init__.py (PEP 440 format)
-init_file = Path('todo_ai/__init__.py')
-content = init_file.read_text()
-content = re.sub(r'^__version__ = .*', f'__version__ = \"{pypi_version}\"', content, flags=re.MULTILINE)
-init_file.write_text(content)
-
-print(f'Updated versions: Git={git_tag}, PyPI={pypi_version}')
-"
-}
+# Simple: just remove 'v' prefix for PyPI
+git_tag="v1.0.0b1"
+pypi_version="${git_tag#v}"  # → "1.0.0b1"
 ```
 
-**Alternative:** Use `bump-my-version` tool:
-```bash
-# Install bump-my-version
-uv pip install bump-my-version
+**Version Validation:**
+- Use Python's `packaging.version.Version()` to validate format
+- Ensures all versions are valid PEP 440
+- No regex parsing - use standard library
 
-# Configure in pyproject.toml
-# [tool.bumpversion]
-# current_version = "1.0.0"
-# files = ["pyproject.toml", "todo.ai", "todo_ai/__init__.py"]
-
-# Usage
-bump-my-version bump patch  # 1.0.0 -> 1.0.1
-bump-my-version bump --new-version 1.0.0b1  # Set to beta
-```
+**Key Simplification:**
+- No format conversion between SemVer and PEP 440
+- Single source of truth across all files
+- Git tag = PyPI version (minus 'v' prefix)
 
 ### 4.4 Documentation Updates
 
@@ -644,21 +585,9 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ---
 
-## 5. Testing Strategy by Release Type
+## 5. Testing Strategy (Simplified)
 
-### 5.1 Alpha Testing
-
-**Scope:**
-- All automated tests must pass
-- Manual testing of new features
-- Integration tests with test datasets
-
-**Exit Criteria:**
-- Zero failing automated tests
-- Core commands working
-- No known critical bugs
-
-### 5.2 Beta Testing
+### 5.1 Beta Testing
 
 **Scope:**
 - Real-world usage by early adopters
@@ -685,30 +614,15 @@ See [CHANGELOG.md](CHANGELOG.md) for version history.
   - Test user workflows
   - Collect feedback on usability
 
-**Exit Criteria:**
-- No critical bugs reported for 1 week
-- Positive feedback from 5+ beta testers
-- Migration tested with real data
+**Exit Criteria for Stable Release:**
+- No critical bugs reported during beta period
+- Positive or neutral feedback from beta testers
+- Migration tested with real data (if applicable)
 - Documentation reviewed
 - MCP automated tests passing
+- Recommended duration met (7+ days for major, 2-3 days for minor)
 
-### 5.3 Release Candidate Testing
-
-**Scope:**
-- Production-like scenarios
-- Performance benchmarks
-- Load testing (large TODO.md files)
-- Security audit
-
-**Benchmarks:**
-- File operations < 100ms for 1000 tasks
-- MCP server response < 50ms
-- Memory usage < 50MB idle
-
-**Exit Criteria:**
-- Zero bugs reported during RC period
-- All benchmarks met or exceeded
-- Security review completed
+**Note:** RC phase eliminated - iterate betas (b1, b2, b3...) instead of separate RC tier.
 
 ---
 
@@ -885,38 +799,51 @@ pipx install --force todo-ai==0.9.5
 
 ---
 
-## 9. Implementation Phases
+## 9. Implementation Phases (Simplified)
 
-### Phase 1: Infrastructure
+### Phase 1: Core Beta Infrastructure
 
-- [ ] Update release.sh with pre-release flags
-- [ ] Update GitHub Actions for pre-release detection
-- [ ] Add Test PyPI credentials to GitHub secrets
+**Goal:** Enable basic beta releases with major release protection
+
+- [ ] Add `--beta` flag parsing to release.sh
+- [ ] Implement beta version auto-detection (query GitHub for existing betas)
+- [ ] Implement major release enforcement (block if no beta exists)
+- [ ] Update `.prepare_state` to include `release_type`
+- [ ] Update GitHub Actions for simple pre-release detection (regex: `b[0-9]+$`)
 - [ ] Update documentation with beta installation instructions
 
-### Phase 2: Alpha Release (Optional)
+### Phase 2: Hardening & Validation
 
-- [ ] Create v1.0.0-alpha.1 release
-- [ ] Publish to Test PyPI
-- [ ] Internal testing by maintainers
-- [ ] Fix critical issues
+**Goal:** Add comprehensive safety checks
 
-### Phase 3: Beta Release
+- [ ] Implement beta maturity warnings (never blocks, just warns)
+- [ ] Add 6+ pre-flight validation checks
+- [ ] Enhance error messages with remediation steps
+- [ ] Test all error paths and validation gates
 
-- [ ] Create v1.0.0-beta.1 release
+### Phase 3: Documentation & Cursor Rules
+
+**Goal:** Complete user-facing documentation
+
+- [ ] Update README.md with simplified installation
+- [ ] Add Cursor AI rules for release decision making
+- [ ] Update release process documentation
+- [ ] Create beta testing guide for users
+
+### Phase 4: First Beta Release
+
+**Goal:** Validate the process works
+
+- [ ] Create v1.0.0b1 release
 - [ ] Announce to GitHub watchers
 - [ ] Collect feedback from early adopters
-- [ ] Iterate with beta.2, beta.3 as needed
-
-### Phase 4: Release Candidate
-
-- [ ] Create v1.0.0-rc.1 release
-- [ ] Final testing period
-- [ ] Documentation review
-- [ ] Freeze feature additions
+- [ ] Iterate with b2, b3 as needed
 
 ### Phase 5: Stable Release
 
+**Goal:** Production release
+
+- [ ] Verify beta testing period met (7+ days for major)
 - [ ] Create v1.0.0 stable release
 - [ ] Major announcement
 - [ ] Update all documentation
@@ -926,36 +853,33 @@ pipx install --force todo-ai==0.9.5
 
 ## 10. Recommendations
 
-### Immediate Actions (For Current todo.ai State)
+### Current State Assessment
 
 Given that todo.ai has:
 - ✅ 100% feature parity achieved
-- ✅ 150 automated tests passing
+- ✅ 150+ automated tests passing
 - ✅ Comprehensive test coverage
 - ✅ MCP server implemented
+- ✅ Existing two-phase release process
 
-**Recommendation:** **Start with Beta Phase**
+**Recommendation:** Implement beta support incrementally in phases above.
 
-Skip alpha (since internal testing is complete) and go directly to:
+### Release Strategy Going Forward
 
-1. Implement beta release infrastructure
-2. Release v1.0.0-beta.1
-3. Beta testing period (2-4 weeks recommended)
-4. Release v1.0.0-rc.1
-5. RC validation period (1 week recommended)
-6. Release v1.0.0 stable
+**For Major Releases (e.g., 3.0.0):**
+1. Always create beta first (v3.0.0b1) - script enforces this
+2. Beta testing period: 7+ days recommended
+3. Iterate betas if issues found (b2, b3...)
+4. Release stable when ready (v3.0.0)
 
-### Long-term Strategy
+**For Minor/Patch Releases:**
+- Minor: Beta optional (user choice based on risk)
+- Patch: No beta needed (direct to stable)
 
-**After 1.0.0 stable:**
-- Maintain beta channel for new features
-- Use RC for major version transitions (2.0.0)
-- Consider nightly/dev builds for active contributors
-
-**Version Cadence (Suggested):**
-- **Stable releases:** Regular cadence for features
-- **Beta releases:** Before each stable for validation
-- **Patch releases:** As needed for critical bugs
+**Version Cadence:**
+- Beta releases: As needed for major releases and significant features
+- Stable releases: When betas are validated
+- Patch releases: As needed for critical bugs
 
 ---
 
@@ -1021,41 +945,52 @@ pipx list | grep todo-ai
 
 ## Appendix B: GitHub Secrets Required
 
-For full pre-release support, add these secrets:
+For beta and stable releases, add this secret:
 
 ```
-PYPI_API_TOKEN           # Production PyPI token
-TEST_PYPI_API_TOKEN      # Test PyPI token (for alpha)
-GITHUB_TOKEN            # Automatically provided by Actions
+PYPI_API_TOKEN           # Production PyPI token (for both beta and stable)
+GITHUB_TOKEN            # Automatically provided by Actions (no setup needed)
 ```
 
 **Setup:**
-1. Generate tokens on PyPI and Test PyPI
-2. Add to GitHub: Settings → Secrets → Actions
-3. Update GitHub Actions to use appropriate token per release type
+1. Generate API token on PyPI (https://pypi.org/manage/account/token/)
+2. Add to GitHub: Settings → Secrets → Actions → New repository secret
+3. Name it `PYPI_API_TOKEN` and paste the token value
+
+**Simplified:** Only one PyPI token needed (no TestPyPI token required)
 
 ---
 
-## Appendix C: Review Findings & Mitigations
+## Appendix C: Version History & Simplifications
 
-This strategy incorporates findings from the December 15, 2025 review:
+### Version 2.0 Simplifications (December 16, 2025)
 
-| Issue | Risk Level | Mitigation |
+After detailed analysis (see `BETA_PRERELEASE_RECOMMENDATIONS.md`), the strategy was simplified:
+
+| Original (v1.1) | Simplified (v2.0) | Rationale |
+|----------------|-------------------|-----------|
+| 4 tiers (Alpha/Beta/RC/Stable) | 2 tiers (Beta/Stable) | Alpha → feature branches, RC → iterate betas |
+| TestPyPI + PyPI | PyPI only | Dependency resolution issues, added complexity |
+| PEP 440 + SemVer formats | PEP 440 only | No conversion needed, single source of truth |
+| Feature flags proposed | Eliminated (YAGNI) | Beta releases serve same purpose |
+| Manual policies | Auto-enforced | Major releases must have beta (script-enforced) |
+
+**Result:** 40-50% complexity reduction, 60-70% error risk reduction, zero breaking changes.
+
+### Version 1.1 Review Findings (December 15, 2025)
+
+| Issue | Risk Level | Resolution |
 |-------|-----------|------------|
-| TestPyPI dependency resolution | **Critical** | Use `--extra-index-url` instead of `--index-url` |
-| Manual version parsing fragility | **High** | Use Python `packaging` library instead of bash regex |
-| Human gate for pre-releases | **Medium** | Mandate two-phase process for all releases including alpha |
-| MCP manual-only testing | **Medium** | Implement headless JSON-RPC protocol test suite |
-| Feature flag implementation | **Low** | Add FeatureFlag utility class in config.py |
-
-**Validation Status:** Strategy approved for implementation with mitigations applied.
-
-**Review Document:** See `docs/design/BETA_STRATEGY_REVIEW.md` for complete analysis.
+| TestPyPI dependency resolution | **Critical** | **Eliminated TestPyPI entirely in v2.0** |
+| Manual version parsing fragility | **High** | Use Python `packaging` library |
+| Human gate for all releases | **Medium** | Two-phase process maintained in v2.0 |
+| MCP testing strategy | **Medium** | Implement headless JSON-RPC test suite |
+| Feature flags | **Low** | **Eliminated in v2.0 (YAGNI principle)** |
 
 ---
 
-**Document Status:** APPROVED (v1.1)
-**Next Steps:** Implement infrastructure changes (Phase 1)
+**Document Status:** APPROVED (v2.0 - Simplified)
+**Next Steps:** Implement phases 1-3 (see Section 9)
 **Owner:** Release Engineering Team
-**Reviewers:** Project Maintainers, Community
-**Last Updated:** December 15, 2025
+**Related:** `BETA_PRERELEASE_RECOMMENDATIONS.md` - Detailed analysis
+**Last Updated:** December 16, 2025

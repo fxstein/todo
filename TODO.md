@@ -4,8 +4,7 @@
 
 ## Tasks
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
-  > Starting Phase 1 implementation: Core Beta Infrastructure
-  > Simplified 2-tier beta strategy (Beta→Stable). Eliminates Alpha/RC/TestPyPI/FeatureFlags. Auto-enforces major release beta requirement. PEP 440 format only. See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0
+  > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
     - [ ] **#172.5.5** Celebrate! 🎉 `#milestone`
@@ -1025,6 +1024,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 13:00:27 CET 2025
+**Last Updated:** Tue Dec 16 13:09:29 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

@@ -3,6 +3,15 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#174** Set up PyPI project for todo-ai package `#release`
+  - [ ] **#174.4** Test PyPI authentication with manual upload `#testing`
+  - [ ] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup`
+  - [ ] **#174.2** Generate PyPI API token with upload permissions `#setup`
+  - [ ] **#174.1** Create PyPI account and todo-ai project (if not exists) `#setup`
+- [ ] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
+  - [ ] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug`
+  - [ ] **#173.2** Fix tag verification - fails even when versions are correct `#bug`
+  - [ ] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug`
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -26,6 +35,7 @@
     - [ ] **#172.4.2** Announce to GitHub watchers `#documentation`
       > Create GitHub Discussion or update release notes. Use beta announcement template from strategy doc. Highlight what's new, testing needs, known issues
     - [ ] **#172.4.1** Create v3.0.0b1 release `#release`
+      > FAILED ATTEMPT: Multiple release script bugs found: auto-commit issues, tag verification failures, dirty working directory. PyPI setup also missing. Tag v3.0.0b1 deleted, version reverted. Created task#173 (release bugs) and task#174 (PyPI setup) to fix before retry.
       > Preparing v3.0.0b1 beta release - first real test of beta release system
       > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
   - [ ] **#172.3** Phase 3: Documentation & Cursor Rules `#documentation`
@@ -1036,6 +1046,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 13:35:09 CET 2025
+**Last Updated:** Tue Dec 16 14:28:05 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

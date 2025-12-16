@@ -2,6 +2,16 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 14:28:05 | fxstein | NOTE | 172.4.1 | FAILED ATTEMPT: Multiple release script bugs found: auto-commit issues, tag verification failures, dirty working directory. PyPI setup also missing. Tag v3.0.0b1 deleted, version reverted. Created task#173 (release bugs) and task#174 (PyPI setup) to fix before retry.
+2025-12-16 14:27:53 | fxstein | ADD_SUBTASK | 174.4 | Test PyPI authentication with manual upload (parent: #174)
+2025-12-16 14:27:53 | fxstein | ADD_SUBTASK | 174.3 | Add PYPI_API_TOKEN to GitHub secrets (parent: #174)
+2025-12-16 14:27:53 | fxstein | ADD_SUBTASK | 174.2 | Generate PyPI API token with upload permissions (parent: #174)
+2025-12-16 14:27:52 | fxstein | ADD_SUBTASK | 174.1 | Create PyPI account and todo-ai project (if not exists) (parent: #174)
+2025-12-16 14:27:43 | fxstein | ADD | 174 | Set up PyPI project for todo-ai package
+2025-12-16 14:27:32 | fxstein | ADD_SUBTASK | 173.3 | Fix prepare side effects - leaves dirty working directory (parent: #173)
+2025-12-16 14:27:32 | fxstein | ADD_SUBTASK | 173.2 | Fix tag verification - fails even when versions are correct (parent: #173)
+2025-12-16 14:27:31 | fxstein | ADD_SUBTASK | 173.1 | Fix auto-commit logic - doesn't handle bash conversion artifacts properly (parent: #173)
+2025-12-16 14:27:22 | fxstein | ADD | 173 | Fix release script bugs found during v3.0.0b1 attempt
 2025-12-16 13:35:09 | fxstein | NOTE | 172.4.1 | Preparing v3.0.0b1 beta release - first real test of beta release system
 2025-12-16 13:18:31 | fxstein | NOTE | 172.3.7 | ✅ PASS: All documentation verified. README, BETA_TESTING_GUIDE, RELEASE_PROCESS, CHANGELOG: commands correct, links valid, version formats PEP 440 compliant, examples accurate.
 2025-12-16 13:18:30 | fxstein | COMPLETE | 172.3.7 | Test documentation accuracy

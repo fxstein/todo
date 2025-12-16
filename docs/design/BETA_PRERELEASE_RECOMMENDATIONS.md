@@ -21,18 +21,6 @@ This document provides recommendations to simplify and harden the proposed beta/
 
 ---
 
-## Table of Contents
-
-1. [Simplification Recommendations](#1-simplification-recommendations)
-2. [Hardening Recommendations](#2-hardening-recommendations)
-3. [Integration with Two-Phase Process](#3-integration-with-two-phase-process)
-4. [Decision Trees for AI Agents](#4-decision-trees-for-ai-agents)
-5. [Implementation Phases](#5-implementation-phases)
-6. [Before/After Comparison](#6-beforeafter-comparison)
-7. [Risk Assessment](#7-risk-assessment)
-
----
-
 ## 1. Simplification Recommendations
 
 ### 1.1 Reduce Release Tiers: 4 → 2
@@ -289,7 +277,7 @@ pip install --pre todo-ai         # Beta
 
 ---
 
-## 2. Hardening Recommendations
+## 2 Hardening Recommendations
 
 ### 2.1 Auto-Detect Major Releases & Enforce Beta Requirement
 
@@ -658,7 +646,7 @@ read_prepare_state() {
 
 ---
 
-## 3. Integration with Two-Phase Process
+## 3 Integration with Two-Phase Process
 
 ### 3.1 Command Structure
 
@@ -798,7 +786,7 @@ read_prepare_state() {
 
 ---
 
-## 4. Decision Trees for AI Agents
+## 4 Decision Trees for AI Agents
 
 ### 4.1 When User Says "Prepare Release" or "Release todo.ai"
 
@@ -1017,7 +1005,7 @@ TIMESTAMP | USER | STEP | MESSAGE
 
 ---
 
-## 5. Implementation Phases
+## 5 Implementation Phases
 
 ### Phase 1: Core Beta Infrastructure (Minimal Viable)
 
@@ -1110,7 +1098,7 @@ TIMESTAMP | USER | STEP | MESSAGE
 
 ---
 
-## 6. Before/After Comparison
+## 6 Before/After Comparison
 
 ### 6.1 Release Tiers
 
@@ -1164,7 +1152,7 @@ TIMESTAMP | USER | STEP | MESSAGE
 
 ---
 
-## 7. Risk Assessment
+## 7 Risk Assessment
 
 ### 7.1 Risks of Current Proposal (v1.1)
 
@@ -1214,7 +1202,7 @@ TIMESTAMP | USER | STEP | MESSAGE
 
 ---
 
-## 8. Cursor AI Rules (To Be Added)
+## 8 Cursor AI Rules (To Be Added)
 
 ### 8.1 Release Decision Making
 
@@ -1294,10 +1282,10 @@ When user requests beta release:
 
    ```text
    ✅ Beta release prepared.
-   
+
    Version: X.Y.ZbN
    Release notes: release/RELEASE_NOTES.md
-   
+
    Review the notes, then tell me 'execute release' when ready.
    ```
 
@@ -1311,11 +1299,11 @@ When user requests beta release:
 
    ```text
    ✅ Beta release vX.Y.ZbN published!
-   
+
    Install: uv tool install --prerelease=allow todo-ai
-   
+
    Recommended testing period: 7+ days for major, 2-3 days for minor
-   
+
    After testing, prepare stable release with same version.
    ```
 
@@ -1325,7 +1313,7 @@ When user requests beta release:
 
 ---
 
-## 9. Success Metrics
+## 9 Success Metrics
 
 ### 9.1 Simplification Success
 
@@ -1366,7 +1354,7 @@ When user requests beta release:
 
 ---
 
-## 10. Recommendations Summary
+## 10 Recommendations Summary
 
 ### ✂️ Simplifications (Reduce Complexity)
 
@@ -1406,7 +1394,7 @@ When user requests beta release:
 
 ---
 
-## 11. Next Steps
+## 11 Next Steps
 
 ### For Decision Makers
 

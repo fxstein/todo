@@ -51,7 +51,7 @@ jobs:
         continue-on-error: true
 
   test:
-    name: Test Suite
+    name: ${{ matrix.python-version == '3.14' && format('🔬 Comprehensive Tests - Python {0} ({1})', matrix.python-version, matrix.os) || format('⚡ Quick Tests - Python {0} ({1})', matrix.python-version, matrix.os) }}
     strategy:
       fail-fast: false
       matrix:

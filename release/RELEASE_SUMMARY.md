@@ -5,3 +5,9 @@ The new architecture includes a `todo-ai` CLI command that maintains full compat
 Key improvements include 10x faster performance for large TODO files, comprehensive validation and error messages, automated migration system for upgrades, GitHub Issues coordination support, and cross-platform compatibility (macOS, Linux, Windows WSL2). The implementation uses modern Python tooling with uv for package management, includes pre-commit hooks for code quality, and maintains backward compatibility with existing TODO.md files.
 
 This is a beta release to gather feedback on the Python refactor before stable release. The shell script (v2.x) remains available but is now legacy. Install with `uv tool install --prerelease=allow todo-ai` and report any issues via `todo-ai report-bug`.
+
+**Documentation:**
+- [Getting Started Guide](https://github.com/fxstein/todo.ai/blob/main/docs/guides/GETTING_STARTED.md) - Quick start and basic usage
+- [Python Migration Guide](https://github.com/fxstein/todo.ai/blob/main/docs/user/PYTHON_MIGRATION_GUIDE.md) - Upgrade from v2.x shell version
+- [MCP Setup Guide](https://github.com/fxstein/todo.ai/blob/main/docs/user/MCP_SETUP.md) - Configure Cursor AI integration
+- [Full Documentation](https://github.com/fxstein/todo.ai/tree/main/docs) - Complete docs index

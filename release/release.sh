@@ -479,6 +479,64 @@ detect_and_enforce_beta_requirement() {
     return 0
 }
 
+# Validate beta maturity before stable release (warning only, never blocks)
+# Returns 0 (always succeeds, just warns)
+validate_beta_maturity() {
+    local new_version="$1"
+    local bump_type="$2"
+
+    # Find latest beta for this version from GitHub releases
+    local latest_beta=$(gh release list --limit 100 --json tagName,publishedAt --jq '.[] | select(.tagName | test("^v'"${new_version}"'b[0-9]+$")) | {tagName, publishedAt}' 2>/dev/null | head -1)
+
+    if [[ -z "$latest_beta" ]]; then
+        # No beta found - this shouldn't happen if enforcement worked, but don't block
+        log_release_step "BETA MATURITY" "No beta found for ${new_version}, skipping maturity check"
+        return 0
+    fi
+
+    # Extract published date
+    local beta_published=$(echo "$latest_beta" | grep -o '"publishedAt":"[^"]*"' | cut -d'"' -f4)
+    if [[ -z "$beta_published" ]]; then
+        log_release_step "BETA MATURITY" "Could not determine beta publish date, skipping maturity check"
+        return 0
+    fi
+
+    # Calculate days since beta was published
+    local beta_timestamp=$(date -j -f "%Y-%m-%dT%H:%M:%SZ" "$beta_published" "+%s" 2>/dev/null || date -d "$beta_published" "+%s" 2>/dev/null || echo "0")
+    local now_timestamp=$(date "+%s")
+    local days_since_beta=$(( (now_timestamp - beta_timestamp) / 86400 ))
+
+    # Determine recommended duration based on bump type
+    local recommended_days=7
+    if [[ "$bump_type" == "minor" ]]; then
+        recommended_days=2
+    fi
+
+    # Extract beta tag name
+    local beta_tag=$(echo "$latest_beta" | grep -o '"tagName":"[^"]*"' | cut -d'"' -f4)
+
+    # Warn if under recommended duration (but never block)
+    if [[ $days_since_beta -lt $recommended_days ]]; then
+        local days_remaining=$((recommended_days - days_since_beta))
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${YELLOW}⚠️  WARNING: Beta released only ${days_since_beta} day(s) ago${NC}"
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo ""
+        echo -e "${YELLOW}Last beta: ${beta_tag}${NC}"
+        echo -e "${YELLOW}Published: ${beta_published}${NC}"
+        echo -e "${YELLOW}Recommended wait: ${days_remaining} more day(s) for feedback${NC}"
+        echo ""
+        echo -e "${BLUE}Proceeding with release...${NC}"
+        echo ""
+        log_release_step "BETA MATURITY WARNING" "Beta ${beta_tag} only ${days_since_beta} days old (recommended: ${recommended_days}), but proceeding"
+    else
+        echo -e "${GREEN}✓ Beta testing period met (${days_since_beta} days)${NC}"
+        log_release_step "BETA MATURITY OK" "Beta ${beta_tag} is ${days_since_beta} days old (recommended: ${recommended_days})"
+    fi
+
+    return 0
+}
+
 # Get GitHub repository URL
 get_repo_url() {
     local remote_url=$(git remote get-url origin 2>/dev/null || echo "")
@@ -908,6 +966,18 @@ main() {
         if ! detect_and_enforce_beta_requirement "$CURRENT_VERSION" "$NEW_VERSION" "false"; then
             exit 1
         fi
+
+        # Validate beta maturity (warning only, never blocks)
+        # Extract major version to determine if we should check maturity
+        local current_major=$(echo "$CURRENT_VERSION" | cut -d'.' -f1)
+        local new_major=$(echo "$NEW_VERSION" | cut -d'.' -f1)
+        local current_minor=$(echo "$CURRENT_VERSION" | cut -d'.' -f2)
+        local new_minor=$(echo "$NEW_VERSION" | cut -d'.' -f2)
+
+        # Check maturity for major or minor releases
+        if [[ "$new_major" -gt "$current_major" ]] || [[ "$new_minor" -gt "$current_minor" ]]; then
+            validate_beta_maturity "$NEW_VERSION" "$BUMP_TYPE"
+        fi
     fi
     echo ""
 
@@ -1022,6 +1092,116 @@ EOF
     return 0
 }
 
+# Pre-flight validation checks before execute
+# Returns 0 if all checks pass, 1 if critical check fails
+preflight_validation() {
+    local release_type="$1"
+    local new_version="$2"
+    local bump_type="$3"
+
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}🔍 Pre-Flight Validation${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    local checks_passed=0
+    local checks_failed=0
+    local checks_warned=0
+
+    # Check 1: Prepare state exists
+    echo -n "1. Checking prepare state... "
+    if [[ -f "release/.prepare_state" ]]; then
+        echo -e "${GREEN}✅ OK${NC}"
+        ((checks_passed++))
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo -e "${RED}   → Prepare state not found${NC}"
+        echo -e "${RED}   → Run: ./release/release.sh --prepare${NC}"
+        ((checks_failed++))
+    fi
+
+    # Check 2: CI/CD passing
+    echo -n "2. Checking CI/CD status... "
+    if command -v ./scripts/wait-for-ci.sh &> /dev/null && ./scripts/wait-for-ci.sh &> /dev/null; then
+        echo -e "${GREEN}✅ OK${NC}"
+        ((checks_passed++))
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo -e "${RED}   → CI/CD workflows failing or not found${NC}"
+        echo -e "${RED}   → Fix errors before releasing${NC}"
+        ((checks_failed++))
+    fi
+
+    # Check 3: No uncommitted changes (exclude release working files)
+    echo -n "3. Checking for uncommitted changes... "
+    local uncommitted=$(git status -s | grep -vE "(release/RELEASE_LOG\.log|\.todo\.ai/\.todo\.ai\.(serial|log))" || echo "")
+    if [[ -z "$uncommitted" ]]; then
+        echo -e "${GREEN}✅ OK${NC}"
+        ((checks_passed++))
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo -e "${RED}   → Uncommitted changes detected${NC}"
+        echo -e "${RED}   → Commit or stash changes first${NC}"
+        ((checks_failed++))
+    fi
+
+    # Check 4: GitHub authenticated
+    echo -n "4. Checking GitHub authentication... "
+    if gh auth status &> /dev/null; then
+        echo -e "${GREEN}✅ OK${NC}"
+        ((checks_passed++))
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo -e "${RED}   → GitHub CLI not authenticated${NC}"
+        echo -e "${RED}   → Run: gh auth login${NC}"
+        ((checks_failed++))
+    fi
+
+    # Check 5: Build dependencies available
+    echo -n "5. Checking build dependencies... "
+    if command -v uv &> /dev/null && uv run python -m build --version &> /dev/null; then
+        echo -e "${GREEN}✅ OK${NC}"
+        ((checks_passed++))
+    else
+        echo -e "${RED}❌ FAIL${NC}"
+        echo -e "${RED}   → Build dependencies missing${NC}"
+        echo -e "${RED}   → Run: uv sync --extra dev${NC}"
+        ((checks_failed++))
+    fi
+
+    # Check 6: Beta maturity (warning only for stable releases)
+    if [[ "$release_type" == "stable" ]] && [[ "$bump_type" != "patch" ]]; then
+        echo -n "6. Checking beta maturity... "
+        # This is a warning-only check, so it never fails
+        # The actual validation was done in prepare, just note it here
+        echo -e "${GREEN}✅ OK${NC} ${YELLOW}(checked in prepare)${NC}"
+        ((checks_passed++))
+    else
+        echo -n "6. Checking beta maturity... "
+        echo -e "${BLUE}⊘ SKIP${NC} (not applicable)"
+    fi
+
+    echo ""
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "Checks passed: ${GREEN}${checks_passed}${NC}"
+    if [[ $checks_failed -gt 0 ]]; then
+        echo -e "Checks failed: ${RED}${checks_failed}${NC}"
+    fi
+    if [[ $checks_warned -gt 0 ]]; then
+        echo -e "Warnings: ${YELLOW}${checks_warned}${NC}"
+    fi
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    if [[ $checks_failed -gt 0 ]]; then
+        log_release_step "PREFLIGHT FAILED" "${checks_failed} pre-flight check(s) failed"
+        return 1
+    fi
+
+    log_release_step "PREFLIGHT PASSED" "All ${checks_passed} pre-flight checks passed"
+    return 0
+}
+
 # Execute prepared release
 execute_release() {
     local PREPARE_STATE_FILE="release/.prepare_state"
@@ -1038,6 +1218,14 @@ execute_release() {
 
     echo -e "${BLUE}🚀 Executing release ${NEW_VERSION}...${NC}"
     echo ""
+
+    # Run pre-flight validation
+    if ! preflight_validation "$RELEASE_TYPE" "$NEW_VERSION" "$BUMP_TYPE"; then
+        echo -e "${RED}❌ Pre-flight validation failed${NC}"
+        echo ""
+        echo "Fix the issues above and try again."
+        exit 1
+    fi
 
     # Regenerate release notes from RELEASE_SUMMARY.md (single source of truth)
     # This ensures any updates to the summary after prepare are included

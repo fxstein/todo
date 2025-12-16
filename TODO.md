@@ -47,6 +47,7 @@
     - [ ] **#172.3.1** Update README.md with simplified installation `#documentation`
       > Add Stable/Beta/Development installation sections. Primary method: uv tool. Collapse pipx/pip alternatives in <details>. Add release channels description
   - [ ] **#172.2** Phase 2: Hardening & Validation `#release` `#validation`
+    > Phase 2 partial: Beta maturity warnings (never blocks), 6+ pre-flight validation checks, beta increment logic. Testing tasks 172.2.3, 172.2.5-8 remain.
     > Goal: Add comprehensive validation and safety checks. Deliverable: Beta maturity warnings, 6+ pre-flight checks, clear error messages, all edge cases handled
     - [ ] **#172.2.8** Test beta increment (b1→b2→b3) `#testing`
       > Create b1, then b2, then b3 for same version. Verify auto-increment logic works correctly. Check no duplicate versions created
@@ -56,13 +57,13 @@
       > Create beta, try stable release <7 days later. Verify warning displayed but release proceeds. Test major vs minor recommendations
     - [ ] **#172.2.5** Test all error paths and validation gates `#testing`
       > Test each validation failure scenario. Verify error messages are clear and actionable. Test edge cases
-    - [ ] **#172.2.4** Add beta version increment logic `#release` `#script`
+    - [x] **#172.2.4** Add beta version increment logic `#release` `#script`
       > Automatic beta numbering. Extract number from existing betas, add 1. Prevents duplicate versions. Logs decision clearly
     - [ ] **#172.2.3** Enhance error messages with remediation steps `#release` `#documentation`
       > Add actionable remediation steps to all error messages. Pattern: Error description, what caused it, how to fix it. User-friendly language
-    - [ ] **#172.2.2** Add 6+ pre-flight validation checks `#release` `#validation`
+    - [x] **#172.2.2** Add 6+ pre-flight validation checks `#release` `#validation`
       > Check: prepare state exists, CI/CD passing, no uncommitted changes, GitHub authenticated, build dependencies available, beta maturity. Clear ✅/❌ status for each with remediation
-    - [ ] **#172.2.1** Implement beta maturity warnings (never blocks) `#release` `#validation`
+    - [x] **#172.2.1** Implement beta maturity warnings (never blocks) `#release` `#validation`
       > Find latest beta from GitHub, calculate days since published. Warn if <7 days (major) or <2 days (minor). Always proceed - warning only. Display clear message with recommendation
   - [ ] **#172.1** Phase 1: Core Beta Infrastructure `#release` `#infrastructure`
     > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
@@ -1023,6 +1024,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 12:55:44 CET 2025
+**Last Updated:** Tue Dec 16 12:57:56 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

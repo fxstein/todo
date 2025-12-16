@@ -283,53 +283,27 @@ pip install --pre todo-ai         # Beta
 
 **Problem:** No automatic detection of when beta is required
 
-**Solution:** Add enforcement in `--prepare` phase
+**Solution:** Add enforcement function in `--prepare` phase
 
-```bash
-# In release/release.sh --prepare phase
+**Key Logic:**
+- Compare major version of proposed release vs last stable
+- If major version changed AND preparing stable release:
+  - Check if any beta exists for the new version (query GitHub releases)
+  - If no beta found: Block with error and show how to create beta
+  - If beta exists: Allow proceed
+- For beta releases: Always allow (no blocking)
 
-detect_and_enforce_beta_requirement() {
-    local proposed_version="$1"
-    local release_type="$2"  # "beta" or "stable"
+**Error Message Pattern:**
+```
+❌ ERROR: Major release requires beta testing first
 
-    # Get last stable release
-    local last_stable=$(gh release list --json tagName,isPrerelease \
-        --jq '.[] | select(.isPrerelease == false) | .tagName' | \
-        head -n1 | sed 's/^v//')
+This is a major version bump (2.0.0 → 3.0.0).
+Major releases MUST have at least one beta release.
 
-    # Extract major version numbers
-    local proposed_major=$(echo "$proposed_version" | cut -d. -f1)
-    local last_major=$(echo "$last_stable" | cut -d. -f1)
+To create a beta:
+  ./release/release.sh --prepare --beta
 
-    # Check if this is a major version bump
-    if [[ "$proposed_major" != "$last_major" ]]; then
-        echo "🔍 Major version bump detected: $last_stable → $proposed_version"
-
-        if [[ "$release_type" == "stable" ]]; then
-            # Preparing stable for major release - check if beta exists
-            local beta_exists=$(gh release list --json tagName \
-                --jq '.[] | select(.tagName | startswith("v'$proposed_version'b")) | .tagName' | \
-                wc -l)
-
-            if [[ "$beta_exists" -eq 0 ]]; then
-                echo ""
-                echo "❌ ERROR: Major release requires beta testing first"
-                echo ""
-                echo "This is a major version bump ($last_stable → $proposed_version)."
-                echo "Major releases MUST have at least one beta release."
-                echo ""
-                echo "To create a beta:"
-                echo "  ./release/release.sh --prepare --beta"
-                echo ""
-                echo "After beta testing, run prepare again for stable."
-                exit 1
-            fi
-        fi
-    fi
-}
-
-# RULE: Major releases cannot skip beta
-# The script automatically enforces this
+After beta testing, run prepare again for stable.
 ```
 
 **Impact:**
@@ -344,66 +318,22 @@ detect_and_enforce_beta_requirement() {
 
 **Problem:** No enforcement of beta testing duration
 
-**Solution:** Add maturity validation with warnings
+**Solution:** Add maturity validation with warnings (never blocks)
 
-```bash
-# In release/release.sh --prepare phase
+**Key Logic:**
+- Only run when preparing stable release (skip for beta releases)
+- Find latest beta for this version from GitHub releases
+- Calculate days since beta was published
+- Compare against recommended duration:
+  - Major releases: 7+ days recommended
+  - Minor releases: 2+ days recommended
+- Display warning if under recommended duration, but always proceed
 
-validate_beta_maturity() {
-    local target_version="$1"  # e.g., "1.0.0"
-    local release_type="$2"
-
-    # Only validate when preparing stable after beta
-    if [[ "$release_type" != "stable" ]]; then
-        return 0
-    fi
-
-    # Find latest beta for this version
-    local latest_beta=$(gh release list --json tagName,publishedAt \
-        --jq '.[] | select(.tagName | startswith("v'$target_version'b")) |
-        {tag: .tagName, date: .publishedAt}' | \
-        head -n1)
-
-    if [[ -z "$latest_beta" ]]; then
-        # No beta found - enforcement handled by detect_and_enforce_beta_requirement
-        return 0
-    fi
-
-    # Calculate days since beta release
-    local beta_tag=$(echo "$latest_beta" | jq -r '.tag')
-    local beta_date=$(echo "$latest_beta" | jq -r '.date')
-    local days_since_beta=$(python3 -c "
-from datetime import datetime
-beta = datetime.fromisoformat('${beta_date}'.replace('Z', '+00:00'))
-now = datetime.now(beta.tzinfo)
-print((now - beta).days)
-")
-
-    # Determine minimum days based on version type
-    local is_major=$(detect_major_bump "$target_version")
-    local min_days=7
-    if [[ "$is_major" == "false" ]]; then
-        min_days=2  # Minor releases need less beta time
-    fi
-
-    echo "📊 Beta maturity check:"
-    echo "   Latest beta: $beta_tag"
-    echo "   Released: $days_since_beta days ago"
-    echo "   Recommended: $min_days days"
-
-    if [[ "$days_since_beta" -lt "$min_days" ]]; then
-        echo ""
-        echo "⚠️  WARNING: Beta released only $days_since_beta days ago"
-        echo "   Recommended wait: $((min_days - days_since_beta)) more days for feedback"
-        echo "   Proceeding with release..."
-        echo ""
-    else
-        echo "   ✅ Beta has matured for recommended period"
-    fi
-}
-
-# RULE: Major releases recommended 7+ days, minor 2+ days
-# Script warns but does NOT block - always allows proceeding
+**Warning Message Pattern:**
+```
+⚠️  WARNING: Beta released only 3 days ago
+   Recommended wait: 4 more days for feedback
+   Proceeding with release...
 ```
 
 **Impact:**
@@ -418,105 +348,30 @@ print((now - beta).days)
 
 **Problem:** No systematic validation before execute
 
-**Solution:** Add comprehensive pre-flight checklist
+**Solution:** Add comprehensive pre-flight checklist in `--execute` phase
 
-```bash
-# In release/release.sh --execute phase
+**Checks to Implement:**
 
-preflight_checks() {
-    echo "=== Pre-Flight Validation ==="
-    echo ""
+1. **Prepare state exists** - Verify `.prepare_state` file present
+2. **CI/CD passing** - Run `./scripts/wait-for-ci.sh` to verify
+3. **No uncommitted changes** - Check git status (exclude release/ folder)
+4. **GitHub authenticated** - Verify `gh auth status` succeeds
+5. **Build dependencies** - Verify `uv run python -m build --version` works
+6. **Beta maturity** - Run maturity validation for stable releases (warning only)
 
-    local errors=0
-    local warnings=0
+**For Each Check:**
+- Display clear ✅ OK or ❌ FAIL status
+- Show remediation steps on failure
+- Exit with non-zero if any critical check fails
+- Warnings don't block release
 
-    # Check 1: Prepare state exists
-    echo -n "1. Checking prepare state... "
-    if [[ ! -f release/.prepare_state ]]; then
-        echo "❌ FAIL"
-        echo "   → No prepare state found"
-        echo "   → Run: ./release/release.sh --prepare [--beta]"
-        ((errors++))
-    else
-        echo "✅ OK"
-    fi
-
-    # Check 2: CI/CD status
-    echo -n "2. Checking CI/CD status... "
-    if ! ./scripts/wait-for-ci.sh; then
-        echo "❌ FAIL"
-        echo "   → CI/CD workflows failing"
-        echo "   → Fix errors before releasing"
-        ((errors++))
-    else
-        echo "✅ OK"
-    fi
-
-    # Check 3: Uncommitted changes
-    echo -n "3. Checking for uncommitted changes... "
-    local uncommitted=$(git status --porcelain | grep -v '^?? release/' | wc -l)
-    if [[ "$uncommitted" -gt 0 ]]; then
-        echo "❌ FAIL"
-        echo "   → Uncommitted changes detected"
-        echo "   → Commit or stash changes first"
-        ((errors++))
-    else
-        echo "✅ OK"
-    fi
-
-    # Check 4: GitHub authentication
-    echo -n "4. Checking GitHub authentication... "
-    if ! gh auth status &>/dev/null; then
-        echo "❌ FAIL"
-        echo "   → GitHub CLI not authenticated"
-        echo "   → Run: gh auth login"
-        ((errors++))
-    else
-        echo "✅ OK"
-    fi
-
-    # Check 5: Build dependencies
-    echo -n "5. Checking build dependencies... "
-    if ! uv run python -m build --version &>/dev/null 2>&1; then
-        echo "❌ FAIL"
-        echo "   → Build dependencies missing"
-        echo "   → Run: uv sync --extra dev"
-        ((errors++))
-    else
-        echo "✅ OK"
-    fi
-
-    # Check 6: Beta maturity (for stable releases)
-    if [[ -f release/.prepare_state ]]; then
-        local release_type=$(jq -r '.release_type' release/.prepare_state 2>/dev/null || echo "stable")
-        if [[ "$release_type" == "stable" ]]; then
-            echo "6. Validating beta maturity..."
-            local base_version=$(jq -r '.base_version' release/.prepare_state)
-            validate_beta_maturity "$base_version" "$release_type"
-            # Note: This function handles its own pass/fail/warning display
-        fi
-    fi
-
-    echo ""
-
-    # Summary
-    if [[ $errors -gt 0 ]]; then
-        echo "❌ $errors pre-flight check(s) failed"
-        echo ""
-        echo "Fix the issues above and run --execute again."
-        exit 1
-    elif [[ $warnings -gt 0 ]]; then
-        echo "⚠️  $warnings warning(s) detected"
-        echo "✅ All critical checks passed"
-        echo ""
-    else
-        echo "✅ All pre-flight checks passed"
-        echo ""
-    fi
-}
-
-# RULE: All checks must pass before release proceeds
-# Script provides clear remediation steps for failures
+**Example Output:**
+```
+=== Pre-Flight Validation ===
+1. Checking prepare state... ✅ OK
+2. Checking CI/CD status... ❌ FAIL
+   → CI/CD workflows failing
+   → Fix errors before releasing
 ```
 
 **Impact:**
@@ -531,49 +386,20 @@ preflight_checks() {
 
 **Problem:** Unclear how to determine next beta number
 
-**Solution:** Add explicit beta version detection
+**Solution:** Add automatic beta version detection
 
-```bash
-# In release/release.sh --prepare phase
+**Key Logic:**
+- Query GitHub releases for existing betas matching base version (e.g., v1.0.0b*)
+- If no betas found: Use `b1` (e.g., 1.0.0b1)
+- If betas exist: Find highest number, increment by 1
+  - Extract number from tag (v1.0.0b2 → 2)
+  - Add 1 to get next (→ 3)
+  - Return new version (1.0.0b3)
 
-determine_beta_version() {
-    local base_version="$1"  # e.g., "1.0.0" from version bump analysis
-
-    echo "🔍 Determining beta version for base: $base_version"
-
-    # Find all existing betas for this base version
-    local existing_betas=$(gh release list --json tagName --jq \
-        '.[] | select(.tagName | startswith("v'$base_version'b")) | .tagName')
-
-    if [[ -z "$existing_betas" ]]; then
-        # First beta for this version
-        local beta_version="${base_version}b1"
-        echo "   → First beta: $beta_version"
-        echo "$beta_version"
-    else
-        # Find highest beta number
-        local highest=$(echo "$existing_betas" | \
-            grep -oE 'b[0-9]+$' | \
-            sed 's/b//' | \
-            sort -n | \
-            tail -n1)
-
-        local next=$((highest + 1))
-        local beta_version="${base_version}b${next}"
-
-        echo "   → Existing betas found: $(echo "$existing_betas" | wc -l)"
-        echo "   → Highest: b$highest"
-        echo "   → Next: $beta_version"
-
-        echo "$beta_version"
-    fi
-}
-
-# EXAMPLES:
-# - No betas exist for 1.0.0 → Returns: 1.0.0b1
-# - v1.0.0b1 exists → Returns: 1.0.0b2
-# - v1.0.0b1 and v1.0.0b2 exist → Returns: 1.0.0b3
-```
+**Examples:**
+- No betas for 1.0.0 → Returns: 1.0.0b1
+- v1.0.0b1 exists → Returns: 1.0.0b2
+- v1.0.0b1 and v1.0.0b2 exist → Returns: 1.0.0b3
 
 **Impact:**
 - ✅ Automatic beta numbering
@@ -585,64 +411,63 @@ determine_beta_version() {
 
 ### 2.5 Enhanced State File for Execute Phase
 
-**Problem:** Current .prepare_state doesn't include all needed metadata
+**Problem:** Current `.prepare_state` doesn't include all needed metadata
 
-**Solution:** Add comprehensive state tracking
+**Solution:** Add comprehensive state tracking in JSON format
 
-```bash
-# In release/release.sh --prepare phase
-
-save_prepare_state() {
-    local version="$1"
-    local git_tag="$2"
-    local release_type="$3"
-    local base_version="$4"
-    local is_major="$5"
-
-    # Create JSON state file
-    cat > release/.prepare_state <<EOF
+**State File Fields:**
+```json
 {
-  "version": "$version",
-  "git_tag": "$git_tag",
-  "release_type": "$release_type",
-  "base_version": "$base_version",
-  "is_major": $is_major,
-  "prepared_at": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-  "prepared_by": "$(git config user.email)"
-}
-EOF
-
-    echo "📝 Prepare state saved:"
-    cat release/.prepare_state | jq .
-}
-
-# USAGE IN EXECUTE:
-read_prepare_state() {
-    if [[ ! -f release/.prepare_state ]]; then
-        echo "❌ No prepare state found"
-        exit 1
-    fi
-
-    # Load all variables from state file
-    VERSION=$(jq -r '.version' release/.prepare_state)
-    GIT_TAG=$(jq -r '.git_tag' release/.prepare_state)
-    RELEASE_TYPE=$(jq -r '.release_type' release/.prepare_state)
-    BASE_VERSION=$(jq -r '.base_version' release/.prepare_state)
-    IS_MAJOR=$(jq -r '.is_major' release/.prepare_state)
-
-    echo "📖 Loading prepare state:"
-    echo "   Version: $VERSION"
-    echo "   Git Tag: $GIT_TAG"
-    echo "   Type: $RELEASE_TYPE"
-    echo "   Major: $IS_MAJOR"
+  "version": "1.0.0b1",
+  "git_tag": "v1.0.0b1",
+  "release_type": "beta",
+  "base_version": "1.0.0",
+  "is_major": true,
+  "prepared_at": "2025-12-16T10:30:00Z",
+  "prepared_by": "user@example.com"
 }
 ```
+
+**Purpose:**
+- Execute phase reads all needed context from state file
+- No need to re-compute version or release type
+- Provides audit trail (who/when prepared)
+- Enables validation logic (beta maturity check needs base_version)
 
 **Impact:**
 - ✅ Execute phase has all needed context
 - ✅ No re-computation of version/type
 - ✅ Audit trail of preparation
 - ✅ Enables more sophisticated validation
+
+---
+
+### 2.6 Release Logging (Already in Place)
+
+**Question:** Do we have detailed release logging?
+
+**Answer:** ✅ **Yes, comprehensive release logging is already implemented.**
+
+The existing `release/release.sh` script has a robust logging system with 31 log points throughout the release process.
+
+**Log Format:** `TIMESTAMP | USER | STEP | MESSAGE`
+
+**What Gets Logged:**
+- Release start (version, bump type, files)
+- Version updates, commits, tags
+- Push operations, GitHub release creation
+- Errors, warnings, completion status
+
+**Log Location:** `release/RELEASE_LOG.log` (committed to repository, newest entries on top)
+
+**For Beta Support:** No changes needed - logging will automatically work for beta releases.
+
+**Impact:**
+- ✅ Full audit trail of all releases
+- ✅ Easy to debug issues
+- ✅ Historical record in git
+- ✅ User attribution and timestamps
+- ✅ Works for both beta and stable releases
 
 ---
 
@@ -786,222 +611,105 @@ read_prepare_state() {
 
 ---
 
-## 4 Decision Trees for AI Agents
+## 4 Decision Framework for AI Agents
 
 ### 4.1 When User Says "Prepare Release" or "Release todo.ai"
 
-```
-START: User requests release
-    ↓
-STEP 1: Check CI/CD status
-    ├─ PASS → Continue
-    └─ FAIL → STOP, report error, ask user to fix
-    ↓
-STEP 2: Analyze commits and determine version bump
-    ├─ Result: Next version (e.g., "1.0.0" or "2.0.0")
-    └─ Type: MAJOR, MINOR, or PATCH
-    ↓
-STEP 3: Decision tree based on bump type
-    ↓
-    ├─ MAJOR (e.g., 2.0.0 → 3.0.0)
-    │   ↓
-    │   Check: Does beta exist for 3.0.0?
-    │       ├─ NO BETA EXISTS
-    │       │   ↓
-    │       │   STOP and recommend:
-    │       │   "This is a major release (3.0.0).
-    │       │    Major releases require beta testing.
-    │       │
-    │       │    To create beta:
-    │       │    ./release/release.sh --prepare --beta
-    │       │
-    │       │    After beta testing, prepare stable."
-    │       │
-    │       └─ BETA EXISTS (e.g., v3.0.0b1)
-    │           ↓
-    │           Check beta age
-    │               ├─ < 7 days
-    │               │   ↓
-    │               │   WARN: "Beta only X days old. Recommend waiting."
-    │               │   Proceed with warning
-    │               │
-    │               └─ >= 7 days
-    │                   ↓
-    │                   Continue prepare for stable
-    │
-    ├─ MINOR (e.g., 2.0.0 → 2.1.0)
-    │   ↓
-    │   Ask user:
-    │   "This is a minor release (2.1.0).
-    │
-    │    Options:
-    │    a) Create beta first (recommended for significant features)
-    │    b) Release stable directly (faster for small additions)
-    │
-    │    Which do you prefer?"
-    │       ├─ a → Run: ./release/release.sh --prepare --beta
-    │       └─ b → Run: ./release/release.sh --prepare
-    │
-    └─ PATCH (e.g., 2.0.0 → 2.0.1)
-        ↓
-        Continue prepare for stable (no beta needed)
-        Run: ./release/release.sh --prepare
-    ↓
-STEP 4: Execute prepare command
-    ↓
-STEP 5: Show preview of release notes
-    ↓
-STEP 6: STOP and say:
-    "✅ Release prepared successfully!
+**Step 1: Check CI/CD Status**
+- Run: `./scripts/wait-for-ci.sh`
+- If fails: STOP, report error, wait for user to fix
+- If passes: Continue to Step 2
 
-     - Current version: X.Y.Z
-     - Proposed version: A.B.C[bN]
-     - Release notes: release/RELEASE_NOTES.md
+**Step 2: Analyze Commits and Determine Version Bump**
+- Analyze commit messages since last release
+- Determine bump type: MAJOR, MINOR, or PATCH
+- Calculate next version number
 
-     Review the release notes, then tell me 'execute release' when ready."
-    ↓
-WAIT FOR USER
-```
+**Step 3: Apply Release Rules Based on Bump Type**
+
+**For MAJOR bumps (e.g., 2.0.0 → 3.0.0):**
+- Check if beta exists for new version: `gh release list | grep "v3.0.0b"`
+- **If no beta:** STOP and recommend creating beta first
+- **If beta exists < 7 days:** WARN but proceed anyway
+- **If beta exists >= 7 days:** Proceed normally
+
+**For MINOR bumps (e.g., 2.0.0 → 2.1.0):**
+- Ask user to choose:
+  - a) Create beta first (safer, for significant features)
+  - b) Release stable directly (faster, for small additions)
+- Respect user choice
+
+**For PATCH bumps (e.g., 2.0.0 → 2.0.1):**
+- Proceed directly to stable (no beta needed)
+
+**Step 4: Execute Prepare Command**
+- Run: `./release/release.sh --prepare [--beta]`
+
+**Step 5: Show Preview and STOP**
+- Display release notes location
+- Display version information
+- Say: "Review the release notes, then tell me 'execute release' when ready."
+- **WAIT FOR USER** - Never auto-execute
 
 ---
 
 ### 4.2 When User Says "Execute Release"
 
+**Step 1: Verify Prepare Was Run**
+- Check if `.prepare_state` file exists
+- If missing: STOP and say "Run prepare first"
+- If exists: Continue to Step 2
+
+**Step 2: Run Execute Command**
+- Run: `./release/release.sh --execute`
+
+**Step 3: Monitor Execution**
+- If SUCCESS: Continue to Step 4
+- If ERROR: STOP immediately, report error, DO NOT CONTINUE
+
+**Step 4: Read Release Type and Report Success**
+- Read `release_type` from `.prepare_state`
+- Show appropriate success message based on type
+
+**For Beta Releases:**
 ```
-START: User requests execute
-    ↓
-STEP 1: Verify prepare was run
-    ├─ .prepare_state exists → Continue
-    └─ .prepare_state missing → STOP, say "Run prepare first"
-    ↓
-STEP 2: Run execute command
-    Run: ./release/release.sh --execute
-    ↓
-STEP 3: Monitor execution
-    ├─ SUCCESS → Continue to Step 4
-    └─ ERROR → STOP, report error, DO NOT CONTINUE
-    ↓
-STEP 4: Read release type from state file
-    ├─ Type: beta → Show beta success message
-    └─ Type: stable → Show stable success message
-    ↓
-STEP 5: Report success
-    ↓
-    ├─ FOR BETA:
-    │   "✅ Beta release v1.0.0b1 published successfully!
-    │
-    │    The beta is now available:
-    │    - PyPI: https://pypi.org/project/todo-ai/
-    │    - Install: uv tool install --prerelease=allow todo-ai
-    │
-    │    Monitor:
-    │    - GitHub Actions: [link]
-    │    - GitHub Release: [link]
-    │
-    │    After beta testing (7+ days for major), prepare stable release."
-    │
-    └─ FOR STABLE:
-        "✅ Stable release v1.0.0 published successfully!
+✅ Beta release v1.0.0b1 published successfully!
 
-         The release is now available:
-         - PyPI: https://pypi.org/project/todo-ai/
-         - Install: uv tool install todo-ai
+Install: uv tool install --prerelease=allow todo-ai
+Recommended testing: 7+ days for major, 2-3 days for minor
 
-         Monitor:
-         - GitHub Actions: [link]
-         - GitHub Release: [link]"
+Monitor: GitHub Actions and PyPI
+```
+
+**For Stable Releases:**
+```
+✅ Stable release v1.0.0 published successfully!
+
+Install: uv tool install todo-ai
+
+Monitor: GitHub Actions and PyPI
 ```
 
 ---
 
-### 4.3 Error Handling Decision Tree
+### 4.3 Error Handling Rules
 
+**If ANY error occurs during release:**
+
+1. **STOP IMMEDIATELY** - Do not continue
+2. **Report clearly** - Show what failed and error message
+3. **NO WORKAROUNDS** - Do not attempt to fix automatically
+4. **WAIT FOR USER** - Ask how to proceed
+
+**Error Report Format:**
 ```
-IF ERROR OCCURS AT ANY POINT:
-    ↓
-1. STOP IMMEDIATELY
-    ↓
-2. Report error clearly:
-   "❌ ERROR: [What failed]
+❌ ERROR: [What failed]
 
-    Error message:
-    [Actual error output]
+Error message: [Actual error output]
+Step: [Which step failed]
 
-    Step: [Which step failed]"
-    ↓
-3. DO NOT ATTEMPT WORKAROUNDS
-    ↓
-4. DO NOT CONTINUE THE PROCESS
-    ↓
-5. Ask user:
-   "An error occurred during release. How should we proceed?"
-    ↓
-6. WAIT FOR USER INSTRUCTION
+An error occurred during release. How should we proceed?
 ```
-
----
-
-## 4.4 Release Logging (Already in Place)
-
-**Question:** Do we have detailed release logging that tracks all release work?
-
-**Answer:** ✅ **Yes, comprehensive release logging is already implemented.**
-
-### Current Release Logging System
-
-The existing `release/release.sh` script has a robust logging system with the `log_release_step()` function:
-
-**Log Format:**
-```
-TIMESTAMP | USER | STEP | MESSAGE
-```
-
-**What Gets Logged (31 log points):**
-- Release start (version, bump type, files)
-- Bash conversion (zsh → bash)
-- Version updates (all files)
-- Git commits (with full output)
-- Tag creation and verification
-- Push operations (main branch and tag)
-- GitHub release creation
-- Errors and warnings
-- Release completion (with URLs)
-
-**Log Location:**
-- File: `release/RELEASE_LOG.log`
-- Committed to repository after each release
-- Newest entries on top for easy reading
-
-**Example Log Entry:**
-```
-2025-12-12 14:40:07 | fxstein | RELEASE COMPLETE | Release 2.7.3 published successfully! - Tag: v2.7.3 - URL: https://github.com/fxstein/todo.ai/releases/tag/v2.7.3
-2025-12-12 14:40:07 | fxstein | GITHUB RELEASE CREATED | GitHub release created successfully for v2.7.3
-2025-12-12 14:40:01 | fxstein | PUSH TAG | Pushing tag v2.7.3 to origin
-2025-12-12 14:39:59 | fxstein | TAG CREATED | Git tag v2.7.3 created successfully at commit 8ac066d
-2025-12-12 14:39:58 | fxstein | VERSION COMMITTED | Version change committed: [git output]
-2025-12-12 14:39:56 | fxstein | VERSION UPDATED | Version updated successfully
-2025-12-12 14:39:18 | fxstein | RELEASE START | Starting release process: Current 2.7.2 → Proposed 2.7.3
-```
-
-### For Beta Support
-
-**No changes needed to logging system** - it will automatically log beta releases:
-
-```
-2025-XX-XX XX:XX:XX | user | RELEASE START | Starting release process: Current 1.0.0 → Proposed 1.0.0b1 (beta)
-2025-XX-XX XX:XX:XX | user | BETA VERSION | Creating first beta for version 1.0.0
-2025-XX-XX XX:XX:XX | user | RELEASE COMPLETE | Beta release 1.0.0b1 published successfully!
-```
-
-**Advantages:**
-- ✅ Full audit trail of all releases
-- ✅ Easy to debug issues (check log for errors)
-- ✅ Historical record committed to git
-- ✅ User attribution (who ran the release)
-- ✅ Timestamps for beta maturity calculation
-- ✅ Works for both beta and stable releases
-
-**Recommendation:** The existing logging system is production-ready and needs no modifications for beta support.
 
 ---
 
@@ -1100,55 +808,24 @@ TIMESTAMP | USER | STEP | MESSAGE
 
 ## 6 Before/After Comparison
 
-### 6.1 Release Tiers
+| Category | Before (Proposed) | After (Recommended) | Impact |
+|----------|-------------------|---------------------|--------|
+| **Release Tiers** | 4 (Alpha/Beta/RC/Stable) | 2 (Beta/Stable) | ✂️ 50% simpler |
+| **PyPI Targets** | 2 (TestPyPI + PyPI) | 1 (PyPI only) | ✂️ -1 secret, no dep issues |
+| **Version Format** | 2 formats (PEP 440 + SemVer) | 1 format (PEP 440) | ✂️ No conversion logic |
+| **Feature Flags** | New system proposed | Deferred (YAGNI) | ✂️ Less code |
+| **Major Release Safety** | Manual policy | Auto-enforced | 🔒 Cannot skip beta |
+| **Beta Maturity** | Manual tracking | Auto-warned | 🔒 Guidance provided |
+| **Pre-flight Checks** | Partial | 6+ comprehensive | 🔒 Catches issues early |
+| **Version Increment** | Manual | Automatic | 🔒 No duplicate versions |
+| **Command Syntax** | N/A | Same + `--beta` flag | ✅ Backward compatible |
+| **GitHub Actions** | ~25 steps | ~15 steps | ✂️ 40% reduction |
+| **Rollback Strategy** | Yank + hotfix | Forward-fix only | ✂️ Simpler |
 
-| Aspect | Before (Proposed) | After (Recommended) | Impact |
-|--------|-------------------|---------------------|--------|
-| **Tiers** | 4 (Alpha/Beta/RC/Stable) | 2 (Beta/Stable) | ✂️ 50% reduction |
-| **PyPI Targets** | 2 (TestPyPI + PyPI) | 1 (PyPI only) | ✂️ Eliminates TestPyPI complexity |
-| **Version Formats** | 2 (PEP 440 + SemVer) | 1 (PEP 440) | ✂️ No conversion logic |
-| **Feature Flags** | Yes (proposed) | No (YAGNI) | ✂️ Less code complexity |
-
----
-
-### 6.2 Command Complexity
-
-| Task | Before (Proposed) | After (Recommended) |
-|------|-------------------|---------------------|
-| **Create Beta** | `--prepare --beta` | `--prepare --beta` (same) |
-| **Create Stable** | `--prepare` | `--prepare` (same) |
-| **Version Override** | `--set-version X.Y.Z` | `--set-version X.Y.Z` (same) |
-| **Execute** | `--execute` | `--execute` (same) |
-
-**Impact:** ✅ No change to user experience
-
----
-
-### 6.3 Automation & Safety
-
-| Feature | Before (Proposed) | After (Recommended) |
-|---------|-------------------|---------------------|
-| **Major Release Protection** | Manual policy | ✅ Automatic enforcement |
-| **Beta Maturity Warnings** | Manual tracking | ✅ Automatic warnings (never blocks) |
-| **Pre-flight Validation** | Partial | ✅ Comprehensive checklist |
-| **Version Increment** | Manual | ✅ Automatic detection |
-| **Error Prevention** | Basic | ✅ AI decision trees + script validation |
-
-**Impact:** ✅ Significantly reduced human error risk
-
----
-
-### 6.4 Operational Complexity
-
-| Aspect | Before (Proposed) | After (Recommended) | Change |
-|--------|-------------------|---------------------|--------|
-| **Secrets to Manage** | 2 (PyPI + TestPyPI) | 1 (PyPI only) | -50% |
-| **GitHub Actions Steps** | ~25 | ~15 | -40% |
-| **Version Conversion Logic** | Required | Not needed | -100% |
-| **Feature Flag Code** | New system | None | -100% |
-| **Rollback Procedures** | Complex (yank + hotfix) | Simple (forward-fix) | -80% |
-
-**Impact:** ✅ Significantly reduced operational burden
+**Summary:**
+- ✂️ **Simplifications:** 40-50% complexity reduction
+- 🔒 **Hardenings:** 60-70% error risk reduction
+- ✅ **Integration:** Zero breaking changes
 
 ---
 
@@ -1202,159 +879,13 @@ TIMESTAMP | USER | STEP | MESSAGE
 
 ---
 
-## 8 Cursor AI Rules (To Be Added)
+## 8 Cursor AI Rules
 
-### 8.1 Release Decision Making
-
-```markdown
-# Add to .cursorrules or .cursor/rules/todo.ai-releases.mdc
-
-When user says "prepare release" or "release todo.ai":
-
-1. **Always check CI/CD first:**
-   - Run: ./scripts/wait-for-ci.sh
-   - If fails: STOP, report error, wait for user to fix
-
-2. **Determine version bump type:**
-   - Analyze commits (as normal)
-   - Identify: MAJOR, MINOR, or PATCH
-
-3. **For MAJOR bumps:**
-   - Check if beta exists: `gh release list | grep "vX.Y.Zb"`
-   - If NO beta:
-     - STOP and say:
-       "This is a major release (X.Y.Z). Major releases require beta testing.
-
-        To create beta:
-        ./release/release.sh --prepare --beta
-
-        After beta testing, prepare stable release."
-   - If beta EXISTS:
-     - Check beta age
-     - If < 7 days: WARN but proceed anyway
-     - If >= 7 days: Proceed without warning
-
-4. **For MINOR bumps:**
-   - Ask user:
-     "This is a minor release (X.Y.Z).
-
-      Options:
-      a) Create beta first (safer, for significant features)
-      b) Release stable directly (faster, for small additions)
-
-      Which do you prefer?"
-   - Respect user choice
-
-5. **For PATCH bumps:**
-   - Proceed directly to stable (no beta needed)
-
-6. **After prepare completes:**
-   - STOP and show preview
-   - WAIT for user to say "execute release"
-   - NEVER execute automatically
-
-7. **Error handling:**
-   - ANY error → STOP immediately
-   - Report error clearly
-   - Do NOT attempt workarounds
-   - Wait for user instruction
-```
+**Note:** Detailed Cursor AI rules will be added to `.cursor/rules/todo.ai-releases.mdc` during implementation. See Section 4 (Decision Framework) for the logic to encode in these rules.
 
 ---
 
-### 8.2 Beta Release Workflow
-
-**Add to `.cursor/rules/todo.ai-releases.mdc`:**
-
-When user requests beta release:
-
-1. **Verify it makes sense:**
-   - Betas appropriate for: MAJOR or significant MINOR releases
-   - Not needed for: PATCH releases or trivial changes
-
-2. **Execute beta prepare:**
-
-   ```bash
-   ./release/release.sh --prepare --beta
-   ```
-
-3. **After prepare, STOP and say:**
-
-   ```text
-   ✅ Beta release prepared.
-
-   Version: X.Y.ZbN
-   Release notes: release/RELEASE_NOTES.md
-
-   Review the notes, then tell me 'execute release' when ready.
-   ```
-
-4. **When user says execute:**
-
-   ```bash
-   ./release/release.sh --execute
-   ```
-
-5. **After execute succeeds:**
-
-   ```text
-   ✅ Beta release vX.Y.ZbN published!
-
-   Install: uv tool install --prerelease=allow todo-ai
-
-   Recommended testing period: 7+ days for major, 2-3 days for minor
-
-   After testing, prepare stable release with same version.
-   ```
-
-6. **Track beta testing:**
-   - Note the beta version in TODO.md or elsewhere
-   - Remind user of testing period when stable is requested
-
----
-
-## 9 Success Metrics
-
-### 9.1 Simplification Success
-
-**Measure:** Lines of code, complexity
-
-| Metric | Target | How to Measure |
-|--------|--------|----------------|
-| Release script LOC | -20% vs proposed | `wc -l release/release.sh` |
-| GitHub Actions LOC | -40% vs proposed | `wc -l .github/workflows/release.yml` |
-| Documentation pages | -30% vs proposed | `wc -w docs/design/BETA_*.md` |
-| Secrets to manage | 1 (not 2) | GitHub Settings → Secrets |
-
----
-
-### 9.2 Hardening Success
-
-**Measure:** Error prevention, validation coverage
-
-| Metric | Target | How to Measure |
-|--------|--------|----------------|
-| Major releases without beta | 0 | Script enforces (cannot happen) |
-| Pre-flight check coverage | 6+ checks | Count checks in preflight_checks() |
-| Failed releases due to missing validation | 0 | Track release failures |
-| AI agent release errors | < 10% | Monitor AI release attempts |
-
----
-
-### 9.3 User Experience
-
-**Measure:** Adoption, satisfaction
-
-| Metric | Target | How to Measure |
-|--------|--------|----------------|
-| Beta releases created | >= 1 per major | GitHub releases list |
-| Beta testing duration | 7+ days for major | Time between beta and stable |
-| Documentation clarity | Positive feedback | User questions, GitHub discussions |
-| Installation success rate | > 95% | PyPI download stats vs reported issues |
-
----
-
-## 10 Recommendations Summary
+## 9 Recommendations Summary
 
 ### ✂️ Simplifications (Reduce Complexity)
 
@@ -1492,28 +1023,6 @@ pip index versions todo-ai
 | **Documentation only** | ❌ No beta needed | Zero code risk |
 | **Dependency updates** | ⚠️ Beta if major deps | Depends on risk |
 | **Refactoring** | ✅ Beta recommended | Risk of introducing bugs |
-
----
-
-## Appendix C: Comparison Table
-
-### Full Feature Comparison
-
-| Feature | Proposed (v1.1) | Recommended | Improvement |
-|---------|-----------------|-------------|-------------|
-| **Release Tiers** | Alpha/Beta/RC/Stable | Beta/Stable | ✂️ 50% simpler |
-| **Version Format** | PEP 440 + SemVer | PEP 440 only | ✂️ No conversion |
-| **PyPI Targets** | TestPyPI + PyPI | PyPI only | ✂️ -1 secret |
-| **Major Release Safety** | Manual policy | Auto-enforced | 🔒 100% protected |
-| **Beta Maturity** | Manual tracking | Auto-validated | 🔒 Enforced |
-| **Pre-flight Checks** | Basic | Comprehensive | 🔒 6+ checks |
-| **Feature Flags** | Proposed system | Deferred (YAGNI) | ✂️ Less code |
-| **Rollback** | Yank + hotfix | Forward-fix only | ✂️ Simpler |
-| **GitHub Actions** | ~25 steps | ~15 steps | ✂️ 40% simpler |
-| **Documentation** | Extensive | Focused | ✂️ 30% shorter |
-| **Backward Compat** | Yes | Yes | ✅ Preserved |
-| **Two-Phase Process** | Yes | Yes | ✅ Preserved |
-| **Human Review** | Required | Required | ✅ Preserved |
 
 ---
 

@@ -1312,6 +1312,15 @@ execute_release() {
         git add todo.bash
     fi
 
+    # Add uv.lock if it exists (may be modified by pre-commit hooks when version changes)
+    if [[ -f "uv.lock" ]]; then
+        local lock_status=$(git status -s uv.lock 2>/dev/null || echo "")
+        if [[ -n "$lock_status" ]]; then
+            log_release_step "COMMIT UV_LOCK" "Adding uv.lock to commit (modified by version change)"
+            git add uv.lock
+        fi
+    fi
+
     # Create version commit message
     local commit_message="release: Version ${NEW_VERSION}"
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]] && [[ "$summary_needs_commit" == true ]]; then
@@ -1321,19 +1330,29 @@ Includes release summary from ${SUMMARY_FILE}"
     fi
 
     # Commit the version change
-    local commit_output=$(git commit -m "$commit_message" 2>&1 || echo "no commit needed")
-    log_release_step "VERSION COMMITTED" "Version change committed: ${commit_output}"
+    if ! git commit -m "$commit_message" > /dev/null 2>&1; then
+        echo -e "${RED}❌ Error: Failed to commit version changes${NC}"
+        echo -e "${RED}   → Git commit failed${NC}"
+        echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
+        echo -e "${RED}   → Check for pre-commit hook failures or other git errors${NC}"
+        log_release_step "COMMIT ERROR" "Failed to commit version changes"
+        exit 1
+    fi
+    log_release_step "VERSION COMMITTED" "Version change committed successfully"
 
     # Get the commit hash for the version change
-    local version_commit_hash=$(git rev-parse HEAD 2>/dev/null || echo "")
+    local version_commit_hash=$(git rev-parse HEAD 2>/dev/null)
 
-    # Verify version was actually updated in the commit
-    if [[ -n "$version_commit_hash" ]]; then
-        if ! git show "$version_commit_hash":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
-            echo -e "${YELLOW}⚠️  Note: Version in working directory but not yet committed${NC}"
-            echo -e "${YELLOW}   This is expected if version was updated in a previous failed attempt${NC}"
-        fi
+    # Verify we got a commit hash
+    if [[ -z "$version_commit_hash" ]]; then
+        echo -e "${RED}❌ Error: Failed to get commit hash${NC}"
+        echo -e "${RED}   → git rev-parse HEAD failed${NC}"
+        echo -e "${RED}   → Repository may be in an inconsistent state${NC}"
+        log_release_step "COMMIT VERIFY ERROR" "Failed to get commit hash after version commit"
+        exit 1
     fi
+
+    log_release_step "COMMIT HASH" "Version commit hash: ${version_commit_hash}"
 
     # Create and push tag
     TAG="v${NEW_VERSION}"

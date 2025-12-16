@@ -768,6 +768,15 @@ main() {
     echo -e "${BLUE}🚀 Preparing release preview...${NC}"
     echo ""
 
+    # Clean up artifacts from previous prepare attempts to ensure idempotency
+    if [[ -f "todo.bash" ]]; then
+        # Check if todo.bash is uncommitted (indicates it's from a failed prepare)
+        if git status --porcelain 2>/dev/null | grep -q "todo.bash"; then
+            echo -e "${BLUE}🧹 Cleaning up uncommitted todo.bash from previous prepare attempt...${NC}"
+            rm -f todo.bash
+        fi
+    fi
+
     # Check if summary file exists if provided (no prompt, just warn)
     if [[ -n "$SUMMARY_FILE" ]] && [[ ! -f "$SUMMARY_FILE" ]]; then
         echo -e "${YELLOW}⚠️  Warning: Summary file not found: $SUMMARY_FILE (continuing without it)${NC}"
@@ -1030,15 +1039,7 @@ main() {
         echo ""
     fi
 
-    # Convert to bash version
-    if ! convert_to_bash; then
-        echo -e "${RED}❌ Error: Bash conversion failed${NC}"
-        echo -e "${RED}   → See error details above for specifics${NC}"
-        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for issues${NC}"
-        log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
-        exit 1
-    fi
-    log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash"
+    # Note: Bash conversion moved to execute phase to avoid uncommitted files after prepare
 
     # Determine if this is a major release
     local current_major=$(echo "$CURRENT_VERSION" | cut -d'.' -f1)
@@ -1270,6 +1271,18 @@ execute_release() {
     echo -e "${GREEN}✓ Verified version updated in todo.ai, pyproject.toml, and todo_ai/__init__.py${NC}"
     log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai, pyproject.toml, and todo_ai/__init__.py"
 
+    # Convert to bash version (now that version is updated)
+    echo -e "${BLUE}🔄 Converting to bash version...${NC}"
+    if ! convert_to_bash; then
+        echo -e "${RED}❌ Error: Bash conversion failed${NC}"
+        echo -e "${RED}   → See error details above for specifics${NC}"
+        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for issues${NC}"
+        log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
+        exit 1
+    fi
+    log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash with version ${NEW_VERSION}"
+    echo -e "${GREEN}✓ Bash version created${NC}"
+
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
@@ -1330,16 +1343,41 @@ Includes release summary from ${SUMMARY_FILE}"
     git tag -a "$TAG" -m "Release version $NEW_VERSION" "$version_commit_hash" > /dev/null 2>&1
     log_release_step "TAG CREATED" "Git tag ${TAG} created successfully at commit ${version_commit_hash}"
 
-    # Verify tag points to commit with correct version
+    # Verify tag points to commit with correct version (with improved checking)
+    echo -e "${BLUE}🔍 Verifying tag points to correct version...${NC}"
+    local verification_failed=false
+    local verification_errors=""
+
+    # Check todo.ai
     if ! git show "$TAG":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
+        verification_failed=true
+        verification_errors="${verification_errors}\n   ❌ todo.ai: VERSION not found or incorrect"
+    fi
+
+    # Check pyproject.toml
+    if ! git show "$TAG":pyproject.toml 2>/dev/null | grep -q "^version = \"${NEW_VERSION}\""; then
+        verification_failed=true
+        verification_errors="${verification_errors}\n   ❌ pyproject.toml: version not found or incorrect"
+    fi
+
+    # Check todo_ai/__init__.py
+    if ! git show "$TAG":todo_ai/__init__.py 2>/dev/null | grep -q "^__version__ = \"${NEW_VERSION}\""; then
+        verification_failed=true
+        verification_errors="${verification_errors}\n   ❌ todo_ai/__init__.py: __version__ not found or incorrect"
+    fi
+
+    if [[ "$verification_failed" == true ]]; then
         echo -e "${RED}❌ Error: Tag verification failed${NC}"
         echo -e "${RED}   → Tag $TAG does not point to commit with correct version${NC}"
-        echo -e "${RED}   → Expected VERSION=\"${NEW_VERSION}\" in todo.ai${NC}"
-        echo -e "${RED}   → This indicates a git commit/tag mismatch${NC}"
-        echo -e "${RED}   → Run: git tag -d $TAG && retry release${NC}"
-        log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - tag doesn't point to commit with VERSION=${NEW_VERSION} in todo.ai or pyproject.toml"
+        echo -e "${RED}   → Expected version: ${NEW_VERSION}${NC}"
+        echo -e "${RED}${verification_errors}${NC}"
+        echo -e "${RED}   → This indicates version files were not committed correctly${NC}"
+        echo -e "${RED}   → Run: git tag -d $TAG && git reset --soft HEAD~1 && retry release${NC}"
+        log_release_step "TAG VERIFY ERROR" "Tag ${TAG} verification failed - version ${NEW_VERSION} not found in all files"
         exit 1
     fi
+    echo -e "${GREEN}✓ Tag verified - points to commit with version ${NEW_VERSION}${NC}"
+    log_release_step "TAG VERIFIED" "Tag ${TAG} successfully verified - all version files match ${NEW_VERSION}"
 
     echo -e "${BLUE}📤 Pushing to remote...${NC}"
     log_release_step "PUSH MAIN" "Pushing main branch to origin"

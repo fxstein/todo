@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-16 16:35:17 | fxstein | COMPLETE | 173 | Fix release script bugs found during v3.0.0b1 attempt
+2025-12-16 16:35:11 | fxstein | COMPLETE | 173.3 | Fix prepare side effects - leaves dirty working directory
+2025-12-16 16:35:11 | fxstein | COMPLETE | 173.2 | Fix tag verification - fails even when versions are correct
+2025-12-16 16:35:11 | fxstein | COMPLETE | 173.1 | Fix auto-commit logic - doesn't handle bash conversion artifacts properly
+2025-12-16 16:33:04 | fxstein | NOTE | 173.1 | Problem: todo.bash converted during --prepare (line 1034) but only added to git during --execute (lines 1297-1300). Leaves uncommitted file after prepare. Fix: Move bash conversion to execute phase OR commit it during prepare.
 2025-12-16 14:28:05 | fxstein | NOTE | 172.4.1 | FAILED ATTEMPT: Multiple release script bugs found: auto-commit issues, tag verification failures, dirty working directory. PyPI setup also missing. Tag v3.0.0b1 deleted, version reverted. Created task#173 (release bugs) and task#174 (PyPI setup) to fix before retry.
 2025-12-16 14:27:53 | fxstein | ADD_SUBTASK | 174.4 | Test PyPI authentication with manual upload (parent: #174)
 2025-12-16 14:27:53 | fxstein | ADD_SUBTASK | 174.3 | Add PYPI_API_TOKEN to GitHub secrets (parent: #174)

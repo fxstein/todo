@@ -8,10 +8,11 @@
   - [ ] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup`
   - [ ] **#174.2** Generate PyPI API token with upload permissions `#setup`
   - [ ] **#174.1** Create PyPI account and todo-ai project (if not exists) `#setup`
-- [ ] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
-  - [ ] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug`
-  - [ ] **#173.2** Fix tag verification - fails even when versions are correct `#bug`
-  - [ ] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug`
+- [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
+  - [x] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug`
+  - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug`
+  - [x] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug`
+    > Problem: todo.bash converted during --prepare (line 1034) but only added to git during --execute (lines 1297-1300). Leaves uncommitted file after prepare. Fix: Move bash conversion to execute phase OR commit it during prepare.
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -1046,6 +1047,6 @@
 
 ---
 
-**Last Updated:** Tue Dec 16 14:28:05 CET 2025
+**Last Updated:** Tue Dec 16 16:35:17 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

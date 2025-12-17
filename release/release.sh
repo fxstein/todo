@@ -572,17 +572,17 @@ generate_release_notes() {
     fi
 
     local repo_url=$(get_repo_url)
-    local temp_notes=$(mktemp)
+    local notes_file="release/RELEASE_NOTES.md"
 
-    echo "## Release ${new_version}" > "$temp_notes"
-    echo "" >> "$temp_notes"
+    echo "## Release ${new_version}" > "$notes_file"
+    echo "" >> "$notes_file"
 
     # Add AI-generated summary if provided
     if [[ -n "$summary_file" ]] && [[ -f "$summary_file" ]]; then
-        echo "$(cat "$summary_file")" >> "$temp_notes"
-        echo "" >> "$temp_notes"
-        echo "---" >> "$temp_notes"
-        echo "" >> "$temp_notes"
+        echo "$(cat "$summary_file")" >> "$notes_file"
+        echo "" >> "$notes_file"
+        echo "---" >> "$notes_file"
+        echo "" >> "$notes_file"
     fi
 
     # Categorize commits
@@ -628,34 +628,34 @@ generate_release_notes() {
 
     # Write categorized commits
     if [[ ${#breaking_commits[@]} -gt 0 ]]; then
-        echo "### 🔴 Breaking Changes" >> "$temp_notes"
-        echo "" >> "$temp_notes"
-        printf '%s\n' "${breaking_commits[@]}" >> "$temp_notes"
-        echo "" >> "$temp_notes"
+        echo "### 🔴 Breaking Changes" >> "$notes_file"
+        echo "" >> "$notes_file"
+        printf '%s\n' "${breaking_commits[@]}" >> "$notes_file"
+        echo "" >> "$notes_file"
     fi
 
     if [[ ${#feature_commits[@]} -gt 0 ]]; then
-        echo "### ✨ Features" >> "$temp_notes"
-        echo "" >> "$temp_notes"
-        printf '%s\n' "${feature_commits[@]}" >> "$temp_notes"
-        echo "" >> "$temp_notes"
+        echo "### ✨ Features" >> "$notes_file"
+        echo "" >> "$notes_file"
+        printf '%s\n' "${feature_commits[@]}" >> "$notes_file"
+        echo "" >> "$notes_file"
     fi
 
     if [[ ${#fix_commits[@]} -gt 0 ]]; then
-        echo "### 🐛 Bug Fixes" >> "$temp_notes"
-        echo "" >> "$temp_notes"
-        printf '%s\n' "${fix_commits[@]}" >> "$temp_notes"
-        echo "" >> "$temp_notes"
+        echo "### 🐛 Bug Fixes" >> "$notes_file"
+        echo "" >> "$notes_file"
+        printf '%s\n' "${fix_commits[@]}" >> "$notes_file"
+        echo "" >> "$notes_file"
     fi
 
     if [[ ${#other_commits[@]} -gt 0 ]]; then
-        echo "### 🔧 Other Changes" >> "$temp_notes"
-        echo "" >> "$temp_notes"
-        printf '%s\n' "${other_commits[@]}" >> "$temp_notes"
-        echo "" >> "$temp_notes"
+        echo "### 🔧 Other Changes" >> "$notes_file"
+        echo "" >> "$notes_file"
+        printf '%s\n' "${other_commits[@]}" >> "$notes_file"
+        echo "" >> "$notes_file"
     fi
 
-    echo "$temp_notes"
+    echo "$notes_file"
 }
 
 # Update version in todo.ai, pyproject.toml, and todo_ai/__init__.py
@@ -1313,6 +1313,13 @@ execute_release() {
         git add "$SUMMARY_FILE"
     fi
 
+    # Commit release notes file (generated from summary + commits)
+    # This file will be used by CI/CD workflow to create the GitHub release
+    if [[ -f "release/RELEASE_NOTES.md" ]]; then
+        log_release_step "COMMIT RELEASE_NOTES" "Adding release notes file to commit: release/RELEASE_NOTES.md"
+        git add release/RELEASE_NOTES.md
+    fi
+
     # Commit TODO.md and .todo.ai files if they're uncommitted (they should always be committed together)
     local todo_status=$(git status -s | grep -E "(TODO\.md|\.todo\.ai/)" || echo "")
     if [[ -n "$todo_status" ]]; then
@@ -1458,73 +1465,12 @@ Includes release summary from ${SUMMARY_FILE}"
     log_release_step "PUSH TAG" "Pushing tag ${TAG} to origin"
     git push origin "$TAG" > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push tag ${TAG}"
 
-    # Create GitHub release with assets
-    echo -e "${BLUE}📦 Creating GitHub release with assets...${NC}"
-    log_release_step "CREATE GITHUB RELEASE" "Creating GitHub release for tag ${TAG} with assets: todo.ai, todo.bash, install.sh"
-
-    # Verify assets exist
-    if [[ ! -f "todo.ai" ]]; then
-        echo -e "${RED}❌ Error: todo.ai not found${NC}"
-        echo -e "${RED}   → The main script file is missing${NC}"
-        echo -e "${RED}   → Ensure you're running from the repository root${NC}"
-        exit 1
-    fi
-    if [[ ! -f "todo.bash" ]]; then
-        echo -e "${RED}❌ Error: todo.bash not found (should have been created by prepare step)${NC}"
-        echo -e "${RED}   → The bash conversion was not completed${NC}"
-        echo -e "${RED}   → Run prepare again: ./release/release.sh --prepare${NC}"
-        exit 1
-    fi
-    if [[ ! -f "install.sh" ]]; then
-        echo -e "${RED}❌ Error: install.sh not found${NC}"
-        echo -e "${RED}   → The installer script is missing${NC}"
-        echo -e "${RED}   → Ensure you're running from the repository root${NC}"
-        exit 1
-    fi
-
-    echo -e "  ${GREEN}✓ todo.ai (zsh version)${NC}"
-    echo -e "  ${GREEN}✓ todo.bash (bash version)${NC}"
-    echo -e "  ${GREEN}✓ install.sh (smart installer)${NC}"
-
-    # Temporarily disable set -e to capture error
-    set +e
-    # Check if release already exists (shouldn't happen, but handle gracefully)
-    if gh release view "$TAG" > /dev/null 2>&1; then
-        echo -e "${YELLOW}⚠️  Release ${TAG} already exists, attaching assets...${NC}"
-        log_release_step "GITHUB RELEASE EXISTS" "Release ${TAG} already exists, attaching shell script assets"
-        local release_output=$(gh release upload "$TAG" \
-            todo.ai \
-            todo.bash \
-            install.sh \
-            --clobber 2>&1)
-        local release_status=$?
-    else
-        # Create new release with shell script assets
-        # Note: GitHub Actions workflow will attach Python package (dist/*) after PyPI publish
-        local release_output=$(gh release create "$TAG" \
-            --title "$NEW_VERSION" \
-            --notes-file "$RELEASE_NOTES_FILE" \
-            todo.ai \
-            todo.bash \
-            install.sh 2>&1)
-        local release_status=$?
-    fi
-    set -e
-
-    if [[ $release_status -eq 0 ]]; then
-        log_release_step "GITHUB RELEASE CREATED" "GitHub release created/updated successfully for ${TAG}\nOutput: ${release_output}\nNote: Python package will be attached by GitHub Actions workflow"
-        echo -e "${GREEN}✓ GitHub release created/updated${NC}"
-        echo -e "${BLUE}  Note: Python package (dist/*) will be automatically attached by CI/CD workflow${NC}"
-    else
-        log_release_step "GITHUB RELEASE ERROR" "Failed to create/update GitHub release for ${TAG}\nError: ${release_output}\nExit code: ${release_status}"
-        echo -e "${RED}⚠️  Warning: GitHub release creation failed${NC}"
-        echo "Error: ${release_output}"
-        echo "Check the release log: ${RELEASE_LOG}"
-        echo "Try manually: gh release view ${TAG} || gh release create ${TAG} --title ${NEW_VERSION} --notes-file <file>"
-    fi
-
-    # Cleanup
-    rm -f "$RELEASE_NOTES_FILE"
+    # Note: GitHub release creation has been moved to CI/CD workflow
+    # This ensures the release is only created AFTER successful PyPI publication
+    # The workflow will create the release and attach all assets (shell scripts + Python dist)
+    # The release notes file (release/RELEASE_NOTES.md) is committed so the workflow can use it
+    echo -e "${BLUE}📦 GitHub release will be created by CI/CD workflow after successful PyPI publish${NC}"
+    log_release_step "GITHUB RELEASE" "GitHub release creation delegated to CI/CD workflow (after PyPI success)"
 
     local repo_url=$(get_repo_url)
     log_release_step "RELEASE COMPLETE" "Release ${NEW_VERSION} published successfully!

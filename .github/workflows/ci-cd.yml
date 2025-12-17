@@ -1,8 +1,12 @@
-name: CI
+name: CI/CD
+
+# Single workflow for CI and Release with mandatory dependencies
+# This ensures releases CANNOT happen unless ALL CI checks pass
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
     branches: [main]
 
@@ -201,3 +205,67 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
+
+  release:
+    name: Build and Publish Release
+    # CRITICAL: Release depends on ALL CI checks passing
+    needs: [quality, test-comprehensive, test-quick]
+    # Only run on tag pushes (releases)
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect pre-release type
+        id: prerelease
+        run: |
+          TAG="${{ github.ref_name }}"
+          # Simple regex: if tag ends with 'b' + digits, it's a beta
+          if [[ "$TAG" =~ b[0-9]+$ ]]; then
+            echo "type=beta" >> $GITHUB_OUTPUT
+            echo "is_prerelease=true" >> $GITHUB_OUTPUT
+          else
+            echo "type=stable" >> $GITHUB_OUTPUT
+            echo "is_prerelease=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --all-extras
+
+      - name: Build package
+        run: uv run python -m build
+
+      - name: Check package
+        run: uv run twine check dist/*
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
+          verbose: true
+
+      - name: Attach Python package to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*
+          # Don't generate notes - release.sh already created the release with notes
+          # This action will attach files to the existing release created by release.sh
+          draft: false
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

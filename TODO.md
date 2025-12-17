@@ -3,6 +3,7 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure`
 - [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure`
   - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure`
   - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure`
@@ -1057,6 +1058,6 @@
 
 ---
 
-**Last Updated:** Wed Dec 17 00:42:05 CET 2025
+**Last Updated:** Wed Dec 17 08:31:02 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

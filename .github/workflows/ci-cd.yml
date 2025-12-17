@@ -3,7 +3,7 @@ name: CI/CD
 # Single workflow for CI and Release with mandatory dependencies
 # This ensures releases CANNOT happen unless ALL CI checks pass
 
-run-name: ${{ github.ref_type == 'tag' && format('📦 Release {0}', github.ref_name) || '🔧 CI/CD' }}
+run-name: ${{ github.ref_type == 'tag' && format('📦 Release {0}', github.ref_name) || github.event.head_commit.message }}
 
 on:
   push:

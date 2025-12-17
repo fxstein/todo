@@ -1348,7 +1348,7 @@ execute_release() {
     fi
 
     # Create version commit message
-    local commit_message="release: Version ${NEW_VERSION}"
+    local commit_message="chore: Bump version to ${NEW_VERSION}"
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]] && [[ "$summary_needs_commit" == true ]]; then
         commit_message="${commit_message}
 

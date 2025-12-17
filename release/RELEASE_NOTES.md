@@ -20,6 +20,8 @@ This is a beta release to gather feedback on the Python refactor before stable r
 
 ### ✨ Features
 
+- Implement clean release dependencies with Python PEP 440 validation ([7305dd0](https://github.com/fxstein/todo.ai/commit/7305dd03402500e8973c79d277520655ba665894))
+- Fix release workflow dependencies and sequencing (task#177) ([7443ce9](https://github.com/fxstein/todo.ai/commit/7443ce9cefe5f07aa9069803ef410d60ae428d0e))
 - Improve workflow run naming and version commit message ([7268a41](https://github.com/fxstein/todo.ai/commit/7268a4118e7bd29b04d6baf211e45d31db5be319))
 - Add dynamic workflow names with emojis for clarity (task#177) ([450c7fe](https://github.com/fxstein/todo.ai/commit/450c7fe42951c1132d2b5d91fe761e8e56ca52ab))
 - Add three-layer defense against forbidden flags (task#175) ([1b603bf](https://github.com/fxstein/todo.ai/commit/1b603bfbf5cc85ae9501bd86502947368e9eadf5))
@@ -39,6 +41,8 @@ This is a beta release to gather feedback on the Python refactor before stable r
 
 ### 🔧 Other Changes
 
+- chore: Reset version to 3.0.0b1 to retest release with new dependencies ([9f19547](https://github.com/fxstein/todo.ai/commit/9f19547709cc5fe9dbe96bf6a62dd469249a194a))
+- chore: Bump version to 3.0.0b2 ([987b8c2](https://github.com/fxstein/todo.ai/commit/987b8c22f7c7a89b1f73c3b3674704ca4875a87a))
 - chore: Reset version to 3.0.0b1 for release retest ([88f329a](https://github.com/fxstein/todo.ai/commit/88f329a3bf9a315d99e80936a1972402017052b0))
 - chore: Revert version to 3.0.0b1 for release process testing ([f8d0ad0](https://github.com/fxstein/todo.ai/commit/f8d0ad0bcff7f5c843b091600b77a3321494ec18))
 - docs: Update release summary to focus on Python refactor, not process ([a442e0b](https://github.com/fxstein/todo.ai/commit/a442e0b4c5d7c55efdcaf79e454efe91060f13ce))

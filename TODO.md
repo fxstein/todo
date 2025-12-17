@@ -3,7 +3,7 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure`
+- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure`
   - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure`
   - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure`
   - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure`
@@ -1062,6 +1062,6 @@
 
 ---
 
-**Last Updated:** Wed Dec 17 22:07:35 CET 2025
+**Last Updated:** Wed Dec 17 22:47:00 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

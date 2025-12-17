@@ -1,7 +1,8 @@
-name: CI/CD
+name: ${{ github.ref_type == 'tag' && format('📦 Release {0}', github.ref_name) || '🔧 CI/CD' }}
 
 # Single workflow for CI and Release with mandatory dependencies
 # This ensures releases CANNOT happen unless ALL CI checks pass
+# Note: Tag pushes show as "📦 Release vX.Y.Z", branch pushes show as "🔧 CI/CD"
 
 on:
   push:

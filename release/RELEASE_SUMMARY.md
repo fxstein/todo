@@ -1,10 +1,8 @@
-This major release transforms todo.ai from a shell script into a modern Python-based tool with dual interfaces: a command-line tool and an MCP server for AI agent integration. The Python implementation provides 100% feature parity with the shell version while adding significant improvements in performance, reliability, and extensibility.
+This second beta release hardens the release infrastructure and implements critical safeguards discovered during the v3.0.0b1 release. While b1 successfully validated the Python refactor and MCP server functionality, the release process itself revealed several critical flaws that are now fixed.
 
-The new architecture includes a `todo-ai` CLI command that maintains full compatibility with existing workflows, plus a `todo-ai-mcp` server that enables seamless integration with AI agents like Cursor. The tool is now installable via modern package managers (uv, pipx, pip) and includes comprehensive test coverage (150+ automated tests), migration support for shell version users, and improved error handling throughout.
+Key improvements include 12 release script bug fixes (commit retry logic, version verification, pre-commit hook handling), a three-layer defense system preventing dangerous git flags from entering the codebase (pre-commit hooks, pytest tests, CI/CD checks), and enforcement of CI/CD dependencies ensuring releases cannot publish to PyPI unless all quality checks and tests pass. The release process now runs pre-commit hooks proactively before staging files, eliminating formatting issues.
 
-Key improvements include 10x faster performance for large TODO files, comprehensive validation and error messages, automated migration system for upgrades, GitHub Issues coordination support, and cross-platform compatibility (macOS, Linux, Windows WSL2). The implementation uses modern Python tooling with uv for package management, includes pre-commit hooks for code quality, and maintains backward compatibility with existing TODO.md files.
-
-This is a beta release to gather feedback on the Python refactor before stable release. The shell script (v2.x) remains available but is now legacy. Install with `uv tool install --prerelease=allow todo-ai` and report any issues via `todo-ai report-bug`.
+This beta demonstrates the hardened infrastructure and validates that the quality gates work as designed. The underlying Python CLI and MCP server remain stable from b1, with 100% feature parity, comprehensive test coverage, and production-ready performance.
 
 **Documentation:**
 - [Getting Started Guide](https://github.com/fxstein/todo.ai/blob/main/docs/guides/GETTING_STARTED.md) - Quick start and basic usage

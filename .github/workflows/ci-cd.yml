@@ -208,10 +208,57 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
+  # Pre-release job: Wait for commit's CI to complete before releasing
+  check-commit-ci:
+    name: Wait for Commit CI
+    # Only run on tag pushes
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for commit's CI workflow to complete
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          echo "Tag: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo ""
+          echo "Waiting for CI workflow on this commit to complete..."
+
+          # Wait up to 10 minutes for the commit's CI to complete
+          timeout=600
+          elapsed=0
+          interval=10
+
+          while [ $elapsed -lt $timeout ]; do
+            # Check if there's a successful CI run for this commit on main branch
+            status=$(gh run list \
+              --commit ${{ github.sha }} \
+              --branch main \
+              --workflow ci-cd.yml \
+              --json conclusion \
+              --jq '.[0].conclusion // "pending"')
+
+            echo "CI status for commit: $status"
+
+            if [ "$status" = "success" ]; then
+              echo "✅ CI passed for this commit"
+              exit 0
+            elif [ "$status" = "failure" ] || [ "$status" = "cancelled" ]; then
+              echo "❌ CI failed for this commit: $status"
+              exit 1
+            fi
+
+            sleep $interval
+            elapsed=$((elapsed + interval))
+          done
+
+          echo "❌ Timeout waiting for CI to complete"
+          exit 1
+
   release:
     name: Build and Publish Release
-    # CRITICAL: Release depends on ALL CI checks passing
-    needs: [quality, test-comprehensive, test-quick]
+    # CRITICAL: Release depends on commit's CI passing first
+    needs: [check-commit-ci]
     # Only run on tag pushes (releases)
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest

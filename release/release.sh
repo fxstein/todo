@@ -1472,6 +1472,45 @@ Includes release summary from ${SUMMARY_FILE}"
     echo -e "${BLUE}📦 GitHub release will be created by CI/CD workflow after successful PyPI publish${NC}"
     log_release_step "GITHUB RELEASE" "GitHub release creation delegated to CI/CD workflow (after PyPI success)"
 
+    # Wait for the release workflow to complete
+    echo -e "${BLUE}⏳ Waiting for release workflow to complete...${NC}"
+    log_release_step "WAIT WORKFLOW" "Waiting for GitHub Actions release workflow to complete"
+
+    # Give GitHub a moment to register the workflow run
+    sleep 5
+
+    # Wait for the workflow triggered by this tag
+    local wait_start=$(date +%s)
+    local timeout=600  # 10 minutes
+    local workflow_status=""
+
+    while true; do
+        # Check if we've exceeded timeout
+        local elapsed=$(($(date +%s) - wait_start))
+        if [ $elapsed -ge $timeout ]; then
+            echo -e "${RED}❌ Timeout waiting for release workflow${NC}"
+            log_release_step "WORKFLOW TIMEOUT" "Release workflow did not complete within ${timeout} seconds"
+            exit 1
+        fi
+
+        # Get the release workflow status for this tag
+        workflow_status=$(gh run list --branch "${TAG}" --workflow ci-cd.yml --limit 1 --json conclusion --jq '.[0].conclusion // "pending"' 2>/dev/null || echo "pending")
+
+        if [[ "$workflow_status" == "success" ]]; then
+            echo -e "${GREEN}✓ Release workflow completed successfully${NC}"
+            log_release_step "WORKFLOW SUCCESS" "GitHub Actions release workflow completed successfully"
+            break
+        elif [[ "$workflow_status" == "failure" ]] || [[ "$workflow_status" == "cancelled" ]]; then
+            echo -e "${RED}❌ Release workflow failed: ${workflow_status}${NC}"
+            echo -e "${RED}   → Check: gh run list --branch ${TAG}${NC}"
+            log_release_step "WORKFLOW FAILED" "GitHub Actions release workflow failed: ${workflow_status}"
+            exit 1
+        else
+            echo -e "${BLUE}   Status: ${workflow_status} (${elapsed}s elapsed)${NC}"
+            sleep 10
+        fi
+    done
+
     local repo_url=$(get_repo_url)
     log_release_step "RELEASE COMPLETE" "Release ${NEW_VERSION} published successfully!
 - Tag: ${TAG}
@@ -1479,6 +1518,7 @@ Includes release summary from ${SUMMARY_FILE}"
 - Release log: ${RELEASE_LOG}"
 
     # Commit and push RELEASE_LOG.log at the very end to capture all release operations
+    # This happens AFTER the release workflow succeeds
     # Note: We don't log these operations since they happen after the log is committed
     if [[ -f "$RELEASE_LOG" ]]; then
         echo -e "${BLUE}📋 Committing release log...${NC}"

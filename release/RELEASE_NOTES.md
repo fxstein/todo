@@ -20,10 +20,14 @@ This is a beta release to gather feedback on the Python refactor before stable r
 
 ### ✨ Features
 
+- Improve workflow run naming and version commit message ([7268a41](https://github.com/fxstein/todo.ai/commit/7268a4118e7bd29b04d6baf211e45d31db5be319))
+- Add dynamic workflow names with emojis for clarity (task#177) ([450c7fe](https://github.com/fxstein/todo.ai/commit/450c7fe42951c1132d2b5d91fe761e8e56ca52ab))
 - Add three-layer defense against forbidden flags (task#175) ([1b603bf](https://github.com/fxstein/todo.ai/commit/1b603bfbf5cc85ae9501bd86502947368e9eadf5))
 
 ### 🐛 Bug Fixes
 
+- Use run-name instead of name for dynamic workflow titles ([ac483de](https://github.com/fxstein/todo.ai/commit/ac483de6e3e9268703b1ce5174d4fc83654f6137))
+- Add environment field for PyPI Trusted Publisher (task#177.1) ([f1ec156](https://github.com/fxstein/todo.ai/commit/f1ec1563d9f0380a98226b6fd8bd096b99ae7935))
 - Move GitHub release creation to workflow (after PyPI success) (task#177.2, task#177.3) ([c58526d](https://github.com/fxstein/todo.ai/commit/c58526dda65b3d7bd2554d7a6cea5eac9d29326a))
 - Merge CI and Release workflows with mandatory dependencies (task#176) CRITICAL ([1ca2563](https://github.com/fxstein/todo.ai/commit/1ca2563eeb8350d0726cc8d0fe8870f87f18d485))
 - Skip bash script test on Windows (task#175) ([700bd6f](https://github.com/fxstein/todo.ai/commit/700bd6f60284f32121ff6e015ec3368f6b30286d))
@@ -35,6 +39,7 @@ This is a beta release to gather feedback on the Python refactor before stable r
 
 ### 🔧 Other Changes
 
+- chore: Reset version to 3.0.0b1 for release retest ([88f329a](https://github.com/fxstein/todo.ai/commit/88f329a3bf9a315d99e80936a1972402017052b0))
 - chore: Revert version to 3.0.0b1 for release process testing ([f8d0ad0](https://github.com/fxstein/todo.ai/commit/f8d0ad0bcff7f5c843b091600b77a3321494ec18))
 - docs: Update release summary to focus on Python refactor, not process ([a442e0b](https://github.com/fxstein/todo.ai/commit/a442e0b4c5d7c55efdcaf79e454efe91060f13ce))
 - chore: Add AI release summary for v3.0.0b2 ([4456c0b](https://github.com/fxstein/todo.ai/commit/4456c0b97254345049d104151043ca886508d9a6))

@@ -213,6 +213,7 @@ jobs:
     # Only run on tag pushes (releases)
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    environment: release # Required for PyPI Trusted Publisher
     permissions:
       contents: write
       id-token: write

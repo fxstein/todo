@@ -6,7 +6,7 @@
 - [ ] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure`
   - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure`
   - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure`
-  - [ ] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure`
+  - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure`
 - [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure`
 - [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure`
   - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure`
@@ -1062,6 +1062,6 @@
 
 ---
 
-**Last Updated:** Wed Dec 17 21:52:23 CET 2025
+**Last Updated:** Wed Dec 17 22:07:35 CET 2025
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

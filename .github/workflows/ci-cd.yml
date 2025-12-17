@@ -234,7 +234,7 @@ jobs:
           pip install packaging
 
           # Validate PEP 440 format and check if it's a pre-release
-          python << 'EOF'
+          python << EOF
           import sys
           from packaging.version import Version, InvalidVersion
 

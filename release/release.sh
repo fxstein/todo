@@ -1458,10 +1458,54 @@ Includes release summary from ${SUMMARY_FILE}"
     echo -e "${GREEN}✓ Tag verified - points to commit with version ${NEW_VERSION}${NC}"
     log_release_step "TAG VERIFIED" "Tag ${TAG} successfully verified - all version files match ${NEW_VERSION}"
 
-    echo -e "${BLUE}📤 Pushing to remote...${NC}"
+    echo -e "${BLUE}📤 Pushing version commit to remote...${NC}"
     log_release_step "PUSH MAIN" "Pushing main branch to origin"
     git push origin main > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push main branch"
 
+    # Wait for CI to pass on the version commit before pushing tag
+    # This ensures the release workflow has a validated commit to work with
+    echo -e "${BLUE}⏳ Waiting for CI to pass on version commit...${NC}"
+    log_release_step "WAIT CI" "Waiting for CI workflow to pass on version commit"
+
+    local commit_sha=$(git rev-parse HEAD)
+    local wait_start=$(date +%s)
+    local timeout=600  # 10 minutes
+    local ci_status=""
+
+    while true; do
+        # Check if we've exceeded timeout
+        local elapsed=$(($(date +%s) - wait_start))
+        if [ $elapsed -ge $timeout ]; then
+            echo -e "${RED}❌ Timeout waiting for CI${NC}"
+            log_release_step "CI TIMEOUT" "CI did not complete within ${timeout} seconds"
+            exit 1
+        fi
+
+        # Check CI status for this commit on main branch
+        ci_status=$(gh run list \
+            --commit "$commit_sha" \
+            --branch main \
+            --workflow ci-cd.yml \
+            --limit 1 \
+            --json conclusion \
+            --jq '.[0].conclusion // "pending"' 2>/dev/null || echo "pending")
+
+        if [[ "$ci_status" == "success" ]]; then
+            echo -e "${GREEN}✓ CI passed for version commit${NC}"
+            log_release_step "CI SUCCESS" "CI workflow passed for version commit"
+            break
+        elif [[ "$ci_status" == "failure" ]] || [[ "$ci_status" == "cancelled" ]]; then
+            echo -e "${RED}❌ CI failed for version commit: ${ci_status}${NC}"
+            echo -e "${RED}   → Check: gh run list --commit ${commit_sha}${NC}"
+            log_release_step "CI FAILED" "CI workflow failed for version commit: ${ci_status}"
+            exit 1
+        else
+            echo -e "${BLUE}   CI status: ${ci_status} (${elapsed}s elapsed)${NC}"
+            sleep 10
+        fi
+    done
+
+    echo -e "${BLUE}📤 Pushing tag to remote...${NC}"
     log_release_step "PUSH TAG" "Pushing tag ${TAG} to origin"
     git push origin "$TAG" > /dev/null 2>&1 || log_release_step "PUSH ERROR" "Failed to push tag ${TAG}"
 

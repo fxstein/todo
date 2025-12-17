@@ -208,57 +208,87 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-  # Pre-release job: Wait for commit's CI to complete before releasing
-  check-commit-ci:
-    name: Wait for Commit CI
+  # Validate release version using Python's packaging library
+  validate-release:
+    name: Validate Release Version
     # Only run on tag pushes
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.validate.outputs.version }}
+      is_prerelease: ${{ steps.validate.outputs.is_prerelease }}
     steps:
-      - name: Wait for commit's CI workflow to complete
+      - name: Validate PEP 440 version and check commit CI
+        id: validate
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          echo "Tag: ${{ github.ref_name }}"
-          echo "Commit: ${{ github.sha }}"
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"  # Remove 'v' prefix
+
+          echo "Tag: $TAG"
+          echo "Version: $VERSION"
           echo ""
-          echo "Waiting for CI workflow on this commit to complete..."
 
-          # Wait up to 10 minutes for the commit's CI to complete
-          timeout=600
-          elapsed=0
-          interval=10
+          # Install packaging library
+          pip install packaging
 
-          while [ $elapsed -lt $timeout ]; do
-            # Check if there's a successful CI run for this commit on main branch
-            status=$(gh run list \
-              --commit ${{ github.sha }} \
-              --branch main \
-              --workflow ci-cd.yml \
-              --json conclusion \
-              --jq '.[0].conclusion // "pending"')
+          # Validate PEP 440 format and check if it's a pre-release
+          python << 'EOF'
+          import sys
+          from packaging.version import Version, InvalidVersion
 
-            echo "CI status for commit: $status"
+          try:
+              v = Version("$VERSION")
 
-            if [ "$status" = "success" ]; then
-              echo "✅ CI passed for this commit"
-              exit 0
-            elif [ "$status" = "failure" ] || [ "$status" = "cancelled" ]; then
-              echo "❌ CI failed for this commit: $status"
-              exit 1
-            fi
+              # Block dev and post releases (not intended for public release)
+              if v.is_devrelease:
+                  print("❌ Dev releases (.dev) are not allowed")
+                  sys.exit(1)
+              if v.is_postrelease:
+                  print("❌ Post releases (.post) are not allowed")
+                  sys.exit(1)
 
-            sleep $interval
-            elapsed=$((elapsed + interval))
-          done
+              # Determine if pre-release
+              is_prerelease = "true" if v.is_prerelease else "false"
 
-          echo "❌ Timeout waiting for CI to complete"
-          exit 1
+              print(f"✅ Valid PEP 440 version: {v}")
+              print(f"   Pre-release: {is_prerelease}")
+
+              # Output for GitHub Actions
+              with open("$GITHUB_OUTPUT", "a") as f:
+                  f.write(f"version={v}\n")
+                  f.write(f"is_prerelease={is_prerelease}\n")
+
+          except InvalidVersion as e:
+              print(f"❌ Invalid PEP 440 version: {e}")
+              sys.exit(1)
+          EOF
+
+          echo ""
+          echo "Checking if commit's CI passed..."
+
+          # Quick check using commit status API (no polling)
+          status=$(gh api repos/${{ github.repository }}/commits/${{ github.sha }}/status --jq '.state' 2>/dev/null || echo "unknown")
+
+          echo "Commit CI status: $status"
+
+          if [ "$status" != "success" ]; then
+            echo "❌ CI has not passed for this commit"
+            echo "   This usually means:"
+            echo "   - Manual tag push before CI completed"
+            echo "   - CI failed on the commit"
+            echo ""
+            echo "   Use 'release.sh' which waits for CI before pushing tags"
+            exit 1
+          fi
+
+          echo "✅ CI passed for this commit"
 
   release:
     name: Build and Publish Release
-    # CRITICAL: Release depends on commit's CI passing first
-    needs: [check-commit-ci]
+    # CRITICAL: Release depends on version validation and CI check
+    needs: [validate-release]
     # Only run on tag pushes (releases)
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -271,18 +301,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Detect pre-release type
-        id: prerelease
-        run: |
-          TAG="${{ github.ref_name }}"
-          # Simple regex: if tag ends with 'b' + digits, it's a beta
-          if [[ "$TAG" =~ b[0-9]+$ ]]; then
-            echo "type=beta" >> $GITHUB_OUTPUT
-            echo "is_prerelease=true" >> $GITHUB_OUTPUT
-          else
-            echo "type=stable" >> $GITHUB_OUTPUT
-            echo "is_prerelease=false" >> $GITHUB_OUTPUT
-          fi
+      # Pre-release flag comes from validation job (uses Python packaging library)
+      # No need to detect again - just use the validated value
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
@@ -320,6 +340,6 @@ jobs:
           # Read release notes from file (generated by release.sh with AI summary + commits)
           body_path: release/RELEASE_NOTES.md
           draft: false
-          prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
+          prerelease: ${{ needs.validate-release.outputs.is_prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

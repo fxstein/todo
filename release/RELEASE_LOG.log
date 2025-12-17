@@ -2,6 +2,16 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-17 22:00:54 | fxstein | HOOK MODIFICATIONS | Pre-commit hooks modified: release/RELEASE_LOG.log release/RELEASE_NOTES.md todo.bash uv.lock
+2025-12-17 22:00:46 | fxstein | COMMIT RELEASE_NOTES | Adding release notes file to commit: release/RELEASE_NOTES.md
+2025-12-17 22:00:46 | fxstein | COMMIT VERSION | Committing version change to git
+2025-12-17 22:00:45 | fxstein | BASH CONVERSION | Successfully converted todo.ai to todo.bash with version 3.0.0b2
+2025-12-17 22:00:45 | fxstein | VERSION UPDATED | Version updated successfully in todo.ai, pyproject.toml, and todo_ai/__init__.py
+2025-12-17 22:00:44 | fxstein | UPDATE VERSION | Updating version in todo.ai, pyproject.toml, and todo_ai/__init__.py from 3.0.0b1 to 3.0.0b2
+2025-12-17 22:00:44 | fxstein | PREFLIGHT PASSED | All 5 pre-flight checks passed
+2025-12-17 22:00:09 | fxstein | PREPARE | Release preview prepared for v3.1.0b1 (beta)
+2025-12-17 22:00:09 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b1 - File version (todo.ai): 3.0.0b1 - Proposed version: 3.1.0b1 - Release type: beta - Bump type: minor - Last tag: v3.0.0b1 - Summary file: release/RELEASE_SUMMARY.md
+2025-12-17 22:00:08 | fxstein | BETA VERSION | No existing betas found for 3.1.0, using b1
 2025-12-17 12:16:08 | fxstein | RELEASE COMPLETE | Release 3.0.0b2 published successfully! - Tag: v3.0.0b2 - URL: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0b2 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
 2025-12-17 12:16:07 | fxstein | GITHUB RELEASE CREATED | GitHub release created/updated successfully for v3.0.0b2 Output: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0b2 Note: Python package will be attached by GitHub Actions workflow
 2025-12-17 12:16:03 | fxstein | CREATE GITHUB RELEASE | Creating GitHub release for tag v3.0.0b2 with assets: todo.ai, todo.bash, install.sh

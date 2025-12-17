@@ -718,6 +718,7 @@ main() {
     local SUMMARY_FILE=""
     local PREPARE_STATE_FILE="release/.prepare_state"
     local BETA_RELEASE=false  # Default to stable release
+    local ABORT_VERSION=""  # Version to abort (optional)
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -738,25 +739,46 @@ main() {
                 MODE="execute"
                 shift
                 ;;
+            --abort)
+                MODE="abort"
+                # Check if next arg is a version
+                if [[ -n "$2" ]] && [[ "$2" != --* ]]; then
+                    ABORT_VERSION="$2"
+                    shift 2
+                else
+                    shift
+                fi
+                ;;
             --beta)
                 BETA_RELEASE=true
                 shift
                 ;;
             *)
                 echo -e "${RED}Unknown option: $1${NC}"
-                echo "Usage: $0 [--prepare|--execute] [--summary <file>] [--beta]"
+                echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta]"
                 echo ""
                 echo "Modes:"
                 echo "  --prepare  Analyze commits and generate release preview (default)"
                 echo "  --execute  Execute prepared release (no prompts)"
+                echo "  --abort    Abort failed release and clean up artifacts"
                 echo ""
                 echo "Options:"
                 echo "  --beta     Create beta/pre-release (e.g., v1.0.0b1)"
                 echo "  --summary  Include AI-generated summary from file"
+                echo ""
+                echo "Abort usage:"
+                echo "  $0 --abort           Auto-detect and abort latest failed release"
+                echo "  $0 --abort v3.0.0b2  Abort specific release version"
                 exit 1
                 ;;
         esac
     done
+
+    # Abort mode: clean up failed release
+    if [[ "$MODE" == "abort" ]]; then
+        abort_release "$ABORT_VERSION"
+        return $?
+    fi
 
     # Execute mode: load state and perform release
     if [[ "$MODE" == "execute" ]]; then
@@ -1101,6 +1123,178 @@ EOF
         echo -e "${YELLOW}  ./release/release.sh --prepare${NC}"
     fi
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+    return 0
+}
+
+# Abort a failed release and clean up all artifacts
+# Usage: abort_release [version]
+abort_release() {
+    local abort_version="$1"
+
+    echo -e "${BLUE}🛑 Abort Release Process${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+
+    # Auto-detect failed release if no version specified
+    if [[ -z "$abort_version" ]]; then
+        echo -e "${BLUE}🔍 Detecting failed release...${NC}"
+
+        # Check last 10 workflow runs for failures
+        local failed_release=$(gh run list --limit 10 --json name,conclusion,headBranch,event \
+            --jq '.[] | select(.conclusion == "failure" and .event == "push" and (.headBranch | startswith("v"))) | .headBranch' \
+            | head -1)
+
+        if [[ -z "$failed_release" ]]; then
+            echo -e "${YELLOW}⚠️  No failed release detected in recent workflow history${NC}"
+            echo ""
+            echo "To abort a specific release, provide the version:"
+            echo -e "${GREEN}  ./release/release.sh --abort v3.0.0b2${NC}"
+            exit 1
+        fi
+
+        abort_version="$failed_release"
+        echo -e "${YELLOW}   Found failed release: ${abort_version}${NC}"
+    fi
+
+    # Remove 'v' prefix if present for version strings
+    local version_number="${abort_version#v}"
+    local tag_name="v${version_number}"
+
+    echo ""
+    echo -e "${YELLOW}About to abort release: ${abort_version}${NC}"
+    echo -e "${YELLOW}This will:${NC}"
+    echo -e "${YELLOW}  - Delete tag ${tag_name} (local + remote)${NC}"
+    echo -e "${YELLOW}  - Delete GitHub release (if exists)${NC}"
+    echo -e "${YELLOW}  - Revert version files to previous version${NC}"
+    echo -e "${YELLOW}  - Clean up release artifacts${NC}"
+    echo -e "${YELLOW}  - Create abort commit${NC}"
+    echo ""
+
+    log_release_step "ABORT START" "Aborting release ${abort_version}"
+
+    # Step 1: Get the previous version (from file, before abort)
+    local current_file_version=$(get_file_version)
+    local previous_version=""
+
+    # Try to get previous version from git tags
+    local all_tags=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(b[0-9]+)?$' || echo "")
+    if [[ -n "$all_tags" ]]; then
+        # Find the tag before the one we're aborting
+        previous_version=$(echo "$all_tags" | grep -v "^${tag_name}$" | head -1 | sed 's/^v//')
+    fi
+
+    if [[ -z "$previous_version" ]]; then
+        echo -e "${RED}❌ Error: Cannot determine previous version${NC}"
+        echo -e "${RED}   → No previous tags found${NC}"
+        log_release_step "ABORT ERROR" "Cannot determine previous version for abort"
+        exit 1
+    fi
+
+    echo -e "${BLUE}📊 Version rollback: ${version_number} → ${previous_version}${NC}"
+    echo ""
+
+    # Step 2: Delete local tag
+    echo -e "${BLUE}🗑️  Deleting local tag ${tag_name}...${NC}"
+    if git tag -d "$tag_name" 2>/dev/null; then
+        echo -e "${GREEN}   ✓ Local tag deleted${NC}"
+        log_release_step "ABORT TAG LOCAL" "Deleted local tag ${tag_name}"
+    else
+        echo -e "${YELLOW}   ⚠️  Local tag not found (may already be deleted)${NC}"
+    fi
+
+    # Step 3: Delete remote tag
+    echo -e "${BLUE}🗑️  Deleting remote tag ${tag_name}...${NC}"
+    if git push origin ":refs/tags/${tag_name}" 2>/dev/null; then
+        echo -e "${GREEN}   ✓ Remote tag deleted${NC}"
+        log_release_step "ABORT TAG REMOTE" "Deleted remote tag ${tag_name}"
+    else
+        echo -e "${YELLOW}   ⚠️  Remote tag not found (may already be deleted)${NC}"
+    fi
+
+    # Step 4: Delete GitHub release (if exists)
+    echo -e "${BLUE}🗑️  Deleting GitHub release ${abort_version}...${NC}"
+    if gh release delete "$abort_version" --yes 2>/dev/null; then
+        echo -e "${GREEN}   ✓ GitHub release deleted${NC}"
+        log_release_step "ABORT RELEASE" "Deleted GitHub release ${abort_version}"
+    else
+        echo -e "${YELLOW}   ⚠️  GitHub release not found (may not have been created)${NC}"
+    fi
+
+    # Step 5: Revert version files
+    echo -e "${BLUE}⏪ Reverting version files to ${previous_version}...${NC}"
+
+    # Update pyproject.toml
+    if [[ -f "pyproject.toml" ]]; then
+        sed -i.bak "s/^version = \".*\"/version = \"${previous_version}\"/" pyproject.toml
+        rm pyproject.toml.bak
+        echo -e "${GREEN}   ✓ pyproject.toml${NC}"
+    fi
+
+    # Update todo.ai
+    if [[ -f "todo.ai" ]]; then
+        sed -i.bak "s/^VERSION=\".*\"/VERSION=\"${previous_version}\"/" todo.ai
+        rm todo.ai.bak
+        echo -e "${GREEN}   ✓ todo.ai${NC}"
+    fi
+
+    # Update todo_ai/__init__.py
+    if [[ -f "todo_ai/__init__.py" ]]; then
+        sed -i.bak "s/^__version__ = \".*\"/__version__ = \"${previous_version}\"/" todo_ai/__init__.py
+        rm todo_ai/__init__.py.bak
+        echo -e "${GREEN}   ✓ todo_ai/__init__.py${NC}"
+    fi
+
+    log_release_step "ABORT REVERT" "Reverted version files to ${previous_version}"
+
+    # Step 6: Clean up release artifacts
+    echo -e "${BLUE}🧹 Cleaning up release artifacts...${NC}"
+    rm -f release/.prepare_state
+    rm -f release/RELEASE_NOTES.md
+    rm -f todo.bash
+    echo -e "${GREEN}   ✓ Artifacts cleaned${NC}"
+    log_release_step "ABORT CLEANUP" "Cleaned release artifacts"
+
+    # Step 7: Stage changes
+    echo -e "${BLUE}📝 Staging changes...${NC}"
+    git add pyproject.toml todo.ai todo_ai/__init__.py release/RELEASE_LOG.log
+
+    # Add uv.lock if it changed (pytest may have updated it)
+    if [[ -f "uv.lock" ]] && git diff --quiet uv.lock 2>/dev/null; then
+        : # No changes to uv.lock
+    elif [[ -f "uv.lock" ]]; then
+        git add uv.lock
+    fi
+
+    # Step 8: Create abort commit
+    echo -e "${BLUE}💾 Creating abort commit...${NC}"
+    local commit_message="release: Abort failed ${abort_version} release for retry
+
+- Deleted tag ${tag_name} (local + remote)
+- Deleted GitHub release (if existed)
+- Reverted version files: ${version_number} → ${previous_version}
+- Cleaned up release artifacts
+
+Ready for retry after fixes applied."
+
+    git commit -m "$commit_message"
+    log_release_step "ABORT COMMIT" "Created abort commit for ${abort_version}"
+
+    # Step 9: Push abort commit
+    echo -e "${BLUE}📤 Pushing abort commit...${NC}"
+    git push
+    log_release_step "ABORT PUSH" "Pushed abort commit to remote"
+
+    echo ""
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${GREEN}✅ Release ${abort_version} aborted successfully!${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    echo -e "${GREEN}Reverted to version: ${previous_version}${NC}"
+    echo -e "${GREEN}Ready for retry: ./release/release.sh --prepare [--beta]${NC}"
+    echo ""
+
+    log_release_step "ABORT COMPLETE" "Release ${abort_version} aborted, reverted to ${previous_version}"
 
     return 0
 }

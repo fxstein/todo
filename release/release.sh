@@ -981,9 +981,11 @@ main() {
     # Check if current version is a beta (e.g., 3.0.0b1)
     # If so, we're in a beta cycle and must stay at the same base version
     local IN_BETA_CYCLE=false
-    if [[ "$CURRENT_VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$ ]]; then
+    local BETA_BASE_VERSION=""
+    if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+b[0-9]+$ ]]; then
         IN_BETA_CYCLE=true
-        local BETA_BASE_VERSION="${BASH_REMATCH[1]}"
+        # Extract base version using sed (works in both bash and zsh)
+        BETA_BASE_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$/\1/')
         echo -e "${BLUE}🔄 In beta cycle for version ${BETA_BASE_VERSION}${NC}"
         echo -e "${BLUE}   Next beta will use base version ${BETA_BASE_VERSION} (ignoring commit-based bump)${NC}"
     fi

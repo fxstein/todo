@@ -1676,13 +1676,28 @@ Includes release summary from ${SUMMARY_FILE}"
         fi
 
         # Check CI status for this commit on main branch
-        ci_status=$(gh run list \
+        # Query ALL workflows (not just ci-cd.yml) and check if ANY failed
+        # If all are success/skipped, we're good. If any failed, abort.
+        local all_runs=$(gh run list \
             --commit "$commit_sha" \
             --branch main \
-            --workflow ci-cd.yml \
-            --limit 1 \
-            --json conclusion \
-            --jq '.[0].conclusion // "pending"' 2>/dev/null || echo "pending")
+            --json conclusion,status \
+            --jq '.[]' 2>/dev/null || echo '{"conclusion":"pending","status":"in_progress"}')
+
+        # Check if any runs are still in progress
+        local has_pending=$(echo "$all_runs" | jq -r 'select(.status == "in_progress" or .status == "queued") | .status' | head -1)
+        # Check if any runs failed
+        local has_failure=$(echo "$all_runs" | jq -r 'select(.conclusion == "failure" or .conclusion == "cancelled") | .conclusion' | head -1)
+        # Count total completed runs
+        local completed_count=$(echo "$all_runs" | jq -r 'select(.status == "completed") | .status' | wc -l | tr -d ' ')
+
+        if [[ -n "$has_failure" ]]; then
+            ci_status="failure"
+        elif [[ -z "$has_pending" ]] && [[ "$completed_count" -gt 0 ]]; then
+            ci_status="success"
+        else
+            ci_status="pending"
+        fi
 
         if [[ "$ci_status" == "success" ]]; then
             echo -e "${GREEN}✓ CI passed for version commit${NC}"

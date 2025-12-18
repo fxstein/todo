@@ -2,6 +2,23 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2025-12-18 10:28:41 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2025-12-18 10:28:41 | fxstein | ABORT REVERT | Reverted version files to 3.0.0b1
+2025-12-18 10:28:40 | fxstein | ABORT TAG REMOTE | Deleted remote tag v3.0.0b2
+2025-12-18 10:28:38 | fxstein | ABORT TAG LOCAL | Deleted local tag v3.0.0b2
+2025-12-18 10:28:38 | fxstein | ABORT START | Aborting release v3.0.0b2
+2025-12-18 10:26:05 | fxstein | WORKFLOW FAILED | GitHub Actions release workflow failed: failure
+2025-12-18 10:23:05 | fxstein | WAIT WORKFLOW | Waiting for GitHub Actions release workflow to complete
+2025-12-18 10:23:05 | fxstein | GITHUB RELEASE | GitHub release creation delegated to CI/CD workflow (after PyPI success)
+2025-12-18 10:23:03 | fxstein | PUSH TAG | Pushing tag v3.0.0b2 to origin
+2025-12-18 10:23:03 | fxstein | CI SUCCESS | CI workflow passed for version commit
+2025-12-18 10:20:09 | fxstein | WAIT CI | Waiting for CI workflow to pass on version commit
+2025-12-18 10:20:07 | fxstein | PUSH MAIN | Pushing main branch to origin
+2025-12-18 10:20:07 | fxstein | TAG VERIFIED | Tag v3.0.0b2 successfully verified - all version files match 3.0.0b2
+2025-12-18 10:20:07 | fxstein | TAG CREATED | Git tag v3.0.0b2 created successfully at commit a1bb5bc5fbe02e1b3bbbddc085b73e713c8ca462
+2025-12-18 10:20:06 | fxstein | CREATE TAG | Creating git tag: v3.0.0b2 pointing to commit a1bb5bc5fbe02e1b3bbbddc085b73e713c8ca462
+2025-12-18 10:20:06 | fxstein | COMMIT HASH | Version commit hash: a1bb5bc5fbe02e1b3bbbddc085b73e713c8ca462
+2025-12-18 10:20:05 | fxstein | VERSION COMMITTED | Version change committed successfully (retried with hook modifications)
 2025-12-18 10:19:58 | fxstein | HOOK MODIFICATIONS | Pre-commit hooks modified: release/RELEASE_LOG.log release/RELEASE_NOTES.md todo.bash uv.lock
 2025-12-18 10:19:50 | fxstein | COMMIT RELEASE_NOTES | Adding release notes file to commit: release/RELEASE_NOTES.md
 2025-12-18 10:19:49 | fxstein | COMMIT VERSION | Committing version change to git

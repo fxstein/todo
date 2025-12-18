@@ -978,20 +978,49 @@ main() {
     echo -e "${BLUE}📊 Analyzing commits since last release...${NC}"
     BUMP_TYPE=$(analyze_commits "$LAST_TAG")
 
+    # Check if current version is a beta (e.g., 3.0.0b1)
+    # If so, we're in a beta cycle and must stay at the same base version
+    local IN_BETA_CYCLE=false
+    if [[ "$CURRENT_VERSION" =~ ^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$ ]]; then
+        IN_BETA_CYCLE=true
+        local BETA_BASE_VERSION="${BASH_REMATCH[1]}"
+        echo -e "${BLUE}🔄 In beta cycle for version ${BETA_BASE_VERSION}${NC}"
+        echo -e "${BLUE}   Next beta will use base version ${BETA_BASE_VERSION} (ignoring commit-based bump)${NC}"
+    fi
+
     case "$BUMP_TYPE" in
         major)
-            echo -e "${RED}🔴 Major release detected (breaking changes)${NC}"
+            if [[ "$IN_BETA_CYCLE" == true ]]; then
+                echo -e "${BLUE}🔴 Major changes detected (will apply after ${BETA_BASE_VERSION} stable release)${NC}"
+            else
+                echo -e "${RED}🔴 Major release detected (breaking changes)${NC}"
+            fi
             ;;
         minor)
-            echo -e "${YELLOW}🟡 Minor release detected (new features)${NC}"
+            if [[ "$IN_BETA_CYCLE" == true ]]; then
+                echo -e "${BLUE}🟡 Minor changes detected (will apply after ${BETA_BASE_VERSION} stable release)${NC}"
+            else
+                echo -e "${YELLOW}🟡 Minor release detected (new features)${NC}"
+            fi
             ;;
         patch)
-            echo -e "${GREEN}🟢 Patch release detected (bug fixes)${NC}"
+            if [[ "$IN_BETA_CYCLE" == true ]]; then
+                echo -e "${BLUE}🟢 Patch changes detected (will apply after ${BETA_BASE_VERSION} stable release)${NC}"
+            else
+                echo -e "${GREEN}🟢 Patch release detected (bug fixes)${NC}"
+            fi
             ;;
     esac
 
     # Calculate next version
-    local BASE_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
+    # If in beta cycle, use the beta base version instead of calculating a new one
+    local BASE_VERSION
+    if [[ "$IN_BETA_CYCLE" == true ]]; then
+        BASE_VERSION="$BETA_BASE_VERSION"
+        log_release_step "BETA CYCLE" "In beta cycle for ${BETA_BASE_VERSION}, next beta will use same base version"
+    else
+        BASE_VERSION=$(calculate_next_version "$CURRENT_VERSION" "$BUMP_TYPE")
+    fi
 
     # Determine if this is a beta or stable release
     local RELEASE_TYPE="stable"

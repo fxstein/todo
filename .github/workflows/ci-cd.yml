@@ -268,6 +268,11 @@ jobs:
           echo ""
           echo "Checking if commit's CI passed..."
 
+          # Brief wait for GitHub's commit status API to update
+          # (release.sh already waited for CI, but API may have caching lag)
+          echo "Waiting 10 seconds for GitHub API to update..."
+          sleep 10
+
           # Quick check using commit status API (no polling)
           status=$(gh api repos/${{ github.repository }}/commits/${{ github.sha }}/status --jq '.state' 2>/dev/null || echo "unknown")
 

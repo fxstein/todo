@@ -1,7 +1,8 @@
 name: CI/CD
 
 # Single workflow for CI and Release with mandatory dependencies
-# This ensures releases CANNOT happen unless ALL CI checks pass
+# Dependency chain: quality → tests → all-tests-pass → validate-release → release
+# This ensures releases CANNOT proceed unless ALL tests pass
 
 run-name: ${{ github.ref_type == 'tag' && format('📦 Release {0}', github.ref_name) || github.event.head_commit.message }}
 
@@ -208,9 +209,30 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
+  # Summary job to gate release on all tests passing
+  # This creates clear visual dependency in GitHub Actions UI
+  all-tests-pass:
+    name: ✅ All Tests Passed
+    # Only run on tag pushes (when we need to release)
+    if: startsWith(github.ref, 'refs/tags/v')
+    # CRITICAL: Depends on ALL test jobs
+    needs: [quality, test-quick, test-comprehensive]
+    runs-on: ubuntu-latest
+    steps:
+      - name: All tests passed
+        run: |
+          echo "✅ All quality checks and tests have passed"
+          echo "   - Code quality checks"
+          echo "   - Quick tests (3.10, 3.11, 3.12, 3.13 x 3 OSes)"
+          echo "   - Comprehensive tests (3.14 x 3 OSes)"
+          echo ""
+          echo "Ready to proceed with release validation and publishing"
+
   # Validate release version using Python's packaging library
   validate-release:
     name: Validate Release Version
+    # CRITICAL: Only runs AFTER all tests pass
+    needs: [all-tests-pass]
     # Only run on tag pushes
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
@@ -301,8 +323,10 @@ jobs:
           fi
 
   release:
-    name: Build and Publish Release
-    # CRITICAL: Release depends on version validation and CI check
+    name: 📦 Build and Publish Release
+    # CRITICAL: Full dependency chain enforced:
+    #   quality → tests → all-tests-pass → validate-release → release
+    # This ensures release CANNOT proceed unless ALL tests pass
     needs: [validate-release]
     # Only run on tag pushes (releases)
     if: startsWith(github.ref, 'refs/tags/v')

@@ -1,6 +1,6 @@
 [project]
 name = "ai-todo"
-version = "3.0.0b2"
+version = "3.0.0b1"
 description = "AI-Agent First TODO List Tracker with MCP and CLI interfaces"
 readme = "README.md"
 requires-python = ">=3.10"

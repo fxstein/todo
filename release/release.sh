@@ -1192,8 +1192,9 @@ main() {
     echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo ""
 
-    # Clean up preview file
-    rm -f "$preview_notes_file"
+    # Keep release notes file for human review (used between prepare and execute)
+    echo -e "${GREEN}📄 Release notes saved to: ${preview_notes_file}${NC}"
+    echo ""
 
     # Show review recommendation if major or large release
     local last_tag_for_count=$(get_last_tag)

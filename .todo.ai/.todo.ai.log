@@ -2,6 +2,16 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-17 12:11:52 | fxstein | UPDATE_NOTE | 178 | Updated note (was 1 lines, now        1 lines)
+2026-01-17 12:11:45 | fxstein | UPDATE_NOTE | 178 | Updated note (was 1 lines, now        1 lines)
+2026-01-17 12:09:44 | fxstein | COMPLETE | 178.3 | Add tests for multiple parents/subtasks
+2026-01-17 12:09:44 | fxstein | COMPLETE | 178.2 | Fix subtask insertion to correct parent
+2026-01-17 12:09:44 | fxstein | COMPLETE | 178.1 | Investigate subtask placement logic
+2026-01-17 12:09:32 | fxstein | NOTE | 178 | Investigate/fix in todo_ai/cli/commands/__init__.py add_subtask_command; tests in tests/integration/test_cli.py (add_subtasks_multiple_parents).
+2026-01-17 12:06:02 | fxstein | ADD_SUBTASK | 178.3 | Add tests for multiple parents/subtasks (parent: #178)
+2026-01-17 12:06:01 | fxstein | ADD_SUBTASK | 178.2 | Fix subtask insertion to correct parent (parent: #178)
+2026-01-17 12:06:01 | fxstein | ADD_SUBTASK | 178.1 | Investigate subtask placement logic (parent: #178)
+2026-01-17 12:05:53 | fxstein | ADD | 178 | Fix issue#40: Subtasks assigned to wrong parent
 2025-12-17 22:46:59 | fxstein | COMPLETE | 177 | Fix release process - PyPI must succeed before GitHub release
 2025-12-17 22:07:35 | fxstein | COMPLETE | 177.1 | Update PyPI Trusted Publisher config to ci-cd.yml/release
 2025-12-17 21:52:23 | fxstein | COMPLETE | 177.3 | Move GitHub release to workflow (after PyPI success)

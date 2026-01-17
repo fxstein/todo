@@ -27,7 +27,7 @@ from todo_ai.cli.utility_ops import (
 from todo_ai.core.config import Config
 from todo_ai.core.coordination import CoordinationManager
 from todo_ai.core.file_ops import FileOps
-from todo_ai.core.task import TaskManager
+from todo_ai.core.task import Task, TaskManager
 
 # Global file_ops cache to preserve relationships across operations
 _file_ops_cache: dict[str, FileOps] = {}
@@ -114,12 +114,40 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     print(output)
 
 
+def _insert_subtask_after_parent(tasks: list[Task], parent_id: str, subtask: Task) -> list[Task]:
+    """Insert a subtask immediately after its parent (or last existing subtask)."""
+    parent_index = None
+    last_subtask_index = None
+    subtask_prefix = f"{parent_id}."
+
+    for index, task in enumerate(tasks):
+        if task.id == parent_id:
+            parent_index = index
+        if task.id.startswith(subtask_prefix):
+            last_subtask_index = index
+
+    if last_subtask_index is not None:
+        insert_at = last_subtask_index + 1
+    elif parent_index is not None:
+        insert_at = parent_index + 1
+    else:
+        insert_at = len(tasks)
+
+    return tasks[:insert_at] + [subtask] + tasks[insert_at:]
+
+
 def add_subtask_command(
     parent_id: str, description: str, tags: list[str], todo_path: str = "TODO.md"
 ):
     """Add a subtask to an existing task."""
-    file_ops = FileOps(todo_path)
-    tasks = file_ops.read_tasks()
+    file_ops = _file_ops_cache.get(todo_path)
+    if file_ops is None:
+        file_ops = FileOps(todo_path)
+        tasks = file_ops.read_tasks()
+        _file_ops_cache[todo_path] = file_ops
+    else:
+        tasks = file_ops.read_tasks()
+
     manager = TaskManager(tasks)
     try:
         parent = manager.get_task(parent_id)
@@ -136,7 +164,8 @@ def add_subtask_command(
         subtask_id = coord_manager.get_next_subtask_id(parent_id, manager)
 
         subtask = manager.add_subtask(parent_id, description, tags, task_id=subtask_id)
-        save_changes(manager, todo_path)
+        ordered_tasks = _insert_subtask_after_parent(tasks, parent_id, subtask)
+        file_ops.write_tasks(ordered_tasks)
 
         # Format output with tags
         tag_str = " ".join([f"`#{tag}`" for tag in sorted(subtask.tags)]) if subtask.tags else ""

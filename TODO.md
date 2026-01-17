@@ -3,6 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug`
+  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
+  - [x] **#178.3** Add tests for multiple parents/subtasks `#bug`
+  - [x] **#178.2** Fix subtask insertion to correct parent `#bug`
+  - [x] **#178.1** Investigate subtask placement logic `#bug`
 - [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure`
   - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure`
   - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure`
@@ -1062,6 +1067,6 @@
 
 ---
 
-**Last Updated:** Wed Dec 17 22:47:00 CET 2025
+**Last Updated:** Sat Jan 17 12:11:52 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

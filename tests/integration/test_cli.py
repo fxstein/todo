@@ -63,6 +63,55 @@ def test_add_subtask_command(isolated_cli):
     assert "Added subtask: #1.1 Subtask 1" in result.output
 
 
+def test_add_subtasks_multiple_parents(isolated_cli):
+    """Ensure subtasks appear under their respective parents."""
+    isolated_cli.invoke(cli, ["add", "Task A"])
+    isolated_cli.invoke(cli, ["add", "Task B"])
+    isolated_cli.invoke(cli, ["add", "Task C"])
+
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask A.1"])
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask A.2"])
+    isolated_cli.invoke(cli, ["add-subtask", "2", "Subtask B.1"])
+    isolated_cli.invoke(cli, ["add-subtask", "2", "Subtask B.2"])
+    isolated_cli.invoke(cli, ["add-subtask", "3", "Subtask C.1"])
+    isolated_cli.invoke(cli, ["add-subtask", "3", "Subtask C.2"])
+
+    content = Path("TODO.md").read_text()
+    lines = content.splitlines()
+
+    def line_index(fragment: str) -> int:
+        return next(i for i, line in enumerate(lines) if fragment in line)
+
+    parent_indices = [
+        ("3", line_index("**#3** Task C")),
+        ("2", line_index("**#2** Task B")),
+        ("1", line_index("**#1** Task A")),
+    ]
+    parent_indices.sort(key=lambda item: item[1])
+
+    subtask_indices = {
+        "1": [
+            line_index("**#1.1** Subtask A.1"),
+            line_index("**#1.2** Subtask A.2"),
+        ],
+        "2": [
+            line_index("**#2.1** Subtask B.1"),
+            line_index("**#2.2** Subtask B.2"),
+        ],
+        "3": [
+            line_index("**#3.1** Subtask C.1"),
+            line_index("**#3.2** Subtask C.2"),
+        ],
+    }
+
+    for index, (parent_id, parent_line) in enumerate(parent_indices):
+        next_parent_line = parent_indices[index + 1][1] if index + 1 < len(parent_indices) else None
+        for subtask_line in subtask_indices[parent_id]:
+            assert subtask_line > parent_line
+            if next_parent_line is not None:
+                assert subtask_line < next_parent_line
+
+
 # Phase 1: Task Management
 def test_modify_command(isolated_cli):
     """Test modify command."""

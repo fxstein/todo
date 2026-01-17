@@ -2,6 +2,12 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-17 14:28:51 | fxstein | PREPARE | Release preview prepared for v3.0.0b3 (beta)
+2026-01-17 14:28:49 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b1 - File version (todo.ai): 3.0.0b2 - Proposed version: 3.0.0b3 - Release type: beta - Bump type: patch - Last tag: v3.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-17 14:28:48 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b3 instead of proposed version
+2026-01-17 14:28:47 | fxstein | BETA VERSION | Found existing betas up to b1 for 3.0.0, using b2
+2026-01-17 14:28:45 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-17 14:28:42 | fxstein | VERSION MISMATCH | File version (3.0.0b2) does not match GitHub version (3.0.0b1)
 2026-01-17 13:22:49 | fxstein | PREFLIGHT FAILED | 1 pre-flight check(s) failed
 2026-01-17 13:21:05 | fxstein | PREPARE | Release preview prepared for v3.0.0b3 (beta)
 2026-01-17 13:21:04 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b1 - File version (todo.ai): 3.0.0b2 - Proposed version: 3.0.0b3 - Release type: beta - Bump type: patch - Last tag: v3.0.0b2 - Summary file: release/RELEASE_SUMMARY.md

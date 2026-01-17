@@ -720,6 +720,53 @@ generate_release_notes() {
     echo "$notes_file"
 }
 
+# Commit and push release notes preview to avoid uncommitted files between prepare/execute
+commit_prepare_artifacts() {
+    local notes_file="release/RELEASE_NOTES.md"
+    local log_file="release/RELEASE_LOG.log"
+
+    if [[ ! -f "$notes_file" ]] && [[ ! -f "$log_file" ]]; then
+        return 0
+    fi
+
+    # Only commit if either file has changes
+    local has_changes=$(git status -s -- "$notes_file" "$log_file" 2>/dev/null | wc -l | tr -d ' ')
+    if [[ "$has_changes" -eq 0 ]]; then
+        return 0
+    fi
+
+    echo -e "${BLUE}💾 Committing release notes preview...${NC}"
+    git add "$notes_file" "$log_file" 2>/dev/null || true
+
+    local commit_message="release: Update release notes preview"
+
+    if ! git commit -m "$commit_message" > /dev/null 2>&1; then
+        local unstaged=$(git diff --name-only 2>/dev/null || echo "")
+        if [[ -n "$unstaged" ]]; then
+            while IFS= read -r file; do
+                [[ -n "$file" ]] && git add "$file"
+            done <<< "$unstaged"
+            if ! git commit -m "$commit_message" > /dev/null 2>&1; then
+                echo -e "${RED}❌ Error: Failed to commit release notes preview${NC}"
+                echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
+                exit 1
+            fi
+        else
+            echo -e "${RED}❌ Error: Failed to commit release notes preview${NC}"
+            echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
+            exit 1
+        fi
+    fi
+
+    echo -e "${GREEN}✓ Release notes preview committed${NC}"
+    echo -e "${BLUE}📤 Pushing release notes preview...${NC}"
+    if ! git push origin main > /dev/null 2>&1; then
+        echo -e "${RED}❌ Error: Failed to push release notes preview commit${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Release notes preview pushed${NC}"
+}
+
 # Update version in todo.ai, pyproject.toml, and todo_ai/__init__.py
 update_version() {
     local new_version="$1"
@@ -965,10 +1012,6 @@ main() {
         if echo "$line" | grep -qE "release/RELEASE_LOG\.log|^RELEASE_LOG\.log"; then
             continue
         fi
-        # Skip RELEASE_NOTES.md and prepare state - these are working files between prepare/execute
-        if echo "$line" | grep -qE "release/RELEASE_NOTES\.md|release/\.prepare_state"; then
-            continue
-        fi
         # Skip .todo.ai/.todo.ai.serial and .todo.ai/.todo.ai.log - these are normal operational files
         # They change whenever tasks are added/completed, which is expected behavior
         # Excluding them prevents blocking releases due to normal task management activity
@@ -1005,9 +1048,20 @@ main() {
         echo -e "$uncommitted"
         echo ""
 
-        # Add all remaining uncommitted files
-        local uncommitted_files=$(echo -e "$uncommitted" | sed 's/^[?AM] */ /' | sed 's/^ //' | grep -v "^$" || true)
-        for file in ${uncommitted_files[@]}; do
+        # Add all remaining uncommitted files (robust parsing for porcelain output)
+        local uncommitted_files=()
+        while IFS= read -r line; do
+            [[ -z "$line" ]] && continue
+            # Strip the 2-char status + space prefix (e.g., " M file" or "A  file")
+            local file=$(echo "$line" | cut -c4-)
+            # Handle renames (format: "old -> new")
+            if [[ "$file" == *" -> "* ]]; then
+                file="${file##* -> }"
+            fi
+            [[ -n "$file" ]] && uncommitted_files+=("$file")
+        done <<< "$uncommitted"
+
+        for file in "${uncommitted_files[@]}"; do
             if [[ -f "$file" ]]; then
                 echo "Adding: $file"
                 git add "$file"
@@ -1253,6 +1307,9 @@ GIT_TAG=v${NEW_VERSION}
 EOF
     log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION} (${RELEASE_TYPE})"
 
+    # Commit release notes preview and release log to keep working tree clean
+    commit_prepare_artifacts
+
     # Display execution command
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}✅ Release preview prepared successfully!${NC}"
@@ -1492,7 +1549,7 @@ preflight_validation() {
 
     # Check 3: No uncommitted changes (exclude release working files)
     echo -n "3. Checking for uncommitted changes... "
-    local uncommitted=$(git status -s | grep -vE "(release/RELEASE_LOG\.log|release/RELEASE_NOTES\.md|release/\.prepare_state|TODO\.md|\.todo\.ai/\.todo\.ai\.(serial|log))" || echo "")
+    local uncommitted=$(git status -s || echo "")
     if [[ -z "$uncommitted" ]]; then
         echo -e "${GREEN}✅ OK${NC}"
         ((checks_passed++))

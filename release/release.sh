@@ -965,6 +965,10 @@ main() {
         if echo "$line" | grep -qE "release/RELEASE_LOG\.log|^RELEASE_LOG\.log"; then
             continue
         fi
+        # Skip RELEASE_NOTES.md and prepare state - these are working files between prepare/execute
+        if echo "$line" | grep -qE "release/RELEASE_NOTES\.md|release/\.prepare_state"; then
+            continue
+        fi
         # Skip .todo.ai/.todo.ai.serial and .todo.ai/.todo.ai.log - these are normal operational files
         # They change whenever tasks are added/completed, which is expected behavior
         # Excluding them prevents blocking releases due to normal task management activity
@@ -1488,7 +1492,7 @@ preflight_validation() {
 
     # Check 3: No uncommitted changes (exclude release working files)
     echo -n "3. Checking for uncommitted changes... "
-    local uncommitted=$(git status -s | grep -vE "(release/RELEASE_LOG\.log|\.todo\.ai/\.todo\.ai\.(serial|log))" || echo "")
+    local uncommitted=$(git status -s | grep -vE "(release/RELEASE_LOG\.log|release/RELEASE_NOTES\.md|release/\.prepare_state|TODO\.md|\.todo\.ai/\.todo\.ai\.(serial|log))" || echo "")
     if [[ -z "$uncommitted" ]]; then
         echo -e "${GREEN}✅ OK${NC}"
         ((checks_passed++))

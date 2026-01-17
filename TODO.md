@@ -3,6 +3,13 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#181** Stabilize release process (no failures) `#release`
+  > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
+  > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
+  - [ ] **#181.4** Add regression tests for release.sh prepare/execute workflow `#release`
+  - [ ] **#181.3** Harden execute flow (preflight, cleanup, retries) `#release`
+  - [ ] **#181.2** Fix release notes lifecycle so prepare/execute are clean `#release`
+  - [ ] **#181.1** Investigate current release blockers (preflight failures, notes handling) `#release`
 - [ ] **#180** Investigate missing --set-version in release.sh `#bug`
   > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
   > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
@@ -1078,6 +1085,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 17 12:40:38 CET 2026
+**Last Updated:** Sat Jan 17 13:36:57 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

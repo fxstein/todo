@@ -1,4 +1,4 @@
-## Release 3.0.0b2
+## Release 3.0.0b3
 
 This beta focuses on reliability for hierarchical task management in the new
 Python-based todo.ai. Subtasks now insert directly under their intended parent

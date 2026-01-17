@@ -2,6 +2,13 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-17 12:17:54 | fxstein | ARCHIVE | 178 | Fix issue#40: Subtasks assigned to wrong parent (with 3 subtasks)
+2026-01-17 12:17:47 | fxstein | ARCHIVE | 177 | Fix release process - PyPI must succeed before GitHub release (with 3 subtasks)
+2026-01-17 12:17:39 | fxstein | ARCHIVE | 176 | Fix CI/CD dependency flaw - merge workflows with job dependencies (with 0 subtasks)
+2026-01-17 12:17:32 | fxstein | ARCHIVE | 175 | Implement safeguards to prevent --no-verify from returning to codebase (with 3 subtasks)
+2026-01-17 12:17:25 | fxstein | ARCHIVE | 174 | Set up PyPI project for todo-ai package (with 7 subtasks)
+2026-01-17 12:17:17 | fxstein | ARCHIVE | 173 | Fix release script bugs found during v3.0.0b1 attempt (with 12 subtasks)
+2026-01-17 12:17:06 | fxstein | COMPLETE | 178 | Fix issue#40: Subtasks assigned to wrong parent
 2026-01-17 12:11:52 | fxstein | UPDATE_NOTE | 178 | Updated note (was 1 lines, now        1 lines)
 2026-01-17 12:11:45 | fxstein | UPDATE_NOTE | 178 | Updated note (was 1 lines, now        1 lines)
 2026-01-17 12:09:44 | fxstein | COMPLETE | 178.3 | Add tests for multiple parents/subtasks

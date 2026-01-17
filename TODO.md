@@ -3,42 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug`
-  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
-  - [x] **#178.3** Add tests for multiple parents/subtasks `#bug`
-  - [x] **#178.2** Fix subtask insertion to correct parent `#bug`
-  - [x] **#178.1** Investigate subtask placement logic `#bug`
-- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure`
-  - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure`
-  - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure`
-  - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure`
-- [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure`
-- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure`
-  - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure`
-  - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure`
-  - [x] **#175.1** Add pre-commit hook to detect forbidden flags `#infrastructure`
-- [x] **#174** Set up PyPI project for todo-ai package `#release`
-  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
-  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
-  - [x] **#174.7** Test first beta release with trusted publisher `#testing`
-  - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure`
-  - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup`
-  - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup`
-- [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug`
-  - [x] **#173.12** Remove --no-verify from release script (ETERNALLY FORBIDDEN) `#critical`
-  - [x] **#173.11** Fix pre-commit hook handling - committed files don't include hook fixes `#bug`
-    > Root cause: Pre-commit hooks ran AFTER staging, fixed files in working dir, but retry logic committed unfixed version from index. Fix: Run pre-commit BEFORE staging to let hooks fix files first, then stage clean files.
-  - [x] **#173.10** Fix todo.bash formatting issues causing CI failures `#bug`
-  - [x] **#173.9** Auto-detect RELEASE_SUMMARY.md in prepare phase `#bug`
-  - [x] **#173.8** Fix pathspec issue in pre-commit hook re-staging logic `#bug`
-  - [x] **#173.7** Fix pre-commit hook timing - hooks modify files after staging `#bug`
-  - [x] **#173.6** Investigate and handle uv.lock modifications during release `#bug`
-  - [x] **#173.5** Add commit success verification after git commit `#bug`
-  - [x] **#173.4** Fix commit error handling - remove error masking on line 1324 `#bug`
-  - [x] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug`
-  - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug`
-  - [x] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug`
-    > Problem: todo.bash converted during --prepare (line 1034) but only added to git during --execute (lines 1297-1300). Leaves uncommitted file after prepare. Fix: Move bash conversion to execute phase OR commit it during prepare.
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -332,6 +296,45 @@
 ------------------
 
 ## Recently Completed
+- [x] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug` (2026-01-17)
+  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
+  - [x] **#178.3** Add tests for multiple parents/subtasks `#bug` (2026-01-17)
+  - [x] **#178.2** Fix subtask insertion to correct parent `#bug` (2026-01-17)
+  - [x] **#178.1** Investigate subtask placement logic `#bug` (2026-01-17)
+- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure` (2026-01-17)
+  - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure` (2026-01-17)
+  - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure` (2026-01-17)
+  - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure` (2026-01-17)
+- [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure` (2026-01-17)
+- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure` (2026-01-17)
+  - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure` (2026-01-17)
+  - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure` (2026-01-17)
+  - [x] **#175.1** Add pre-commit hook to detect forbidden flags `#infrastructure` (2026-01-17)
+- [x] **#174** Set up PyPI project for todo-ai package `#release` (2026-01-17)
+  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
+  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
+  - [x] **#174.7** Test first beta release with trusted publisher `#testing` (2026-01-17)
+  - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure` (2026-01-17)
+  - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup` (2026-01-17)
+  - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup` (2026-01-17)
+  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15) (2026-01-17)
+  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15) (2026-01-17)
+  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15) (2026-01-17)
+- [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug` (2026-01-17)
+  - [x] **#173.12** Remove --no-verify from release script (ETERNALLY FORBIDDEN) `#critical` (2026-01-17)
+  - [x] **#173.11** Fix pre-commit hook handling - committed files don't include hook fixes `#bug` (2026-01-17)
+    > Root cause: Pre-commit hooks ran AFTER staging, fixed files in working dir, but retry logic committed unfixed version from index. Fix: Run pre-commit BEFORE staging to let hooks fix files first, then stage clean files.
+  - [x] **#173.10** Fix todo.bash formatting issues causing CI failures `#bug` (2026-01-17)
+  - [x] **#173.9** Auto-detect RELEASE_SUMMARY.md in prepare phase `#bug` (2026-01-17)
+  - [x] **#173.8** Fix pathspec issue in pre-commit hook re-staging logic `#bug` (2026-01-17)
+  - [x] **#173.7** Fix pre-commit hook timing - hooks modify files after staging `#bug` (2026-01-17)
+  - [x] **#173.6** Investigate and handle uv.lock modifications during release `#bug` (2026-01-17)
+  - [x] **#173.5** Add commit success verification after git commit `#bug` (2026-01-17)
+  - [x] **#173.4** Fix commit error handling - remove error masking on line 1324 `#bug` (2026-01-17)
+  - [x] **#173.3** Fix prepare side effects - leaves dirty working directory `#bug` (2026-01-17)
+  - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug` (2026-01-17)
+  - [x] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug` (2026-01-17)
+    > Problem: todo.bash converted during --prepare (line 1034) but only added to git during --execute (lines 1297-1300). Leaves uncommitted file after prepare. Fix: Move bash conversion to execute phase OR commit it during prepare.
 - [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement` (2025-12-16)
   > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
   > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
@@ -920,9 +923,6 @@
 - [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
 
 ## Deleted Tasks
-  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
-  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
-  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
     - [D] **#163.51.4** Remove unused methods and parameters `#code` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.51.3** Update documentation `#docs` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.51.2** Add unit tests for FileStructureSnapshot `#test` (deleted 2025-12-15, expires 2026-01-14)
@@ -1067,6 +1067,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 17 12:11:52 CET 2026
+**Last Updated:** Sat Jan 17 12:17:54 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

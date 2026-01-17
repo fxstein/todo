@@ -3,6 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#180** Investigate missing --set-version in release.sh `#bug`
+  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
+  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
+  - [ ] **#180.3** Implement change and update docs/tests `#bug`
+  - [ ] **#180.2** Decide whether to add --set-version or document alternative `#bug`
+  - [ ] **#180.1** Confirm supported release.sh options and expected override workflow `#bug`
 - [ ] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug`
   > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
   - [ ] **#179.3** Implement fix and add regression test `#bug`
@@ -1072,6 +1078,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 17 12:28:18 CET 2026
+**Last Updated:** Sat Jan 17 12:40:38 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

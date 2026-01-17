@@ -83,6 +83,23 @@ VERSION="1.0.0"
 # Result: v1.0.0b1, v1.0.0b2, etc.
 ```
 
+### Override Proposed Version (Optional)
+
+If you need to override the proposed version (e.g., force `3.0.0b3`), use
+`--set-version` during prepare:
+
+```bash
+# Force a specific beta version
+./release/release.sh --prepare --beta --set-version 3.0.0b3
+
+# Force a specific stable version
+./release/release.sh --prepare --set-version 3.0.0
+```
+
+**Constraints:**
+- Version must be greater than the current GitHub release
+- Beta overrides must keep the same base version during an active beta cycle
+
 ### Stable Release Commands
 
 ```bash

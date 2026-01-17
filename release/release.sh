@@ -393,6 +393,68 @@ calculate_next_version() {
     echo "${major}.${minor}.${patch}"
 }
 
+# Version helpers (supports X.Y.Z and X.Y.ZbN)
+is_valid_version() {
+    [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+(b[0-9]+)?$ ]]
+}
+
+is_beta_version() {
+    [[ "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+b[0-9]+$ ]]
+}
+
+get_base_version() {
+    echo "$1" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$/\1/'
+}
+
+get_beta_number() {
+    echo "$1" | sed -nE 's/^.*b([0-9]+)$/\1/p'
+}
+
+compare_versions() {
+    local a="$1"
+    local b="$2"
+
+    IFS='.' read -r a_major a_minor a_patch <<< "$(get_base_version "$a")"
+    IFS='.' read -r b_major b_minor b_patch <<< "$(get_base_version "$b")"
+
+    if [[ $a_major -ne $b_major ]]; then
+        [[ $a_major -gt $b_major ]] && echo 1 || echo -1
+        return
+    fi
+    if [[ $a_minor -ne $b_minor ]]; then
+        [[ $a_minor -gt $b_minor ]] && echo 1 || echo -1
+        return
+    fi
+    if [[ $a_patch -ne $b_patch ]]; then
+        [[ $a_patch -gt $b_patch ]] && echo 1 || echo -1
+        return
+    fi
+
+    local a_beta=$(get_beta_number "$a")
+    local b_beta=$(get_beta_number "$b")
+
+    if [[ -z "$a_beta" ]] && [[ -z "$b_beta" ]]; then
+        echo 0
+        return
+    fi
+    if [[ -z "$a_beta" ]] && [[ -n "$b_beta" ]]; then
+        echo 1
+        return
+    fi
+    if [[ -n "$a_beta" ]] && [[ -z "$b_beta" ]]; then
+        echo -1
+        return
+    fi
+
+    if [[ "$a_beta" -gt "$b_beta" ]]; then
+        echo 1
+    elif [[ "$a_beta" -lt "$b_beta" ]]; then
+        echo -1
+    else
+        echo 0
+    fi
+}
+
 # Determine next beta version by querying GitHub releases
 # Returns version like "1.0.0b1", "1.0.0b2", etc.
 determine_beta_version() {
@@ -719,6 +781,7 @@ main() {
     local PREPARE_STATE_FILE="release/.prepare_state"
     local BETA_RELEASE=false  # Default to stable release
     local ABORT_VERSION=""  # Version to abort (optional)
+    local OVERRIDE_VERSION=""
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -753,9 +816,17 @@ main() {
                 BETA_RELEASE=true
                 shift
                 ;;
+            --set-version)
+                if [[ -z "$2" ]] || [[ "$2" == --* ]]; then
+                    echo -e "${RED}Error: --set-version requires a version (e.g., 3.0.0b3)${NC}"
+                    exit 1
+                fi
+                OVERRIDE_VERSION="$2"
+                shift 2
+                ;;
             *)
                 echo -e "${RED}Unknown option: $1${NC}"
-                echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta]"
+                echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta] [--set-version <version>]"
                 echo ""
                 echo "Modes:"
                 echo "  --prepare  Analyze commits and generate release preview (default)"
@@ -765,6 +836,7 @@ main() {
                 echo "Options:"
                 echo "  --beta     Create beta/pre-release (e.g., v1.0.0b1)"
                 echo "  --summary  Include AI-generated summary from file"
+                echo "  --set-version  Override proposed version (e.g., 3.0.0b3)"
                 echo ""
                 echo "Abort usage:"
                 echo "  $0 --abort           Auto-detect and abort latest failed release"
@@ -1033,20 +1105,63 @@ main() {
     else
         NEW_VERSION="$BASE_VERSION"
         echo -e "${GREEN}📌 Proposed new version: ${NEW_VERSION}${NC}"
+    fi
 
-        # Enforce beta requirement for major releases
+    # Apply explicit version override if provided
+    if [[ -n "$OVERRIDE_VERSION" ]]; then
+        if ! is_valid_version "$OVERRIDE_VERSION"; then
+            echo -e "${RED}❌ Error: Invalid version format for --set-version${NC}"
+            echo -e "${RED}   → Expected X.Y.Z or X.Y.ZbN (e.g., 3.0.0b3)${NC}"
+            exit 1
+        fi
+
+        # Ensure override is greater than current version
+        local version_cmp=$(compare_versions "$OVERRIDE_VERSION" "$CURRENT_VERSION")
+        if [[ "$version_cmp" -le 0 ]]; then
+            echo -e "${RED}❌ Error: Override version must be greater than current version${NC}"
+            echo -e "${RED}   → Current: ${CURRENT_VERSION}${NC}"
+            echo -e "${RED}   → Override: ${OVERRIDE_VERSION}${NC}"
+            exit 1
+        fi
+
+        local override_is_beta=false
+        if is_beta_version "$OVERRIDE_VERSION"; then
+            override_is_beta=true
+        fi
+
+        if [[ "$override_is_beta" == true ]]; then
+            local override_base=$(get_base_version "$OVERRIDE_VERSION")
+            if [[ "$IN_BETA_CYCLE" == true ]] && [[ "$override_base" != "$BETA_BASE_VERSION" ]]; then
+                echo -e "${RED}❌ Error: Override beta base must match current beta cycle${NC}"
+                echo -e "${RED}   → Current beta base: ${BETA_BASE_VERSION}${NC}"
+                echo -e "${RED}   → Override base: ${override_base}${NC}"
+                exit 1
+            fi
+            RELEASE_TYPE="beta"
+            BETA_RELEASE=true
+            BASE_VERSION="$override_base"
+        else
+            RELEASE_TYPE="stable"
+            BETA_RELEASE=false
+            BASE_VERSION="$OVERRIDE_VERSION"
+        fi
+
+        NEW_VERSION="$OVERRIDE_VERSION"
+        echo -e "${YELLOW}📌 Override version: ${NEW_VERSION}${NC}"
+        log_release_step "VERSION OVERRIDE" "Using override version ${NEW_VERSION} instead of proposed version"
+    fi
+
+    # Enforce beta requirement and maturity checks for stable releases
+    if [[ "$RELEASE_TYPE" == "stable" ]]; then
         if ! detect_and_enforce_beta_requirement "$CURRENT_VERSION" "$NEW_VERSION" "false"; then
             exit 1
         fi
 
-        # Validate beta maturity (warning only, never blocks)
-        # Extract major version to determine if we should check maturity
         local current_major=$(echo "$CURRENT_VERSION" | cut -d'.' -f1)
         local new_major=$(echo "$NEW_VERSION" | cut -d'.' -f1)
         local current_minor=$(echo "$CURRENT_VERSION" | cut -d'.' -f2)
         local new_minor=$(echo "$NEW_VERSION" | cut -d'.' -f2)
 
-        # Check maturity for major or minor releases
         if [[ "$new_major" -gt "$current_major" ]] || [[ "$new_minor" -gt "$current_minor" ]]; then
             validate_beta_maturity "$NEW_VERSION" "$BUMP_TYPE"
         fi

@@ -2,6 +2,12 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-17 12:40:38 | fxstein | NOTE | 180 | Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
+2026-01-17 12:30:56 | fxstein | NOTE | 180 | Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
+2026-01-17 12:30:52 | fxstein | ADD_SUBTASK | 180.3 | Implement change and update docs/tests (parent: #180)
+2026-01-17 12:30:52 | fxstein | ADD_SUBTASK | 180.2 | Decide whether to add --set-version or document alternative (parent: #180)
+2026-01-17 12:30:51 | fxstein | ADD_SUBTASK | 180.1 | Confirm supported release.sh options and expected override workflow (parent: #180)
+2026-01-17 12:30:48 | fxstein | ADD | 180 | Investigate missing --set-version in release.sh
 2026-01-17 12:28:18 | fxstein | NOTE | 179 | Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
 2026-01-17 12:28:12 | fxstein | ADD_SUBTASK | 179.3 | Implement fix and add regression test (parent: #179)
 2026-01-17 12:28:12 | fxstein | ADD_SUBTASK | 179.2 | Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md (parent: #179)

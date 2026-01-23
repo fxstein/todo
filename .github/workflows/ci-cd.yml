@@ -83,6 +83,17 @@ jobs:
             !**/dist-info/**
             !**/dist/**
 
+  logs-quality:
+    name: Logs Quality
+    needs: changes
+    if: |
+      !startsWith(github.ref, 'refs/tags/v') &&
+      needs.changes.outputs.logs_only == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder for log-only changes
+        run: echo "Log-only change detected. No checks required."
+
   quality:
     name: Code Quality
     needs: changes
@@ -286,13 +297,22 @@ jobs:
   all-tests-pass:
     name: ✅ All Tests Passed
     if: always()
-    needs: [changes, docs-quality, quality, test-quick, test-comprehensive, test-pr]
+    needs: [
+      changes,
+      docs-quality,
+      logs-quality,
+      quality,
+      test-quick,
+      test-comprehensive,
+      test-pr
+    ]
     runs-on: ubuntu-latest
     steps:
       - name: Evaluate checks
         run: |
           echo "Results:"
           echo "  docs-quality: ${{ needs.docs-quality.result }}"
+          echo "  logs-quality: ${{ needs.logs-quality.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  test-quick: ${{ needs.test-quick.result }}"
           echo "  test-comprehensive: ${{ needs.test-comprehensive.result }}"
@@ -302,6 +322,7 @@ jobs:
           failures=0
           for result in \
             "${{ needs.docs-quality.result }}" \
+            "${{ needs.logs-quality.result }}" \
             "${{ needs.quality.result }}" \
             "${{ needs.test-quick.result }}" \
             "${{ needs.test-comprehensive.result }}" \

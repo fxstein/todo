@@ -61,6 +61,7 @@ Introduce a single workflow with change detection:
   - `code`: any non-`*.md` and non-`*.log`
 - `docs-quality` runs for docs changes (push/PR).
 - `quality`, `test-quick`, `test-comprehensive` run only when code changes are present (push/PR), and always for tags.
+- `logs-quality` runs for log-only changes (push/PR) as a placeholder gate.
 - Tag events still run full CI + release.
 
 ## Workflow Behavior
@@ -68,12 +69,13 @@ Introduce a single workflow with change detection:
 | Event | Change Type | Actions |
 | --- | --- | --- |
 | push to `main` | `*.md` only | Run `docs-quality` only |
-| push to `main` | `*.log` only | Skip all checks |
+| push to `main` | `*.log` only | Run `logs-quality` only |
 | push to `main` | other files | Run `quality`, `test-quick`, `test-comprehensive` |
 | push to `main` | docs + code | Run both `docs-quality` and code checks |
 | tag `v*` | any | Run full chain + release (unchanged) |
 | pull_request | docs | Run `docs-quality` only |
 | pull_request | code | Run `quality` + tests |
+| pull_request | logs | Run `logs-quality` only |
 | pull_request | docs + code | Run both `docs-quality` and code checks |
 
 ## Implementation Details
@@ -82,6 +84,7 @@ Introduce a single workflow with change detection:
 
 - Add a `changes` job using `dorny/paths-filter@v3`.
 - Add a `docs-quality` job gated by `docs` output on push/PR.
+- Add a `logs-quality` placeholder job gated by `logs_only` output on push/PR.
 - Gate `quality` and test jobs by `code` output on push.
 - Keep `pull_request` and tag triggers unchanged.
 
@@ -97,7 +100,7 @@ coverage.
 
 1. Add change detection (`changes` job) to `ci-cd.yml`.
 2. Add `docs-quality` job gated by docs changes.
-3. Ensure `all-tests-pass` depends on docs + code checks (skips allowed).
+3. Ensure `all-tests-pass` depends on docs + logs + code checks (skips allowed).
 4. Validate on a docs-only commit (expect docs-quality only).
 5. Validate on a logs-only commit (expect no jobs beyond change detection).
 6. Validate on a code change (expect full matrix).
@@ -117,7 +120,7 @@ coverage.
 ## Testing and Validation
 
 - Docs-only push (e.g., update README) should run docs checks only.
-- Logs-only push (e.g., update `release/RELEASE_LOG.log`) should run no jobs beyond change detection.
+- Logs-only push (e.g., update `release/RELEASE_LOG.log`) should run `logs-quality` only.
 - Mixed push (docs + code) should run both docs and code checks.
 - Code change push (e.g., modify `todo_ai/`) should run full matrix.
 - Tag release should still run full chain and release.

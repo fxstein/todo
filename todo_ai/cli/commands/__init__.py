@@ -490,11 +490,6 @@ def update_note_command(task_id: str, new_note_text: str, todo_path: str = "TODO
         new_count = len(new_note_text.split("\n"))
         print(f"Task #{task_id} currently has {old_count} note(s).")
         print(f"New note will have {new_count} line(s).")
-        reply = input(f"Replace notes for task #{task_id}? (y/N) ")
-
-        if reply.strip().lower() != "y":
-            print("Cancelled - notes not updated")
-            return
 
         task = manager.update_notes_for_task(task_id, new_note_text)
         save_changes(manager, todo_path)

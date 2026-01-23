@@ -187,8 +187,7 @@ def test_update_note_command(isolated_cli):
     """Test update-note command."""
     isolated_cli.invoke(cli, ["add", "Task with note"])
     isolated_cli.invoke(cli, ["note", "1", "Old note"])
-    # update-note requires confirmation, provide 'y' as input
-    result = isolated_cli.invoke(cli, ["update-note", "1", "New note"], input="y\n")
+    result = isolated_cli.invoke(cli, ["update-note", "1", "New note"])
     assert result.exit_code == 0
     assert "Updated notes" in result.output and "#1" in result.output
 
@@ -385,10 +384,9 @@ def test_note_workflow(isolated_cli):
     result = isolated_cli.invoke(cli, ["note", task_id, "First note"])
     assert result.exit_code == 0
 
-    # Update note (requires confirmation - skip for now as it needs input)
-    # Note: update-note requires user confirmation; tested separately
-    # result = isolated_cli.invoke(cli, ["update-note", task_id, "Updated note"], input="y\n")
-    # assert result.exit_code == 0
+    # Update note
+    result = isolated_cli.invoke(cli, ["update-note", task_id, "Updated note"])
+    assert result.exit_code == 0
 
     # Delete note
     result = isolated_cli.invoke(cli, ["delete-note", task_id])

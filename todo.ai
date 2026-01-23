@@ -4756,13 +4756,6 @@ update_note() {
     # Show preview
     echo "Task #$task_id currently has $old_count line(s) of notes."
     echo "New note will have $new_count line(s)."
-    printf "Replace notes for task #$task_id? (y/N) "
-    read -r reply
-    
-    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-        echo "Cancelled - notes not updated"
-        return 0
-    fi
     
     # Delete old notes (without confirmation since we already confirmed)
     delete_notes_only "$task_id"

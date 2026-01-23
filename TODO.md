@@ -24,18 +24,6 @@
   - [ ] **#181.3** Harden execute flow (preflight, cleanup, retries) `#release`
   - [ ] **#181.2** Fix release notes lifecycle so prepare/execute are clean `#release`
   - [ ] **#181.1** Investigate current release blockers (preflight failures, notes handling) `#release`
-- [x] **#180** Investigate missing --set-version in release.sh `#bug`
-  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
-  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
-  - [x] **#180.3** Implement change and update docs/tests `#bug`
-  - [x] **#180.2** Decide whether to add --set-version or document alternative `#bug`
-  - [x] **#180.1** Confirm supported release.sh options and expected override workflow `#bug`
-    > release.sh does not support --help; running ./release/release.sh --help returns 'Unknown option' but prints usage. Usage currently lists --prepare/--execute/--abort, --beta, --summary, --set-version, --dry-run.
-- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug`
-  > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
-  - [x] **#179.3** Implement fix and add regression test `#bug`
-  - [x] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug`
-  - [x] **#179.1** Reproduce stale summary detection in release.sh `#bug`
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -329,6 +317,18 @@
 ------------------
 
 ## Recently Completed
+- [x] **#180** Investigate missing --set-version in release.sh `#bug` (2026-01-23)
+  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
+  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
+  - [x] **#180.3** Implement change and update docs/tests `#bug` (2026-01-23)
+  - [x] **#180.2** Decide whether to add --set-version or document alternative `#bug` (2026-01-23)
+  - [x] **#180.1** Confirm supported release.sh options and expected override workflow `#bug` (2026-01-23)
+    > release.sh does not support --help; running ./release/release.sh --help returns 'Unknown option' but prints usage. Usage currently lists --prepare/--execute/--abort, --beta, --summary, --set-version, --dry-run.
+- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug` (2026-01-23)
+  > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
+  - [x] **#179.3** Implement fix and add regression test `#bug` (2026-01-23)
+  - [x] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug` (2026-01-23)
+  - [x] **#179.1** Reproduce stale summary detection in release.sh `#bug` (2026-01-23)
 - [x] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug` (2026-01-17)
   > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
   - [x] **#178.3** Add tests for multiple parents/subtasks `#bug` (2026-01-17)
@@ -1100,6 +1100,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 18:42:14 CET 2026
+**Last Updated:** Fri Jan 23 19:44:53 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

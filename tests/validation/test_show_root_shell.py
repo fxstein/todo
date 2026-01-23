@@ -4,6 +4,10 @@ import os
 import subprocess
 from pathlib import Path
 
+import pytest
+
+_IS_WINDOWS = os.name == "nt"
+
 
 def _run_show_root(repo_root: Path, args: list[str], env: dict[str, str] | None = None) -> str:
     script = repo_root / "todo.ai"
@@ -19,6 +23,7 @@ def _run_show_root(repo_root: Path, args: list[str], env: dict[str, str] | None 
     return (result.stdout or "") + (result.stderr or "")
 
 
+@pytest.mark.skipif(_IS_WINDOWS, reason="todo.ai shell script is not runnable on Windows")
 def test_show_root_uses_git_root():
     repo_root = Path(__file__).parent.parent.parent
     output = _run_show_root(repo_root, [])
@@ -26,6 +31,7 @@ def test_show_root_uses_git_root():
     assert "source: git" in output
 
 
+@pytest.mark.skipif(_IS_WINDOWS, reason="todo.ai shell script is not runnable on Windows")
 def test_show_root_overrides(tmp_path: Path):
     repo_root = Path(__file__).parent.parent.parent
     override_root = tmp_path / "override-root"

@@ -51,14 +51,14 @@ Introduce a single workflow with change detection:
    - No `uv sync`, no pre-commit, no pytest matrix.
 
 3. **Logs-only pushes**:
-   - No jobs run (all checks skipped).
+  - Run `logs-quality` only (placeholder gate).
 
 ### Workflow Routing
 
 - A `changes` job uses `dorny/paths-filter@v3` to detect:
   - `docs`: any `*.md`
-  - `logs_only`: only `*.log`
-  - `code`: any non-`*.md` and non-`*.log`
+  - `logs`: any `*.log`
+- `code` is derived by subtracting `*.md`/`*.log` from all changed files.
 - `docs-quality` runs for docs changes (push/PR).
 - `quality`, `test-quick`, `test-comprehensive` run only when code changes are present (push/PR), and always for tags.
 - `logs-quality` runs for log changes (push/PR) as a placeholder gate.

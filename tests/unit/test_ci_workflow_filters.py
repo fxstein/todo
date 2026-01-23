@@ -10,7 +10,7 @@ def test_ci_cd_has_change_detection():
     assert "dorny/paths-filter" in content
     assert "docs:" in content
     assert "logs:" in content
-    assert "code:" in content
+    assert "all:" in content
     assert "**/*.md" in content
     assert "**/*.log" in content
 

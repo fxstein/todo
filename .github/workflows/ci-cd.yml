@@ -20,7 +20,8 @@ jobs:
     outputs:
       docs: ${{ steps.filter.outputs.docs }}
       logs: ${{ steps.filter.outputs.logs }}
-      code: ${{ steps.filter.outputs.code }}
+      code: ${{ steps.compute.outputs.code }}
+      code_files: ${{ steps.compute.outputs.code_files }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -39,12 +40,26 @@ jobs:
             logs:
               - '*.log'
               - '**/*.log'
-            code:
+            all:
               - '**/*'
-              - '!*.md'
-              - '!**/*.md'
-              - '!*.log'
-              - '!**/*.log'
+
+      - name: Derive code changes
+        id: compute
+        run: |
+          files="${{ steps.filter.outputs.all_files }}"
+          code=false
+          code_files=""
+
+          for f in $files; do
+            if [[ "$f" != *.md && "$f" != *.log ]]; then
+              code=true
+              code_files+="$f "
+            fi
+          done
+
+          code_files="${code_files%% }"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "code_files=$code_files" >> "$GITHUB_OUTPUT"
 
   docs-quality:
     name: Docs Quality

@@ -1,9 +1,9 @@
-This beta focuses on reliability for hierarchical task management in the new
-Python-based todo.ai. Subtasks now insert directly under their intended parent
-task (or the parent’s last subtask), preventing the mis-grouping that previously
-collapsed all subtasks under a single task.
+This beta hardens repo-scoped usage by pinning todo.ai to the repository (or
+super-repo) root by default, preventing accidental initialization in the wrong
+directory. It also adds a `show-root` command with `--root` and `TODO_AI_ROOT`
+overrides so users can verify and control the resolved root explicitly.
 
-Alongside the fix, the release includes routine maintenance and task cleanup to
-keep the repository and workflows tidy. The core user-facing change is the
-correct subtask placement behavior, which restores confidence in multi-parent
-task trees.
+The release brings parity updates in the Python CLI alongside new validation
+tests, plus clearer guidance in the Getting Started and Usage Patterns docs.
+CI gating is now scoped to the latest commit for release preparation, reducing
+false stops from older failed runs.

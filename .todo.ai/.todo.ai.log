@@ -2,6 +2,16 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 20:38:17 | fxstein | COMPLETE | 182.14 | Add temp submodule test for Python CLI show-root
+2026-01-23 20:38:17 | fxstein | COMPLETE | 182.13 | Add temp submodule test for shell show-root
+2026-01-23 20:34:34 | fxstein | ADD_SUBTASK | 182.16 | Execute beta release 3.0.0b6 (parent: #182)
+2026-01-23 20:34:29 | fxstein | ADD_SUBTASK | 182.15 | Prepare beta release 3.0.0b6 (parent: #182)
+2026-01-23 20:34:25 | fxstein | COMPLETE | 182.12 | Execute beta release 3.0.0b5
+2026-01-23 20:34:25 | fxstein | COMPLETE | 182.11 | Prepare beta release 3.0.0b5
+2026-01-23 20:33:14 | fxstein | NOTE | 182.14 | Use temp repo/submodule fixture for Python CLI; call show-root and assert resolved root is superproject (not submodule).
+2026-01-23 20:33:09 | fxstein | NOTE | 182.13 | Create temp git repo (one file + one commit) and add as submodule in tests; run show-root from submodule path, assert superproject root.
+2026-01-23 20:33:05 | fxstein | ADD_SUBTASK | 182.14 | Add temp submodule test for Python CLI show-root (parent: #182)
+2026-01-23 20:33:02 | fxstein | ADD_SUBTASK | 182.13 | Add temp submodule test for shell show-root (parent: #182)
 2026-01-23 20:05:14 | fxstein | COMPLETE | 182.9 | Execute beta release 3.0.0b4
 2026-01-23 20:05:14 | fxstein | COMPLETE | 182.8 | Prepare beta release 3.0.0b4
 2026-01-23 20:04:45 | fxstein | MODIFY | 182.12 | Execute beta release 3.0.0b5

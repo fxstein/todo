@@ -84,6 +84,14 @@ def _resolve_git_root(cwd: str) -> str | None:
             gitdir_path = gitdir.stdout.strip()
             if gitdir_path:
                 gitdir_real = (Path(cwd) / gitdir_path).resolve()
+                if gitdir_real.is_file():
+                    try:
+                        gitdir_line = gitdir_real.read_text().splitlines()[0].strip()
+                    except (OSError, IndexError):
+                        gitdir_line = ""
+                    if gitdir_line.startswith("gitdir:"):
+                        gitdir_value = gitdir_line.split("gitdir:", 1)[1].strip()
+                        gitdir_real = (Path(cwd) / gitdir_value).resolve()
                 marker = str(Path(".git") / "modules") + os.sep
                 gitdir_real_str = str(gitdir_real)
                 if marker in gitdir_real_str:

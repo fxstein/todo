@@ -3,11 +3,11 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
+- [x] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
   > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
-  - [ ] **#182.19** Execute beta release 3.0.0b7 `#release`
-  - [ ] **#182.18** Prepare beta release 3.0.0b7 `#release`
-  - [ ] **#182.17** Fix migrations root scoping for TODO_AI_ROOT `#bug`
+  - [x] **#182.19** Execute beta release 3.0.0b7 `#release`
+  - [x] **#182.18** Prepare beta release 3.0.0b7 `#release`
+  - [x] **#182.17** Fix migrations root scoping for TODO_AI_ROOT `#bug`
     > Update run_migrations to use ROOT_DIR instead of ORIGINAL_WORKING_DIR so .todo.ai/migrations stays under TODO_AI_ROOT/--root.
   - [x] **#182.16** Execute beta release 3.0.0b6 `#release`
   - [x] **#182.15** Prepare beta release 3.0.0b6 `#release`
@@ -1116,6 +1116,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 21:37:17 CET 2026
+**Last Updated:** Fri Jan 23 22:06:56 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

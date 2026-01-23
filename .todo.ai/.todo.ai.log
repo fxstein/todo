@@ -2,6 +2,26 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.1 | Investigate current directory resolution & init flow
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.2 | Evaluate options to pin directory safely
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.3 | Design user-facing CLI/config behavior
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.4 | Implement directory pinning for CLI
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.5 | Add tests for pinned directory behavior
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.6 | Implement and test missing feature parity in Python
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.7 | Update documentation and guides for pinned root feature
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.8 | Prepare beta release 3.0.0b4
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.9 | Execute beta release 3.0.0b4
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.10 | Fix root resolution for nested submodules
+2026-01-23 22:06:56 | fxstein | COMPLETE | 182.11 | Prepare beta release 3.0.0b5
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.12 | Execute beta release 3.0.0b5
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.13 | Add temp submodule test for shell show-root
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.14 | Add temp submodule test for Python CLI show-root
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.15 | Prepare beta release 3.0.0b6
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.16 | Execute beta release 3.0.0b6
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.17 | Fix migrations root scoping for TODO_AI_ROOT
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.18 | Prepare beta release 3.0.0b7
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182.19 | Execute beta release 3.0.0b7
+2026-01-23 22:06:55 | fxstein | COMPLETE | 182 | Design pinned project directory for todo.ai CLI (non-MCP)
 2026-01-23 21:37:17 | fxstein | ADD_SUBTASK | 182.19 | Execute beta release 3.0.0b7 (parent: #182)
 2026-01-23 21:37:12 | fxstein | ADD_SUBTASK | 182.18 | Prepare beta release 3.0.0b7 (parent: #182)
 2026-01-23 21:36:48 | fxstein | NOTE | 182.17 | Update run_migrations to use ROOT_DIR instead of ORIGINAL_WORKING_DIR so .todo.ai/migrations stays under TODO_AI_ROOT/--root.

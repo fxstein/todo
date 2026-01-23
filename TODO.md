@@ -3,7 +3,7 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#184** Remove confirmation prompt when deleting task notes `#feature`
+- [x] **#184** Remove confirmation prompt when deleting task notes `#feature`
 - [ ] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra`
   - [ ] **#183.5** Document CI/CD optimization and release impact `#docs`
   - [ ] **#183.4** Add tests/verification for CI/CD changes `#infra`
@@ -1123,6 +1123,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 00:06:13 CET 2026
+**Last Updated:** Sat Jan 24 00:07:42 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

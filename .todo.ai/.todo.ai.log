@@ -2,6 +2,13 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 15:30:34 | fxstein | ADD_SUBTASK | 182.6 | STOP (parent: #182)
+2026-01-23 15:30:33 | fxstein | ADD_SUBTASK | 182.5 | Add tests for pinned directory behavior (parent: #182)
+2026-01-23 15:30:33 | fxstein | ADD_SUBTASK | 182.4 | Implement directory pinning for CLI (parent: #182)
+2026-01-23 15:30:32 | fxstein | ADD_SUBTASK | 182.3 | Design user-facing CLI/config behavior (parent: #182)
+2026-01-23 15:30:32 | fxstein | ADD_SUBTASK | 182.2 | Evaluate options to pin directory safely (parent: #182)
+2026-01-23 15:30:32 | fxstein | ADD_SUBTASK | 182.1 | Investigate current directory resolution & init flow (parent: #182)
+2026-01-23 15:30:21 | fxstein | ADD | 182 | Design pinned project directory for todo.ai CLI (non-MCP)
 2026-01-17 13:36:57 | fxstein | NOTE | 181 | Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
 2026-01-17 13:35:23 | fxstein | NOTE | 181 | Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
 2026-01-17 13:35:19 | fxstein | ADD_SUBTASK | 181.4 | Add regression tests for release.sh prepare/execute workflow (parent: #181)

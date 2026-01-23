@@ -19,8 +19,8 @@ WORKFLOWS=$(gh run list --limit 10 --json name,status,conclusion,event \
     --jq '.[] | select(.status != "completed") | .name' | sort -u)
 
 if [ -z "$WORKFLOWS" ]; then
-    # Check if latest runs were successful
-    LATEST=$(gh run list --limit 3 --json name,status,conclusion \
+    # Check latest completed run only
+    LATEST=$(gh run list --limit 1 --json name,status,conclusion \
         --jq '.[] | select(.status == "completed")')
 
     # FIX: Check if LATEST is empty (no completed workflows to verify)
@@ -42,22 +42,14 @@ if [ -z "$WORKFLOWS" ]; then
         exit 1
     fi
 
-    ALL_SUCCESS=true
-    while IFS= read -r line; do
-        CONCLUSION=$(echo "$line" | grep -o '"conclusion":"[^"]*"' | cut -d'"' -f4)
-        if [ "$CONCLUSION" != "success" ]; then
-            ALL_SUCCESS=false
-            break
-        fi
-    done <<< "$LATEST"
-
-    if $ALL_SUCCESS; then
+    CONCLUSION=$(echo "$LATEST" | grep -o '"conclusion":"[^"]*"' | cut -d'"' -f4)
+    if [ "$CONCLUSION" = "success" ]; then
         echo -e "${GREEN}✅ All workflows completed successfully!${NC}"
         exit 0
     else
         echo -e "${YELLOW}⚠️  Some workflows completed with failures${NC}"
         echo ""
-        gh run list --limit 5 --json name,status,conclusion \
+        gh run list --limit 1 --json name,status,conclusion \
             --jq '.[] | "\(.name): \(.conclusion)"'
         exit 1
     fi

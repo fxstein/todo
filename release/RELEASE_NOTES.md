@@ -1,3 +1,30 @@
+## Release 3.0.0b5
+
+This beta fixes repository root resolution when running inside submodules, so
+`show-root` now reliably points to the superproject instead of the nested
+submodule directory. The shell and Python CLIs both detect submodule gitdir
+paths and resolve back to the correct top-level repo for consistent behavior.
+
+The update tightens submodule path detection to avoid false matches, making the
+root logic more robust across complex workspaces. This ensures Cursor rules and
+todo.ai data stay scoped to the intended repository even when working deep in
+submodule trees.
+
+---
+
+### 🐛 Bug Fixes
+
+- tighten submodule gitdir marker (task#182.10) ([186a87e](https://github.com/fxstein/todo.ai/commit/186a87e245fd1ef0f214b0e63cf6b95fb4581858))
+- resolve root to superproject from submodules (task#182.10) ([79acd78](https://github.com/fxstein/todo.ai/commit/79acd7812f8992b30da8b0b5920e3b58ee532136))
+
+### 🔧 Other Changes
+
+- chore: update AI release summary ([9ae1e51](https://github.com/fxstein/todo.ai/commit/9ae1e5136299111b9a9e2ee7be98efc08c12eaa2))
+- internal: update task#182 release subtasks ([2848728](https://github.com/fxstein/todo.ai/commit/28487285ed51e45627fe0b8b28748ff1cf15c7a6))
+- internal: archive tasks task#179 and task#180 ([0605084](https://github.com/fxstein/todo.ai/commit/0605084dde8cc6578ce94ba162b1843e8b8a2bf8))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b4
 
 This beta hardens repo-scoped usage by pinning todo.ai to the repository (or

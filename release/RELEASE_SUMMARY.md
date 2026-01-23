@@ -1,11 +1,9 @@
-This beta hardens repo-scoped usage by pinning todo.ai to the repository (or
-super-repo) root by default, preventing accidental initialization in the wrong
-directory. It also adds a `show-root` command with `--root` and `TODO_AI_ROOT`
-overrides, plus parity tests to verify the behavior across the shell and Python
-interfaces.
+This beta fixes repository root resolution when running inside submodules, so
+`show-root` now reliably points to the superproject instead of the nested
+submodule directory. The shell and Python CLIs both detect submodule gitdir
+paths and resolve back to the correct top-level repo for consistent behavior.
 
-Release tooling is more reliable with a clarified AI summary pipeline, a
-finalized `--set-version` workflow, and CI gating that focuses on the latest
-commit to avoid false failures. Documentation updates cover the pinned-root
-feature, usage patterns, and the overall design so users and contributors have
-clear guidance.
+The update tightens submodule path detection to avoid false matches, making the
+root logic more robust across complex workspaces. This ensures Cursor rules and
+todo.ai data stay scoped to the intended repository even when working deep in
+submodule trees.

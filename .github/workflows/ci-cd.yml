@@ -31,6 +31,7 @@ jobs:
         id: filter
         uses: dorny/paths-filter@v3
         with:
+          list-files: shell
           filters: |
             docs:
               - '**/*.md'
@@ -45,7 +46,6 @@ jobs:
     name: Docs Quality
     needs: changes
     if: |
-      github.event_name == 'push' &&
       !startsWith(github.ref, 'refs/tags/v') &&
       needs.changes.outputs.docs == 'true' &&
       needs.changes.outputs.logs_only != 'true'
@@ -88,7 +88,7 @@ jobs:
     needs: changes
     if: |
       startsWith(github.ref, 'refs/tags/v') ||
-      github.event_name == 'pull_request' ||
+      (github.event_name == 'pull_request' && needs.changes.outputs.code == 'true') ||
       (github.event_name == 'push' && needs.changes.outputs.code == 'true')
     runs-on: ubuntu-latest
     steps:
@@ -131,26 +131,22 @@ jobs:
       - name: Install dependencies
         run: uv sync --all-extras
 
-      - name: Run pre-commit checks
-        run: uv run pre-commit run --all-files
+      - name: Run pre-commit checks (code files only)
+        run: |
+          files="${{ needs.changes.outputs.code_files }}"
+          if [ -z "$files" ]; then
+            echo "No code files changed; skipping pre-commit checks."
+            exit 0
+          fi
 
-      - name: Validate documentation
-        uses: DavidAnson/markdownlint-cli2-action@v20
-        with:
-          globs: |
-            **/*.md
-            !node_modules/**
-            !.git/**
-            !.venv/**
-            !**/site-packages/**
-            !**/dist-info/**
-            !**/dist/**
-        continue-on-error: true
+          uv run pre-commit run --files $files
 
   test-comprehensive:
     name: Comprehensive Tests
     needs: quality
-    if: github.event_name == 'push'
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'push' && needs.changes.outputs.code == 'true')
     strategy:
       fail-fast: false
       matrix:
@@ -196,7 +192,9 @@ jobs:
   test-quick:
     name: Quick Tests
     needs: quality
-    if: github.event_name == 'push'
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'push' && needs.changes.outputs.code == 'true')
     strategy:
       fail-fast: false
       matrix:
@@ -241,7 +239,7 @@ jobs:
   test-pr:
     name: PR Tests
     needs: quality
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && needs.changes.outputs.code == 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -287,20 +285,38 @@ jobs:
   # This creates clear visual dependency in GitHub Actions UI
   all-tests-pass:
     name: ✅ All Tests Passed
-    # Only run on tag pushes (when we need to release)
-    if: startsWith(github.ref, 'refs/tags/v')
-    # CRITICAL: Depends on ALL test jobs
-    needs: [quality, test-quick, test-comprehensive]
+    if: always()
+    needs: [changes, docs-quality, quality, test-quick, test-comprehensive, test-pr]
     runs-on: ubuntu-latest
     steps:
-      - name: All tests passed
+      - name: Evaluate checks
         run: |
-          echo "✅ All quality checks and tests have passed"
-          echo "   - Code quality checks"
-          echo "   - Quick tests (3.10, 3.11, 3.12, 3.13 x 3 OSes)"
-          echo "   - Comprehensive tests (3.14 x 3 OSes)"
+          echo "Results:"
+          echo "  docs-quality: ${{ needs.docs-quality.result }}"
+          echo "  quality: ${{ needs.quality.result }}"
+          echo "  test-quick: ${{ needs.test-quick.result }}"
+          echo "  test-comprehensive: ${{ needs.test-comprehensive.result }}"
+          echo "  test-pr: ${{ needs.test-pr.result }}"
           echo ""
-          echo "Ready to proceed with release validation and publishing"
+
+          failures=0
+          for result in \
+            "${{ needs.docs-quality.result }}" \
+            "${{ needs.quality.result }}" \
+            "${{ needs.test-quick.result }}" \
+            "${{ needs.test-comprehensive.result }}" \
+            "${{ needs.test-pr.result }}"; do
+            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
+              failures=1
+            fi
+          done
+
+          if [ "$failures" -ne 0 ]; then
+            echo "❌ One or more required checks failed"
+            exit 1
+          fi
+
+          echo "✅ All required checks passed (skipped checks are acceptable)"
 
   # Validate release version using Python's packaging library
   validate-release:

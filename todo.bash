@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.0b7
+# Version: 3.0.0b8
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.0b7"
+VERSION="3.0.0b8"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -2784,7 +2784,12 @@ modify_todo() {
     # Get the current completion status and existing line (handle both bold and non-bold formatting, and subtasks)
     # Check all possible indentations: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
     local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) |^    - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
-    local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/' | sed 's/    - \[\([^]]*\)\].*/\1/')
+    local current_status=$(echo "$current_line" | sed -E 's/^[[:space:]]*- \[([ xX])\].*/\1/')
+    if [[ "$current_status" =~ [Xx] ]]; then
+        current_status="x"
+    else
+        current_status=" "
+    fi
 
     # Extract existing tags from current line (tags are in backticks after the task text)
     local existing_tags=""
@@ -4707,16 +4712,6 @@ delete_note() {
     # Count note lines
     local note_count=$(echo "$notes" | wc -l | tr -d ' ')
 
-    # Show confirmation prompt
-    echo "Task #$task_id has $note_count line(s) of notes."
-    printf "Delete all notes from task #$task_id? (y/N) "
-    read -r reply
-
-    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-        echo "Cancelled - notes not deleted"
-        return 0
-    fi
-
     # Delete the notes
     delete_notes_only "$task_id"
 
@@ -4761,13 +4756,6 @@ update_note() {
     # Show preview
     echo "Task #$task_id currently has $old_count line(s) of notes."
     echo "New note will have $new_count line(s)."
-    printf "Replace notes for task #$task_id? (y/N) "
-    read -r reply
-
-    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-        echo "Cancelled - notes not updated"
-        return 0
-    fi
 
     # Delete old notes (without confirmation since we already confirmed)
     delete_notes_only "$task_id"

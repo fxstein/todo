@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.0b5
+# Version: 3.0.0b6
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.0b5"
+VERSION="3.0.0b6"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -115,8 +115,25 @@ resolve_git_root() {
         local gitdir_path
         gitdir_path=$(git -C "$ORIGINAL_WORKING_DIR" rev-parse --git-dir 2>/dev/null || true)
         if [[ -n "$gitdir_path" ]]; then
-            local gitdir_real
-            gitdir_real=$(cd "$ORIGINAL_WORKING_DIR" 2>/dev/null && cd "$gitdir_path" 2>/dev/null && pwd -P)
+            local gitdir_real=""
+            local gitdir_candidate="$gitdir_path"
+            # Handle gitdir pointer files (common in submodules)
+            if [[ "$gitdir_candidate" != /* ]]; then
+                gitdir_candidate="${ORIGINAL_WORKING_DIR}/${gitdir_candidate}"
+            fi
+            if [[ -f "$gitdir_candidate" ]]; then
+                local gitdir_line
+                gitdir_line=$(head -n 1 "$gitdir_candidate" 2>/dev/null || true)
+                if [[ "$gitdir_line" == gitdir:\ * ]]; then
+                    local gitdir_from_file="${gitdir_line#gitdir: }"
+                    if [[ "$gitdir_from_file" != /* ]]; then
+                        gitdir_from_file="${ORIGINAL_WORKING_DIR}/${gitdir_from_file}"
+                    fi
+                    gitdir_real=$(cd "$gitdir_from_file" 2>/dev/null && pwd -P)
+                fi
+            else
+                gitdir_real=$(cd "$ORIGINAL_WORKING_DIR" 2>/dev/null && cd "$gitdir_path" 2>/dev/null && pwd -P)
+            fi
             if [[ -n "$gitdir_real" ]]; then
                 # Detect submodule gitdir path: /path/to/.git/modules/<submodule>[/...]
                 if [[ "$gitdir_real" == *"/.git/modules/"* ]]; then

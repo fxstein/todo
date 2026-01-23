@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.0b6
+# Version: 3.0.0b7
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.0b6"
+VERSION="3.0.0b7"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -6068,9 +6068,8 @@ version_compare() {
 # Function to run migrations
 run_migrations() {
     local current_version="$VERSION"
-    # Use original working directory (captured at script startup) instead of current pwd
-    # This ensures migrations run in the user's working directory, not the script's directory
-    local migrations_dir="${ORIGINAL_WORKING_DIR}/.todo.ai/migrations"
+    # Use resolved root to keep migrations scoped correctly (supports TODO_AI_ROOT/--root)
+    local migrations_dir="${ROOT_DIR}/.todo.ai/migrations"
     local lock_file="${migrations_dir}/.migrations_lock"
 
     # Lock to prevent concurrent execution

@@ -1,3 +1,25 @@
+## Release 3.0.0b7
+
+This beta fixes migrations writing .todo.ai data into the current working
+directory when TODO_AI_ROOT or --root is used. Migrations now respect the
+resolved root, keeping data and state consistent across nested workflows.
+
+Users working inside subdirectories can safely set TODO_AI_ROOT without seeing
+new .todo.ai folders created in the wrong place, which keeps repository hygiene
+and tooling expectations aligned.
+
+---
+
+### 🐛 Bug Fixes
+
+- scope migrations to resolved root (task#182.17) ([e8e438c](https://github.com/fxstein/todo.ai/commit/e8e438c39ab2ac886c0bca97725cd7dd9a1ee98c))
+
+### 🔧 Other Changes
+
+- chore: update AI release summary ([f4e914b](https://github.com/fxstein/todo.ai/commit/f4e914bb63364dc2f783db7d67d7a168dcf67424))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b6
 
 This beta improves repository root detection for submodule layouts by correctly

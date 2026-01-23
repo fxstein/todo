@@ -2,6 +2,62 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 19:24:25 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 19:24:23 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 19:24:22 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 19:24:21 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b4 instead of proposed version
+2026-01-23 19:24:20 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 19:24:18 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 19:21:17 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 19:21:15 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 19:21:15 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 19:21:14 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b4 instead of proposed version
+2026-01-23 19:21:13 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 19:21:11 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 19:18:21 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 19:18:19 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 19:18:18 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 19:18:18 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b4 instead of proposed version
+2026-01-23 19:18:17 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 19:18:15 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 19:14:35 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 19:14:33 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: none
+2026-01-23 19:14:32 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b4 instead of proposed version
+2026-01-23 19:14:31 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 19:14:29 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:41:29 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 18:41:27 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 18:41:26 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 18:41:25 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b4 instead of proposed version
+2026-01-23 18:41:24 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 18:41:23 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:40:52 | fxstein | PREPARE | Release preview prepared for v3.0.0b99 (beta)
+2026-01-23 18:40:50 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b99 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 18:40:49 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 18:40:48 | fxstein | VERSION OVERRIDE | Using override version 3.0.0b99 instead of proposed version
+2026-01-23 18:40:47 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 18:40:45 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:28:21 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 18:28:19 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 18:28:18 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 18:28:18 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 18:28:15 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:25:53 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 18:25:51 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 18:25:50 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 18:25:49 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 18:25:47 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:24:08 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 18:24:06 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 18:24:05 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 18:24:04 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 18:24:02 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:15:24 | fxstein | PREPARE | Release preview prepared for v3.0.0b4 (beta)
+2026-01-23 18:15:23 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b3 - File version (todo.ai): 3.0.0b3 - Proposed version: 3.0.0b4 - Release type: beta - Bump type: minor - Last tag: v3.0.0b3 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-23 18:15:22 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-23 18:15:21 | fxstein | BETA VERSION | Found existing betas up to b3 for 3.0.0, using b4
+2026-01-23 18:15:19 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
+2026-01-23 18:12:18 | fxstein | ERROR - Auto-Commit Failed | Failed to auto-commit uncommitted changes
 2026-01-17 14:35:43 | fxstein | RELEASE COMPLETE | Release 3.0.0b3 published successfully! - Tag: v3.0.0b3 - URL: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0b3 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
 2026-01-17 14:35:42 | fxstein | WORKFLOW SUCCESS | GitHub Actions release workflow completed successfully
 2026-01-17 14:33:05 | fxstein | WAIT WORKFLOW | Waiting for GitHub Actions release workflow to complete

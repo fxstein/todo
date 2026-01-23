@@ -110,6 +110,24 @@ resolve_git_root() {
             echo "$super_root"
             return 0
         fi
+        # If we're inside a submodule, --show-superproject-working-tree can be empty.
+        # Fall back to reading .git and walking back to the superproject root.
+        local gitdir_path
+        gitdir_path=$(git -C "$ORIGINAL_WORKING_DIR" rev-parse --git-dir 2>/dev/null || true)
+        if [[ -n "$gitdir_path" ]]; then
+            local gitdir_real
+            gitdir_real=$(cd "$ORIGINAL_WORKING_DIR" 2>/dev/null && cd "$gitdir_path" 2>/dev/null && pwd -P)
+            if [[ -n "$gitdir_real" ]]; then
+                # Detect submodule gitdir path: /path/to/.git/modules/<submodule>[/...]
+                if [[ "$gitdir_real" == *"/.git/modules/"* ]]; then
+                    local before_modules="${gitdir_real%%/.git/modules/*}"
+                    if [[ -n "$before_modules" ]]; then
+                        echo "$before_modules"
+                        return 0
+                    fi
+                fi
+            fi
+        fi
         git -C "$ORIGINAL_WORKING_DIR" rev-parse --show-toplevel 2>/dev/null
     fi
 }

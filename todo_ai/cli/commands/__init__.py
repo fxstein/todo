@@ -73,6 +73,23 @@ def _resolve_git_root(cwd: str) -> str | None:
             candidate = superproject.stdout.strip()
             if candidate:
                 return candidate
+        gitdir = subprocess.run(
+            ["git", "rev-parse", "--git-dir"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if gitdir.returncode == 0:
+            gitdir_path = gitdir.stdout.strip()
+            if gitdir_path:
+                gitdir_real = (Path(cwd) / gitdir_path).resolve()
+                marker = str(Path(".git") / "modules")
+                gitdir_real_str = str(gitdir_real)
+                if marker in gitdir_real_str:
+                    super_root = gitdir_real_str.split(marker, 1)[0].rstrip("/")
+                    if super_root:
+                        return super_root
         toplevel = subprocess.run(
             ["git", "rev-parse", "--show-toplevel"],
             cwd=cwd,

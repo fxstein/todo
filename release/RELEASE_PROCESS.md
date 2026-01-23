@@ -178,6 +178,26 @@ The intelligent release script will:
 5. **Request human review** for major releases or releases with >10 commits
 6. **Wait for explicit execute** after prepare
 
+## CI/CD Triggers and Test Optimization
+
+The CI/CD workflow runs in a single workflow file and selects jobs based on
+which files changed. This keeps the dependency graph intact while skipping
+expensive tests for docs/log-only updates.
+
+### Triggers
+
+- `*.md` changes → `docs-quality` only (markdown lint + forbidden flag scan)
+- `*.log` changes → `logs-quality` only (placeholder gate)
+- Non-`*.md`/`*.log` changes → `quality` + full test matrix
+- Mixed changes → run all relevant jobs for the changed file types
+- Tag releases (`v*`) → full chain always runs regardless of file types
+
+### Optimization Impact
+
+- Documentation/log updates no longer trigger the full test matrix.
+- Code changes still run full CI and remain release-gated.
+- Releases remain fully protected by tag-triggered full CI.
+
 ### How It Works
 
 The script uses a **hybrid approach** with three priority levels:

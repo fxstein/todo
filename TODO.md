@@ -5,8 +5,12 @@
 ## Tasks
 - [ ] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
   > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
-  - [ ] **#182.16** Execute beta release 3.0.0b6 `#release`
-  - [ ] **#182.15** Prepare beta release 3.0.0b6 `#release`
+  - [ ] **#182.19** Execute beta release 3.0.0b7 `#release`
+  - [ ] **#182.18** Prepare beta release 3.0.0b7 `#release`
+  - [ ] **#182.17** Fix migrations root scoping for TODO_AI_ROOT `#bug`
+    > Update run_migrations to use ROOT_DIR instead of ORIGINAL_WORKING_DIR so .todo.ai/migrations stays under TODO_AI_ROOT/--root.
+  - [x] **#182.16** Execute beta release 3.0.0b6 `#release`
+  - [x] **#182.15** Prepare beta release 3.0.0b6 `#release`
   - [x] **#182.14** Add temp submodule test for Python CLI show-root `#test`
     > Use temp repo/submodule fixture for Python CLI; call show-root and assert resolved root is superproject (not submodule).
   - [x] **#182.13** Add temp submodule test for shell show-root `#test`
@@ -15,7 +19,7 @@
     > Execute beta release only after explicit approval; wait for CI/CD completion before cleanup per release.sh workflow.
   - [x] **#182.11** Prepare beta release 3.0.0b5 `#release`
     > After fix lands, draft AI summary and run prepare for next beta; ensure summary commit is latest/near-latest to satisfy staleness check.
-  - [ ] **#182.10** Fix root resolution for nested submodules `#bug`
+  - [x] **#182.10** Fix root resolution for nested submodules `#bug`
     > Investigate submodule root detection: use gitdir path (.git/modules/...) to locate superproject when --show-superproject-working-tree returns empty.
   - [x] **#182.9** Execute beta release 3.0.0b4 `#release`
   - [x] **#182.8** Prepare beta release 3.0.0b4 `#release`
@@ -1112,6 +1116,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 20:38:18 CET 2026
+**Last Updated:** Fri Jan 23 21:37:17 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

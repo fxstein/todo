@@ -6068,9 +6068,8 @@ version_compare() {
 # Function to run migrations
 run_migrations() {
     local current_version="$VERSION"
-    # Use original working directory (captured at script startup) instead of current pwd
-    # This ensures migrations run in the user's working directory, not the script's directory
-    local migrations_dir="${ORIGINAL_WORKING_DIR}/.todo.ai/migrations"
+    # Use resolved root to keep migrations scoped correctly (supports TODO_AI_ROOT/--root)
+    local migrations_dir="${ROOT_DIR}/.todo.ai/migrations"
     local lock_file="${migrations_dir}/.migrations_lock"
     
     # Lock to prevent concurrent execution

@@ -2,6 +2,13 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 21:37:17 | fxstein | ADD_SUBTASK | 182.19 | Execute beta release 3.0.0b7 (parent: #182)
+2026-01-23 21:37:12 | fxstein | ADD_SUBTASK | 182.18 | Prepare beta release 3.0.0b7 (parent: #182)
+2026-01-23 21:36:48 | fxstein | NOTE | 182.17 | Update run_migrations to use ROOT_DIR instead of ORIGINAL_WORKING_DIR so .todo.ai/migrations stays under TODO_AI_ROOT/--root.
+2026-01-23 21:36:39 | fxstein | ADD_SUBTASK | 182.17 | Fix migrations root scoping for TODO_AI_ROOT (parent: #182)
+2026-01-23 21:36:20 | fxstein | COMPLETE | 182.10 | Fix root resolution for nested submodules
+2026-01-23 21:35:53 | fxstein | COMPLETE | 182.16 | Execute beta release 3.0.0b6
+2026-01-23 21:35:53 | fxstein | COMPLETE | 182.15 | Prepare beta release 3.0.0b6
 2026-01-23 20:38:17 | fxstein | COMPLETE | 182.14 | Add temp submodule test for Python CLI show-root
 2026-01-23 20:38:17 | fxstein | COMPLETE | 182.13 | Add temp submodule test for shell show-root
 2026-01-23 20:34:34 | fxstein | ADD_SUBTASK | 182.16 | Execute beta release 3.0.0b6 (parent: #182)

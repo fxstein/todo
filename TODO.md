@@ -5,7 +5,6 @@
 ## Tasks
 - [ ] **#184** Remove confirmation prompt when deleting task notes `#feature`
 - [ ] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra`
-  > Tests: tests/unit/test_ci_workflow_filters.py validates ci-cd.yml change detection + docs-quality presence. Update if workflow path or filter naming changes.
   - [ ] **#183.5** Document CI/CD optimization and release impact `#docs`
   - [ ] **#183.4** Add tests/verification for CI/CD changes `#infra`
   - [x] **#183.3** Implement optimized CI/CD workflow changes `#infra`
@@ -1124,6 +1123,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 23:55:34 CET 2026
+**Last Updated:** Sat Jan 24 00:06:13 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

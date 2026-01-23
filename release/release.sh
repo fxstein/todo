@@ -987,10 +987,16 @@ main() {
         fi
     fi
 
-    # Check if AI summary file exists if provided (no prompt, just warn)
+    # Require AI_RELEASE_SUMMARY.md for prepare (per releases.mdc)
     if [[ -n "$AI_SUMMARY_FILE" ]] && [[ ! -f "$AI_SUMMARY_FILE" ]]; then
-        echo -e "${YELLOW}⚠️  Warning: Summary file not found: $AI_SUMMARY_FILE (continuing without it)${NC}"
-        AI_SUMMARY_FILE=""
+        echo -e "${RED}❌ Error: Summary file not found: $AI_SUMMARY_FILE${NC}"
+        echo -e "${YELLOW}Please prepare release/AI_RELEASE_SUMMARY.md first (per releases.mdc).${NC}"
+        return 1
+    fi
+    if [[ -z "$AI_SUMMARY_FILE" ]]; then
+        echo -e "${RED}❌ Error: Missing AI release summary.${NC}"
+        echo -e "${YELLOW}Please prepare release/AI_RELEASE_SUMMARY.md first (per releases.mdc).${NC}"
+        return 1
     fi
 
     # Validate AI summary file is not stale (newer than last release)

@@ -465,11 +465,6 @@ def delete_note_command(task_id: str, todo_path: str = "TODO.md"):
             print(f"Task #{task_id} has no notes to delete")
             return
 
-        reply = input(f"Delete all notes from task #{task_id}? (y/N) ")
-        if reply.strip().lower() != "y":
-            print("Cancelled - notes not deleted")
-            return
-
         manager.delete_notes_from_task(task_id)
         save_changes(manager, todo_path)
         print(f"Deleted notes from task #{task_id}")

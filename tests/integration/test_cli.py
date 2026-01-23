@@ -178,8 +178,7 @@ def test_delete_note_command(isolated_cli):
     """Test delete-note command."""
     isolated_cli.invoke(cli, ["add", "Task with note"])
     isolated_cli.invoke(cli, ["note", "1", "Note to delete"])
-    # delete-note requires confirmation, provide 'y' as input
-    result = isolated_cli.invoke(cli, ["delete-note", "1"], input="y\n")
+    result = isolated_cli.invoke(cli, ["delete-note", "1"])
     assert result.exit_code == 0
     assert "Deleted notes" in result.output and "#1" in result.output
 
@@ -387,14 +386,13 @@ def test_note_workflow(isolated_cli):
     assert result.exit_code == 0
 
     # Update note (requires confirmation - skip for now as it needs input)
-    # Note: update-note and delete-note require user confirmation
-    # These are tested separately in their individual test functions
+    # Note: update-note requires user confirmation; tested separately
     # result = isolated_cli.invoke(cli, ["update-note", task_id, "Updated note"], input="y\n")
     # assert result.exit_code == 0
 
-    # Delete note (requires confirmation - skip for now as it needs input)
-    # result = isolated_cli.invoke(cli, ["delete-note", task_id], input="y\n")
-    # assert result.exit_code == 0
+    # Delete note
+    result = isolated_cli.invoke(cli, ["delete-note", task_id])
+    assert result.exit_code == 0
 
 
 def test_relationship_workflow(isolated_cli):

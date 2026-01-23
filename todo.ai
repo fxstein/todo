@@ -4706,17 +4706,7 @@ delete_note() {
     
     # Count note lines
     local note_count=$(echo "$notes" | wc -l | tr -d ' ')
-    
-    # Show confirmation prompt
-    echo "Task #$task_id has $note_count line(s) of notes."
-    printf "Delete all notes from task #$task_id? (y/N) "
-    read -r reply
-    
-    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
-        echo "Cancelled - notes not deleted"
-        return 0
-    fi
-    
+
     # Delete the notes
     delete_notes_only "$task_id"
     

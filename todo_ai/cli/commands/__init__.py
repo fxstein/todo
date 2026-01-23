@@ -84,7 +84,7 @@ def _resolve_git_root(cwd: str) -> str | None:
             gitdir_path = gitdir.stdout.strip()
             if gitdir_path:
                 gitdir_real = (Path(cwd) / gitdir_path).resolve()
-                marker = str(Path(".git") / "modules")
+                marker = str(Path(".git") / "modules") + os.sep
                 gitdir_real_str = str(gitdir_real)
                 if marker in gitdir_real_str:
                     super_root = gitdir_real_str.split(marker, 1)[0].rstrip("/")

@@ -2,6 +2,14 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 15:39:57 | fxstein | COMPLETE | 182.2 | Evaluate options to pin directory safely
+2026-01-23 15:39:53 | fxstein | NOTE | 182.2 | Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
+2026-01-23 15:38:58 | fxstein | COMPLETE | 182.1 | Investigate current directory resolution & init flow
+2026-01-23 15:37:20 | fxstein | NOTE | 182.1 | Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md
+2026-01-23 15:37:15 | fxstein | NOTE | 182 | Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
+2026-01-23 15:37:15 | fxstein | DELETE_NOTE | 182 | Deleted 2 line(s) of notes
+2026-01-23 15:35:39 | fxstein | NOTE | 182 | Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md (details on ORIGINAL_WORKING_DIR-derived paths and init order)
+2026-01-23 15:33:04 | fxstein | NOTE | 182 | Investigation: todo.ai uses ORIGINAL_WORKING_DIR=/Users/oratzes/cursor/todo.ai at startup (todo.ai lines ~60). TODO_FILE/.todo.ai paths are derived from ORIGINAL_WORKING_DIR. init_log_file + init_todo_file run at script init (lines ~6995) BEFORE CLI arg handling, so calling from any directory initializes .todo.ai/ and TODO.md there. init_cursor_rules also uses pwd. No pinning mechanism besides env overrides (TODO_FILE, TODO_SERIAL, TODO_LOG, TODO_CONFIG).
 2026-01-23 15:30:34 | fxstein | ADD_SUBTASK | 182.6 | STOP (parent: #182)
 2026-01-23 15:30:33 | fxstein | ADD_SUBTASK | 182.5 | Add tests for pinned directory behavior (parent: #182)
 2026-01-23 15:30:33 | fxstein | ADD_SUBTASK | 182.4 | Implement directory pinning for CLI (parent: #182)

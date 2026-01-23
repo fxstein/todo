@@ -4,12 +4,15 @@
 
 ## Tasks
 - [ ] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
+  > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
   - [ ] **#182.6** STOP `#stop`
   - [ ] **#182.5** Add tests for pinned directory behavior `#feature`
   - [ ] **#182.4** Implement directory pinning for CLI `#feature`
   - [ ] **#182.3** Design user-facing CLI/config behavior `#feature`
-  - [ ] **#182.2** Evaluate options to pin directory safely `#feature`
-  - [ ] **#182.1** Investigate current directory resolution & init flow `#feature`
+  - [x] **#182.2** Evaluate options to pin directory safely `#feature`
+    > Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
+  - [x] **#182.1** Investigate current directory resolution & init flow `#feature`
+    > Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md
 - [ ] **#181** Stabilize release process (no failures) `#release`
   > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
   > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
@@ -1092,6 +1095,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 15:30:34 CET 2026
+**Last Updated:** Fri Jan 23 15:39:57 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

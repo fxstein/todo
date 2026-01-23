@@ -6,6 +6,19 @@
 
 This document describes various usage patterns and setups for `todo.ai` in different development scenarios. Each pattern addresses specific needs and constraints, from individual developer workflows to team collaboration.
 
+### Pinned Project Root (All Patterns)
+
+todo.ai pins itself to the repo (or super-repo) root by default. This ensures
+tasks and config always live in the correct repository, even when commands are
+run from subdirectories.
+
+Overrides when needed:
+```bash
+./todo.ai show-root
+./todo.ai show-root --root /path/to/repo
+TODO_AI_ROOT=/path/to/repo ./todo.ai show-root
+```
+
 ---
 
 ## Pattern 1: Individual Developer (Project Not Using todo.ai)

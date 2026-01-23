@@ -25,6 +25,22 @@ This smart installer auto-detects your system and installs the optimal version (
 ./todo.ai init
 ```
 
+### Pinned Project Root
+
+By default, todo.ai pins itself to the repository root (or super-repo root
+when running inside a submodule). This prevents accidental initialization in
+the wrong directory.
+
+Use these commands when needed:
+```bash
+./todo.ai show-root
+./todo.ai show-root --root /path/to/repo
+TODO_AI_ROOT=/path/to/repo ./todo.ai show-root
+```
+
+If you run from a subdirectory and `./todo.ai` is not in that folder, call it
+via a relative path or PATH, e.g. `../todo.ai show-root`.
+
 ### Use Interactive Setup Wizard
 
 The easiest way to configure todo.ai:

@@ -9,8 +9,10 @@ def test_ci_cd_has_change_detection():
     content = (_repo_root() / ".github/workflows/ci-cd.yml").read_text(encoding="utf-8")
     assert "dorny/paths-filter" in content
     assert "docs:" in content
-    assert "logs_only:" in content
+    assert "logs:" in content
     assert "code:" in content
+    assert "**/*.md" in content
+    assert "**/*.log" in content
 
 
 def test_ci_cd_has_docs_quality_job():

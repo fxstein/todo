@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       docs: ${{ steps.filter.outputs.docs }}
-      logs_only: ${{ steps.filter.outputs.logs_only }}
+      logs: ${{ steps.filter.outputs.logs }}
       code: ${{ steps.filter.outputs.code }}
     steps:
       - name: Checkout repository
@@ -36,11 +36,9 @@ jobs:
             docs:
               - '*.md'
               - '**/*.md'
-            logs_only:
+            logs:
               - '*.log'
               - '**/*.log'
-              - '!*.md'
-              - '!**/*.md'
             code:
               - '**/*'
               - '!*.md'
@@ -53,8 +51,7 @@ jobs:
     needs: changes
     if: |
       !startsWith(github.ref, 'refs/tags/v') &&
-      needs.changes.outputs.docs == 'true' &&
-      needs.changes.outputs.logs_only != 'true'
+      needs.changes.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -94,7 +91,7 @@ jobs:
     needs: changes
     if: |
       !startsWith(github.ref, 'refs/tags/v') &&
-      needs.changes.outputs.logs_only == 'true'
+      needs.changes.outputs.logs == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Placeholder for log-only changes

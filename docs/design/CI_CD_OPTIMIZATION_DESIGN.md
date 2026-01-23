@@ -61,7 +61,7 @@ Introduce a single workflow with change detection:
   - `code`: any non-`*.md` and non-`*.log`
 - `docs-quality` runs for docs changes (push/PR).
 - `quality`, `test-quick`, `test-comprehensive` run only when code changes are present (push/PR), and always for tags.
-- `logs-quality` runs for log-only changes (push/PR) as a placeholder gate.
+- `logs-quality` runs for log changes (push/PR) as a placeholder gate.
 - Tag events still run full CI + release.
 
 ## Workflow Behavior
@@ -72,11 +72,15 @@ Introduce a single workflow with change detection:
 | push to `main` | `*.log` only | Run `logs-quality` only |
 | push to `main` | other files | Run `quality`, `test-quick`, `test-comprehensive` |
 | push to `main` | docs + code | Run both `docs-quality` and code checks |
+| push to `main` | docs + logs | Run both `docs-quality` and `logs-quality` |
+| push to `main` | logs + code | Run both `logs-quality` and code checks |
 | tag `v*` | any | Run full chain + release (unchanged) |
 | pull_request | docs | Run `docs-quality` only |
 | pull_request | code | Run `quality` + tests |
 | pull_request | logs | Run `logs-quality` only |
 | pull_request | docs + code | Run both `docs-quality` and code checks |
+| pull_request | docs + logs | Run both `docs-quality` and `logs-quality` |
+| pull_request | logs + code | Run both `logs-quality` and code checks |
 
 ## Implementation Details
 

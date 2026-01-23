@@ -619,11 +619,31 @@ get_repo_url() {
 }
 
 # Generate release notes from commits
+generate_release_summary() {
+    local ai_summary_file="${1:-}"
+    local summary_file="release/RELEASE_SUMMARY.md"
+
+    if [[ -n "$ai_summary_file" ]] && [[ -f "$ai_summary_file" ]]; then
+        cat "$ai_summary_file" > "$summary_file"
+        echo "" >> "$summary_file"
+        echo "$summary_file"
+        return 0
+    fi
+
+    return 1
+}
+
+# Generate release notes from commits
 generate_release_notes() {
     local last_tag="$1"
     local new_version="$2"
     local summary_file="${3:-}"
     local commit_range
+    local is_beta=false
+
+    if [[ "$new_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+b[0-9]+$ ]]; then
+        is_beta=true
+    fi
 
     if [[ -z "$last_tag" ]] || [[ ! "$last_tag" =~ ^v ]]; then
         # No previous tag or not a version tag - use all commits
@@ -717,6 +737,17 @@ generate_release_notes() {
         echo "" >> "$notes_file"
     fi
 
+    if [[ "$is_beta" == true ]] && [[ -n "$last_tag" ]] && [[ "$last_tag" =~ ^v ]]; then
+        local previous_notes
+        previous_notes=$(git show "${last_tag}:release/RELEASE_NOTES.md" 2>/dev/null || echo "")
+        if [[ -n "$previous_notes" ]]; then
+            echo "## Previous Beta Release Notes" >> "$notes_file"
+            echo "" >> "$notes_file"
+            echo "$previous_notes" >> "$notes_file"
+            echo "" >> "$notes_file"
+        fi
+    fi
+
     echo "$notes_file"
 }
 
@@ -724,19 +755,20 @@ generate_release_notes() {
 commit_prepare_artifacts() {
     local notes_file="release/RELEASE_NOTES.md"
     local log_file="release/RELEASE_LOG.log"
+    local summary_file="release/RELEASE_SUMMARY.md"
 
-    if [[ ! -f "$notes_file" ]] && [[ ! -f "$log_file" ]]; then
+    if [[ ! -f "$notes_file" ]] && [[ ! -f "$log_file" ]] && [[ ! -f "$summary_file" ]]; then
         return 0
     fi
 
     # Only commit if either file has changes
-    local has_changes=$(git status -s -- "$notes_file" "$log_file" 2>/dev/null | wc -l | tr -d ' ')
+    local has_changes=$(git status -s -- "$notes_file" "$log_file" "$summary_file" 2>/dev/null | wc -l | tr -d ' ')
     if [[ "$has_changes" -eq 0 ]]; then
         return 0
     fi
 
     echo -e "${BLUE}💾 Committing release notes preview...${NC}"
-    git add "$notes_file" "$log_file" 2>/dev/null || true
+    git add "$notes_file" "$log_file" "$summary_file" 2>/dev/null || true
 
     local commit_message="release: Update release notes preview"
 
@@ -825,6 +857,8 @@ convert_to_bash() {
 main() {
     local MODE="prepare"  # Default to prepare mode
     local SUMMARY_FILE=""
+    local AI_SUMMARY_FILE=""
+    local DRY_RUN=false
     local PREPARE_STATE_FILE="release/.prepare_state"
     local BETA_RELEASE=false  # Default to stable release
     local ABORT_VERSION=""  # Version to abort (optional)
@@ -838,7 +872,7 @@ main() {
                     echo -e "${RED}Error: --summary requires a file path${NC}"
                     exit 1
                 fi
-                SUMMARY_FILE="$2"
+                AI_SUMMARY_FILE="$2"
                 shift 2
                 ;;
             --prepare)
@@ -871,6 +905,10 @@ main() {
                 OVERRIDE_VERSION="$2"
                 shift 2
                 ;;
+            --dry-run)
+                DRY_RUN=true
+                shift
+                ;;
             *)
                 echo -e "${RED}Unknown option: $1${NC}"
                 echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta] [--set-version <version>]"
@@ -884,6 +922,7 @@ main() {
                 echo "  --beta     Create beta/pre-release (e.g., v1.0.0b1)"
                 echo "  --summary  Include AI-generated summary from file"
                 echo "  --set-version  Override proposed version (e.g., 3.0.0b3)"
+                echo "  --dry-run  Generate preview without committing"
                 echo ""
                 echo "Abort usage:"
                 echo "  $0 --abort           Auto-detect and abort latest failed release"
@@ -909,10 +948,10 @@ main() {
     echo -e "${BLUE}🚀 Preparing release preview...${NC}"
     echo ""
 
-    # Auto-detect RELEASE_SUMMARY.md if --summary not provided
-    if [[ -z "$SUMMARY_FILE" ]] && [[ -f "release/RELEASE_SUMMARY.md" ]]; then
-        SUMMARY_FILE="release/RELEASE_SUMMARY.md"
-        echo -e "${BLUE}📄 Auto-detected release summary: $SUMMARY_FILE${NC}"
+    # Auto-detect AI_RELEASE_SUMMARY.md if --summary not provided
+    if [[ -z "$AI_SUMMARY_FILE" ]] && [[ -f "release/AI_RELEASE_SUMMARY.md" ]]; then
+        AI_SUMMARY_FILE="release/AI_RELEASE_SUMMARY.md"
+        echo -e "${BLUE}📄 Auto-detected AI release summary: $AI_SUMMARY_FILE${NC}"
     fi
 
     # Clean up artifacts from previous prepare attempts to ensure idempotency
@@ -924,14 +963,14 @@ main() {
         fi
     fi
 
-    # Check if summary file exists if provided (no prompt, just warn)
-    if [[ -n "$SUMMARY_FILE" ]] && [[ ! -f "$SUMMARY_FILE" ]]; then
-        echo -e "${YELLOW}⚠️  Warning: Summary file not found: $SUMMARY_FILE (continuing without it)${NC}"
-        SUMMARY_FILE=""
+    # Check if AI summary file exists if provided (no prompt, just warn)
+    if [[ -n "$AI_SUMMARY_FILE" ]] && [[ ! -f "$AI_SUMMARY_FILE" ]]; then
+        echo -e "${YELLOW}⚠️  Warning: Summary file not found: $AI_SUMMARY_FILE (continuing without it)${NC}"
+        AI_SUMMARY_FILE=""
     fi
 
-    # Validate summary file is not stale (newer than last release)
-    if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
+    # Validate AI summary file is not stale (newer than last release)
+    if [[ -n "$AI_SUMMARY_FILE" ]] && [[ -f "$AI_SUMMARY_FILE" ]]; then
         # Get the last release tag
         local last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
@@ -942,10 +981,10 @@ main() {
             # Get modification time of summary file (seconds since epoch)
             if [[ "$(uname)" == "Darwin" ]]; then
                 # macOS stat command
-                local summary_mtime=$(stat -f %m "$SUMMARY_FILE" 2>/dev/null || echo "0")
+                local summary_mtime=$(stat -f %m "$AI_SUMMARY_FILE" 2>/dev/null || echo "0")
             else
                 # Linux stat command
-                local summary_mtime=$(stat -c %Y "$SUMMARY_FILE" 2>/dev/null || echo "0")
+                local summary_mtime=$(stat -c %Y "$AI_SUMMARY_FILE" 2>/dev/null || echo "0")
             fi
 
             # Compare timestamps
@@ -955,7 +994,7 @@ main() {
                 echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
                 echo ""
                 echo -e "${YELLOW}The release summary file is older than the last release:${NC}"
-                echo -e "  Summary file: ${SUMMARY_FILE}"
+                echo -e "  Summary file: ${AI_SUMMARY_FILE}"
                 echo -e "  Last release: ${last_tag} ($(git log -1 --format=%cd --date=format:'%Y-%m-%d %H:%M:%S' "$last_tag"))"
                 echo -e "  File modified: $(date -r "$summary_mtime" '+%Y-%m-%d %H:%M:%S' 2>/dev/null || date -d "@$summary_mtime" '+%Y-%m-%d %H:%M:%S')"
                 echo ""
@@ -1043,6 +1082,11 @@ main() {
 
     # Auto-commit any remaining uncommitted changes (except those already handled)
     if [[ -n "$uncommitted" ]]; then
+        if [[ "$DRY_RUN" == true ]]; then
+            echo -e "${YELLOW}⚠️  Dry-run: Uncommitted changes detected; skipping auto-commit${NC}"
+            echo -e "$uncommitted"
+            echo ""
+        else
         echo -e "${YELLOW}⚠️  Auto-committing uncommitted changes before release...${NC}"
         echo "Uncommitted files:"
         echo -e "$uncommitted"
@@ -1079,6 +1123,7 @@ main() {
         log_release_step "AUTO-COMMIT" "Auto-committed uncommitted changes: $uncommitted"
         echo -e "${GREEN}✓ Changes auto-committed${NC}"
         echo ""
+        fi
     fi
 
     # Validate version consistency between file and GitHub
@@ -1226,6 +1271,12 @@ main() {
     fi
     echo ""
 
+    if [[ -n "$AI_SUMMARY_FILE" ]] && [[ -f "$AI_SUMMARY_FILE" ]]; then
+        SUMMARY_FILE=$(generate_release_summary "$AI_SUMMARY_FILE")
+        summary_needs_commit=true
+        log_release_step "SUMMARY GENERATED" "Generated release summary from ${AI_SUMMARY_FILE} into ${SUMMARY_FILE}"
+    fi
+
     # Log release start with all details
     log_release_step "RELEASE START" "Starting release process:
 - Current version (GitHub): ${CURRENT_VERSION}
@@ -1308,7 +1359,11 @@ EOF
     log_release_step "PREPARE" "Release preview prepared for v${NEW_VERSION} (${RELEASE_TYPE})"
 
     # Commit release notes preview and release log to keep working tree clean
-    commit_prepare_artifacts
+    if [[ "$DRY_RUN" == true ]]; then
+        echo -e "${YELLOW}⚠️  Dry-run: Skipping prepare artifact commit${NC}"
+    else
+        commit_prepare_artifacts
+    fi
 
     # Display execution command
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"

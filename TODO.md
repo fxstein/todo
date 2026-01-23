@@ -30,11 +30,11 @@
   - [ ] **#180.3** Implement change and update docs/tests `#bug`
   - [ ] **#180.2** Decide whether to add --set-version or document alternative `#bug`
   - [ ] **#180.1** Confirm supported release.sh options and expected override workflow `#bug`
-- [ ] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug`
+- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug`
   > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
-  - [ ] **#179.3** Implement fix and add regression test `#bug`
-  - [ ] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug`
-  - [ ] **#179.1** Reproduce stale summary detection in release.sh `#bug`
+  - [x] **#179.3** Implement fix and add regression test `#bug`
+  - [x] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug`
+  - [x] **#179.1** Reproduce stale summary detection in release.sh `#bug`
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -1099,6 +1099,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 17:36:41 CET 2026
+**Last Updated:** Fri Jan 23 18:29:44 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

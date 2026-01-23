@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-24 00:32:03 | fxstein | PREPARE | Release preview prepared for v3.0.0b8 (beta)
+2026-01-24 00:32:02 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b7 - File version (todo.ai): 3.0.0b7 - Proposed version: 3.0.0b8 - Release type: beta - Bump type: minor - Last tag: v3.0.0b7 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-24 00:32:01 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-24 00:32:00 | fxstein | BETA VERSION | Found existing betas up to b7 for 3.0.0, using b8
+2026-01-24 00:31:58 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
 2026-01-23 22:01:06 | fxstein | RELEASE COMPLETE | Release 3.0.0b7 published successfully! - Tag: v3.0.0b7 - URL: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0b7 - Release log: /Users/oratzes/cursor/todo.ai/release/RELEASE_LOG.log
 2026-01-23 22:01:05 | fxstein | WORKFLOW SUCCESS | GitHub Actions release workflow completed successfully
 2026-01-23 21:56:45 | fxstein | WAIT WORKFLOW | Waiting for GitHub Actions release workflow to complete

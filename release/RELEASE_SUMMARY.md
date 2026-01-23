@@ -1,7 +1,8 @@
-This beta fixes migrations writing .todo.ai data into the current working
-directory when TODO_AI_ROOT or --root is used. Migrations now respect the
-resolved root, keeping data and state consistent across nested workflows.
+This release streamlines the release workflow and day-to-day maintenance by
+reducing unnecessary CI/CD runs while keeping full coverage for code changes
+and tag-based releases. Docs and log changes now trigger focused checks,
+improving turnaround without weakening release safeguards.
 
-Users working inside subdirectories can safely set TODO_AI_ROOT without seeing
-new .todo.ai folders created in the wrong place, which keeps repository hygiene
-and tooling expectations aligned.
+It also removes confirmation prompts for delete-note and update-note flows,
+making note management faster and more scriptable, and fixes a checkbox parsing
+edge case when modifying tasks so formatting stays consistent.

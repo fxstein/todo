@@ -1,3 +1,53 @@
+## Release 3.0.0b8
+
+This release streamlines the release workflow and day-to-day maintenance by
+reducing unnecessary CI/CD runs while keeping full coverage for code changes
+and tag-based releases. Docs and log changes now trigger focused checks,
+improving turnaround without weakening release safeguards.
+
+It also removes confirmation prompts for delete-note and update-note flows,
+making note management faster and more scriptable, and fixes a checkbox parsing
+edge case when modifying tasks so formatting stays consistent.
+
+---
+
+### ✨ Features
+
+- remove update-note confirmation prompt (task#185) ([b95f09e](https://github.com/fxstein/todo.ai/commit/b95f09e7df15ccd0cadfe9d48ed4fa6848d35dce))
+- remove delete-note confirmation prompt (task#184) ([8e14e4c](https://github.com/fxstein/todo.ai/commit/8e14e4c02ab24966ccdfe89f8c85fefc23ec2708))
+
+### 🐛 Bug Fixes
+
+- preserve checkbox state on task modify ([a157e41](https://github.com/fxstein/todo.ai/commit/a157e41059234a13163af03db7b67c344f60bcba))
+- derive code changes from file list ([c75f25d](https://github.com/fxstein/todo.ai/commit/c75f25de86ce993e23ac9b8a0ea5b33721978c0a))
+- restore simple md/log change filters ([f1deaa1](https://github.com/fxstein/todo.ai/commit/f1deaa1054ae17ee2825d6dc90d13b0b7234a475))
+- tighten CI change filters for docs/logs ([e5dc9c8](https://github.com/fxstein/todo.ai/commit/e5dc9c87bd2c9c118c1721cb508954692e34e754))
+- use repo-root for workflow file checks ([a2cc4d5](https://github.com/fxstein/todo.ai/commit/a2cc4d51cf8f56e6968e2bfe5f1fba1930532e83))
+
+### 🔧 Other Changes
+
+- chore: add AI release summary ([1074656](https://github.com/fxstein/todo.ai/commit/1074656900892d87201c0c10c646bd44ea1fdc71))
+- internal: archive task#183 and task#185 ([5b6994d](https://github.com/fxstein/todo.ai/commit/5b6994d89d134d51968e55e3c2d535121466f4e1))
+- internal: complete task#183 CI/CD optimization ([a52e326](https://github.com/fxstein/todo.ai/commit/a52e3267a3ff24c9b636cd1222ec9c566a9fd23e))
+- internal: complete task#185 update-note prompt ([0282abb](https://github.com/fxstein/todo.ai/commit/0282abb630a958bb2cf010832d7a1c14edadc91e))
+- internal: complete task#184 delete-note prompt ([6e7adf4](https://github.com/fxstein/todo.ai/commit/6e7adf4b784c2bb5c80548b460c35dcbe36219cf))
+- internal: remove task#183 test note ([db6275d](https://github.com/fxstein/todo.ai/commit/db6275d1b73a0be50321ebbf87bb77922a006de5))
+- internal: add task#184 for note deletion prompt ([fb714b9](https://github.com/fxstein/todo.ai/commit/fb714b9b83ab3c4d5c1b532251869424a050143b))
+- internal: add tests note for task#183 ([ac02a90](https://github.com/fxstein/todo.ai/commit/ac02a904ec21f4f997a8737e4ec29615595f6c9b))
+- internal: complete task#183.3 CI/CD workflow changes ([f3189ec](https://github.com/fxstein/todo.ai/commit/f3189ec104f102aa7f5d436503d73d1f9f79997a))
+- infra: add logs-quality gate to CI/CD ([269528f](https://github.com/fxstein/todo.ai/commit/269528fc893793337bc71c7d36d8a94f666e10c9))
+- infra: split docs and code checks in CI/CD ([622223f](https://github.com/fxstein/todo.ai/commit/622223ff175d30cfdeac51d7d9aab1d4c06e023a))
+- infra: gate CI for docs/log-only changes (task#183.3, task#183.4) ([825ce0a](https://github.com/fxstein/todo.ai/commit/825ce0a075fb7ce1cce33de55adf2856fa2625c0))
+- internal: complete task#183.2 CI/CD design ([5a848b9](https://github.com/fxstein/todo.ai/commit/5a848b9271bcae73bdd0d8c725c571292305a989))
+- docs: add CI/CD optimization design (task#183.2) ([9a5045b](https://github.com/fxstein/todo.ai/commit/9a5045b5cc5eaa4589b4e6406d4d9a39e4355e75))
+- internal: complete task#183.1 CI/CD analysis ([8639a30](https://github.com/fxstein/todo.ai/commit/8639a30dc141c603ca10b73174100e6d32ff3489))
+- docs: add CI/CD optimization analysis for b6/b7 ([7f55114](https://github.com/fxstein/todo.ai/commit/7f551146a6a1154a82394404504240ca971857b2))
+- infra: add task#183 CI/CD optimization plan ([bd46e09](https://github.com/fxstein/todo.ai/commit/bd46e09f158013bd929ba2b38faf9a2b87708375))
+- internal: archive task#181 (release stabilization) ([e1bdd62](https://github.com/fxstein/todo.ai/commit/e1bdd626d1f6adf5dcd45b764629c5d7c1056d8e))
+- internal: complete task#182 and subtasks ([9ad199f](https://github.com/fxstein/todo.ai/commit/9ad199f1ffc5157d74c7cfadcaf93199201dbbde))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b7
 
 This beta fixes migrations writing .todo.ai data into the current working

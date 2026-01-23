@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 18:42:14 | fxstein | COMPLETE | 180.3 | Implement change and update docs/tests
+2026-01-23 18:42:14 | fxstein | COMPLETE | 180.2 | Decide whether to add --set-version or document alternative
+2026-01-23 18:42:14 | fxstein | COMPLETE | 180 | Investigate missing --set-version in release.sh
+2026-01-23 18:33:31 | fxstein | COMPLETE | 180.1 | Confirm supported release.sh options and expected override workflow
+2026-01-23 18:33:23 | fxstein | NOTE | 180.1 | release.sh does not support --help; running ./release/release.sh --help returns 'Unknown option' but prints usage. Usage currently lists --prepare/--execute/--abort, --beta, --summary, --set-version, --dry-run.
 2026-01-23 18:29:44 | fxstein | COMPLETE | 179 | Investigate release prepare failure on stale RELEASE_SUMMARY.md
 2026-01-23 18:29:44 | fxstein | COMPLETE | 179.3 | Implement fix and add regression test
 2026-01-23 18:29:43 | fxstein | COMPLETE | 179.2 | Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md

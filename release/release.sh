@@ -867,6 +867,25 @@ main() {
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
+            --help|-h)
+                echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta] [--set-version <version>] [--dry-run]"
+                echo ""
+                echo "Modes:"
+                echo "  --prepare  Analyze commits and generate release preview (default)"
+                echo "  --execute  Execute prepared release (no prompts)"
+                echo "  --abort    Abort failed release and clean up artifacts"
+                echo ""
+                echo "Options:"
+                echo "  --beta     Create beta/pre-release (e.g., v1.0.0b1)"
+                echo "  --summary  Include AI-generated summary from file"
+                echo "  --set-version  Override proposed version (e.g., 3.0.0b3)"
+                echo "  --dry-run  Generate preview without committing"
+                echo ""
+                echo "Abort usage:"
+                echo "  $0 --abort           Auto-detect and abort latest failed release"
+                echo "  $0 --abort v3.0.0b2  Abort specific release version"
+                exit 0
+                ;;
             --summary)
                 if [[ -z "$2" ]] || [[ "$2" == --* ]]; then
                     echo -e "${RED}Error: --summary requires a file path${NC}"
@@ -902,6 +921,11 @@ main() {
                     echo -e "${RED}Error: --set-version requires a version (e.g., 3.0.0b3)${NC}"
                     exit 1
                 fi
+                if [[ "$MODE" == "execute" ]]; then
+                    echo -e "${RED}Error: --set-version is only supported during prepare${NC}"
+                    echo -e "${YELLOW}Run: ./release/release.sh --prepare --set-version $2${NC}"
+                    exit 1
+                fi
                 OVERRIDE_VERSION="$2"
                 shift 2
                 ;;
@@ -911,7 +935,7 @@ main() {
                 ;;
             *)
                 echo -e "${RED}Unknown option: $1${NC}"
-                echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta] [--set-version <version>]"
+                echo "Usage: $0 [--prepare|--execute|--abort [version]] [--summary <file>] [--beta] [--set-version <version>] [--dry-run]"
                 echo ""
                 echo "Modes:"
                 echo "  --prepare  Analyze commits and generate release preview (default)"

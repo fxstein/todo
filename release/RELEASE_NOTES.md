@@ -1,3 +1,25 @@
+## Release 3.0.0b6
+
+This beta improves repository root detection for submodule layouts by correctly
+handling gitdir pointer files. Running `show-root` from inside a submodule now
+resolves to the superproject root instead of the nested module directory.
+
+The update ensures consistent scoping for Cursor rules and todo.ai data when
+working in projects that use submodules, reducing accidental initialization in
+the wrong directory.
+
+---
+
+### 🐛 Bug Fixes
+
+- handle submodule gitdir files for root resolution (task#182.10) ([3f6bf8b](https://github.com/fxstein/todo.ai/commit/3f6bf8bd1a5b97f35efca812f2f80d847171d0cd))
+
+### 🔧 Other Changes
+
+- chore: update AI release summary ([fc3e17a](https://github.com/fxstein/todo.ai/commit/fc3e17a6a160086d06a097cb628da7a11e7c147d))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b5
 
 This beta fixes repository root resolution when running inside submodules, so

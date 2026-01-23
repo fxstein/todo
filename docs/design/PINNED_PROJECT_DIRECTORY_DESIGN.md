@@ -19,16 +19,16 @@ with deterministic overrides. There is no config setting for this pin.
 
 Root Resolution Order
 ---------------------
-1) Git root anchor (default pin)
+1) `--root /path` override
+   - If provided, use it as the root (absolute or relative path resolved to
+     an absolute path).
+2) `TODO_AI_ROOT` environment variable override
+   - If set, use it as the root (absolute or relative path resolved to
+     an absolute path).
+3) Git root anchor (default pin)
    - If inside a git repo, use `git rev-parse --show-toplevel`.
    - If inside a submodule, prefer the superproject root via
      `git rev-parse --show-superproject-working-tree` when available.
-2) `--root /path` override
-   - If provided, use it as the root (absolute or relative path resolved to
-     an absolute path).
-3) `TODO_AI_ROOT` environment variable override
-   - If set, use it as the root (absolute or relative path resolved to
-     an absolute path).
 4) Fallback
    - If none of the above are available, use `ORIGINAL_WORKING_DIR`.
 

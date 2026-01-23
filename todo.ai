@@ -58,10 +58,94 @@ SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 # Can be overridden with environment variables
 # Capture original working directory at script startup (before any cd commands)
 ORIGINAL_WORKING_DIR="${ORIGINAL_WORKING_DIR:-$(pwd)}"
-TODO_FILE="${TODO_FILE:-${ORIGINAL_WORKING_DIR}/TODO.md}"
-SERIAL_FILE="${TODO_SERIAL:-${ORIGINAL_WORKING_DIR}/.todo.ai/.todo.ai.serial}"
-LOG_FILE="${TODO_LOG:-${ORIGINAL_WORKING_DIR}/.todo.ai/.todo.ai.log}"
-CONFIG_FILE="${TODO_CONFIG:-${ORIGINAL_WORKING_DIR}/.todo.ai/config.yaml}"
+
+# Parse global --root override before initialization
+ROOT_OVERRIDE_PATH=""
+ROOT_FILTERED_ARGS=()
+ROOT_EXPECTING_VALUE="false"
+for arg in "$@"; do
+    if [[ "$ROOT_EXPECTING_VALUE" == "true" ]]; then
+        ROOT_OVERRIDE_PATH="$arg"
+        ROOT_EXPECTING_VALUE="false"
+        continue
+    fi
+    case "$arg" in
+        --root)
+            ROOT_EXPECTING_VALUE="true"
+            ;;
+        --root=*)
+            ROOT_OVERRIDE_PATH="${arg#--root=}"
+            ;;
+        *)
+            ROOT_FILTERED_ARGS+=("$arg")
+            ;;
+    esac
+done
+if [[ "$ROOT_EXPECTING_VALUE" == "true" ]]; then
+    echo "Error: --root requires a path" >&2
+    exit 1
+fi
+if (( ${#ROOT_FILTERED_ARGS[@]} > 0 )); then
+    set -- "${ROOT_FILTERED_ARGS[@]}"
+else
+    set --
+fi
+
+resolve_abs_path() {
+    local raw_path="$1"
+    if [[ -z "$raw_path" ]]; then
+        return 1
+    fi
+    if [[ "$raw_path" != /* ]]; then
+        raw_path="${ORIGINAL_WORKING_DIR}/${raw_path}"
+    fi
+    (cd "$raw_path" 2>/dev/null && pwd -P)
+}
+
+resolve_git_root() {
+    if command -v git >/dev/null 2>&1 && git -C "$ORIGINAL_WORKING_DIR" rev-parse --git-dir >/dev/null 2>&1; then
+        local super_root
+        super_root=$(git -C "$ORIGINAL_WORKING_DIR" rev-parse --show-superproject-working-tree 2>/dev/null || true)
+        if [[ -n "$super_root" ]]; then
+            echo "$super_root"
+            return 0
+        fi
+        git -C "$ORIGINAL_WORKING_DIR" rev-parse --show-toplevel 2>/dev/null
+    fi
+}
+
+ROOT_DIR=""
+ROOT_SOURCE=""
+git_root="$(resolve_git_root)"
+if [[ -n "$ROOT_OVERRIDE_PATH" ]]; then
+    if resolved_root="$(resolve_abs_path "$ROOT_OVERRIDE_PATH")"; then
+        ROOT_DIR="$resolved_root"
+        ROOT_SOURCE="--root"
+    else
+        echo "Warning: --root path not found: $ROOT_OVERRIDE_PATH" >&2
+    fi
+fi
+if [[ -z "$ROOT_DIR" && -n "${TODO_AI_ROOT:-}" ]]; then
+    if resolved_root="$(resolve_abs_path "$TODO_AI_ROOT")"; then
+        ROOT_DIR="$resolved_root"
+        ROOT_SOURCE="env"
+    else
+        echo "Warning: TODO_AI_ROOT path not found: $TODO_AI_ROOT" >&2
+    fi
+fi
+if [[ -z "$ROOT_DIR" && -n "$git_root" ]]; then
+    ROOT_DIR="$git_root"
+    ROOT_SOURCE="git"
+fi
+if [[ -z "$ROOT_DIR" ]]; then
+    ROOT_DIR="$ORIGINAL_WORKING_DIR"
+    ROOT_SOURCE="cwd"
+fi
+
+TODO_FILE="${TODO_FILE:-${ROOT_DIR}/TODO.md}"
+SERIAL_FILE="${TODO_SERIAL:-${ROOT_DIR}/.todo.ai/.todo.ai.serial}"
+LOG_FILE="${TODO_LOG:-${ROOT_DIR}/.todo.ai/.todo.ai.log}"
+CONFIG_FILE="${TODO_CONFIG:-${ROOT_DIR}/.todo.ai/config.yaml}"
 
 # ============================================================================
 # Hybrid Task Numbering System
@@ -238,7 +322,7 @@ validate_config() {
 
 # Create backup before mode switching
 create_mode_backup() {
-    local backup_dir="$(pwd)/.todo.ai/backups"
+    local backup_dir="${ROOT_DIR}/.todo.ai/backups"
     local timestamp=$(date +"%Y%m%d%H%M%S")
     local backup_name="mode-switch-${timestamp}"
     
@@ -279,7 +363,7 @@ rollback_from_backup() {
         return 1
     fi
     
-    local backup_dir="$(pwd)/.todo.ai/backups"
+    local backup_dir="${ROOT_DIR}/.todo.ai/backups"
     local backup_todo="${backup_dir}/${backup_name}.TODO.md"
     local backup_config="${backup_dir}/${backup_name}.config.yaml"
     local backup_serial="${backup_dir}/${backup_name}.serial"
@@ -322,7 +406,7 @@ rollback_from_backup() {
 
 # List mode backups
 list_mode_backups() {
-    local backup_dir="$(pwd)/.todo.ai/backups"
+    local backup_dir="${ROOT_DIR}/.todo.ai/backups"
     
     if [[ ! -d "$backup_dir" ]]; then
         echo "No backups found"
@@ -1351,8 +1435,8 @@ EOF
 
 # Function to ensure Cursor rules include todo.ai requirement
 init_cursor_rules() {
-    local rules_dir="$(pwd)/.cursor/rules"
-    local cursor_rules_file="$(pwd)/.cursorrules"
+    local rules_dir="${ROOT_DIR}/.cursor/rules"
+    local cursor_rules_file="${ROOT_DIR}/.cursorrules"
     local rules_created=0
     local rules_updated=0
     
@@ -1699,6 +1783,8 @@ normalize_checkboxes() {
 # Function to show usage
 show_usage() {
     echo "Usage: ./todo.ai [command] [options]"
+    echo "Global options:"
+    echo "  --root <path>                 Override repo root for this invocation"
     echo ""
     echo "Version: $VERSION"
     echo ""
@@ -1731,6 +1817,7 @@ show_usage() {
     echo "  list-mode-backups             List mode switch backups"
     echo "  rollback-mode <backup-name>   Rollback from mode switch backup"
     echo "  config, show-config           Show current configuration"
+    echo "  show-root                     Show resolved root and source"
     echo "  detect-coordination           Detect available coordination options based on system"
     echo "  setup-coordination <type>     Set up coordination service (github-issues, counterapi)"
     echo "  setup, setup-wizard           Interactive setup wizard for mode and coordination"
@@ -1774,6 +1861,7 @@ show_usage() {
     echo "  ./todo.ai log"
     echo "  ./todo.ai log --filter ADD"
     echo "  ./todo.ai log --lines 20"
+    echo "  ./todo.ai show-root"
     echo "  ./todo.ai update                     # Update to latest version"
     echo "  ./todo.ai backups                    # List available backups"
     echo "  ./todo.ai rollback                   # Rollback to latest backup"
@@ -1797,6 +1885,15 @@ show_usage() {
     echo "Copyright 2025 Oliver Ratzesberger"
     echo "Licensed under the Apache License, Version 2.0"
     echo "Repository: $REPO_URL"
+}
+
+show_root() {
+    echo "Resolved root: $ROOT_DIR (source: $ROOT_SOURCE)"
+    if [[ "$ROOT_SOURCE" == "env" ]]; then
+        echo "Override: TODO_AI_ROOT=$TODO_AI_ROOT"
+    elif [[ "$ROOT_SOURCE" == "--root" ]]; then
+        echo "Override: --root $ROOT_OVERRIDE_PATH"
+    fi
 }
 
 # Function to validate command arguments and detect invalid options
@@ -5464,7 +5561,7 @@ check_version() {
 
 # Function to ensure backups directory exists
 init_backups_dir() {
-    local backups_dir="$(pwd)/.todo.ai/backups"
+    local backups_dir="${ROOT_DIR}/.todo.ai/backups"
     if [[ ! -d "$backups_dir" ]]; then
         mkdir -p "$backups_dir" 2>/dev/null || return 1
     fi
@@ -5487,8 +5584,8 @@ get_script_path() {
             script_path=""
         fi
     # Strategy 3: Try current directory
-    elif [[ -f "$(pwd)/todo.ai" ]]; then
-        script_path="$(pwd)/todo.ai"
+    elif [[ -f "${ROOT_DIR}/todo.ai" ]]; then
+        script_path="${ROOT_DIR}/todo.ai"
     # Strategy 4: Try relative path
     elif [[ -f "./todo.ai" ]]; then
         script_path="./todo.ai"
@@ -6848,14 +6945,14 @@ uninstall_tool() {
     }
     
     # Detect .todo.ai/ directory (in current working directory)
-    local todo_ai_dir="$(pwd)/.todo.ai"
+    local todo_ai_dir="${ROOT_DIR}/.todo.ai"
     local has_data_dir=false
     if [[ -d "$todo_ai_dir" ]]; then
         has_data_dir=true
     fi
     
     # Detect Cursor rules created by todo.ai
-    local rules_dir="$(pwd)/.cursor/rules"
+    local rules_dir="${ROOT_DIR}/.cursor/rules"
     local todo_ai_rules=()
     if [[ -d "$rules_dir" ]]; then
         # Find all todo.ai-*.mdc files
@@ -7251,6 +7348,9 @@ case "${1:-}" in
     "rollback-mode")
         shift
         rollback_from_backup "$1"
+        ;;
+    "show-root")
+        show_root
         ;;
     "config"|"show-config")
         show_config

@@ -27,6 +27,7 @@ from todo_ai.cli.commands import (
     setup_coordination_tool_command,
     setup_wizard_tool_command,
     show_command,
+    show_root_command,
     switch_mode_tool_command,
     undo_command,
     uninstall_tool_command,
@@ -116,6 +117,14 @@ def archive(ctx, task_ids, reason):
 def restore(ctx, task_id):
     """Restore a task from Deleted or Recently Completed back to Tasks section."""
     restore_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("show-root")
+@click.option("--root", "root_override", help="Override repo root for this invocation")
+@click.pass_context
+def show_root(ctx, root_override):
+    """Show resolved root and source."""
+    show_root_command(root_override)
 
 
 @cli.command()

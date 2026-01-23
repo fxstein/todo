@@ -60,6 +60,55 @@ def save_changes(manager: TaskManager, todo_path: str = "TODO.md") -> None:
     file_ops.write_tasks(tasks)
 
 
+def _resolve_git_root(cwd: str) -> str | None:
+    try:
+        superproject = subprocess.run(
+            ["git", "rev-parse", "--show-superproject-working-tree"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if superproject.returncode == 0:
+            candidate = superproject.stdout.strip()
+            if candidate:
+                return candidate
+        toplevel = subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if toplevel.returncode == 0:
+            candidate = toplevel.stdout.strip()
+            if candidate:
+                return candidate
+    except OSError:
+        return None
+    return None
+
+
+def _resolve_root(
+    cwd: str, root_override: str | None = None, env_override: str | None = None
+) -> tuple[str, str]:
+    if root_override:
+        return str(Path(root_override).resolve()), "--root"
+    if env_override:
+        return str(Path(env_override).resolve()), "env"
+    git_root = _resolve_git_root(cwd)
+    if git_root:
+        return git_root, "git"
+    return cwd, "cwd"
+
+
+def show_root_command(root_override: str | None = None) -> None:
+    cwd = os.getcwd()
+    env_override = os.getenv("TODO_AI_ROOT")
+    root, source = _resolve_root(cwd, root_override=root_override, env_override=env_override)
+    print(f"Resolved root: {root} (source: {source})")
+
+
 def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     """Add a new task."""
     # Use cached file_ops if available, otherwise create new one

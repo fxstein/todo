@@ -6,8 +6,8 @@
 - [ ] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
   > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
   - [ ] **#182.7** Update documentation and guides for pinned root feature `#docs`
-  - [ ] **#182.6** STOP `#stop`
-  - [ ] **#182.5** Add tests for pinned directory behavior `#feature`
+  - [x] **#182.6** Implement and test missing feature parity in Python `#feature`
+  - [x] **#182.5** Add tests for pinned directory behavior `#feature`
   - [x] **#182.4** Implement directory pinning for CLI `#feature`
   - [x] **#182.3** Design user-facing CLI/config behavior `#feature`
     > Design doc: docs/design/PINNED_PROJECT_DIRECTORY_DESIGN.md
@@ -1097,6 +1097,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 17:10:38 CET 2026
+**Last Updated:** Fri Jan 23 17:25:06 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

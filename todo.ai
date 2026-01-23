@@ -2784,7 +2784,12 @@ modify_todo() {
     # Get the current completion status and existing line (handle both bold and non-bold formatting, and subtasks)
     # Check all possible indentations: main tasks (0 spaces), subtasks (2 spaces), sub-subtasks (4 spaces)
     local current_line=$(grep -E "^- \[.*\] (\*\*#$task_id\*\*|#$task_id) |^  - \[.*\] (\*\*#$task_id\*\*|#$task_id) |^    - \[.*\] (\*\*#$task_id\*\*|#$task_id) " "$TODO_FILE" | head -1)
-    local current_status=$(echo "$current_line" | sed 's/- \[\([^]]*\)\].*/\1/' | sed 's/  - \[\([^]]*\)\].*/\1/' | sed 's/    - \[\([^]]*\)\].*/\1/')
+    local current_status=$(echo "$current_line" | sed -E 's/^[[:space:]]*- \[([ xX])\].*/\1/')
+    if [[ "$current_status" =~ [Xx] ]]; then
+        current_status="x"
+    else
+        current_status=" "
+    fi
     
     # Extract existing tags from current line (tags are in backticks after the task text)
     local existing_tags=""

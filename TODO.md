@@ -3,10 +3,9 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#184** Remove confirmation prompt when deleting task notes `#feature`
 - [ ] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra`
   - [ ] **#183.5** Document CI/CD optimization and release impact `#docs`
-  - [ ] **#183.4** Add tests/verification for CI/CD changes `#infra`
+  - [x] **#183.4** Add tests/verification for CI/CD changes `#infra` `#skipped`
   - [x] **#183.3** Implement optimized CI/CD workflow changes `#infra`
   - [x] **#183.2** Design CI/CD optimization plan (path filters, tiers) `#infra`
   - [x] **#183.1** Analyze current CI/CD triggers and test matrix `#infra`
@@ -303,6 +302,7 @@
 ------------------
 
 ## Recently Completed
+- [x] **#184** Remove confirmation prompt when deleting task notes `#feature` (2026-01-24)
 - [x] **#181** Stabilize release process (no failures) `#release` (2026-01-23)
   > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
   > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
@@ -1123,6 +1123,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 00:07:42 CET 2026
+**Last Updated:** Sat Jan 24 00:16:08 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

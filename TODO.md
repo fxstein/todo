@@ -8,7 +8,8 @@
   - [ ] **#182.6** STOP `#stop`
   - [ ] **#182.5** Add tests for pinned directory behavior `#feature`
   - [ ] **#182.4** Implement directory pinning for CLI `#feature`
-  - [ ] **#182.3** Design user-facing CLI/config behavior `#feature`
+  - [x] **#182.3** Design user-facing CLI/config behavior `#feature`
+    > Design doc: docs/design/PINNED_PROJECT_DIRECTORY_DESIGN.md
   - [x] **#182.2** Evaluate options to pin directory safely `#feature`
     > Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
   - [x] **#182.1** Investigate current directory resolution & init flow `#feature`
@@ -1095,6 +1096,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 15:39:57 CET 2026
+**Last Updated:** Fri Jan 23 16:17:50 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

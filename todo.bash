@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.0b4
+# Version: 3.0.0b5
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.0b4"
+VERSION="3.0.0b5"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -109,6 +109,24 @@ resolve_git_root() {
         if [[ -n "$super_root" ]]; then
             echo "$super_root"
             return 0
+        fi
+        # If we're inside a submodule, --show-superproject-working-tree can be empty.
+        # Fall back to reading .git and walking back to the superproject root.
+        local gitdir_path
+        gitdir_path=$(git -C "$ORIGINAL_WORKING_DIR" rev-parse --git-dir 2>/dev/null || true)
+        if [[ -n "$gitdir_path" ]]; then
+            local gitdir_real
+            gitdir_real=$(cd "$ORIGINAL_WORKING_DIR" 2>/dev/null && cd "$gitdir_path" 2>/dev/null && pwd -P)
+            if [[ -n "$gitdir_real" ]]; then
+                # Detect submodule gitdir path: /path/to/.git/modules/<submodule>[/...]
+                if [[ "$gitdir_real" == *"/.git/modules/"* ]]; then
+                    local before_modules="${gitdir_real%%/.git/modules/*}"
+                    if [[ -n "$before_modules" ]]; then
+                        echo "$before_modules"
+                        return 0
+                    fi
+                fi
+            fi
         fi
         git -C "$ORIGINAL_WORKING_DIR" rev-parse --show-toplevel 2>/dev/null
     fi

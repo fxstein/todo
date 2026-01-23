@@ -4,7 +4,7 @@
 
 ## Tasks
 - [x] **#185** Remove confirmation prompt when updating task notes `#feature`
-- [ ] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra`
+- [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra`
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs`
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.
   - [x] **#183.4** Add tests/verification for CI/CD changes `#infra` `#skipped`
@@ -1125,6 +1125,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 00:27:15 CET 2026
+**Last Updated:** Sat Jan 24 00:28:01 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

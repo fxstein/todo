@@ -34,12 +34,18 @@ jobs:
           list-files: shell
           filters: |
             docs:
+              - '*.md'
               - '**/*.md'
             logs_only:
+              - '*.log'
               - '**/*.log'
+              - '!*.md'
               - '!**/*.md'
             code:
+              - '**/*'
+              - '!*.md'
               - '!**/*.md'
+              - '!*.log'
               - '!**/*.log'
 
   docs-quality:

@@ -999,8 +999,32 @@ main() {
         return 1
     fi
 
-    # Validate AI summary file is not stale (newer than last release)
+    # Validate AI summary file is not stale (recent commit + newer than last release)
     if [[ -n "$AI_SUMMARY_FILE" ]] && [[ -f "$AI_SUMMARY_FILE" ]]; then
+        local repo_root
+        repo_root=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+        local summary_path="$AI_SUMMARY_FILE"
+        if [[ "$summary_path" == "$repo_root/"* ]]; then
+            summary_path="${summary_path#$repo_root/}"
+        fi
+        summary_path="${summary_path#./}"
+
+        # Require the summary to be committed in the latest 1-2 commits
+        if ! git log -n 2 --name-only --pretty=format: | grep -qx "$summary_path"; then
+            echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo -e "${RED}⚠️  STALE SUMMARY COMMIT DETECTED${NC}"
+            echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+            echo ""
+            echo -e "${YELLOW}The AI release summary was not updated in the latest commits:${NC}"
+            echo -e "  Summary file: ${AI_SUMMARY_FILE}"
+            echo -e "  Latest commits:"
+            git log -n 2 --pretty=format:"  - %h %s"
+            echo ""
+            echo -e "${YELLOW}Please update and commit release/AI_RELEASE_SUMMARY.md immediately before prepare.${NC}"
+            echo ""
+            exit 1
+        fi
+
         # Get the last release tag
         local last_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
 
@@ -2063,9 +2087,13 @@ Includes release summary from ${SUMMARY_FILE}"
 - URL: ${repo_url}/releases/tag/${TAG}
 - Release log: ${RELEASE_LOG}"
 
-    # Commit and push RELEASE_LOG.log at the very end to capture all release operations
+    # Commit and push final artifacts at the very end to capture all operations
     # This happens AFTER the release workflow succeeds
     # Note: We don't log these operations since they happen after the log is committed
+    if [[ -f "release/AI_RELEASE_SUMMARY.md" ]]; then
+        echo -e "${BLUE}🧹 Removing AI release summary (post-release)...${NC}"
+        git rm -f release/AI_RELEASE_SUMMARY.md > /dev/null 2>&1
+    fi
     if [[ -f "$RELEASE_LOG" ]]; then
         echo -e "${BLUE}📋 Committing release log...${NC}"
         git add "$RELEASE_LOG"

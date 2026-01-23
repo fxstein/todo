@@ -14,8 +14,82 @@ on:
     branches: [main]
 
 jobs:
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
+      logs_only: ${{ steps.filter.outputs.logs_only }}
+      code: ${{ steps.filter.outputs.code }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect change types
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            docs:
+              - '**/*.md'
+            logs_only:
+              - '**/*.log'
+              - '!**/*.md'
+            code:
+              - '!**/*.md'
+              - '!**/*.log'
+
+  docs-quality:
+    name: Docs Quality
+    needs: changes
+    if: |
+      github.event_name == 'push' &&
+      !startsWith(github.ref, 'refs/tags/v') &&
+      needs.changes.outputs.docs == 'true' &&
+      needs.changes.outputs.logs_only != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for forbidden flags
+        run: |
+          # Build the forbidden flag using string concatenation to avoid self-detection
+          FORBIDDEN="--no-""verify"
+          echo "Checking for forbidden flag: ${FORBIDDEN}"
+
+          if grep -r "$FORBIDDEN" release/ .github/ scripts/ 2>/dev/null; then
+            echo ""
+            echo "❌ CRITICAL: Found forbidden flag '$FORBIDDEN' in codebase"
+            echo "This flag is ETERNALLY FORBIDDEN."
+            echo "It bypasses all pre-commit hooks and safety checks."
+            echo "No automated process may use it without explicit human approval."
+            exit 1
+          fi
+
+          echo "✅ No forbidden flags found"
+
+      - name: Validate documentation
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: |
+            **/*.md
+            !node_modules/**
+            !.git/**
+            !.venv/**
+            !**/site-packages/**
+            !**/dist-info/**
+            !**/dist/**
+
   quality:
     name: Code Quality
+    needs: changes
+    if: |
+      startsWith(github.ref, 'refs/tags/v') ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && needs.changes.outputs.code == 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

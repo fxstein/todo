@@ -4,8 +4,8 @@
 
 This design reduces redundant full CI/CD runs for metadata-only changes while
 preserving strict safety for code changes and release tags. The goal is to keep
-release integrity intact while using separate lightweight docs checks and
-skipping all tests for log-only changes.
+release integrity intact while running a lightweight docs workflow and skipping
+all checks for log-only changes.
 
 ## Problem Statement
 
@@ -38,7 +38,7 @@ feedback.
 
 ## Proposed Approach
 
-Introduce a two-workflow model using change detection:
+Introduce a single workflow with change detection:
 
 1. **Full CI** for code changes or tag pushes:
    - Existing `quality`, `test-quick`, `test-comprehensive` jobs.
@@ -50,85 +50,37 @@ Introduce a two-workflow model using change detection:
      - markdownlint (docs validation)
    - No `uv sync`, no pre-commit, no pytest matrix.
 
-3. **Logs CI** for log-only changes on `main`:
+3. **Logs-only pushes**:
    - No jobs run (all checks skipped).
 
-### Change Detection
+### Workflow Routing
 
-Add a `changes` job using `dorny/paths-filter@v3` to set outputs:
-
-- `code`: any change outside docs/log files.
-- `docs_only`: changes limited to `*.md` (no `*.log`).
-- `logs_only`: changes limited to `*.log` (no `*.md`).
-
-Recommended filters:
-
-```
-docs_only:
-  - '**/*.md'
-  - '!**/*.log'
-logs_only:
-  - '**/*.log'
-  - '!**/*.md'
-code:
-  - '!**/*.md'
-  - '!**/*.log'
-```
-
-Notes:
-- The `code` filter is the inverse of docs/log-only changes.
-- Tag events bypass filtering and always run full CI.
-- Pull requests remain full CI to avoid missing regressions.
+- A `changes` job uses `dorny/paths-filter@v3` to detect:
+  - `docs`: any `*.md`
+  - `logs_only`: only `*.log`
+  - `code`: any non-`*.md` and non-`*.log`
+- `docs-quality` runs only for docs pushes to `main`.
+- `quality`, `test-quick`, `test-comprehensive` run for code pushes, PRs, and tags.
+- Tag events still run full CI + release.
 
 ## Workflow Behavior
 
 | Event | Change Type | Actions |
 | --- | --- | --- |
-| push to `main` | docs_only | Run `docs-quality` only |
-| push to `main` | logs_only | Skip all checks |
-| push to `main` | code | Run `quality`, `test-quick`, `test-comprehensive` |
+| push to `main` | `*.md` only | Run `docs-quality` only |
+| push to `main` | `*.log` only | Skip all checks |
+| push to `main` | other files | Run `quality`, `test-quick`, `test-comprehensive` |
 | tag `v*` | any | Run full chain + release (unchanged) |
 | pull_request | any | Run full CI (unchanged) |
 
 ## Implementation Details
 
-### New `changes` Job
+### `ci-cd.yml` (All Behavior)
 
-- Uses `dorny/paths-filter@v3` to detect change type.
-- Runs only for `push` events on `main` (not tags).
-- Outputs `docs_only`, `logs_only`, and `code` flags to downstream jobs.
-
-### Docs Quality Job
-
-Add a `docs-quality` job for docs-only pushes:
-
-- Steps:
-  - Checkout
-  - Forbidden flag scan (existing script snippet)
-  - Markdown lint (markdownlint-cli2 action)
-- No Python/uv installs.
-
-### Logs-Only Behavior
-
-No jobs run for logs-only pushes. This keeps log commits fast and avoids
-unnecessary CI usage.
-
-### Existing Jobs (Gated)
-
-Gate current jobs on change type:
-
-- `quality`: run when `code` is true or on tag/PR.
-- `test-quick` and `test-comprehensive`: run when `code` is true or on tag.
-- `all-tests-pass`, `validate-release`, `release`: unchanged (tag only).
-
-Example condition pattern:
-
-```
-if: |
-  startsWith(github.ref, 'refs/tags/v') ||
-  github.event_name == 'pull_request' ||
-  (github.event_name == 'push' && needs.changes.outputs.code == 'true')
-```
+- Add a `changes` job using `dorny/paths-filter@v3`.
+- Add a `docs-quality` job gated by `docs` output on push.
+- Gate `quality` and test jobs by `code` output on push.
+- Keep `pull_request` and tag triggers unchanged.
 
 ## Release-Specific Behavior
 
@@ -140,11 +92,12 @@ coverage.
 
 ## Rollout Plan
 
-1. Implement `changes` + `docs-quality` in `ci-cd.yml`.
-2. Add log output that prints detected change type.
+1. Add change detection (`changes` job) to `ci-cd.yml`.
+2. Add `docs-quality` job gated by docs-only changes.
 3. Validate on a docs-only commit (expect docs-quality only).
-4. Validate on a small code change (expect full matrix).
-5. Monitor the next beta release for reduced CI runs.
+4. Validate on a logs-only commit (expect no jobs beyond change detection).
+5. Validate on a code change (expect full matrix).
+6. Monitor the next beta release for reduced CI runs.
 
 ## Risks and Mitigations
 
@@ -155,12 +108,12 @@ coverage.
 - **Risk**: Log-only commits skip all checks.
   - **Mitigation**: Restrict `*.log` to release logs and metadata artifacts.
 - **Risk**: Workflow complexity increases.
-  - **Mitigation**: Single `changes` job, minimal gating logic, no extra workflows.
+  - **Mitigation**: Single `changes` job, minimal gating logic in `ci-cd.yml`.
 
 ## Testing and Validation
 
 - Docs-only push (e.g., update README) should run docs checks only.
-- Logs-only push (e.g., update `release/RELEASE_LOG.log`) should run nothing.
+- Logs-only push (e.g., update `release/RELEASE_LOG.log`) should run no jobs beyond change detection.
 - Code change push (e.g., modify `todo_ai/`) should run full matrix.
 - Tag release should still run full chain and release.
 

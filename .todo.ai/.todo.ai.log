@@ -2,6 +2,13 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-23 22:09:22 | fxstein | ARCHIVE | 181 | Stabilize release process (with 4 subtasks)
+2026-01-23 22:09:00 | fxstein | COMPLETE | 181.1 | Investigate current release blockers (preflight failures, notes handling)
+2026-01-23 22:09:00 | fxstein | COMPLETE | 181.2 | Fix release notes lifecycle so prepare/execute are clean
+2026-01-23 22:09:00 | fxstein | COMPLETE | 181.3 | Harden execute flow (preflight, cleanup, retries)
+2026-01-23 22:09:00 | fxstein | COMPLETE | 181.4 | Add regression tests for release.sh prepare/execute workflow
+2026-01-23 22:09:00 | fxstein | COMPLETE | 181 | Stabilize release process (no failures)
+2026-01-23 22:08:19 | fxstein | ARCHIVE | 182 | Design pinned project directory for todo.ai CLI (with 19 subtasks)
 2026-01-23 22:06:56 | fxstein | COMPLETE | 182.1 | Investigate current directory resolution & init flow
 2026-01-23 22:06:56 | fxstein | COMPLETE | 182.2 | Evaluate options to pin directory safely
 2026-01-23 22:06:56 | fxstein | COMPLETE | 182.3 | Design user-facing CLI/config behavior

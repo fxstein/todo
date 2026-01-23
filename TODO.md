@@ -3,43 +3,6 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [x] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
-  > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
-  - [x] **#182.19** Execute beta release 3.0.0b7 `#release`
-  - [x] **#182.18** Prepare beta release 3.0.0b7 `#release`
-  - [x] **#182.17** Fix migrations root scoping for TODO_AI_ROOT `#bug`
-    > Update run_migrations to use ROOT_DIR instead of ORIGINAL_WORKING_DIR so .todo.ai/migrations stays under TODO_AI_ROOT/--root.
-  - [x] **#182.16** Execute beta release 3.0.0b6 `#release`
-  - [x] **#182.15** Prepare beta release 3.0.0b6 `#release`
-  - [x] **#182.14** Add temp submodule test for Python CLI show-root `#test`
-    > Use temp repo/submodule fixture for Python CLI; call show-root and assert resolved root is superproject (not submodule).
-  - [x] **#182.13** Add temp submodule test for shell show-root `#test`
-    > Create temp git repo (one file + one commit) and add as submodule in tests; run show-root from submodule path, assert superproject root.
-  - [x] **#182.12** Execute beta release 3.0.0b5 `#release`
-    > Execute beta release only after explicit approval; wait for CI/CD completion before cleanup per release.sh workflow.
-  - [x] **#182.11** Prepare beta release 3.0.0b5 `#release`
-    > After fix lands, draft AI summary and run prepare for next beta; ensure summary commit is latest/near-latest to satisfy staleness check.
-  - [x] **#182.10** Fix root resolution for nested submodules `#bug`
-    > Investigate submodule root detection: use gitdir path (.git/modules/...) to locate superproject when --show-superproject-working-tree returns empty.
-  - [x] **#182.9** Execute beta release 3.0.0b4 `#release`
-  - [x] **#182.8** Prepare beta release 3.0.0b4 `#release`
-  - [x] **#182.7** Update documentation and guides for pinned root feature `#docs`
-  - [x] **#182.6** Implement and test missing feature parity in Python `#feature`
-  - [x] **#182.5** Add tests for pinned directory behavior `#feature`
-  - [x] **#182.4** Implement directory pinning for CLI `#feature`
-  - [x] **#182.3** Design user-facing CLI/config behavior `#feature`
-    > Design doc: docs/design/PINNED_PROJECT_DIRECTORY_DESIGN.md
-  - [x] **#182.2** Evaluate options to pin directory safely `#feature`
-    > Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
-  - [x] **#182.1** Investigate current directory resolution & init flow `#feature`
-    > Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md
-- [ ] **#181** Stabilize release process (no failures) `#release`
-  > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
-  > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
-  - [ ] **#181.4** Add regression tests for release.sh prepare/execute workflow `#release`
-  - [ ] **#181.3** Harden execute flow (preflight, cleanup, retries) `#release`
-  - [ ] **#181.2** Fix release notes lifecycle so prepare/execute are clean `#release`
-  - [ ] **#181.1** Investigate current release blockers (preflight failures, notes handling) `#release`
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -333,6 +296,43 @@
 ------------------
 
 ## Recently Completed
+- [x] **#181** Stabilize release process (no failures) `#release` (2026-01-23)
+  > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
+  > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
+  - [x] **#181.4** Add regression tests for release.sh prepare/execute workflow `#release` (2026-01-23)
+  - [x] **#181.3** Harden execute flow (preflight, cleanup, retries) `#release` (2026-01-23)
+  - [x] **#181.2** Fix release notes lifecycle so prepare/execute are clean `#release` (2026-01-23)
+  - [x] **#181.1** Investigate current release blockers (preflight failures, notes handling) `#release` (2026-01-23)
+- [x] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature` (2026-01-23)
+  > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
+  - [x] **#182.19** Execute beta release 3.0.0b7 `#release` (2026-01-23)
+  - [x] **#182.18** Prepare beta release 3.0.0b7 `#release` (2026-01-23)
+  - [x] **#182.17** Fix migrations root scoping for TODO_AI_ROOT `#bug` (2026-01-23)
+    > Update run_migrations to use ROOT_DIR instead of ORIGINAL_WORKING_DIR so .todo.ai/migrations stays under TODO_AI_ROOT/--root.
+  - [x] **#182.16** Execute beta release 3.0.0b6 `#release` (2026-01-23)
+  - [x] **#182.15** Prepare beta release 3.0.0b6 `#release` (2026-01-23)
+  - [x] **#182.14** Add temp submodule test for Python CLI show-root `#test` (2026-01-23)
+    > Use temp repo/submodule fixture for Python CLI; call show-root and assert resolved root is superproject (not submodule).
+  - [x] **#182.13** Add temp submodule test for shell show-root `#test` (2026-01-23)
+    > Create temp git repo (one file + one commit) and add as submodule in tests; run show-root from submodule path, assert superproject root.
+  - [x] **#182.12** Execute beta release 3.0.0b5 `#release` (2026-01-23)
+    > Execute beta release only after explicit approval; wait for CI/CD completion before cleanup per release.sh workflow.
+  - [x] **#182.11** Prepare beta release 3.0.0b5 `#release` (2026-01-23)
+    > After fix lands, draft AI summary and run prepare for next beta; ensure summary commit is latest/near-latest to satisfy staleness check.
+  - [x] **#182.10** Fix root resolution for nested submodules `#bug` (2026-01-23)
+    > Investigate submodule root detection: use gitdir path (.git/modules/...) to locate superproject when --show-superproject-working-tree returns empty.
+  - [x] **#182.9** Execute beta release 3.0.0b4 `#release` (2026-01-23)
+  - [x] **#182.8** Prepare beta release 3.0.0b4 `#release` (2026-01-23)
+  - [x] **#182.7** Update documentation and guides for pinned root feature `#docs` (2026-01-23)
+  - [x] **#182.6** Implement and test missing feature parity in Python `#feature` (2026-01-23)
+  - [x] **#182.5** Add tests for pinned directory behavior `#feature` (2026-01-23)
+  - [x] **#182.4** Implement directory pinning for CLI `#feature` (2026-01-23)
+  - [x] **#182.3** Design user-facing CLI/config behavior `#feature` (2026-01-23)
+    > Design doc: docs/design/PINNED_PROJECT_DIRECTORY_DESIGN.md
+  - [x] **#182.2** Evaluate options to pin directory safely `#feature` (2026-01-23)
+    > Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
+  - [x] **#182.1** Investigate current directory resolution & init flow `#feature` (2026-01-23)
+    > Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md
 - [x] **#180** Investigate missing --set-version in release.sh `#bug` (2026-01-23)
   > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
   > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
@@ -1116,6 +1116,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 22:06:56 CET 2026
+**Last Updated:** Fri Jan 23 22:09:22 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

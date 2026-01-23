@@ -5,8 +5,14 @@
 ## Tasks
 - [ ] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature`
   > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
-  - [ ] **#182.9** Execute beta release 3.0.0b4 `#release`
-  - [ ] **#182.8** Prepare beta release 3.0.0b4 `#release`
+  - [ ] **#182.12** Execute beta release 3.0.0b5 `#release`
+    > Execute beta release only after explicit approval; wait for CI/CD completion before cleanup per release.sh workflow.
+  - [ ] **#182.11** Prepare beta release 3.0.0b5 `#release`
+    > After fix lands, draft AI summary and run prepare for next beta; ensure summary commit is latest/near-latest to satisfy staleness check.
+  - [ ] **#182.10** Fix root resolution for nested submodules `#bug`
+    > Investigate submodule root detection: use gitdir path (.git/modules/...) to locate superproject when --show-superproject-working-tree returns empty.
+  - [x] **#182.9** Execute beta release 3.0.0b4 `#release`
+  - [x] **#182.8** Prepare beta release 3.0.0b4 `#release`
   - [x] **#182.7** Update documentation and guides for pinned root feature `#docs`
   - [x] **#182.6** Implement and test missing feature parity in Python `#feature`
   - [x] **#182.5** Add tests for pinned directory behavior `#feature`
@@ -1100,6 +1106,6 @@
 
 ---
 
-**Last Updated:** Fri Jan 23 19:44:53 CET 2026
+**Last Updated:** Fri Jan 23 20:05:14 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

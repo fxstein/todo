@@ -350,6 +350,7 @@ jobs:
       - name: Evaluate checks
         run: |
           echo "Results:"
+          echo "  changes: ${{ needs.changes.result }}"
           echo "  docs-quality: ${{ needs.docs-quality.result }}"
           echo "  logs-quality: ${{ needs.logs-quality.result }}"
           echo "  quality: ${{ needs.quality.result }}"
@@ -360,6 +361,7 @@ jobs:
 
           failures=0
           for result in \
+            "${{ needs.changes.result }}" \
             "${{ needs.docs-quality.result }}" \
             "${{ needs.logs-quality.result }}" \
             "${{ needs.quality.result }}" \
@@ -393,6 +395,9 @@ jobs:
         id: tag-context
         run: |
           is_tag="${{ needs.changes.outputs.is_tag }}"
+          echo "Debug: is_tag from changes job: '$is_tag'"
+          echo "Debug: GITHUB_REF: '$GITHUB_REF'"
+
           echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
           if [[ "$is_tag" != "true" ]]; then
             echo "Not a tag run; skipping release validation."

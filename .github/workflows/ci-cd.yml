@@ -363,7 +363,7 @@ jobs:
     # CRITICAL: Only runs AFTER all tests pass
     needs: [all-tests-pass]
     # Only run on tag pushes
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.validate.outputs.version }}
@@ -458,7 +458,7 @@ jobs:
     # This ensures release CANNOT proceed unless ALL tests pass
     needs: [validate-release]
     # Only run on tag pushes (releases)
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     environment: release # Required for PyPI Trusted Publisher
     permissions:

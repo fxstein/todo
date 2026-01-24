@@ -14,6 +14,7 @@ This release maintains comprehensive debug logging at critical workflow checkpoi
 
 ### 🔧 Other Changes
 
+- chore: Update release log with pre-flight attempts ([89e96a1](https://github.com/fxstein/todo.ai/commit/89e96a19a0186b85840e092ca13549e55c5126d1))
 - chore: Add AI release summary for actual fix ([e1b0afa](https://github.com/fxstein/todo.ai/commit/e1b0afae3e506ca9d7d68637944865d2e7e43cd5))
 
 ## Previous Beta Release Notes

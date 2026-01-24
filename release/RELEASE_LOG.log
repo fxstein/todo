@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-24 19:02:20 | fxstein | PREFLIGHT FAILED | 1 pre-flight check(s) failed
+2026-01-24 19:01:48 | fxstein | PREFLIGHT FAILED | 1 pre-flight check(s) failed
 2026-01-24 19:01:43 | fxstein | PREPARE | Release preview prepared for v3.0.0b11 (beta)
 2026-01-24 19:01:42 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b7 - File version (todo.ai): 3.0.0b10 - Proposed version: 3.0.0b11 - Release type: beta - Bump type: patch - Last tag: v3.0.0b10 - Summary file: release/RELEASE_SUMMARY.md
 2026-01-24 19:01:42 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md

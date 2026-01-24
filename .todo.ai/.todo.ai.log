@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-24 18:34:12 | fxstein | NOTE | 186.4 | Added comprehensive debug logging: 1) changes job - verbose tag detection with condition evaluation, 2) all-tests-pass - outputs display, 3) validate-release - full workflow context with dependencies and outputs, 4) release - dependency outputs and conditional evaluation. Future-proofed for debugging.
+2026-01-24 18:34:11 | fxstein | COMPLETE | 186.4 | Implement Fix #4: Add debug workflow context to validate-release job
 2026-01-24 18:22:55 | fxstein | NOTE | 186.3 | Tag detection VERIFIED working correctly. v3.0.0b8 logs show: Ref=refs/tags/v3.0.0b8, Ref type=tag, Ref name=v3.0.0b8. Both detection conditions (ref match and ref_type) work. Issue is NOT with tag detection.
 2026-01-24 18:22:53 | fxstein | COMPLETE | 186.3 | Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values)
 2026-01-24 18:22:49 | fxstein | NOTE | 186.2 | Output chain correctly implemented but validate-release has NO if condition. GitHub Actions skips job without explicit condition. Solution: Restore 'if: needs.changes.outputs.is_tag == true' removed in dd9a222.

@@ -8,7 +8,8 @@
   - [ ] **#186.7** Verify release artifacts published successfully `#bug`
   - [ ] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug`
   - [ ] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
-  - [ ] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug`
+  - [x] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug`
+    > Added comprehensive debug logging: 1) changes job - verbose tag detection with condition evaluation, 2) all-tests-pass - outputs display, 3) validate-release - full workflow context with dependencies and outputs, 4) release - dependency outputs and conditional evaluation. Future-proofed for debugging.
     > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
   - [x] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug`
     > Tag detection VERIFIED working correctly. v3.0.0b8 logs show: Ref=refs/tags/v3.0.0b8, Ref type=tag, Ref name=v3.0.0b8. Both detection conditions (ref match and ref_type) work. Issue is NOT with tag detection.
@@ -1139,6 +1140,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 18:22:55 CET 2026
+**Last Updated:** Sat Jan 24 18:34:12 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

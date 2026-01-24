@@ -65,22 +65,41 @@ jobs:
       - name: Detect tag ref
         id: refs
         run: |
+          echo "================================================"
+          echo "🏷️  TAG DETECTION"
+          echo "================================================"
+
           ref="${GITHUB_REF:-}"
           ref_type="${GITHUB_REF_TYPE:-}"
           ref_name="${GITHUB_REF_NAME:-}"
           is_tag=false
 
+          echo "Environment variables:"
+          echo "  GITHUB_REF: '$ref'"
+          echo "  GITHUB_REF_TYPE: '$ref_type'"
+          echo "  GITHUB_REF_NAME: '$ref_name'"
+          echo ""
+
+          echo "Tag detection logic:"
           if [[ "$ref" == refs/tags/v* ]]; then
+            echo "  ✅ Condition 1: GITHUB_REF matches 'refs/tags/v*'"
             is_tag=true
-          fi
-          if [[ "$ref_type" == "tag" ]]; then
-            is_tag=true
+          else
+            echo "  ❌ Condition 1: GITHUB_REF does not match 'refs/tags/v*'"
           fi
 
-          echo "Ref: $ref"
-          echo "Ref type: $ref_type"
-          echo "Ref name: $ref_name"
+          if [[ "$ref_type" == "tag" ]]; then
+            echo "  ✅ Condition 2: GITHUB_REF_TYPE == 'tag'"
+            is_tag=true
+          else
+            echo "  ❌ Condition 2: GITHUB_REF_TYPE != 'tag' (value: '$ref_type')"
+          fi
+
+          echo ""
+          echo "Result: is_tag=$is_tag"
+          echo "  Writing to GITHUB_OUTPUT: is_tag=$is_tag"
           echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+          echo "================================================"
 
   docs-quality:
     name: Docs Quality
@@ -349,7 +368,11 @@ jobs:
     steps:
       - name: Evaluate checks
         run: |
-          echo "Results:"
+          echo "================================================"
+          echo "✅ ALL TESTS PASSED - GATEKEEPER CHECK"
+          echo "================================================"
+          echo ""
+          echo "Job Results:"
           echo "  changes: ${{ needs.changes.result }}"
           echo "  docs-quality: ${{ needs.docs-quality.result }}"
           echo "  logs-quality: ${{ needs.logs-quality.result }}"
@@ -357,6 +380,14 @@ jobs:
           echo "  test-quick: ${{ needs.test-quick.result }}"
           echo "  test-comprehensive: ${{ needs.test-comprehensive.result }}"
           echo "  test-pr: ${{ needs.test-pr.result }}"
+          echo ""
+          echo "Changes Job Outputs:"
+          echo "  is_tag: '${{ needs.changes.outputs.is_tag }}'"
+          echo "  docs: '${{ needs.changes.outputs.docs }}'"
+          echo "  logs: '${{ needs.changes.outputs.logs }}'"
+          echo "  code: '${{ needs.changes.outputs.code }}'"
+          echo ""
+          echo "================================================"
           echo ""
 
           failures=0
@@ -391,16 +422,52 @@ jobs:
       version: ${{ steps.validate.outputs.version }}
       is_prerelease: ${{ steps.validate.outputs.is_prerelease }}
     steps:
+      - name: Debug workflow context
+        run: |
+          echo "================================================"
+          echo "🔍 WORKFLOW CONTEXT DIAGNOSTICS"
+          echo "================================================"
+          echo ""
+          echo "Trigger Information:"
+          echo "  Event name: ${{ github.event_name }}"
+          echo "  Ref: ${{ github.ref }}"
+          echo "  Ref type: ${{ github.ref_type }}"
+          echo "  Ref name: ${{ github.ref_name }}"
+          echo "  SHA: ${{ github.sha }}"
+          echo ""
+          echo "Dependency Status:"
+          echo "  all-tests-pass: ${{ needs.all-tests-pass.result }}"
+          echo "  changes: ${{ needs.changes.result }}"
+          echo ""
+          echo "Changes Job Outputs:"
+          echo "  is_tag: '${{ needs.changes.outputs.is_tag }}'"
+          echo "  docs: '${{ needs.changes.outputs.docs }}'"
+          echo "  logs: '${{ needs.changes.outputs.logs }}'"
+          echo "  code: '${{ needs.changes.outputs.code }}'"
+          echo ""
+          echo "GitHub Context (direct):"
+          echo "  GITHUB_REF: '$GITHUB_REF'"
+          echo "  GITHUB_REF_TYPE: '$GITHUB_REF_TYPE'"
+          echo "  GITHUB_REF_NAME: '$GITHUB_REF_NAME'"
+          echo "  GITHUB_EVENT_NAME: '$GITHUB_EVENT_NAME'"
+          echo ""
+          echo "================================================"
+
       - name: Capture tag context
         id: tag-context
         run: |
           is_tag="${{ needs.changes.outputs.is_tag }}"
-          echo "Debug: is_tag from changes job: '$is_tag'"
-          echo "Debug: GITHUB_REF: '$GITHUB_REF'"
+          echo "📋 Tag context capture:"
+          echo "  Input is_tag value: '$is_tag'"
+          echo "  Value type: $(if [[ -z "$is_tag" ]]; then echo "empty"; elif [[ "$is_tag" == "true" ]]; then echo "boolean true"; elif [[ "$is_tag" == "false" ]]; then echo "boolean false"; else echo "other: '$is_tag'"; fi)"
 
           echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+          echo "  Output written to GITHUB_OUTPUT: is_tag=$is_tag"
+
           if [[ "$is_tag" != "true" ]]; then
-            echo "Not a tag run; skipping release validation."
+            echo "⚠️  Not a tag run; release validation will be skipped."
+          else
+            echo "✅ Tag run confirmed; proceeding with release validation."
           fi
 
       - name: Validate PEP 440 version and check commit CI
@@ -501,6 +568,32 @@ jobs:
       id-token: write
 
     steps:
+      - name: Debug release context
+        run: |
+          echo "================================================"
+          echo "📦 RELEASE JOB CONTEXT DIAGNOSTICS"
+          echo "================================================"
+          echo ""
+          echo "Dependency Status:"
+          echo "  validate-release: ${{ needs.validate-release.result }}"
+          echo ""
+          echo "Validate-Release Job Outputs:"
+          echo "  is_tag: '${{ needs.validate-release.outputs.is_tag }}'"
+          echo "  version: '${{ needs.validate-release.outputs.version }}'"
+          echo "  is_prerelease: '${{ needs.validate-release.outputs.is_prerelease }}'"
+          echo ""
+          echo "Job Conditional Evaluation:"
+          echo "  if: needs.validate-release.outputs.is_tag == 'true'"
+          echo "  Actual value: '${{ needs.validate-release.outputs.is_tag }}'"
+          echo "  Evaluated to: $(if [[ '${{ needs.validate-release.outputs.is_tag }}' == 'true' ]]; then echo 'TRUE (job running)'; else echo 'FALSE (job should not run)'; fi)"
+          echo ""
+          echo "GitHub Context:"
+          echo "  Ref: ${{ github.ref }}"
+          echo "  Ref name: ${{ github.ref_name }}"
+          echo "  SHA: ${{ github.sha }}"
+          echo ""
+          echo "================================================"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 

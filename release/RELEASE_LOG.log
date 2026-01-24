@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-24 02:58:35 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2026-01-24 02:58:34 | fxstein | ABORT REVERT | Reverted version files to 3.0.0b7
+2026-01-24 02:58:32 | fxstein | ABORT TAG REMOTE | Deleted remote tag v3.0.0b8
+2026-01-24 02:58:29 | fxstein | ABORT TAG LOCAL | Deleted local tag v3.0.0b8
+2026-01-24 02:58:28 | fxstein | ABORT START | Aborting release v3.0.0b8
 2026-01-24 02:54:35 | fxstein | HOOK MODIFICATIONS | Pre-commit hooks modified: release/RELEASE_LOG.log release/RELEASE_NOTES.md todo.bash
 2026-01-24 02:54:31 | fxstein | COMMIT RELEASE_NOTES | Adding release notes file to commit: release/RELEASE_NOTES.md
 2026-01-24 02:54:30 | fxstein | COMMIT SUMMARY | Adding release summary file to commit: release/RELEASE_SUMMARY.md

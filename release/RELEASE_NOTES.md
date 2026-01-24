@@ -1,3 +1,21 @@
+## Release 3.0.0b14
+
+This beta release enhances release quality validation by ensuring all quality checks run on every release build. Previously, documentation and log validation were skipped on tag pushes, but now all checks execute to provide comprehensive validation.
+
+Release builds now validate documentation quality, log files, code quality, and run the complete test suite across all supported Python versions and operating systems. This ensures maximum quality confidence for every release with no exceptions or shortcuts in the validation process.
+
+This enhancement complements the recently resolved CI/CD release job skipping issue, providing both reliable release execution and comprehensive quality validation.
+
+---
+
+### 🔧 Other Changes
+
+- chore: Add AI release summary ([acd3fe6](https://github.com/fxstein/todo.ai/commit/acd3fe64d4a0f5e6c7250d2aa5bad0af4c7d1635))
+- infra: Run all quality checks on release builds ([605c2b1](https://github.com/fxstein/todo.ai/commit/605c2b1da821c9a3c37d1e0633544b659fa358df))
+- docs: Document successful resolution of CI/CD release issue ([35792ff](https://github.com/fxstein/todo.ai/commit/35792ff3522612b72d58e3b6f45cfeded57e01b4))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b13
 
 This beta release resolves the CI/CD release job skipping issue by restoring the workflow configuration to match the proven v3.0.0b7 setup. The root cause was the all-tests-pass job using `if: always()` which runs on all workflow types, conflicting with the tag-specific release jobs downstream.

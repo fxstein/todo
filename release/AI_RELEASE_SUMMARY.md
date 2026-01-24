@@ -1,0 +1,5 @@
+This beta release fixes the critical CI/CD issue where release jobs were being skipped on tag pushes, preventing any releases from being published since v3.0.0b8. The root cause was identified as a missing job-level conditional that was inadvertently removed, causing GitHub Actions to skip the validate-release and release jobs entirely.
+
+The fix restores the explicit `if: needs.changes.outputs.is_tag == 'true'` condition to the validate-release job, eliminating the ambiguity that caused GitHub Actions to apply implicit skipping logic. Additionally, comprehensive debug logging has been added throughout the workflow to provide detailed diagnostics at all critical points, significantly improving our ability to quickly diagnose similar issues in the future.
+
+This release includes extensive analysis documentation detailing the investigation process, root cause analysis, and output propagation verification. The debug logging additions provide verbose tag detection with condition evaluation, dependency status verification, output propagation tracking, and conditional evaluation display across five key workflow checkpoints.

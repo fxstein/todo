@@ -1,3 +1,23 @@
+## Release 3.0.0b11
+
+This beta release contains the final fix for the critical CI/CD issue. After extensive investigation and testing, the root cause was identified: the `changes` dependency in the validate-release job's needs array was causing GitHub Actions to skip the job even when all conditions were met.
+
+The solution removes the `changes` dependency from validate-release, matching the proven v3.0.0b7 configuration exactly. Since the job uses direct GitHub context (`startsWith(github.ref, 'refs/tags/v')`) rather than job outputs, the changes dependency was unnecessary and was causing unexpected GitHub Actions behavior.
+
+This release includes comprehensive debug logging at all critical workflow checkpoints and extensive analysis documentation. The debug improvements remain for future diagnostics while the core fix restores reliable release execution with a simpler, proven dependency chain.
+
+---
+
+### 🐛 Bug Fixes
+
+- Remove changes dependency from validate-release job (task#186.5 final) ([4f3ff16](https://github.com/fxstein/todo.ai/commit/4f3ff161d0d7f8e050a1c0d42f12f9f88cb79a69))
+
+### 🔧 Other Changes
+
+- chore: Add AI release summary for final fix ([4a4382e](https://github.com/fxstein/todo.ai/commit/4a4382e3326fb38562763deafb8e0e10b9566410))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b10
 
 This beta release contains the revised fix for the critical CI/CD issue where release jobs were being skipped on tag pushes. After discovering that job output comparisons were unreliable in GitHub Actions conditionals, we switched to using direct GitHub context for tag detection.

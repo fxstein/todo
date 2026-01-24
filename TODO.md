@@ -51,7 +51,7 @@
       > Create .cursor/rules/todo.ai-beta-releases.mdc with AI decision trees. When to use beta vs stable, error handling rules, major/minor/patch logic. See Section 4 of strategy doc
     - [x] **#172.3.1** Update README.md with simplified installation `#documentation`
       > Add Stable/Beta/Development installation sections. Primary method: uv tool. Collapse pipx/pip alternatives in <details>. Add release channels description
-  - [ ] **#172.2** Phase 2: Hardening & Validation `#release` `#validation`
+  - [x] **#172.2** Phase 2: Hardening & Validation `#release` `#validation`
     > Phase 2 partial: Beta maturity warnings (never blocks), 6+ pre-flight validation checks, beta increment logic. Testing tasks 172.2.3, 172.2.5-8 remain.
     > Goal: Add comprehensive validation and safety checks. Deliverable: Beta maturity warnings, 6+ pre-flight checks, clear error messages, all edge cases handled
     - [x] **#172.2.8** Test beta increment (b1→b2→b3) `#testing`
@@ -77,13 +77,13 @@
       > Check: prepare state exists, CI/CD passing, no uncommitted changes, GitHub authenticated, build dependencies available, beta maturity. Clear ✅/❌ status for each with remediation
     - [x] **#172.2.1** Implement beta maturity warnings (never blocks) `#release` `#validation`
       > Find latest beta from GitHub, calculate days since published. Warn if <7 days (major) or <2 days (minor). Always proceed - warning only. Display clear message with recommendation
-  - [ ] **#172.1** Phase 1: Core Beta Infrastructure `#release` `#infrastructure`
+  - [x] **#172.1** Phase 1: Core Beta Infrastructure `#release` `#infrastructure`
     > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
     > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
     - [x] **#172.1.8** Test major release blocking without beta `#testing`
       > ✅ PASS: Major release blocking works correctly. Tested 2.7.3→3.0.0 without beta, script blocked with clear error message and remediation steps.
       > Try to prepare 3.0.0 stable without beta. Verify script blocks with error message showing remediation (create beta first)
-    - [ ] **#172.1.7** Test beta release creation (v3.0.0b1) `#testing`
+    - [x] **#172.1.7** Test beta release creation (v3.0.0b1) `#testing`
       > Run prepare --beta and execute. Verify PyPI marks as pre-release. Test install: uv tool install --prerelease=allow todo-ai
     - [x] **#172.1.6** Update documentation with beta installation instructions `#documentation`
       > Add installation commands to README.md: uv tool install --prerelease=allow todo-ai. Include pipx/pip alternatives in collapsible section
@@ -1125,6 +1125,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 02:29:36 CET 2026
+**Last Updated:** Sat Jan 24 02:31:18 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

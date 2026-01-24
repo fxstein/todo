@@ -462,7 +462,9 @@ determine_beta_version() {
 
     # Query GitHub for existing beta releases matching this base version
     # Format: v1.0.0b1, v1.0.0b2, etc.
-    local existing_betas=$(gh release list --limit 100 --json tagName --jq '.[].tagName' 2>/dev/null | grep "^v${base_version}b[0-9]\+$" || echo "")
+    # We use git ls-remote to find ALL tags, not just those with GitHub releases
+    # This prevents collisions with orphan tags from failed release attempts
+    local existing_betas=$(git ls-remote --tags origin | awk '{print $2}' | sed 's|refs/tags/||' | grep "^v${base_version}b[0-9]\+$" || echo "")
 
     if [[ -z "$existing_betas" ]]; then
         # No betas found for this version - use b1

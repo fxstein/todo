@@ -1,3 +1,23 @@
+## Release 3.0.0b13
+
+This beta release resolves the CI/CD release job skipping issue by restoring the workflow configuration to match the proven v3.0.0b7 setup. The root cause was the all-tests-pass job using `if: always()` which runs on all workflow types, conflicting with the tag-specific release jobs downstream.
+
+The fix restores the tag-specific conditional to all-tests-pass and simplifies its dependencies to match v3.0.0b7 exactly. All three critical jobs (all-tests-pass, validate-release, and release) now use `startsWith(github.ref, 'refs/tags/v')` for consistent tag detection with a clean dependency chain.
+
+This release includes comprehensive debug logging improvements and extensive analysis documentation of the investigation process, providing valuable diagnostic capabilities for future troubleshooting while restoring reliable release execution.
+
+---
+
+### 🐛 Bug Fixes
+
+- Match all-tests-pass job config to v3.0.0b7 for tag pushes ([a06544f](https://github.com/fxstein/todo.ai/commit/a06544fdb68d552e300f35bfd782a4e38530ee1e))
+
+### 🔧 Other Changes
+
+- chore: Add AI release summary ([f9f1831](https://github.com/fxstein/todo.ai/commit/f9f1831c4d4040eb38ee495518122f94c16abe0e))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b12
 
 This beta release contains the actual fix for the CI/CD release job skipping issue. After extensive investigation and multiple test releases, the root cause was finally identified: debug logging steps were referencing `needs.changes` dependencies that weren't listed in the job's needs array, causing GitHub Actions to skip the entire job as invalid configuration.

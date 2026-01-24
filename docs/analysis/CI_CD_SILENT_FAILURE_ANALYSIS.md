@@ -618,3 +618,56 @@ The issue may be with GitHub Actions expression evaluation:
 2. Check GitHub Actions expression documentation for output comparisons
 3. Try boolean comparison without quotes: `if: needs.changes.outputs.is_tag`
 4. Add more verbose debug logging to understand GitHub Actions evaluation
+
+---
+
+## Solution - Direct GitHub Context (Task#186.5 Revised - January 24, 2026)
+
+### Research Findings
+
+GitHub Actions documentation reveals:
+1. **Job outputs are always strings** - `needs.job.outputs.value` evaluates as string, not boolean
+2. **String comparison syntax** - `needs.job.outputs.value == 'true'` should work theoretically
+3. **GitHub ignores case** when comparing strings
+4. **Alternative: truthy/falsy** - `if: needs.job.outputs.value` (non-empty strings are truthy)
+
+### Why Job Output Comparison Failed
+
+Despite correct syntax, the job output comparison `if: needs.changes.outputs.is_tag == 'true'` did not work. Possible reasons:
+- GitHub Actions expression evaluation quirks with job outputs
+- Output may not be available at job-level conditional evaluation time
+- Case sensitivity or whitespace issues despite documentation claims
+
+### The Reliable Solution
+
+**Use direct GitHub context instead of job outputs:**
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]
+  if: startsWith(github.ref, 'refs/tags/v')  # Direct context, always available
+  runs-on: ubuntu-latest
+```
+
+**Why this works:**
+- ✅ `github.ref` is a built-in context variable, always available
+- ✅ No dependency on job outputs or state propagation
+- ✅ Proven to work (v3.0.0b7 used this successfully)
+- ✅ Simpler and more reliable than output chaining
+
+**Trade-offs:**
+- Bypasses the `changes` job's `is_tag` output (but we keep it for debugging)
+- Duplicates tag detection logic (but it's simple and reliable)
+- More explicit condition (easier to understand)
+
+### Implementation
+
+Changed line 420 in `.github/workflows/ci-cd.yml`:
+```yaml
+# OLD (didn't work despite being correct syntax):
+if: needs.changes.outputs.is_tag == 'true'
+
+# NEW (uses direct GitHub context):
+if: startsWith(github.ref, 'refs/tags/v')
+```
+
+This matches the successful v3.0.0b7 approach while maintaining all our debug improvements.

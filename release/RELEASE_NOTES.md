@@ -1,3 +1,24 @@
+## Release 3.0.0b10
+
+This beta release contains the revised fix for the critical CI/CD issue where release jobs were being skipped on tag pushes. After discovering that job output comparisons were unreliable in GitHub Actions conditionals, we switched to using direct GitHub context for tag detection.
+
+The solution uses `startsWith(github.ref, 'refs/tags/v')` instead of comparing job outputs, which is the same proven approach that worked successfully in v3.0.0b7. This bypasses the job output propagation entirely and relies on GitHub's built-in context variables which are always available and dependable.
+
+This release maintains all the comprehensive debug logging improvements added in v3.0.0b9, providing excellent diagnostic visibility at all critical workflow checkpoints. The changes job's is_tag output remains for debug purposes, while the actual conditional uses the more reliable direct context approach.
+
+---
+
+### 🐛 Bug Fixes
+
+- Use direct GitHub context instead of job output for tag detection (task#186.5 revised) ([f3d7e6a](https://github.com/fxstein/todo.ai/commit/f3d7e6a7b5dff867bb720ddecbae5c05373337cf))
+
+### 🔧 Other Changes
+
+- chore: Add AI release summary for revised fix ([b845e21](https://github.com/fxstein/todo.ai/commit/b845e2143bdf8ac87a1d5f3ca6537142683c9bb2))
+- docs: Document v3.0.0b9 test results - fix deployed but still failing (task#186.6) ([54505a8](https://github.com/fxstein/todo.ai/commit/54505a8029bd584309e90febde496e4e4226ae05))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b9
 
 This beta release fixes the critical CI/CD issue where release jobs were being skipped on tag pushes, preventing any releases from being published since v3.0.0b8. The root cause was identified as a missing job-level conditional that was inadvertently removed, causing GitHub Actions to skip the validate-release and release jobs entirely.

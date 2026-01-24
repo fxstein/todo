@@ -22,6 +22,7 @@ jobs:
       logs: ${{ steps.filter.outputs.logs }}
       code: ${{ steps.compute.outputs.code }}
       code_files: ${{ steps.compute.outputs.code_files }}
+      is_tag: ${{ steps.refs.outputs.is_tag }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -60,6 +61,26 @@ jobs:
           code_files="${code_files%% }"
           echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "code_files=$code_files" >> "$GITHUB_OUTPUT"
+
+      - name: Detect tag ref
+        id: refs
+        run: |
+          ref="${GITHUB_REF:-}"
+          ref_type="${GITHUB_REF_TYPE:-}"
+          ref_name="${GITHUB_REF_NAME:-}"
+          is_tag=false
+
+          if [[ "$ref" == refs/tags/v* ]]; then
+            is_tag=true
+          fi
+          if [[ "$ref_type" == "tag" ]]; then
+            is_tag=true
+          fi
+
+          echo "Ref: $ref"
+          echo "Ref type: $ref_type"
+          echo "Ref name: $ref_name"
+          echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
 
   docs-quality:
     name: Docs Quality
@@ -361,14 +382,19 @@ jobs:
   validate-release:
     name: Validate Release Version
     # CRITICAL: Only runs AFTER all tests pass
-    needs: [all-tests-pass]
+    needs: [all-tests-pass, changes]
     # Only run on tag pushes
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref_type == 'tag'
+    if: needs.changes.outputs.is_tag == 'true'
     runs-on: ubuntu-latest
     outputs:
+      is_tag: ${{ steps.tag-context.outputs.is_tag }}
       version: ${{ steps.validate.outputs.version }}
       is_prerelease: ${{ steps.validate.outputs.is_prerelease }}
     steps:
+      - name: Capture tag context
+        id: tag-context
+        run: echo "is_tag=${{ needs.changes.outputs.is_tag }}" >> "$GITHUB_OUTPUT"
+
       - name: Validate PEP 440 version and check commit CI
         id: validate
         env:
@@ -458,7 +484,7 @@ jobs:
     # This ensures release CANNOT proceed unless ALL tests pass
     needs: [validate-release]
     # Only run on tag pushes (releases)
-    if: startsWith(github.ref, 'refs/tags/v') || github.ref_type == 'tag'
+    if: needs.validate-release.outputs.is_tag == 'true'
     runs-on: ubuntu-latest
     environment: release # Required for PyPI Trusted Publisher
     permissions:

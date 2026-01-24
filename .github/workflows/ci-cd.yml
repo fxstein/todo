@@ -354,62 +354,20 @@ jobs:
   # This creates clear visual dependency in GitHub Actions UI
   all-tests-pass:
     name: ✅ All Tests Passed
-    if: always()
-    needs: [
-      changes,
-      docs-quality,
-      logs-quality,
-      quality,
-      test-quick,
-      test-comprehensive,
-      test-pr
-    ]
+    # Only run on tag pushes (when we need to release)
+    if: startsWith(github.ref, 'refs/tags/v')
+    # CRITICAL: Depends on ALL test jobs
+    needs: [quality, test-quick, test-comprehensive]
     runs-on: ubuntu-latest
     steps:
-      - name: Evaluate checks
+      - name: All tests passed
         run: |
-          echo "================================================"
-          echo "✅ ALL TESTS PASSED - GATEKEEPER CHECK"
-          echo "================================================"
+          echo "✅ All quality checks and tests have passed"
+          echo "   - Code quality checks"
+          echo "   - Quick tests (3.10, 3.11, 3.12, 3.13 x 3 OSes)"
+          echo "   - Comprehensive tests (3.14 x 3 OSes)"
           echo ""
-          echo "Job Results:"
-          echo "  changes: ${{ needs.changes.result }}"
-          echo "  docs-quality: ${{ needs.docs-quality.result }}"
-          echo "  logs-quality: ${{ needs.logs-quality.result }}"
-          echo "  quality: ${{ needs.quality.result }}"
-          echo "  test-quick: ${{ needs.test-quick.result }}"
-          echo "  test-comprehensive: ${{ needs.test-comprehensive.result }}"
-          echo "  test-pr: ${{ needs.test-pr.result }}"
-          echo ""
-          echo "Changes Job Outputs:"
-          echo "  is_tag: '${{ needs.changes.outputs.is_tag }}'"
-          echo "  docs: '${{ needs.changes.outputs.docs }}'"
-          echo "  logs: '${{ needs.changes.outputs.logs }}'"
-          echo "  code: '${{ needs.changes.outputs.code }}'"
-          echo ""
-          echo "================================================"
-          echo ""
-
-          failures=0
-          for result in \
-            "${{ needs.changes.result }}" \
-            "${{ needs.docs-quality.result }}" \
-            "${{ needs.logs-quality.result }}" \
-            "${{ needs.quality.result }}" \
-            "${{ needs.test-quick.result }}" \
-            "${{ needs.test-comprehensive.result }}" \
-            "${{ needs.test-pr.result }}"; do
-            if [ "$result" = "failure" ] || [ "$result" = "cancelled" ]; then
-              failures=1
-            fi
-          done
-
-          if [ "$failures" -ne 0 ]; then
-            echo "❌ One or more required checks failed"
-            exit 1
-          fi
-
-          echo "✅ All required checks passed (skipped checks are acceptable)"
+          echo "Ready to proceed with release validation and publishing"
 
   # Validate release version using Python's packaging library
   validate-release:

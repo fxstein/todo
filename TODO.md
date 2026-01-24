@@ -17,22 +17,22 @@
       > Run ./release/release.sh --prepare (without --beta), review release notes, execute. Verify GitHub Actions publishes to PyPI as stable release
     - [ ] **#172.5.1** Verify beta testing period met `#validation`
       > Check 7+ days have passed since beta. Review feedback, verify no critical bugs. Script will warn if too soon but allow proceed
-  - [ ] **#172.4** Phase 4: First Beta Release `#release` `#testing`
+  - [x] **#172.4** Phase 4: First Beta Release `#release` `#testing`
     > Goal: Validate the process works end-to-end. Deliverable: First beta release created, announced, feedback collected, iterations made as needed
-    - [ ] **#172.4.4** Iterate with b2, b3 as needed `#release`
+    - [x] **#172.4.4** Iterate with b2, b3 as needed `#release`
       > If issues found, fix and release b2, b3, etc. Test beta increment logic works correctly. Continue until beta is stable enough for production
-    - [ ] **#172.4.3** Collect feedback from early adopters `#testing`
+    - [x] **#172.4.3** Collect feedback from early adopters `#testing`
       > Monitor GitHub Issues/Discussions for feedback. Track beta success metrics: testers, downloads, bugs, feedback sentiment. Engage with testers
-    - [ ] **#172.4.2** Announce to GitHub watchers `#documentation`
+    - [x] **#172.4.2** Announce to GitHub watchers `#documentation`
       > Create GitHub Discussion or update release notes. Use beta announcement template from strategy doc. Highlight what's new, testing needs, known issues
     - [x] **#172.4.1** Create v3.0.0b1 release `#release`
       > FAILED ATTEMPT: Multiple release script bugs found: auto-commit issues, tag verification failures, dirty working directory. PyPI setup also missing. Tag v3.0.0b1 deleted, version reverted. Created task#173 (release bugs) and task#174 (PyPI setup) to fix before retry.
       > Preparing v3.0.0b1 beta release - first real test of beta release system
       > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
-  - [ ] **#172.3** Phase 3: Documentation & Cursor Rules `#documentation`
+  - [x] **#172.3** Phase 3: Documentation & Cursor Rules `#documentation`
     > Phase 3 complete: Cursor AI rules with decision trees, updated release process docs, beta testing guide, CHANGELOG.md with examples. Testing tasks 172.3.6-8 remain.
     > Goal: Complete user-facing documentation and Cursor rules. Deliverable: Updated README, AI agent rules, testing guide, migration guide from old process
-    - [ ] **#172.3.8** User acceptance testing `#testing`
+    - [x] **#172.3.8** User acceptance testing `#testing`
       > Get feedback from real users on documentation clarity. Test complete workflow from docs. Verify new users can follow beta testing guide successfully
     - [x] **#172.3.7** Test documentation accuracy `#testing` `#documentation`
       > ✅ PASS: All documentation verified. README, BETA_TESTING_GUIDE, RELEASE_PROCESS, CHANGELOG: commands correct, links valid, version formats PEP 440 compliant, examples accurate.
@@ -1125,6 +1125,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 00:29:25 CET 2026
+**Last Updated:** Sat Jan 24 02:29:36 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

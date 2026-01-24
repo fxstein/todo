@@ -3,10 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
-- [ ] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug`
+- [x] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug`
   > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
-  - [ ] **#186.7** Verify release artifacts published successfully `#bug`
-  - [ ] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug`
+  - [x] **#186.7** Verify release artifacts published successfully `#bug`
+    > VERIFIED: v3.0.0b13 published successfully. GitHub release created with 7 assets (whl, tar.gz, attestations, install.sh, todo.ai, todo.bash). PyPI publish completed. First successful release since v3.0.0b7.
+  - [x] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug`
+    > SUCCESS with v3.0.0b13! All jobs ran: ✓ all-tests-pass (3s), ✓ validate-release (15s), ✓ release (35s). Published to GitHub with 7 assets. Root cause: all-tests-pass had if: always() instead of if: startsWith(github.ref, 'refs/tags/v'). Fixed by matching v3.0.0b7 config exactly.
     > CRITICAL FINDING: Fix was deployed but still failing! Tag detection works (is_tag=true confirmed in logs), all-tests-pass shows is_tag: 'true', but validate-release still skipped. Condition 'if: needs.changes.outputs.is_tag == true' present in v3.0.0b9 workflow but not evaluated correctly by GitHub Actions. Need to investigate GitHub Actions expression syntax or output type mismatch.
   - [x] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
     > COMPLETE FIX: all-tests-pass job had if: always() instead of if: startsWith(github.ref, 'refs/tags/v'). Matched v3.0.0b7 config for all three jobs (all-tests-pass, validate-release, release). Removed extra dependencies and invalid references.
@@ -1146,6 +1148,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 19:38:16 CET 2026
+**Last Updated:** Sat Jan 24 19:48:25 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

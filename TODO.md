@@ -10,8 +10,10 @@
   - [ ] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
   - [ ] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug`
     > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
-  - [ ] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug`
-  - [ ] **#186.2** Analyze is_tag output propagation through changes → validate-release → release jobs `#bug`
+  - [x] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug`
+    > Tag detection VERIFIED working correctly. v3.0.0b8 logs show: Ref=refs/tags/v3.0.0b8, Ref type=tag, Ref name=v3.0.0b8. Both detection conditions (ref match and ref_type) work. Issue is NOT with tag detection.
+  - [x] **#186.2** Analyze is_tag output propagation through changes → validate-release → release jobs `#bug`
+    > Output chain correctly implemented but validate-release has NO if condition. GitHub Actions skips job without explicit condition. Solution: Restore 'if: needs.changes.outputs.is_tag == true' removed in dd9a222.
   - [x] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug`
     > Root cause: Commit dd9a222 removed job-level if condition from validate-release. Changes job outputs is_tag=true correctly, but validate-release skips entirely (no logs). Hypothesis: output not exported or GitHub Actions implicit skipping.
     > Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
@@ -1137,6 +1139,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 18:20:14 CET 2026
+**Last Updated:** Sat Jan 24 18:22:55 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

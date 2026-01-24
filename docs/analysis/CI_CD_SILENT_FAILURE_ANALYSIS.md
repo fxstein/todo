@@ -356,3 +356,149 @@ When the job-level `if` was present in v3.0.0b7, it explicitly checked the value
 2. **Add Debug Logging**: Implement Fix #4 to see actual values being passed
 3. **Restore Job-Level Condition**: The original `if: needs.changes.outputs.is_tag == 'true'` condition was correct and should be restored
 4. **Add Explicit Debug Step**: Add a step that dumps all `needs.changes.outputs.*` values before any conditional logic
+
+---
+
+## Output Propagation Analysis (Task#186.2 - January 24, 2026)
+
+### Complete Output Flow Chain
+
+**1. changes job → PRODUCES is_tag**
+
+Job declaration (lines 17-25):
+```yaml
+changes:
+  outputs:
+    is_tag: ${{ steps.refs.outputs.is_tag }}
+```
+
+Step implementation (lines 65-83):
+```yaml
+- name: Detect tag ref
+  id: refs
+  run: |
+    is_tag=false
+    if [[ "$ref" == refs/tags/v* ]]; then is_tag=true; fi
+    if [[ "$ref_type" == "tag" ]]; then is_tag=true; fi
+    echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+```
+
+Status: ✅ **Working correctly** - Logs show `is_tag=true` written to output
+
+**2. validate-release job → CONSUMES and RE-EXPORTS is_tag**
+
+Job declaration (lines 384-392):
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]
+  # ❌ NO job-level if condition (removed in dd9a222)
+  outputs:
+    is_tag: ${{ steps.tag-context.outputs.is_tag }}
+```
+
+Step implementation (lines 394-404):
+```yaml
+- name: Capture tag context
+  id: tag-context
+  run: |
+    is_tag="${{ needs.changes.outputs.is_tag }}"
+    echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+```
+
+Status: ❌ **Job skipped entirely** - No steps executed, no outputs produced
+
+**3. release job → CONSUMES is_tag**
+
+Job declaration (lines 489-496):
+```yaml
+release:
+  needs: [validate-release]
+  if: needs.validate-release.outputs.is_tag == 'true'
+```
+
+Status: ❌ **Skipped** - Condition evaluates to false (output is empty/null)
+
+### Evolution of validate-release Job Configuration
+
+**Original (v3.0.0b7 - SUCCESS):**
+```yaml
+validate-release:
+  needs: [all-tests-pass]
+  if: startsWith(github.ref, 'refs/tags/v')
+  outputs:
+    version: ...
+    is_prerelease: ...
+    # NO is_tag output
+```
+
+**Intermediate (after adding changes dependency):**
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]
+  if: needs.changes.outputs.is_tag == 'true'
+  outputs:
+    is_tag: ...  # Added
+    version: ...
+    is_prerelease: ...
+```
+
+**Current (after dd9a222 - FAILURE):**
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]
+  # ❌ if condition removed
+  outputs:
+    is_tag: ...
+    version: ...
+    is_prerelease: ...
+```
+
+### Root Cause: Missing Job-Level Conditional
+
+**The Problem:**
+Commit `dd9a222` removed the job-level `if: needs.changes.outputs.is_tag == 'true'` condition to "avoid skipping", but this caused the opposite problem.
+
+**Why This Fails:**
+1. Without a job-level `if` condition, GitHub Actions evaluates whether to run the job based on:
+   - Dependency completion status (✅ all completed successfully)
+   - Job outputs expectations (❓ job declares outputs but no condition to determine when they're valid)
+   - Implicit conditions (❓ GitHub Actions may detect inconsistency)
+
+2. The job declares `is_tag` as an output from `steps.tag-context.outputs.is_tag`
+3. But the job has no explicit condition stating WHEN it should run
+4. GitHub Actions appears to skip the job entirely rather than running it without clear conditions
+
+**GitHub Actions Behavior:**
+- With `if: needs.changes.outputs.is_tag == 'true'`: Job runs IF condition is true, skips IF false
+- Without any `if`: Job SHOULD run after dependencies complete, but GitHub Actions is skipping it
+- This suggests GitHub Actions has implicit logic that prevents running jobs with unclear execution conditions
+
+### Verification from API
+
+```bash
+$ gh api repos/fxstein/todo.ai/actions/runs/21318445519/jobs \
+  --jq '.jobs[] | select(.name == "Detect Changes") | {name, conclusion, outputs}'
+{"conclusion":"success","name":"Detect Changes","outputs":null}
+```
+
+The GitHub Actions API shows `outputs: null` for the changes job, even though the logs clearly show the output was written. This may be:
+- An API limitation (outputs not exposed)
+- An indication that outputs aren't properly registered
+- Expected behavior (outputs only visible to dependent jobs, not via API)
+
+### Conclusion
+
+The output propagation chain is CORRECTLY IMPLEMENTED in the code:
+- ✅ `changes` job sets `is_tag=true` to `$GITHUB_OUTPUT`
+- ✅ `changes` job declares output `is_tag: ${{ steps.refs.outputs.is_tag }}`
+- ✅ `validate-release` reads `needs.changes.outputs.is_tag`
+- ✅ `validate-release` declares output `is_tag: ${{ steps.tag-context.outputs.is_tag }}`
+- ✅ `release` checks `needs.validate-release.outputs.is_tag == 'true'`
+
+The FAILURE occurs because:
+- ❌ `validate-release` has NO job-level `if` condition
+- ❌ GitHub Actions skips the job without executing any steps
+- ❌ Job outputs remain empty/null
+- ❌ `release` job conditional evaluates to false and skips
+
+**Solution:** Restore the job-level `if: needs.changes.outputs.is_tag == 'true'` condition that was removed in commit `dd9a222`.

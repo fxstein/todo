@@ -1,3 +1,21 @@
+## Release 3.0.0b11
+
+This beta release verifies the release pipeline fix that prevents tag-based
+jobs from being skipped. Validation and publish steps should now execute
+consistently after the CI/CD optimization changes.
+
+We also continue to tighten the release workflow’s safety checks and retry
+behavior so beta releases can be repeated without manual cleanup.
+
+---
+
+### 🔧 Other Changes
+
+- chore: add AI release summary ([0a95e10](https://github.com/fxstein/todo.ai/commit/0a95e105050f1d47c008461e43c6db0d377f7b35))
+- infra: avoid skipping validate-release on tag runs ([dd9a222](https://github.com/fxstein/todo.ai/commit/dd9a2229c10136bdec635044bffdd7d8baa4096c))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b10
 
 This beta release validates the new tag-detection logic so release jobs run

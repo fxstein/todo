@@ -1,7 +1,6 @@
-This beta release validates the new tag-detection logic so release jobs run
-consistently on tag pushes. It should ensure validation and publishing steps
-execute reliably after the CI/CD optimization changes.
+This beta release verifies the release pipeline fix that prevents tag-based
+jobs from being skipped. Validation and publish steps should now execute
+consistently after the CI/CD optimization changes.
 
-We are also continuing to harden the release workflow with clearer abort and
-retry behaviors, keeping beta releases safe to repeat while we verify the
-end-to-end process.
+We also continue to tighten the release workflow’s safety checks and retry
+behavior so beta releases can be repeated without manual cleanup.

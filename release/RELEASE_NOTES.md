@@ -1,3 +1,17 @@
+## Release 3.0.0b8
+
+
+
+---
+
+### 🔧 Other Changes
+
+- chore: Update release summary for beta release ([5804ce4](https://github.com/fxstein/todo.ai/commit/5804ce43d3fc0e111512e9e2f59f31e78e8661ef))
+- docs: Add analysis of CI/CD silent failure incident ([08f1b3e](https://github.com/fxstein/todo.ai/commit/08f1b3ef786d1f7ec0d9860cc7d626bcc527f263))
+- infra: Fix CI/CD pipeline silent failure on changes job error ([86109bb](https://github.com/fxstein/todo.ai/commit/86109bb61516ef4bd088f63bb64203f72d56b6fe))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b11
 
 This beta release verifies the release pipeline fix that prevents tag-based

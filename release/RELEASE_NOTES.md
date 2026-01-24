@@ -1,3 +1,22 @@
+## Release 3.0.0b9
+
+This beta release fixes the release pipeline so tag-triggered jobs reliably run,
+including validation and publish steps. It should allow the beta to publish to
+PyPI and generate the GitHub release without manual intervention.
+
+We also include the recent workflow gating adjustments and release tooling
+improvements that make retries safe and transparent. This keeps the beta
+process stable while we validate the end-to-end release flow.
+
+---
+
+### 🔧 Other Changes
+
+- chore: add AI release summary ([0397926](https://github.com/fxstein/todo.ai/commit/03979263cd56e02f17a09ba160ba954ce1a83a45))
+- infra: run release jobs on tag refs reliably ([246436b](https://github.com/fxstein/todo.ai/commit/246436bfd6eda0d97097d1873a9403a7e06609d6))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b8
 
 This beta release restores a reliable release workflow by preventing duplicate

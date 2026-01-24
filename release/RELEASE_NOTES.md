@@ -1,90 +1,6 @@
-## Release 3.0.0b12
-
-
-
----
-
-### 🔧 Other Changes
-
-- chore: Auto-commit changes before release ([7066836](https://github.com/fxstein/todo.ai/commit/70668361950ba7793d74ce15cdfe90e261aa6e9a))
-- chore: Update release summary for beta release ([5804ce4](https://github.com/fxstein/todo.ai/commit/5804ce43d3fc0e111512e9e2f59f31e78e8661ef))
-- docs: Add analysis of CI/CD silent failure incident ([08f1b3e](https://github.com/fxstein/todo.ai/commit/08f1b3ef786d1f7ec0d9860cc7d626bcc527f263))
-- infra: Fix CI/CD pipeline silent failure on changes job error ([86109bb](https://github.com/fxstein/todo.ai/commit/86109bb61516ef4bd088f63bb64203f72d56b6fe))
-
-## Previous Beta Release Notes
-
-## Release 3.0.0b11
-
-This beta release verifies the release pipeline fix that prevents tag-based
-jobs from being skipped. Validation and publish steps should now execute
-consistently after the CI/CD optimization changes.
-
-We also continue to tighten the release workflow’s safety checks and retry
-behavior so beta releases can be repeated without manual cleanup.
-
----
-
-### 🔧 Other Changes
-
-- chore: add AI release summary ([0a95e10](https://github.com/fxstein/todo.ai/commit/0a95e105050f1d47c008461e43c6db0d377f7b35))
-- infra: avoid skipping validate-release on tag runs ([dd9a222](https://github.com/fxstein/todo.ai/commit/dd9a2229c10136bdec635044bffdd7d8baa4096c))
-
-## Previous Beta Release Notes
-
-## Release 3.0.0b10
-
-This beta release validates the new tag-detection logic so release jobs run
-consistently on tag pushes. It should ensure validation and publishing steps
-execute reliably after the CI/CD optimization changes.
-
-We are also continuing to harden the release workflow with clearer abort and
-retry behaviors, keeping beta releases safe to repeat while we verify the
-end-to-end process.
-
----
-
-### 🔧 Other Changes
-
-- chore: add AI release summary ([cd73f1d](https://github.com/fxstein/todo.ai/commit/cd73f1d3d192b1e6a9db12b131ba60dcd5b0f0c0))
-- infra: derive tag context for release jobs ([f124f2d](https://github.com/fxstein/todo.ai/commit/f124f2d38793ac815830d3315360d9d174f65b52))
-
-## Previous Beta Release Notes
-
-## Release 3.0.0b9
-
-This beta release fixes the release pipeline so tag-triggered jobs reliably run,
-including validation and publish steps. It should allow the beta to publish to
-PyPI and generate the GitHub release without manual intervention.
-
-We also include the recent workflow gating adjustments and release tooling
-improvements that make retries safe and transparent. This keeps the beta
-process stable while we validate the end-to-end release flow.
-
----
-
-### 🔧 Other Changes
-
-- chore: add AI release summary ([0397926](https://github.com/fxstein/todo.ai/commit/03979263cd56e02f17a09ba160ba954ce1a83a45))
-- infra: run release jobs on tag refs reliably ([246436b](https://github.com/fxstein/todo.ai/commit/246436bfd6eda0d97097d1873a9403a7e06609d6))
-
-## Previous Beta Release Notes
-
 ## Release 3.0.0b8
 
-This beta release restores a reliable release workflow by preventing duplicate
-tag failures and ensuring tag-triggered jobs execute correctly. It unblocks
-publishing when the release pipeline is retried after a failed attempt.
 
-We also refined the Python v3 installation and migration guidance to align with
-the `ai-todo` package name and uv-first usage. These updates keep beta testing
-and user onboarding consistent with the current release tooling.
-This beta release focuses on making the release pipeline reliable and repeatable.
-We fixed the tag-based release gating so the publish jobs execute on tag pushes,
-which unblocks PyPI publishing and GitHub release creation for beta builds.
-
-Documentation for the Python v3 installation and migration flow was also refined
-to align with the `ai-todo` package name and uv-first guidance. Together these
-changes ensure the beta release process and user onboarding steps are consistent.
 
 ---
 
@@ -103,6 +19,21 @@ changes ensure the beta release process and user onboarding steps are consistent
 
 ### 🔧 Other Changes
 
+- chore: Update release summary for beta release ([24abc5d](https://github.com/fxstein/todo.ai/commit/24abc5d1a825b61404a0d8e0b785d98023279c75))
+- chore: Auto-commit changes before release ([7066836](https://github.com/fxstein/todo.ai/commit/70668361950ba7793d74ce15cdfe90e261aa6e9a))
+- chore: Update release summary for beta release ([5804ce4](https://github.com/fxstein/todo.ai/commit/5804ce43d3fc0e111512e9e2f59f31e78e8661ef))
+- docs: Add analysis of CI/CD silent failure incident ([08f1b3e](https://github.com/fxstein/todo.ai/commit/08f1b3ef786d1f7ec0d9860cc7d626bcc527f263))
+- infra: Fix CI/CD pipeline silent failure on changes job error ([86109bb](https://github.com/fxstein/todo.ai/commit/86109bb61516ef4bd088f63bb64203f72d56b6fe))
+- chore: Bump version to 3.0.0b11 ([6258729](https://github.com/fxstein/todo.ai/commit/62587290add1be8e3b5e25db11db630932d8608e))
+- chore: add AI release summary ([0a95e10](https://github.com/fxstein/todo.ai/commit/0a95e105050f1d47c008461e43c6db0d377f7b35))
+- infra: avoid skipping validate-release on tag runs ([dd9a222](https://github.com/fxstein/todo.ai/commit/dd9a2229c10136bdec635044bffdd7d8baa4096c))
+- chore: Bump version to 3.0.0b10 ([0b2d209](https://github.com/fxstein/todo.ai/commit/0b2d209231c74d8a7f30eee976a7ad248e5718b1))
+- chore: add AI release summary ([cd73f1d](https://github.com/fxstein/todo.ai/commit/cd73f1d3d192b1e6a9db12b131ba60dcd5b0f0c0))
+- infra: derive tag context for release jobs ([f124f2d](https://github.com/fxstein/todo.ai/commit/f124f2d38793ac815830d3315360d9d174f65b52))
+- chore: Bump version to 3.0.0b9 ([d027893](https://github.com/fxstein/todo.ai/commit/d02789308492d40e8956367e630520944d52971f))
+- chore: add AI release summary ([0397926](https://github.com/fxstein/todo.ai/commit/03979263cd56e02f17a09ba160ba954ce1a83a45))
+- infra: run release jobs on tag refs reliably ([246436b](https://github.com/fxstein/todo.ai/commit/246436bfd6eda0d97097d1873a9403a7e06609d6))
+- chore: Bump version to 3.0.0b8 ([e6f1441](https://github.com/fxstein/todo.ai/commit/e6f144142e40096f2d4b790b1267749f5fbd2fb1))
 - chore: add AI release summary ([4033725](https://github.com/fxstein/todo.ai/commit/4033725bd2038826f7ab11b94d9e016e88661743))
 - chore: Bump version to 3.0.0b8 ([ee58d8d](https://github.com/fxstein/todo.ai/commit/ee58d8d3791fc56236bc7ccfebf8b65902364b9f))
 - chore: add AI release summary ([e43b2d2](https://github.com/fxstein/todo.ai/commit/e43b2d2c71c040d6bb5703056fd0264bfba9c344))

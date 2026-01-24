@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-24 03:05:32 | fxstein | PREPARE | Release preview prepared for v3.0.0b8 (beta)
+2026-01-24 03:05:30 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b7 - File version (todo.ai): 3.0.0b7 - Proposed version: 3.0.0b8 - Release type: beta - Bump type: minor - Last tag: v3.0.0b7 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-24 03:05:29 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-24 03:05:28 | fxstein | BETA VERSION | Found existing betas up to b7 for 3.0.0, using b8
+2026-01-24 03:05:26 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
 2026-01-24 02:58:35 | fxstein | ABORT CLEANUP | Cleaned release artifacts
 2026-01-24 02:58:34 | fxstein | ABORT REVERT | Reverted version files to 3.0.0b7
 2026-01-24 02:58:32 | fxstein | ABORT TAG REMOTE | Deleted remote tag v3.0.0b8

@@ -3,6 +3,17 @@
 > **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
 
 ## Tasks
+- [ ] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug`
+  > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
+  - [ ] **#186.7** Verify release artifacts published successfully `#bug`
+  - [ ] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug`
+  - [ ] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
+  - [ ] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug`
+    > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
+  - [ ] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug`
+  - [ ] **#186.2** Analyze is_tag output propagation through changes → validate-release → release jobs `#bug`
+  - [ ] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug`
+    > Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
@@ -1125,6 +1136,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 02:35:48 CET 2026
+**Last Updated:** Sat Jan 24 18:12:42 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

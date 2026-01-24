@@ -68,3 +68,159 @@ This incident highlights the importance of:
 1. Validating *all* dependencies in aggregate gatekeeper jobs, not just the immediate test jobs.
 2. Ensuring that "skipped" logic accounts for upstream failures vs. intentional skips.
 3. Failing fast when context data (like `is_tag`) is missing or malformed, rather than silently skipping.
+
+---
+
+## Release Job Skipping Issue (January 24, 2026)
+Status: Under Investigation
+
+### Symptom
+When a release tag is pushed (e.g., `v1.0.0`), the following jobs are being skipped:
+- `validate-release` (Validate Release Version)
+- `release` (Build and Publish Release)
+
+The pipeline completes without errors, but no release artifacts are published.
+
+### Analysis
+
+#### Issue #1: Missing Job-Level Conditional
+The `validate-release` job (line 384) has **NO** `if` condition at the job level:
+```yaml
+validate-release:
+  name: Validate Release Version
+  needs: [all-tests-pass, changes]
+  runs-on: ubuntu-latest
+```
+
+This causes the job to:
+- Run on **every** workflow trigger (commits, PRs, tags)
+- Only perform validation work if internal step conditions pass
+- Always produce outputs, even when empty or invalid
+
+#### Issue #2: Output Propagation Chain
+The `is_tag` flag flows through multiple jobs:
+```
+changes.outputs.is_tag → validate-release.outputs.is_tag → release conditional
+```
+
+**Failure Points:**
+1. **Tag Detection** (lines 73-78 in `changes` job):
+   ```bash
+   if [[ "$ref" == refs/tags/v* ]]; then
+     is_tag=true
+   fi
+   ```
+   - May fail if `GITHUB_REF` format differs from expected
+   - Environment variables might not be populated correctly
+   - Workflow trigger might be different than expected
+
+2. **Output Propagation** (line 401 in `validate-release`):
+   ```yaml
+   echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+   ```
+   - If `$is_tag` from `needs.changes.outputs.is_tag` is empty, outputs empty string
+   - String comparison issues: `"true"` vs `true` vs `"True"`
+   - Whitespace in values
+
+3. **Release Job Conditional** (line 496):
+   ```yaml
+   if: needs.validate-release.outputs.is_tag == 'true'
+   ```
+   - Requires exact string match `'true'`
+   - Fails silently if output is empty, false, or malformed
+
+#### Issue #3: Silent Skip Pattern
+Both jobs skip silently without error because:
+- `validate-release` runs but produces empty/false outputs
+- `release` job conditional evaluates to false
+- GitHub Actions shows "Skipped" status (not failure)
+- No error messages indicate why the skip occurred
+
+### Likely Root Causes
+
+**Most Probable:**
+1. Tag detection logic in `changes` job not catching tag push events correctly
+2. Output value type mismatch in GitHub Actions expression evaluation
+3. Environment variables (`GITHUB_REF`, `GITHUB_REF_TYPE`) not populated as expected during tag pushes
+
+**Secondary:**
+- The `validate-release` job should have a job-level conditional to prevent running on non-tag workflows
+- Debug logging added (lines 397-401) may not be visible if job is skipped entirely
+
+### Required Investigation Steps
+
+To diagnose the actual issue, check in workflow run logs:
+
+1. **`changes` job outputs:**
+   - What value does `is_tag` actually have?
+   - What are `GITHUB_REF`, `GITHUB_REF_TYPE`, `GITHUB_REF_NAME`?
+
+2. **`tag-context` step in `validate-release`:**
+   - Does the debug logging show `is_tag` correctly?
+   - Is the step even running?
+
+3. **GitHub Actions UI:**
+   - Are jobs showing "Skipped" or "Not Run"?
+   - What does the `all-tests-pass` job show for status?
+
+4. **Workflow trigger:**
+   - How is the workflow being triggered? (push to tag vs manual trigger)
+   - Is the tag format correct? (e.g., `v1.0.0` vs `1.0.0`)
+
+### Proposed Fixes
+
+**Fix #1: Add Job-Level Conditional**
+```yaml
+validate-release:
+  name: Validate Release Version
+  needs: [all-tests-pass, changes]
+  if: needs.changes.outputs.is_tag == 'true'
+  runs-on: ubuntu-latest
+```
+
+**Fix #2: Enhance Tag Detection**
+Add fallback detection using `github.ref_type` directly:
+```yaml
+- name: Detect tag ref
+  id: refs
+  run: |
+    is_tag=false
+    if [[ "${{ github.ref_type }}" == "tag" ]]; then
+      is_tag=true
+    elif [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+      is_tag=true
+    fi
+    echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+```
+
+**Fix #3: Add Explicit Failure on Missing Data**
+```yaml
+- name: Capture tag context
+  id: tag-context
+  run: |
+    is_tag="${{ needs.changes.outputs.is_tag }}"
+    if [[ -z "$is_tag" ]]; then
+      echo "❌ ERROR: is_tag output from changes job is empty"
+      exit 1
+    fi
+    echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+```
+
+**Fix #4: Debug Workflow Trigger**
+Add early debug step to all tag-dependent jobs:
+```yaml
+- name: Debug workflow context
+  run: |
+    echo "Event name: ${{ github.event_name }}"
+    echo "Ref: ${{ github.ref }}"
+    echo "Ref type: ${{ github.ref_type }}"
+    echo "Ref name: ${{ github.ref_name }}"
+    echo "SHA: ${{ github.sha }}"
+```
+
+### Next Steps
+
+1. Examine actual workflow run logs to confirm which scenario is occurring
+2. Implement Fix #4 first to gather diagnostic data
+3. Based on data, implement Fix #1 and Fix #2 or Fix #3 as appropriate
+4. Test with a beta release tag to verify fixes

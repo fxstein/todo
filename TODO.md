@@ -109,7 +109,7 @@
     - [ ] **#163.52.4** Beta/Pre-release: Conduct real user testing and collect feedback `#release`
     - [ ] **#163.52.3** Final release: Finalize migration support and documentation `#release`
     - [ ] **#163.52.2** Final release: Publish final release to PyPI with migration support `#release`
-    - [ ] **#163.52.1** Final release: Update installation instructions and migration guide `#docs`
+    - [x] **#163.52.1** Final release: Update installation instructions and migration guide `#docs`
   - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests `#code`
     - [x] **#163.51.8** Final validation with all parity tests `#test`
     - [x] **#163.51.7** Add unit tests for FileStructureSnapshot `#test`
@@ -1125,6 +1125,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 02:33:58 CET 2026
+**Last Updated:** Sat Jan 24 02:35:48 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

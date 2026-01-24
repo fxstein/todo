@@ -221,10 +221,10 @@ curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash
 **Python (v3.0+):**
 ```bash
 # Using uv (recommended)
-uv tool upgrade todo-ai
+uv tool upgrade ai-todo
 
 # Alternative: pipx
-pipx upgrade todo-ai
+pipx upgrade ai-todo
 ```
 
 **Legacy Shell:**

@@ -12,8 +12,9 @@ Version 3.0 is a complete rewrite in Python, offering:
 
 ## Prerequisites
 
-- **Python 3.8+** installed on your system.
-- **pipx** (recommended): A tool for installing and running Python applications in isolated environments.
+- **Python 3.10+** installed on your system.
+- **uv** (recommended): A fast Python tool installer for isolated CLI tools.
+- **pipx** (alternative): A tool for installing and running Python applications in isolated environments.
 
 ### Installing pipx (if not installed)
 
@@ -28,10 +29,14 @@ Follow the official [pipx installation guide](https://pypa.github.io/pipx/).
 
 ## Installation
 
-We recommend installing `todo-ai` globally using `pipx`. This ensures it doesn't conflict with other Python packages.
+We recommend installing `ai-todo` globally using `uv tool`. This ensures it doesn't conflict with other Python packages.
 
 ```bash
-pipx install todo-ai
+# Using uv (recommended)
+uv tool install ai-todo
+
+# Alternative: pipx
+pipx install ai-todo
 ```
 
 This will expose two commands globally:

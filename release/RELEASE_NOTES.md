@@ -1,6 +1,8 @@
 ## Release 3.0.0b8
 
+This beta release focuses on hardening the CI/CD pipeline and improving the user experience for task notes. Key improvements include fixes for silent CI/CD failures, optimized workflow triggers for documentation-only changes, and enhanced release process reliability with orphan tag cleanup.
 
+User-facing changes include the removal of confirmation prompts for `update-note` and `delete-note` commands to streamline workflow, and a fix for preserving checkbox states when modifying tasks.
 
 ---
 
@@ -19,6 +21,7 @@
 
 ### 🔧 Other Changes
 
+- chore: Update release summary for beta release ([c81a98d](https://github.com/fxstein/todo.ai/commit/c81a98da50dc8f125eac451535a41b486a3a30d8))
 - chore: Update release summary for beta release ([24abc5d](https://github.com/fxstein/todo.ai/commit/24abc5d1a825b61404a0d8e0b785d98023279c75))
 - chore: Auto-commit changes before release ([7066836](https://github.com/fxstein/todo.ai/commit/70668361950ba7793d74ce15cdfe90e261aa6e9a))
 - chore: Update release summary for beta release ([5804ce4](https://github.com/fxstein/todo.ai/commit/5804ce43d3fc0e111512e9e2f59f31e78e8661ef))

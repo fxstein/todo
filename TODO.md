@@ -7,7 +7,8 @@
   > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
   - [ ] **#186.7** Verify release artifacts published successfully `#bug`
   - [ ] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug`
-  - [ ] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
+  - [x] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
+    > Restored 'if: needs.changes.outputs.is_tag == true' condition to validate-release job (line 420). This was removed in dd9a222 causing GitHub Actions to skip the job. Fix eliminates ambiguity about when job should run.
   - [x] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug`
     > Added comprehensive debug logging: 1) changes job - verbose tag detection with condition evaluation, 2) all-tests-pass - outputs display, 3) validate-release - full workflow context with dependencies and outputs, 4) release - dependency outputs and conditional evaluation. Future-proofed for debugging.
     > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
@@ -1140,6 +1141,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 18:34:12 CET 2026
+**Last Updated:** Sat Jan 24 18:35:47 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

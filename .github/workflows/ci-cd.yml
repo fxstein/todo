@@ -416,6 +416,8 @@ jobs:
     name: Validate Release Version
     # CRITICAL: Only runs AFTER all tests pass
     needs: [all-tests-pass, changes]
+    # Only run on tag pushes (required for GitHub Actions to execute the job)
+    if: needs.changes.outputs.is_tag == 'true'
     runs-on: ubuntu-latest
     outputs:
       is_tag: ${{ steps.tag-context.outputs.is_tag }}

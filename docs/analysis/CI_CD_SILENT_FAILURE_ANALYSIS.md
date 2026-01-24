@@ -224,3 +224,135 @@ Add early debug step to all tag-dependent jobs:
 2. Implement Fix #4 first to gather diagnostic data
 3. Based on data, implement Fix #1 and Fix #2 or Fix #3 as appropriate
 4. Test with a beta release tag to verify fixes
+
+---
+
+## Diagnostic Data (Task#186.1 - January 24, 2026)
+
+### Workflow Run Analysis
+
+**Examined Runs:**
+- v3.0.0b8 (21318445519) - FAILED: validate-release and release skipped
+- v3.0.0b999 (21317498772) - FAILED: validate-release and release skipped
+- v3.0.0b10 (21314200673) - FAILED: validate-release and release skipped
+- v3.0.0b11 (21316100901) - FAILED: validate-release and release skipped
+- v3.0.0b7 (21300926413) - SUCCESS: all jobs ran, release published
+
+### Key Discovery: Root Cause Identified
+
+**Timeline of Changes:**
+- v3.0.0b7 (Jan 23, 2026 20:56): ✅ SUCCESS - Release published
+- Commit `dd9a222` (Jan 24, 2026 14:42): Modified validate-release job
+- v3.0.0b8+ (Jan 24, 2026 onwards): ❌ FAILED - Jobs skipped
+
+**Commit `dd9a222` Changes:**
+```diff
+  validate-release:
+    name: Validate Release Version
+    needs: [all-tests-pass, changes]
+-   # Only run on tag pushes
+-   if: needs.changes.outputs.is_tag == 'true'
+    runs-on: ubuntu-latest
+```
+
+The job-level `if` condition was removed to "avoid skipping", but this caused the opposite problem.
+
+### Evidence from Workflow Logs
+
+**v3.0.0b8 Changes Job Output (Working Correctly):**
+```
+Detect Changes → Detect tag ref:
+  Ref: refs/tags/v3.0.0b8
+  Ref type: tag
+  Ref name: v3.0.0b8
+```
+- Tag detection IS working correctly
+- `is_tag` output should be `true`
+
+**v3.0.0b8 All Tests Passed Job Output (Working Correctly):**
+```
+Results:
+  changes: success
+  docs-quality: skipped
+  logs-quality: skipped
+  quality: success
+  test-quick: success
+  test-comprehensive: success
+  test-pr: skipped
+
+✅ All required checks passed (skipped checks are acceptable)
+```
+- Gatekeeper job passed successfully
+- All required test jobs passed
+
+**v3.0.0b8 Validate Release Version Job:**
+- Status: Skipped
+- Duration: 0s
+- Logs: **COMPLETELY EMPTY** (not even "Set up job")
+- NO steps executed
+
+**v3.0.0b8 Build and Publish Release Job:**
+- Status: Skipped
+- Duration: 0s
+- Conditional: `if: needs.validate-release.outputs.is_tag == 'true'`
+
+### Root Cause Analysis
+
+**Critical Finding:**
+The `validate-release` job is being skipped by GitHub Actions BEFORE it even starts (no "Set up job" logs). This is happening despite:
+1. Having NO explicit `if` condition at the job level
+2. The `needs` jobs (`all-tests-pass`, `changes`) both completed successfully
+3. The first step "Capture tag context" has no `if` condition and should run
+
+**This indicates one of three scenarios:**
+
+1. **GitHub Actions Implicit Skipping**: When a job has no `if` condition but produces outputs that downstream jobs depend on, GitHub Actions may skip it if it detects the outputs won't be used (but this doesn't match our case)
+
+2. **Output Value is Empty/Null**: The `needs.changes.outputs.is_tag` value is actually empty or null, not the string "true", causing some implicit GitHub Actions behavior to skip the job
+
+3. **Job Dependencies Issue**: The combination of `needs: [all-tests-pass, changes]` with no explicit `if` condition is causing GitHub Actions to evaluate the job differently than expected
+
+**Evidence for Scenario #2 (Most Likely):**
+- The `changes` job completed successfully
+- The `is_tag` detection logic ran and printed values
+- BUT: The output may not have been captured in `$GITHUB_OUTPUT`
+- Downstream jobs checking `needs.changes.outputs.is_tag` get empty/null
+- GitHub Actions skips jobs with unmet implicit conditions
+
+**Comparing v3.0.0b7 (SUCCESS) vs v3.0.0b8 (FAILED):**
+
+v3.0.0b7 Configuration:
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]
+  if: needs.changes.outputs.is_tag == 'true'  # Explicit condition
+```
+- Job runs IF condition is true
+- Job skips IF condition is false or empty
+- **Clear decision point**
+
+v3.0.0b8+ Configuration:
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]
+  # NO if condition - should always run
+```
+- Job should run after dependencies complete
+- BUT: GitHub Actions is skipping it anyway
+- **Implicit behavior causing silent skip**
+
+### Hypothesis
+
+The issue is NOT with tag detection or test passing. The issue is that removing the job-level `if` condition exposed a **different problem**: the `validate-release` job's steps expect to read `needs.changes.outputs.is_tag`, but that output may be:
+- Empty string
+- Null
+- Not properly exported from the changes job
+
+When the job-level `if` was present in v3.0.0b7, it explicitly checked the value and decided to run/skip. When removed, GitHub Actions has no guidance and may be applying implicit skipping logic.
+
+### Required Next Steps
+
+1. **Verify Output Export**: Check if `changes` job is actually exporting `is_tag` to `$GITHUB_OUTPUT` correctly
+2. **Add Debug Logging**: Implement Fix #4 to see actual values being passed
+3. **Restore Job-Level Condition**: The original `if: needs.changes.outputs.is_tag == 'true'` condition was correct and should be restored
+4. **Add Explicit Debug Step**: Add a step that dumps all `needs.changes.outputs.*` values before any conditional logic

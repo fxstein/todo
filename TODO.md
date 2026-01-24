@@ -12,7 +12,8 @@
     > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
   - [ ] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug`
   - [ ] **#186.2** Analyze is_tag output propagation through changes → validate-release → release jobs `#bug`
-  - [ ] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug`
+  - [x] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug`
+    > Root cause: Commit dd9a222 removed job-level if condition from validate-release. Changes job outputs is_tag=true correctly, but validate-release skips entirely (no logs). Hypothesis: output not exported or GitHub Actions implicit skipping.
     > Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
@@ -1136,6 +1137,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 18:12:42 CET 2026
+**Last Updated:** Sat Jan 24 18:20:14 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

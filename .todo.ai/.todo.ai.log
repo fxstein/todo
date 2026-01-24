@@ -2,6 +2,8 @@
 # Format: TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-24 18:20:14 | fxstein | NOTE | 186.1 | Root cause: Commit dd9a222 removed job-level if condition from validate-release. Changes job outputs is_tag=true correctly, but validate-release skips entirely (no logs). Hypothesis: output not exported or GitHub Actions implicit skipping.
+2026-01-24 18:20:12 | fxstein | COMPLETE | 186.1 | Examine recent workflow runs to gather diagnostic data
 2026-01-24 18:12:42 | fxstein | NOTE | 186.4 | Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
 2026-01-24 18:12:41 | fxstein | NOTE | 186.1 | Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
 2026-01-24 18:12:40 | fxstein | NOTE | 186 | See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).

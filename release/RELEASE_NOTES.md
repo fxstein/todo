@@ -1,3 +1,22 @@
+## Release 3.0.0b10
+
+This beta release validates the new tag-detection logic so release jobs run
+consistently on tag pushes. It should ensure validation and publishing steps
+execute reliably after the CI/CD optimization changes.
+
+We are also continuing to harden the release workflow with clearer abort and
+retry behaviors, keeping beta releases safe to repeat while we verify the
+end-to-end process.
+
+---
+
+### 🔧 Other Changes
+
+- chore: add AI release summary ([cd73f1d](https://github.com/fxstein/todo.ai/commit/cd73f1d3d192b1e6a9db12b131ba60dcd5b0f0c0))
+- infra: derive tag context for release jobs ([f124f2d](https://github.com/fxstein/todo.ai/commit/f124f2d38793ac815830d3315360d9d174f65b52))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b9
 
 This beta release fixes the release pipeline so tag-triggered jobs reliably run,

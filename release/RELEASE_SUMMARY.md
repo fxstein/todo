@@ -1,7 +1,7 @@
-This beta release fixes the release pipeline so tag-triggered jobs reliably run,
-including validation and publish steps. It should allow the beta to publish to
-PyPI and generate the GitHub release without manual intervention.
+This beta release validates the new tag-detection logic so release jobs run
+consistently on tag pushes. It should ensure validation and publishing steps
+execute reliably after the CI/CD optimization changes.
 
-We also include the recent workflow gating adjustments and release tooling
-improvements that make retries safe and transparent. This keeps the beta
-process stable while we validate the end-to-end release flow.
+We are also continuing to harden the release workflow with clearer abort and
+retry behaviors, keeping beta releases safe to repeat while we verify the
+end-to-end process.

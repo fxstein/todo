@@ -415,7 +415,7 @@ jobs:
   validate-release:
     name: Validate Release Version
     # CRITICAL: Only runs AFTER all tests pass
-    needs: [all-tests-pass, changes]
+    needs: [all-tests-pass]
     # Only run on tag pushes - use direct GitHub context for reliability
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest

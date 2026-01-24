@@ -671,3 +671,67 @@ if: startsWith(github.ref, 'refs/tags/v')
 ```
 
 This matches the successful v3.0.0b7 approach while maintaining all our debug improvements.
+
+---
+
+## Test Results - v3.0.0b10 & Final Fix (Task#186.6 Continued - January 24, 2026)
+
+### Test Release: v3.0.0b10 (STILL FAILED)
+
+**Configuration tested:**
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]  # ❌ This was the problem!
+  if: startsWith(github.ref, 'refs/tags/v')
+```
+
+**Result:** ❌ STILL SKIPPED - Jobs showed 0s duration, no logs
+
+**Evidence:**
+- GITHUB_REF: 'refs/tags/v3.0.0b10' ✅
+- startsWith condition should evaluate to true ✅
+- all-tests-pass: success ✅
+- changes: success ✅
+- But validate-release: **SKIPPED** ❌
+
+### The Actual Root Cause
+
+Comparing v3.0.0b7 (SUCCESS) vs current (FAIL):
+
+**v3.0.0b7 (worked):**
+```yaml
+validate-release:
+  needs: [all-tests-pass]  # Only one dependency
+  if: startsWith(github.ref, 'refs/tags/v')
+```
+
+**v3.0.0b10 (failed):**
+```yaml
+validate-release:
+  needs: [all-tests-pass, changes]  # Two dependencies
+  if: startsWith(github.ref, 'refs/tags/v')
+```
+
+**The Issue:** Adding `changes` to the `needs` array causes GitHub Actions to skip the job even though both dependencies completed successfully and the condition should be true.
+
+**Hypothesis:** When `validate-release` depends on both `all-tests-pass` and `changes`, and the job also has a conditional that doesn't reference the `changes` outputs, GitHub Actions may apply implicit skipping logic or dependency resolution that causes the job to skip.
+
+### Final Fix
+
+Remove `changes` from the `needs` array to match v3.0.0b7:
+```yaml
+validate-release:
+  needs: [all-tests-pass]  # Only dependency we actually need
+  if: startsWith(github.ref, 'refs/tags/v')
+```
+
+**Why this works:**
+- Matches the proven v3.0.0b7 configuration exactly
+- We don't need `changes` dependency since we use direct `github.ref` context
+- Eliminates whatever GitHub Actions dependency resolution issue was occurring
+- Simpler dependency chain is more reliable
+
+**Trade-off:**
+- The `changes` job's debug outputs won't be directly referenced
+- But we keep all the debug logging for future use
+- All tests still run through `all-tests-pass` dependency

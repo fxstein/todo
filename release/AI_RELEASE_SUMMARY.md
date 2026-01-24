@@ -1,0 +1,5 @@
+This beta release contains the actual fix for the CI/CD release job skipping issue. After extensive investigation and multiple test releases, the root cause was finally identified: debug logging steps were referencing `needs.changes` dependencies that weren't listed in the job's needs array, causing GitHub Actions to skip the entire job as invalid configuration.
+
+The solution removes all references to dependencies not in the needs array and matches the proven v3.0.0b7 configuration exactly. Both validate-release and release jobs now use direct GitHub context (`startsWith(github.ref, 'refs/tags/v')`) for tag detection, with simplified debug logging that only references valid dependencies. This eliminates the configuration error that was causing GitHub Actions to reject the jobs at orchestration time.
+
+This release maintains comprehensive debug logging at critical workflow checkpoints while ensuring all dependency references are valid, restoring reliable release execution with clear diagnostic visibility for future troubleshooting.

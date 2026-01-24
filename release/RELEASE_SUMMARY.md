@@ -1,8 +1,7 @@
-This release streamlines the release workflow and day-to-day maintenance by
-reducing unnecessary CI/CD runs while keeping full coverage for code changes
-and tag-based releases. Docs and log changes now trigger focused checks,
-improving turnaround without weakening release safeguards.
+This beta release focuses on making the release pipeline reliable and repeatable.
+We fixed the tag-based release gating so the publish jobs execute on tag pushes,
+which unblocks PyPI publishing and GitHub release creation for beta builds.
 
-It also removes confirmation prompts for delete-note and update-note flows,
-making note management faster and more scriptable, and fixes a checkbox parsing
-edge case when modifying tasks so formatting stays consistent.
+Documentation for the Python v3 installation and migration flow was also refined
+to align with the `ai-todo` package name and uv-first guidance. Together these
+changes ensure the beta release process and user onboarding steps are consistent.

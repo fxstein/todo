@@ -1,5 +1,28 @@
 ## Release 3.0.0b8
 
+This beta release focuses on making the release pipeline reliable and repeatable.
+We fixed the tag-based release gating so the publish jobs execute on tag pushes,
+which unblocks PyPI publishing and GitHub release creation for beta builds.
+
+Documentation for the Python v3 installation and migration flow was also refined
+to align with the `ai-todo` package name and uv-first guidance. Together these
+changes ensure the beta release process and user onboarding steps are consistent.
+
+---
+
+### 🔧 Other Changes
+
+- chore: add AI release summary ([e43b2d2](https://github.com/fxstein/todo.ai/commit/e43b2d2c71c040d6bb5703056fd0264bfba9c344))
+- infra: run release jobs on tag refs ([3a761a5](https://github.com/fxstein/todo.ai/commit/3a761a5817912ef63794b3e0b0e0c106c2cbfe8b))
+- docs: update v3 install and migration guide ([0be3dc6](https://github.com/fxstein/todo.ai/commit/0be3dc6d7f328c7456e9611b4909889a26c7300c))
+- internal: complete task#163.44 ([f0f972c](https://github.com/fxstein/todo.ai/commit/f0f972c00ac6832aaeaed1b55471d26f8a53e3d4))
+- internal: complete task#172.1 and task#172.2 ([5e37683](https://github.com/fxstein/todo.ai/commit/5e37683fec2980a432f0aad8969726d581356890))
+- internal: complete task#172.3 and task#172.4 ([98be4aa](https://github.com/fxstein/todo.ai/commit/98be4aafc3b4c88bfb6b887f7c9a9b438cbf69b4))
+
+## Previous Beta Release Notes
+
+## Release 3.0.0b8
+
 This release streamlines the release workflow and day-to-day maintenance by
 reducing unnecessary CI/CD runs while keeping full coverage for code changes
 and tag-based releases. Docs and log changes now trigger focused checks,

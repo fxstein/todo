@@ -489,6 +489,117 @@ determine_beta_version() {
     log_release_step "BETA VERSION" "Found existing betas up to b${highest_beta} for ${base_version}, using b${next_beta}"
 }
 
+# Detect failed release tags (orphan tags without GitHub release)
+# Returns a newline-separated list of orphan tags
+detect_failed_release_tags() {
+    local base_version="$1" # Optional: filter by base version (e.g., "3.0.0")
+
+    # 1. Get all remote tags
+    local all_tags=$(git ls-remote --tags origin | awk '{print $2}' | sed 's|refs/tags/||' | grep "^v" || echo "")
+
+    # 2. Get all GitHub releases
+    local all_releases=$(gh release list --limit 1000 --json tagName --jq '.[].tagName' 2>/dev/null || echo "")
+
+    # 3. Find orphans (in tags but not in releases)
+    local orphans=""
+    while IFS= read -r tag; do
+        [[ -z "$tag" ]] && continue
+
+        # Filter by base version if provided
+        if [[ -n "$base_version" ]] && [[ "$tag" != v${base_version}* ]]; then
+            continue
+        fi
+
+        # Check if tag exists in releases
+        if ! echo "$all_releases" | grep -qx "$tag"; then
+            orphans="${orphans}${tag}\n"
+        fi
+    done <<< "$all_tags"
+
+    echo -e "$orphans" | sed '/^$/d'
+}
+
+# Cleanup failed release tags
+cleanup_failed_tags() {
+    local base_version="$1"
+
+    echo -e "${BLUE}🔍 Checking for failed release tags (orphans)...${NC}"
+
+    local orphans=$(detect_failed_release_tags "$base_version")
+
+    if [[ -z "$orphans" ]]; then
+        echo -e "${GREEN}✓ No orphan tags found${NC}"
+        return 0
+    fi
+
+    echo -e "${YELLOW}⚠️  Found orphan tags (exist in git but no GitHub release):${NC}"
+    echo -e "$orphans" | sed 's/^/   - /'
+    echo ""
+
+    # Safety check: Only delete if they look like beta versions of the current cycle
+    # or if explicitly confirmed
+
+    local tags_to_delete=""
+    while IFS= read -r tag; do
+        [[ -z "$tag" ]] && continue
+
+        # Auto-select for deletion if it matches current base version pattern
+        if [[ -n "$base_version" ]] && [[ "$tag" =~ ^v${base_version}b[0-9]+$ ]]; then
+            tags_to_delete="${tags_to_delete}${tag}\n"
+        fi
+    done <<< "$orphans"
+
+    if [[ -z "$tags_to_delete" ]]; then
+        echo -e "${BLUE}   No tags matched cleanup criteria (v${base_version}b*)${NC}"
+        return 0
+    fi
+
+    echo -e "${YELLOW}The following tags appear to be failed release attempts:${NC}"
+    echo -e "$tags_to_delete" | sed 's/^/   - /'
+    echo ""
+    echo -e "${YELLOW}Deleting these tags will allow reusing their version numbers.${NC}"
+
+    # Prompt for confirmation (unless non-interactive)
+    if [[ -t 0 ]]; then
+        read -p "Delete these tags? (y/N): " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo -e "${BLUE}Skipping cleanup.${NC}"
+            return 0
+        fi
+    else
+        echo -e "${YELLOW}Running in non-interactive mode - skipping cleanup for safety.${NC}"
+        return 0
+    fi
+
+    # Delete tags
+    while IFS= read -r tag; do
+        [[ -z "$tag" ]] && continue
+
+        echo -e "${BLUE}🗑️  Deleting ${tag}...${NC}"
+
+        # Delete local
+        if git tag -d "$tag" 2>/dev/null; then
+            echo -e "${GREEN}   ✓ Local deleted${NC}"
+        else
+            echo -e "${YELLOW}   ⚠️  Local not found${NC}"
+        fi
+
+        # Delete remote
+        if git push origin ":refs/tags/${tag}" 2>/dev/null; then
+            echo -e "${GREEN}   ✓ Remote deleted${NC}"
+            log_release_step "CLEANUP" "Deleted orphan tag ${tag}"
+        else
+            echo -e "${RED}   ❌ Remote delete failed${NC}"
+        fi
+
+    done <<< "$tags_to_delete"
+
+    echo -e "${GREEN}✓ Cleanup complete${NC}"
+    echo ""
+}
+
+
 # Detect and enforce beta requirement for major releases
 # Returns 0 if OK to proceed, 1 if blocked
 detect_and_enforce_beta_requirement() {
@@ -658,6 +769,8 @@ generate_release_notes() {
     local repo_url=$(get_repo_url)
     local notes_file="release/RELEASE_NOTES.md"
 
+    # Reset the notes file to ensure we start clean
+    # This prevents pollution from previous failed attempts or uncommitted changes
     echo "## Release ${new_version}" > "$notes_file"
     echo "" >> "$notes_file"
 
@@ -987,6 +1100,19 @@ main() {
             echo -e "${BLUE}🧹 Cleaning up uncommitted todo.bash from previous prepare attempt...${NC}"
             rm -f todo.bash
         fi
+    fi
+
+    # Get current version from GitHub (source of truth)
+    CURRENT_VERSION=$(get_current_version)
+
+    # Check if we are in a beta cycle to scope cleanup
+    local BETA_BASE_VERSION=""
+    if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+b[0-9]+$ ]]; then
+        BETA_BASE_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$/\1/')
+
+        # Run cleanup for orphan tags in this beta cycle
+        # This prevents version collisions if previous releases failed
+        cleanup_failed_tags "$BETA_BASE_VERSION"
     fi
 
     # Require AI_RELEASE_SUMMARY.md for prepare (per releases.mdc)

@@ -1,6 +1,3 @@
-This beta release verifies the release pipeline fix that prevents tag-based
-jobs from being skipped. Validation and publish steps should now execute
-consistently after the CI/CD optimization changes.
+This beta release addresses critical stability issues in the CI/CD pipeline that were causing release builds to fail silently. Specifically, it fixes a logic gap in the dependency validation that allowed the release process to skip essential steps when change detection failed.
 
-We also continue to tighten the release workflow’s safety checks and retry
-behavior so beta releases can be repeated without manual cleanup.
+It also includes a detailed failure analysis document describing the incident, its root cause, and the implemented safeguards to prevent recurrence.

@@ -1,3 +1,27 @@
+## Release 3.0.0b9
+
+This beta release fixes the critical CI/CD issue where release jobs were being skipped on tag pushes, preventing any releases from being published since v3.0.0b8. The root cause was identified as a missing job-level conditional that was inadvertently removed, causing GitHub Actions to skip the validate-release and release jobs entirely.
+
+The fix restores the explicit `if: needs.changes.outputs.is_tag == 'true'` condition to the validate-release job, eliminating the ambiguity that caused GitHub Actions to apply implicit skipping logic. Additionally, comprehensive debug logging has been added throughout the workflow to provide detailed diagnostics at all critical points, significantly improving our ability to quickly diagnose similar issues in the future.
+
+This release includes extensive analysis documentation detailing the investigation process, root cause analysis, and output propagation verification. The debug logging additions provide verbose tag detection with condition evaluation, dependency status verification, output propagation tracking, and conditional evaluation display across five key workflow checkpoints.
+
+---
+
+### 🐛 Bug Fixes
+
+- Restore job-level conditional to validate-release job (task#186.5) ([6331e5e](https://github.com/fxstein/todo.ai/commit/6331e5e71c9831c1b099847e19ded83c5f3738e0))
+
+### 🔧 Other Changes
+
+- chore: Add AI release summary for beta release ([5ec4585](https://github.com/fxstein/todo.ai/commit/5ec4585c3b702e4e118fc158f02410189d68b6d5))
+- infra: Add comprehensive debug logging to CI/CD workflow (task#186.4) ([4b28631](https://github.com/fxstein/todo.ai/commit/4b286318d35486931c0eea6c23792fdf34493cdc))
+- docs: Complete output propagation analysis for CI/CD issue (task#186.2, task#186.3) ([4b34a54](https://github.com/fxstein/todo.ai/commit/4b34a541ac4ef719debda11c4b1c2c73a8097916))
+- docs: Document diagnostic findings for CI/CD release job skipping (task#186.1) ([4d643af](https://github.com/fxstein/todo.ai/commit/4d643afc0abca682c4406e00ffb483671269cddb))
+- docs: Document CI/CD release job skipping issue and create investigation tasks (task#186) ([f713dbb](https://github.com/fxstein/todo.ai/commit/f713dbbf4a5f9f9f2d31659aaca917723e241046))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b8
 
 This beta release focuses on hardening the CI/CD pipeline and improving the user experience for task notes. Key improvements include fixes for silent CI/CD failures, optimized workflow triggers for documentation-only changes, and enhanced release process reliability with orphan tag cleanup.

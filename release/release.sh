@@ -1929,8 +1929,34 @@ Includes release summary from ${SUMMARY_FILE}"
     TAG="v${NEW_VERSION}"
     echo -e "${BLUE}🏷️  Creating tag ${TAG}...${NC}"
     log_release_step "CREATE TAG" "Creating git tag: ${TAG} pointing to commit ${version_commit_hash}"
+    # Guard against reusing an existing tag
+    local existing_tag_hash=""
+    if git rev-parse -q --verify "refs/tags/${TAG}" > /dev/null; then
+        existing_tag_hash=$(git rev-parse "refs/tags/${TAG}" 2>/dev/null || echo "")
+        echo -e "${RED}❌ Error: Tag ${TAG} already exists${NC}"
+        if [[ -n "$existing_tag_hash" ]]; then
+            if [[ "$existing_tag_hash" == "$version_commit_hash" ]]; then
+                echo -e "${RED}   → Existing tag points to the same commit (${existing_tag_hash})${NC}"
+                echo -e "${RED}   → This is an identical tag from a previous release attempt${NC}"
+            else
+                echo -e "${RED}   → Existing tag points to commit ${existing_tag_hash}${NC}"
+                echo -e "${RED}   → Current release commit is ${version_commit_hash}${NC}"
+            fi
+        fi
+        echo -e "${RED}   → Release cannot proceed with an existing tag${NC}"
+        echo -e "${RED}   → Use a new version or delete the tag (local + remote) before retrying${NC}"
+        log_release_step "TAG ERROR" "Tag ${TAG} already exists (hash: ${existing_tag_hash:-unknown}); cannot proceed"
+        exit 1
+    fi
+
     # Explicitly tag the commit hash to ensure we're tagging the right commit
-    git tag -a "$TAG" -m "Release version $NEW_VERSION" "$version_commit_hash" > /dev/null 2>&1
+    if ! git tag -a "$TAG" -m "Release version $NEW_VERSION" "$version_commit_hash" > /dev/null 2>&1; then
+        echo -e "${RED}❌ Error: Failed to create tag ${TAG}${NC}"
+        echo -e "${RED}   → Git tag command failed${NC}"
+        echo -e "${RED}   → Check git status and tag list for details${NC}"
+        log_release_step "TAG ERROR" "Failed to create tag ${TAG} at commit ${version_commit_hash}"
+        exit 1
+    fi
     log_release_step "TAG CREATED" "Git tag ${TAG} created successfully at commit ${version_commit_hash}"
 
     # Verify tag points to commit with correct version (with improved checking)

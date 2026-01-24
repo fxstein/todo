@@ -383,8 +383,6 @@ jobs:
     name: Validate Release Version
     # CRITICAL: Only runs AFTER all tests pass
     needs: [all-tests-pass, changes]
-    # Only run on tag pushes
-    if: needs.changes.outputs.is_tag == 'true'
     runs-on: ubuntu-latest
     outputs:
       is_tag: ${{ steps.tag-context.outputs.is_tag }}
@@ -393,10 +391,16 @@ jobs:
     steps:
       - name: Capture tag context
         id: tag-context
-        run: echo "is_tag=${{ needs.changes.outputs.is_tag }}" >> "$GITHUB_OUTPUT"
+        run: |
+          is_tag="${{ needs.changes.outputs.is_tag }}"
+          echo "is_tag=$is_tag" >> "$GITHUB_OUTPUT"
+          if [[ "$is_tag" != "true" ]]; then
+            echo "Not a tag run; skipping release validation."
+          fi
 
       - name: Validate PEP 440 version and check commit CI
         id: validate
+        if: steps.tag-context.outputs.is_tag == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

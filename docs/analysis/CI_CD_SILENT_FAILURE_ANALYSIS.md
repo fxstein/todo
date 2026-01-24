@@ -735,3 +735,65 @@ validate-release:
 - The `changes` job's debug outputs won't be directly referenced
 - But we keep all the debug logging for future use
 - All tests still run through `all-tests-pass` dependency
+
+---
+
+## The ACTUAL Root Cause (Task#186.6 - January 24, 2026)
+
+### Critical Discovery
+
+After testing v3.0.0b10 and v3.0.0b11 (both FAILED), the root cause was finally identified:
+
+**The debug logging steps were referencing dependencies NOT in the needs array!**
+
+v3.0.0b11 configuration:
+```yaml
+validate-release:
+  needs: [all-tests-pass]  # ❌ No 'changes' here
+  steps:
+    - name: Debug workflow context
+      run: |
+        echo "changes: ${{ needs.changes.result }}"  # ⚠️ INVALID REFERENCE!
+        echo "is_tag: '${{ needs.changes.outputs.is_tag }}'"  # ⚠️ INVALID REFERENCE!
+```
+
+**GitHub Actions Behavior:**
+When a job references a dependency (via `needs.job_name`) that is NOT listed in its `needs` array, GitHub Actions **skips the entire job** as invalid configuration.
+
+**Why This Happened:**
+1. We added comprehensive debug logging (task#186.4)
+2. The debug steps referenced `needs.changes.result` and `needs.changes.outputs.*`
+3. But in task#186.5, we removed `changes` from the `needs` array
+4. This created invalid dependency references
+5. GitHub Actions silently skipped the job
+
+### The Complete Fix
+
+1. **Remove 'changes' from needs array** (already done)
+2. **Remove all references to needs.changes** from job steps
+3. **Use only direct github.ref context** for tag detection
+4. **Match v3.0.0b7 configuration** exactly
+
+Final configuration:
+```yaml
+validate-release:
+  needs: [all-tests-pass]  # Only dependency we need
+  if: startsWith(github.ref, 'refs/tags/v')  # Direct context
+  outputs:
+    version: ...  # Removed is_tag output
+    is_prerelease: ...
+  steps:
+    - name: Debug  # No references to needs.changes
+    - name: Validate  # No conditional, runs if job runs
+
+release:
+  needs: [validate-release]
+  if: startsWith(github.ref, 'refs/tags/v')  # Direct context, not output check
+```
+
+### Lessons Learned
+
+1. **Never reference dependencies not in needs array** - GitHub Actions skips the job
+2. **Debug logging must match dependencies** - Can't log non-existent dependency status
+3. **Simpler is better** - Direct context variables are more reliable than output chaining
+4. **Test configurations match working versions** - v3.0.0b7 worked, match it exactly

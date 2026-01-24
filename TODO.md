@@ -146,7 +146,7 @@
       > Interleaved content capture verified. Full read/write cycle test will be completed in Phase 12 when interleaved content is inserted back into generated markdown.
     - [x] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID `#code`
     - [x] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code`
-  - [ ] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script `#test`
+  - [x] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script `#test`
     - [x] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested `#test`
     - [x] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop `#test`
     - [x] **#163.44.4** Test all commands with dedicated test TODO.md dataset - Ensure Python version produces identical results to shell version `#test`
@@ -1125,6 +1125,6 @@
 
 ---
 
-**Last Updated:** Sat Jan 24 02:31:18 CET 2026
+**Last Updated:** Sat Jan 24 02:33:58 CET 2026
 **Repository:** https://github.com/fxstein/todo.ai
 **Maintenance:** Use `todo.ai` script only

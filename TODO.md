@@ -3,6 +3,17 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
+- [ ] **#207** Fix shell/Python parity issues discovered in validation tests `#bug`
+  > Discovered while fixing task#206. After clearing TODO_FILE env var, validation tests revealed Python CLI isn't modifying TODO.md in test directories. Pattern: Tests create separate shell_env/python_env dirs, shell version works correctly, Python version appears to run but doesn't modify files. Likely issue: Python CLI not respecting cwd parameter or using different TODO.md path. Tests failing: test_complete_with_dataset, test_modify_with_dataset, test_delete_with_dataset, test_archive_with_dataset, test_undo_with_dataset, test_note_with_dataset, test_workflow_sequence_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[show].
+  - [ ] **#207.9** Verify all 9 parity tests pass after fixes `#bug`
+  - [ ] **#207.8** Fix test_show_command_parity (shell can't find task, Python can) `#bug`
+  - [ ] **#207.7** Fix test_undo_with_dataset and test_note_with_dataset failures `#bug`
+  - [ ] **#207.6** Fix test_archive_with_dataset (Python not archiving tasks) `#bug`
+  - [ ] **#207.5** Fix test_delete_with_dataset (Python not deleting tasks) `#bug`
+  - [ ] **#207.4** Fix test_modify_with_dataset (Python not modifying tasks) `#bug`
+  - [ ] **#207.3** Fix test_complete_with_dataset (Python not completing tasks) `#bug`
+  - [ ] **#207.2** Analyze test fixture setup (test_env_shell vs python_env directories) `#bug`
+  - [ ] **#207.1** Investigate why Python CLI doesn't modify TODO.md in parity tests `#bug`
 - [x] **#206** Fix shell script test failures (Cursor rules initialization during tests) `#bug`
   > 5 parity tests failing: test_list_with_dataset, test_archive_with_dataset, test_note_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[command3-args3]. Root cause: Shell script outputs '⚠️ IMPORTANT: Cursor rules initialized' during test runs, causing exit code 1 instead of 0. Python version correctly returns exit code 0.
   > Fix implemented: Added TODO_AI_TESTING environment variable check in todo.ai lines 1474-1476 (init_cursor_rules) and line 7134 (mode display). Test harnesses updated in test_dataset_parity.py lines 31-32 and test_feature_parity.py lines 40-41. When TODO_AI_TESTING=1, shell script suppresses all initialization output for clean test parity with Python version.

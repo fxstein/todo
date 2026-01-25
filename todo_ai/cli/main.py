@@ -44,8 +44,14 @@ from todo_ai.cli.commands import (
 @click.pass_context
 def cli(ctx, todo_file, root):
     """todo.ai - AI-Agent First TODO List Tracker"""
+    from pathlib import Path
+
     ctx.ensure_object(dict)
-    ctx.obj["todo_file"] = todo_file
+    # Resolve todo_file relative to root if root is provided
+    if root and not Path(todo_file).is_absolute():
+        ctx.obj["todo_file"] = str(Path(root) / todo_file)
+    else:
+        ctx.obj["todo_file"] = todo_file
     ctx.obj["root"] = root
 
 

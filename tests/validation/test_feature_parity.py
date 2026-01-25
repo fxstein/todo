@@ -65,6 +65,8 @@ def run_python_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
         env = os.environ.copy()
         repo_root = Path(__file__).parent.parent.parent
         env["PYTHONPATH"] = str(repo_root)
+        # Set TODO_AI_ROOT to ensure Python CLI uses the test directory
+        env["TODO_AI_ROOT"] = str(cwd)
 
         result = subprocess.run(
             ["uv", "run", "python", "-m", "todo_ai.cli.main"] + cmd,

@@ -1,8 +1,21 @@
 import os
 
+import pytest
+
 from todo_ai.cli.main import add_command, add_subtask_command, archive_command, restore_command
 from todo_ai.core.file_ops import FileOps
 from todo_ai.core.task import TaskManager, TaskStatus
+
+
+@pytest.fixture(autouse=True)
+def clean_env():
+    """Clean up TODO_FILE environment variable after each test."""
+    original = os.environ.get("TODO_FILE")
+    yield
+    if original is None:
+        os.environ.pop("TODO_FILE", None)
+    else:
+        os.environ["TODO_FILE"] = original
 
 
 def test_restore_subtasks_reproduction(tmp_path, capsys):

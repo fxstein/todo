@@ -14,11 +14,11 @@
   > - Requirement: `restore_command` should ONLY move the task (and subtasks) back to the "Tasks" section. It must PRESERVE the completion status (`[x]` or `[ ]`).
   > - This allows restoring a completed task tree without losing the completion state of subtasks.
   - [x] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix`
-  - [ ] **#204.1** Create reproduction test case for restore subtask failure `#test`
-  - [ ] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix`
-  - [ ] **#204.3** Verify fix with regression test `#test`
-  - [ ] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix`
   - [x] **#204.5** Fix `restore_command` to restore subtasks in correct reverse-chronological order `#bug` `#fix`
+  - [ ] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix`
+  - [ ] **#204.3** Verify fix with regression test `#test`
+  - [ ] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix`
+  - [ ] **#204.1** Create reproduction test case for restore subtask failure `#test`
 - [ ] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
   > Reopening to restore legacy Python support (3.10-3.13).
   > - Requirement: Keep 3.10+ support.

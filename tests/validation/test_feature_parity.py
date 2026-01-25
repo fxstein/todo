@@ -38,12 +38,16 @@ def test_env(tmp_path):
 def run_shell_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
     """Run shell script command and return output and exit code."""
     try:
+        env = os.environ.copy()
+        env["TODO_AI_TESTING"] = "1"
+
         result = subprocess.run(
             [str(SHELL_SCRIPT)] + cmd,
             cwd=cwd,
             capture_output=True,
             text=True,
             timeout=10,
+            env=env,
         )
         return result.stdout + result.stderr, result.returncode
     except subprocess.TimeoutExpired:

@@ -9,7 +9,7 @@
   - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
   - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
   - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
-- [ ] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
+- [ ] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#inprogress` `#python`
   - [ ] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
   - [ ] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`
   - [ ] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
@@ -341,38 +341,6 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
-- [x] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` (2026-01-25)
-  > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
-  > - Avoids "project" terminology.
-  > - Provides zero-friction context retrieval.
-  > - Replaces task #201.13 (deleted).
-  > Added `stop` command to scope (subtasks #201.15 - #201.19).
-  > - Allows removing `#inprogress` tag without completing the task.
-  > - Mirrors `start` command functionality.
-  > Clarification: The `stop` command is optional and rarely needed.
-  > - `complete` implicitly stops a task (removes `#inprogress` tag).
-  > - `archive` implicitly stops a task.
-  > - `delete` implicitly stops a task.
-  > - `stop` is only for pausing work on a task without completing it.
-  - [x] **#201.19** Document `stop` command usage `#documentation` (2026-01-25)
-  - [x] **#201.18** Add tests for `stop` command `#test` (2026-01-25)
-  - [x] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp` (2026-01-25)
-  - [x] **#201.16** Implement `stop` command in CLI `#cli` `#code` (2026-01-25)
-  - [x] **#201.15** Design and implement `stop` command to remove  tag without completing task `#design` `#feature` (2026-01-25)
-  - [x] **#201.14** Design `get_active_tasks` tool (or `get_status`) instead of overloading `list_tasks` `#design` `#mcp` (2026-01-25)
-  - [x] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp` (2026-01-25)
-  - [x] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp` (2026-01-25)
-  - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation` (2026-01-25)
-  - [x] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research` (2026-01-25)
-  - [x] **#201.8** Document start command and usage `#documentation` (2026-01-25)
-  - [x] **#201.7** Create tests for start command and tag lifecycle `#test` (2026-01-25)
-  - [x] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp` (2026-01-25)
-  - [x] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic` (2026-01-25)
-  - [x] **#201.4** Implement `start` command in CLI `#cli` `#code` (2026-01-25)
-  - [x] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#logic` (2026-01-25)
-  - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#mcp` (2026-01-25)
-  - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` (2026-01-25)
-  - [x] **#201.13** Update `list_tasks` tool description to encourage checking  at start of chat `#code` `#mcp` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -437,6 +405,38 @@
   > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
   - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test` (2026-01-25)
   - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code` (2026-01-25)
+- [x] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` (2026-01-25)
+  > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
+  > - Avoids "project" terminology.
+  > - Provides zero-friction context retrieval.
+  > - Replaces task #201.13 (deleted).
+  > Added `stop` command to scope (subtasks #201.15 - #201.19).
+  > - Allows removing `#inprogress` tag without completing the task.
+  > - Mirrors `start` command functionality.
+  > Clarification: The `stop` command is optional and rarely needed.
+  > - `complete` implicitly stops a task (removes `#inprogress` tag).
+  > - `archive` implicitly stops a task.
+  > - `delete` implicitly stops a task.
+  > - `stop` is only for pausing work on a task without completing it.
+  - [x] **#201.19** Document `stop` command usage `#documentation` (2026-01-25)
+  - [x] **#201.18** Add tests for `stop` command `#test` (2026-01-25)
+  - [x] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp` (2026-01-25)
+  - [x] **#201.16** Implement `stop` command in CLI `#cli` `#code` (2026-01-25)
+  - [x] **#201.15** Design and implement `stop` command to remove  tag without completing task `#design` `#feature` (2026-01-25)
+  - [x] **#201.14** Design `get_active_tasks` tool (or `get_status`) instead of overloading `list_tasks` `#design` `#mcp` (2026-01-25)
+  - [x] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp` (2026-01-25)
+  - [x] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp` (2026-01-25)
+  - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation` (2026-01-25)
+  - [x] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research` (2026-01-25)
+  - [x] **#201.8** Document start command and usage `#documentation` (2026-01-25)
+  - [x] **#201.7** Create tests for start command and tag lifecycle `#test` (2026-01-25)
+  - [x] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp` (2026-01-25)
+  - [x] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic` (2026-01-25)
+  - [x] **#201.4** Implement `start` command in CLI `#cli` `#code` (2026-01-25)
+  - [x] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#logic` (2026-01-25)
+  - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#mcp` (2026-01-25)
+  - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` (2026-01-25)
+  - [x] **#201.13** Update `list_tasks` tool description to encourage checking  at start of chat `#code` `#mcp` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.

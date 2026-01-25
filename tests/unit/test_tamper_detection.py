@@ -43,7 +43,7 @@ def test_checksum_calculation(temp_todo_dir):
 def test_initialization_creates_checksum(temp_todo_dir):
     """Test that initializing FileOps creates a checksum file."""
     todo_file = temp_todo_dir / "TODO.md"
-    checksum_file = temp_todo_dir / ".todo.ai" / "checksum"
+    checksum_file = temp_todo_dir / ".todo.ai" / "state" / "checksum"
 
     assert not checksum_file.exists()
 
@@ -66,7 +66,7 @@ def test_tamper_detection_passive_mode(temp_todo_dir):
     file_ops_new = FileOps(str(todo_file))
 
     # Checksum should be updated to match new content
-    checksum_file = temp_todo_dir / ".todo.ai" / "checksum"
+    checksum_file = temp_todo_dir / ".todo.ai" / "state" / "checksum"
     new_checksum = file_ops_new.calculate_checksum(todo_file.read_text(encoding="utf-8"))
     assert checksum_file.read_text().strip() == new_checksum
 
@@ -150,6 +150,6 @@ def test_shadow_copy_update(temp_todo_dir):
     content = "New content"
     file_ops.update_integrity(content)
 
-    shadow_file = temp_todo_dir / ".todo.ai" / "shadow" / "TODO.md"
+    shadow_file = temp_todo_dir / ".todo.ai" / "state" / "TODO.md"
     assert shadow_file.exists()
     assert shadow_file.read_text(encoding="utf-8") == content

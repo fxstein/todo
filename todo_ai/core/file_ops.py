@@ -54,11 +54,12 @@ class FileOps:
     ):
         self.todo_path = Path(todo_path)
         self.config_dir = self.todo_path.parent / ".todo.ai"
+        self.state_dir = self.config_dir / "state"
         self.serial_path = self.config_dir / ".todo.ai.serial"
-        self.checksum_path = self.config_dir / "checksum"
-        self.shadow_path = self.config_dir / "shadow" / "TODO.md"
+        self.checksum_path = self.state_dir / "checksum"
+        self.shadow_path = self.state_dir / "TODO.md"
         self.log_path = self.config_dir / ".todo.ai.log"
-        self.tamper_mode_path = self.config_dir / "tamper_mode"
+        self.tamper_mode_path = self.state_dir / "tamper_mode"
         self.interface = interface
 
         # State to preserve file structure
@@ -89,6 +90,8 @@ class FileOps:
         # Ensure config directory exists
         if not self.config_dir.exists():
             self.config_dir.mkdir(parents=True, exist_ok=True)
+        if not self.state_dir.exists():
+            self.state_dir.mkdir(parents=True, exist_ok=True)
 
         # Verify integrity on init (Gatekeeper)
         if not skip_verify:
@@ -163,13 +166,14 @@ class FileOps:
         # Calculate new hash
         new_hash = self.calculate_checksum(content)
 
+        # Ensure state directory exists
+        if not self.state_dir.exists():
+            self.state_dir.mkdir(parents=True, exist_ok=True)
+
         # Write checksum
         self.checksum_path.write_text(new_hash, encoding="utf-8")
 
         # Update shadow copy
-        if not self.shadow_path.parent.exists():
-            self.shadow_path.parent.mkdir(parents=True, exist_ok=True)
-
         # Atomic write for shadow copy not strictly necessary but good practice
         # We'll just write directly for now
         self.shadow_path.write_text(content, encoding="utf-8")

@@ -15,15 +15,15 @@ The system relies on a **Strict Checksum Verification** model:
 
 ## 2. Core Components
 
-### 2.1 Checksum File (`.todo.ai/checksum`)
+### 2.1 Checksum File (`.todo.ai/state/checksum`)
 A plain text file containing the SHA-256 hash of the normalized `TODO.md` content.
-- **Location:** `.todo.ai/checksum`
+- **Location:** `.todo.ai/state/checksum`
 - **Format:** `SHA256_HASH_STRING` (e.g., `a1b2c3d4...`)
 - **Normalization:** Before hashing, `TODO.md` content is normalized (newlines converted to `\n`, encoding UTF-8) to ensure cross-platform consistency.
 
-### 2.2 Shadow Copy (`.todo.ai/shadow/TODO.md`)
+### 2.2 Shadow Copy (`.todo.ai/state/TODO.md`)
 A hidden backup of the last known valid state of `TODO.md`.
-- **Location:** `.todo.ai/shadow/TODO.md`
+- **Location:** `.todo.ai/state/TODO.md`
 - **Purpose:** Enables diffing against the "last valid state" even if no Git commits exist.
 - **Update Logic:** Updated atomically alongside the checksum whenever a valid `todo-ai` write occurs.
 
@@ -52,9 +52,9 @@ A new security setting controls the strictness of tamper detection.
   - `false` (Passive): Checksums are calculated and logged. Mismatches are logged but **do not block** execution.
   - `true` (Active): Checksum mismatches **block** execution (raise `TamperError`).
 
-### 2.7 Tamper Mode State (`.todo.ai/tamper_mode`)
+### 2.7 Tamper Mode State (`.todo.ai/state/tamper_mode`)
 A file tracking the last known state of the `tamper_proof` setting to detect and log changes.
-- **Location:** `.todo.ai/tamper_mode`
+- **Location:** `.todo.ai/state/tamper_mode`
 - **Content:** `true` or `false`
 - **Update Logic:** Updated whenever `FileOps` detects a change in `config.yaml` vs this file. Logs `ACTION: SETTING_CHANGE` when updated.
 
@@ -65,10 +65,10 @@ This logic runs *before* any command execution (in `FileOps.__init__` or `load()
 
 1. **Read** `TODO.md` from disk.
 2. **Calculate** SHA-256 hash of normalized content (`current_hash`).
-3. **Read** stored hash from `.todo.ai/checksum` (`stored_hash`).
+3. **Read** stored hash from `.todo.ai/state/checksum` (`stored_hash`).
 4. **Check Configuration:**
    - Read `tamper_proof` from config.
-   - Compare with `.todo.ai/tamper_mode`. If changed, log `SETTING_CHANGE` and update state file.
+   - Compare with `.todo.ai/state/tamper_mode`. If changed, log `SETTING_CHANGE` and update state file.
 5. **Compare Hashes:**
    - If `current_hash == stored_hash`: **Pass**.
    - If `stored_hash` is missing: **First Run / Reset**. (Warn user, create checksum, proceed).
@@ -81,8 +81,8 @@ This logic runs *after* a successful operation (in `FileOps.save()`).
 
 1. **Write** new content to `TODO.md`.
 2. **Calculate** new SHA-256 hash (`new_hash`).
-3. **Write** `new_hash` to `.todo.ai/checksum`.
-4. **Copy** `TODO.md` to `.todo.ai/shadow/TODO.md`.
+3. **Write** `new_hash` to `.todo.ai/state/checksum`.
+4. **Copy** `TODO.md` to `.todo.ai/state/TODO.md`.
 5. **Log** the action with `INTERFACE` and `CHECKSUM`.
 
 ### 3.3 Tamper Handling (Recovery)
@@ -144,7 +144,7 @@ Agents encountering `TamperError` will receive a structured error message.
 
 ### Phase 2: CLI Commands
 - [ ] Create `todo-ai tamper` command group.
-  - `diff`: Diff `TODO.md` vs `.todo.ai/shadow/TODO.md`.
+  - `diff`: Diff `TODO.md` vs `.todo.ai/state/TODO.md`.
   - `accept`: Archive event, update checksum/shadow to match current file.
 - [ ] Ensure NO global `--force` flag is implemented.
 

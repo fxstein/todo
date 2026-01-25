@@ -10,6 +10,8 @@
   - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
   - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
 - [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` `#inprogress`
+  - [ ] **#201.13** Update `list_tasks` tool description to encourage checking `#inprogress` at start of chat `#code` `#mcp`
+  - [ ] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp`
   - [ ] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
   - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
   - [x] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research`

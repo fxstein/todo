@@ -28,9 +28,15 @@ The `start` command allows users (and agents) to explicitly mark a task as "in p
 
 4. **MCP Context Surfacing:**
    * The MCP server needs to make in-progress tasks visible to the agent.
-   * **Strategy:**
-     * When `list_tasks` is called, tasks with `#inprogress` should be highlighted or filtered easily.
-     * (Future) System prompt injection of active tasks? (Out of scope for this task, but `list_tasks` support is in scope).
+   * **Strategy 1: MCP Prompt (Recommended):**
+     * Implement an MCP Prompt named `active_context` (or `current_status`).
+     * When invoked, this prompt returns a formatted list of all tasks marked `#inprogress`.
+     * This allows the user/agent to explicitly "load" the active context at the start of a session.
+   * **Strategy 2: Tool Description Engineering:**
+     * Update the `list_tasks` tool description.
+     * Add explicit instruction: "Use this tool at the start of a conversation to check for #inprogress tasks."
+   * **Strategy 3: List Filtering:**
+     * Ensure `list_tasks` supports filtering by tag (already exists, but verify `#inprogress` works seamlessly).
 
 ## Implementation Plan
 
@@ -52,10 +58,14 @@ The `start` command allows users (and agents) to explicitly mark a task as "in p
 
 ### 3. MCP Implementation (`todo_ai/mcp/server.py`)
 
-* Add `start_task` tool.
-* Expose via MCP protocol.
+* **Tools:**
+  * Add `start_task` tool.
+  * Update `list_tasks` tool description to encourage checking `#inprogress`.
+* **Prompts:**
+  * Add `active_context` prompt that returns currently in-progress tasks.
 
 ### 4. Tests
 
 * Unit tests for `start_task` logic.
 * Integration tests for lifecycle (start -> complete -> verify tag removed).
+* Verify MCP Prompt returns correct tasks.

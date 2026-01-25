@@ -19,6 +19,7 @@ from todo_ai.cli.commands import (
     note_command,
     reformat_command,
     relate_command,
+    reorder_command,
     report_bug_tool_command,
     resolve_conflicts_command,
     restore_command,
@@ -229,6 +230,13 @@ def lint(ctx):
 def reformat(ctx, dry_run):
     """Apply formatting fixes."""
     reformat_command(dry_run, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("reorder")
+@click.pass_context
+def reorder(ctx):
+    """Reorder subtasks to match reverse-chronological order (newest on top)."""
+    reorder_command(todo_path=ctx.obj["todo_file"])
 
 
 @cli.command("resolve-conflicts")

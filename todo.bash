@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.0b15
+# Version: 3.0.0b16
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.0b15"
+VERSION="3.0.0b16"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -1470,6 +1470,11 @@ EOF
 
 # Function to ensure Cursor rules include todo.ai requirement
 init_cursor_rules() {
+    # Skip cursor rules initialization during tests
+    if [[ -n "$TODO_AI_TESTING" ]]; then
+        return 0
+    fi
+
     local rules_dir="${ROOT_DIR}/.cursor/rules"
     local cursor_rules_file="${ROOT_DIR}/.cursorrules"
     local rules_created=0
@@ -7125,7 +7130,9 @@ init_cursor_rules
 
 # Display current operating mode (unless it's a command that doesn't need it)
 # Skip for internal operations and help/version commands
-if [[ "${1:-}" != "version" && "${1:-}" != "--version" && "${1:-}" != "-v" && \
+# Also skip during testing to avoid output differences
+if [[ -z "$TODO_AI_TESTING" ]] && \
+   [[ "${1:-}" != "version" && "${1:-}" != "--version" && "${1:-}" != "-v" && \
       "${1:-}" != "--help" && "${1:-}" != "help" && "${1:-}" != "-h" && \
       "${1:-}" != "--info" ]]; then
     current_mode=$(get_numbering_mode)

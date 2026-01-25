@@ -10,7 +10,11 @@
   - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
   - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
 - [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` `#inprogress`
-  - [ ] **#201.13** Update `list_tasks` tool description to encourage checking `#inprogress` at start of chat `#code` `#mcp`
+  > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
+  > - Avoids "project" terminology.
+  > - Provides zero-friction context retrieval.
+  > - Replaces task #201.13 (deleted).
+  - [ ] **#201.14** Design `get_active_tasks` tool (or `get_status`) instead of overloading `list_tasks` `#design` `#mcp`
   - [ ] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp`
   - [ ] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
   - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
@@ -1121,6 +1125,7 @@
   > 2. Should we support time tracking (start/stop)?
   > 3. How does this interact with todo.txt format (e.g. priority changes)?
   > 4. Should this trigger any external integrations?
+  - [D] **#201.13** Update `list_tasks` tool description to encourage checking  at start of chat `#code` `#inprogress` `#mcp` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)

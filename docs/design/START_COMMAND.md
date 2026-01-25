@@ -28,15 +28,15 @@ The `start` command allows users (and agents) to explicitly mark a task as "in p
 
 4. **MCP Context Surfacing:**
    * The MCP server needs to make in-progress tasks visible to the agent.
-   * **Strategy 1: MCP Prompt (Recommended):**
-     * Implement an MCP Prompt named `active_context` (or `current_status`).
-     * When invoked, this prompt returns a formatted list of all tasks marked `#inprogress`.
-     * This allows the user/agent to explicitly "load" the active context at the start of a session.
-   * **Strategy 2: Tool Description Engineering:**
-     * Update the `list_tasks` tool description.
-     * Add explicit instruction: "Use this tool at the start of a conversation to check for #inprogress tasks."
-   * **Strategy 3: List Filtering:**
-     * Ensure `list_tasks` supports filtering by tag (already exists, but verify `#inprogress` works seamlessly).
+   * **Strategy 1: Dedicated Tool (Recommended):**
+     * Implement `get_active_tasks` (no arguments).
+     * Returns a curated list of tasks marked `#inprogress`.
+     * Zero friction for the agent to "orient" itself.
+   * **Strategy 2: MCP Prompt:**
+     * Implement `active_context` prompt.
+     * Returns the same data as `get_active_tasks` but via the Prompts API.
+   * **Strategy 3: List Filtering (Fallback):**
+     * `list_tasks` supports filtering by tag, but requires agent to know/remember the tag.
 
 ## Implementation Plan
 
@@ -60,12 +60,12 @@ The `start` command allows users (and agents) to explicitly mark a task as "in p
 
 * **Tools:**
   * Add `start_task` tool.
-  * Update `list_tasks` tool description to encourage checking `#inprogress`.
+  * Add `get_active_tasks` tool (wraps `list_tasks(tag="#inprogress")` logic but with better formatting).
 * **Prompts:**
-  * Add `active_context` prompt that returns currently in-progress tasks.
+  * Add `active_context` prompt.
 
 ### 4. Tests
 
 * Unit tests for `start_task` logic.
 * Integration tests for lifecycle (start -> complete -> verify tag removed).
-* Verify MCP Prompt returns correct tasks.
+* Verify `get_active_tasks` returns correct tasks.

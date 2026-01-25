@@ -28,6 +28,7 @@ dependencies = [
     "pyyaml>=6.0",
     "requests>=2.28.0",
     "pygithub>=1.59.0",
+    "fastmcp>=2.14.0,<3.0.0",
 ]
 
 [project.urls]

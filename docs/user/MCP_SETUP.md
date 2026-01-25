@@ -16,27 +16,43 @@
 
 ## Configuration
 
-1. **Locate the MCP Server Command:**
+### Project-Specific Configuration (Recommended)
 
-    After installation, the command `todo-ai-mcp` should be available globally.
-    Verify it by running:
-    ```bash
-    which todo-ai-mcp
-    ```
-    *(Copy the full path output, e.g., `/Users/username/.local/bin/todo-ai-mcp`)*
+To ensure `todo-ai` uses the correct `TODO.md` file for your project, create a `.cursor/mcp.json` file in your project root:
 
+```json
+{
+  "mcpServers": {
+    "todo-ai": {
+      "command": "uvx",
+      "args": [
+        "todo-ai",
+        "serve",
+        "--root",
+        "${workspaceFolder}"
+      ]
+    }
+  }
+}
+```
+
+This configuration:
+1. Uses `uvx` to run `todo-ai` without permanent installation (or uses installed version if available).
+2. Runs the `serve` command to start the MCP server.
+3. Sets the `--root` to the current workspace folder, ensuring the correct `TODO.md` is used.
+
+### Global Configuration
+
+If you prefer a global setup (not recommended for multiple projects), you can configure it in Cursor Settings:
+
+1. **Locate the Command:** `which todo-ai`
 2. **Configure Cursor:**
+   - **Name:** `todo-ai`
+   - **Type:** `stdio`
+   - **Command:** `todo-ai` (or full path)
+   - **Arguments:** `serve`
 
-    - Open **Cursor Settings** (Cmd+Shift+J or `Ctrl+Shift+J`).
-    - Navigate to **Features** > **MCP Servers**.
-    - Click **+ Add New MCP Server**.
-    - Enter the following details:
-        - **Name:** `todo-ai`
-        - **Type:** `stdio`
-        - **Command:** `todo-ai-mcp` (or the full path from step 1)
-        - **Arguments:** (Leave empty)
-
-    *Note: If `todo-ai-mcp` is not in Cursor's PATH, explicitly use the full path found in step 1.*
+   *Note: Without the `--root` argument, the global server will look for `TODO.md` in the directory where Cursor was launched.*
 
 3. **Verify Connection:**
 

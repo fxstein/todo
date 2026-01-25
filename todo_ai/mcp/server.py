@@ -5,9 +5,7 @@ import io
 import sys
 from pathlib import Path
 
-import mcp.types as types
-from mcp.server import Server
-from mcp.server.stdio import stdio_server
+from fastmcp import FastMCP
 
 from todo_ai.cli.commands import (
     add_command,
@@ -39,502 +37,258 @@ from todo_ai.cli.commands import (
     update_tool_command,
 )
 
+# Initialize FastMCP
+mcp = FastMCP("todo-ai")
 
-class MCPServer:
-    """MCP server for todo.ai."""
+# Global state for todo path (set by run_server)
+CURRENT_TODO_PATH: str = "TODO.md"
 
-    def __init__(self, todo_path: str = "TODO.md"):
-        self.app = Server("todo-ai")
-        self.todo_path = todo_path
-        self._setup_handlers()
 
-    def _setup_handlers(self):
-        """Setup MCP request handlers."""
+def _capture_output(func, *args, **kwargs) -> str:
+    """Capture stdout from a function call."""
+    old_stdout = sys.stdout
+    sys.stdout = captured_output = io.StringIO()
+    try:
+        func(*args, **kwargs)
+        return captured_output.getvalue() or "Success"
+    except Exception as e:
+        return f"Error: {str(e)}"
+    finally:
+        sys.stdout = old_stdout
 
-        @self.app.list_tools()
-        async def list_tools() -> list[types.Tool]:
-            """List all available MCP tools."""
-            return [
-                # Basic task operations
-                types.Tool(
-                    name="add_task",
-                    description="Add a new task to TODO.md",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "description": {"type": "string"},
-                            "tags": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": ["description"],
-                    },
-                ),
-                types.Tool(
-                    name="add_subtask",
-                    description="Add a subtask to an existing task",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "parent_id": {"type": "string"},
-                            "description": {"type": "string"},
-                            "tags": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": ["parent_id", "description"],
-                    },
-                ),
-                types.Tool(
-                    name="complete_task",
-                    description="Mark a task as complete",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "with_subtasks": {"type": "boolean"},
-                        },
-                        "required": ["task_id"],
-                    },
-                ),
-                types.Tool(
-                    name="list_tasks",
-                    description="List tasks from TODO.md",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "status": {
-                                "type": "string",
-                                "enum": ["pending", "completed", "archived"],
-                            },
-                            "tag": {"type": "string"},
-                        },
-                    },
-                ),
-                # Phase 1: Task Management
-                types.Tool(
-                    name="modify_task",
-                    description="Modify a task's description and/or tags",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "description": {"type": "string"},
-                            "tags": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": ["task_id", "description"],
-                    },
-                ),
-                types.Tool(
-                    name="delete_task",
-                    description="Delete a task (move to Deleted section)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "with_subtasks": {"type": "boolean"},
-                        },
-                        "required": ["task_id"],
-                    },
-                ),
-                types.Tool(
-                    name="archive_task",
-                    description="Archive a task (move to Recently Completed section)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "reason": {"type": "string"},
-                            "with_subtasks": {"type": "boolean"},
-                        },
-                        "required": ["task_id"],
-                    },
-                ),
-                types.Tool(
-                    name="restore_task",
-                    description="Restore a task from Deleted or Recently Completed back to Tasks section",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"task_id": {"type": "string"}},
-                        "required": ["task_id"],
-                    },
-                ),
-                types.Tool(
-                    name="undo_task",
-                    description="Reopen (undo) a completed task",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"task_id": {"type": "string"}},
-                        "required": ["task_id"],
-                    },
-                ),
-                # Phase 2: Note Management
-                types.Tool(
-                    name="add_note",
-                    description="Add a note to a task",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "note_text": {"type": "string"},
-                        },
-                        "required": ["task_id", "note_text"],
-                    },
-                ),
-                types.Tool(
-                    name="delete_note",
-                    description="Delete all notes from a task",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"task_id": {"type": "string"}},
-                        "required": ["task_id"],
-                    },
-                ),
-                types.Tool(
-                    name="update_note",
-                    description="Replace existing notes with new text",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "new_note_text": {"type": "string"},
-                        },
-                        "required": ["task_id", "new_note_text"],
-                    },
-                ),
-                # Phase 3: Task Display and Relationships
-                types.Tool(
-                    name="show_task",
-                    description="Display task with subtasks, relationships, and notes",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"task_id": {"type": "string"}},
-                        "required": ["task_id"],
-                    },
-                ),
-                types.Tool(
-                    name="relate_task",
-                    description="Add task relationship (completed-by, depends-on, blocks, related-to, duplicate-of)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string"},
-                            "rel_type": {
-                                "type": "string",
-                                "enum": [
-                                    "completed-by",
-                                    "depends-on",
-                                    "blocks",
-                                    "related-to",
-                                    "duplicate-of",
-                                ],
-                            },
-                            "target_ids": {"type": "array", "items": {"type": "string"}},
-                        },
-                        "required": ["task_id", "rel_type", "target_ids"],
-                    },
-                ),
-                # Phase 4: File Operations
-                types.Tool(
-                    name="lint_todo",
-                    description="Identify formatting issues (indentation, checkboxes)",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="reformat_todo",
-                    description="Apply formatting fixes",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"dry_run": {"type": "boolean"}},
-                    },
-                ),
-                types.Tool(
-                    name="resolve_conflicts",
-                    description="Detect and resolve duplicate task IDs",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"dry_run": {"type": "boolean"}},
-                    },
-                ),
-                # Phase 5: System Operations
-                types.Tool(
-                    name="view_log",
-                    description="View TODO operation log",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "filter": {"type": "string"},
-                            "lines": {"type": "integer"},
-                        },
-                    },
-                ),
-                types.Tool(
-                    name="update_tool",
-                    description="Update todo.ai to latest version",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="list_backups",
-                    description="List available backup versions",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="rollback",
-                    description="Rollback to previous version (by index or timestamp)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {"target": {"type": "string"}},
-                    },
-                ),
-                # Phase 6: Configuration and Setup
-                types.Tool(
-                    name="show_config",
-                    description="Show current configuration",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="detect_coordination",
-                    description="Detect available coordination options based on system",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="setup_coordination",
-                    description="Set up coordination service (github-issues, counterapi)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "coord_type": {
-                                "type": "string",
-                                "enum": ["github-issues", "counterapi"],
-                            },
-                        },
-                        "required": ["coord_type"],
-                    },
-                ),
-                types.Tool(
-                    name="switch_mode",
-                    description="Switch numbering mode (single-user, multi-user, branch, enhanced)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "mode": {
-                                "type": "string",
-                                "enum": ["single-user", "multi-user", "branch", "enhanced"],
-                            },
-                            "force": {"type": "boolean"},
-                            "renumber": {"type": "boolean"},
-                        },
-                        "required": ["mode"],
-                    },
-                ),
-                # Phase 7: Utility Commands
-                types.Tool(
-                    name="report_bug",
-                    description="Report bugs to GitHub Issues (with duplicate detection)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "error_description": {"type": "string"},
-                            "error_context": {"type": "string"},
-                            "command": {"type": "string"},
-                        },
-                        "required": ["error_description"],
-                    },
-                ),
-                types.Tool(
-                    name="uninstall_tool",
-                    description="Uninstall todo.ai",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "remove_data": {"type": "boolean"},
-                            "remove_rules": {"type": "boolean"},
-                            "force": {"type": "boolean"},
-                        },
-                    },
-                ),
-            ]
 
-        @self.app.call_tool()
-        async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
-            """Handle MCP tool calls by routing to CLI command functions."""
-            # Capture stdout to return as text content
-            old_stdout = sys.stdout
-            sys.stdout = captured_output = io.StringIO()
+# Basic Task Operations
 
-            try:
-                # Basic task operations
-                if name == "add_task":
-                    tags = arguments.get("tags", [])
-                    if not isinstance(tags, list):
-                        tags = []
-                    add_command(arguments["description"], tags, todo_path=self.todo_path)
 
-                elif name == "add_subtask":
-                    tags = arguments.get("tags", [])
-                    if not isinstance(tags, list):
-                        tags = []
-                    add_subtask_command(
-                        arguments["parent_id"],
-                        arguments["description"],
-                        tags,
-                        todo_path=self.todo_path,
-                    )
+@mcp.tool()
+def add_task(description: str, tags: list[str] | None = None) -> str:
+    """Add a new task to TODO.md."""
+    if tags is None:
+        tags = []
+    return _capture_output(add_command, description, tags, todo_path=CURRENT_TODO_PATH)
 
-                elif name == "complete_task":
-                    task_ids = [arguments["task_id"]]
-                    with_subtasks = arguments.get("with_subtasks", False)
-                    complete_command(task_ids, with_subtasks, todo_path=self.todo_path)
 
-                elif name == "list_tasks":
-                    tag = arguments.get("tag")
-                    # list_command signature: (tag, incomplete_only, parents_only, has_subtasks, todo_path)
-                    # Note: status filter not directly supported, would need to filter results
-                    list_command(tag=tag, todo_path=self.todo_path)
+@mcp.tool()
+def add_subtask(parent_id: str, description: str, tags: list[str] | None = None) -> str:
+    """Add a subtask to an existing task."""
+    if tags is None:
+        tags = []
+    return _capture_output(
+        add_subtask_command, parent_id, description, tags, todo_path=CURRENT_TODO_PATH
+    )
 
-                # Phase 1: Task Management
-                elif name == "modify_task":
-                    tags = arguments.get("tags", [])
-                    if not isinstance(tags, list):
-                        tags = []
-                    modify_command(
-                        arguments["task_id"],
-                        arguments["description"],
-                        tags,
-                        todo_path=self.todo_path,
-                    )
 
-                elif name == "delete_task":
-                    task_ids = [arguments["task_id"]]
-                    with_subtasks = arguments.get("with_subtasks", False)
-                    delete_command(task_ids, with_subtasks, todo_path=self.todo_path)
+@mcp.tool()
+def complete_task(task_id: str, with_subtasks: bool = False) -> str:
+    """Mark a task as complete."""
+    return _capture_output(complete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH)
 
-                elif name == "archive_task":
-                    task_ids = [arguments["task_id"]]
-                    reason = arguments.get("reason")
-                    # archive_command signature: (task_ids, reason, todo_path) - no with_subtasks parameter
-                    archive_command(task_ids, reason, todo_path=self.todo_path)
 
-                elif name == "restore_task":
-                    restore_command(arguments["task_id"], todo_path=self.todo_path)
+@mcp.tool()
+def list_tasks(status: str | None = None, tag: str | None = None) -> str:
+    """List tasks from TODO.md.
 
-                elif name == "undo_task":
-                    undo_command(arguments["task_id"], todo_path=self.todo_path)
+    Args:
+        status: Filter by status (pending, completed, archived). currently only 'pending' supported via incomplete_only=True
+        tag: Filter by tag
+    """
+    incomplete_only = status == "pending"
+    return _capture_output(
+        list_command, tag=tag, incomplete_only=incomplete_only, todo_path=CURRENT_TODO_PATH
+    )
 
-                # Phase 2: Note Management
-                elif name == "add_note":
-                    note_command(
-                        arguments["task_id"],
-                        arguments["note_text"],
-                        todo_path=self.todo_path,
-                    )
 
-                elif name == "delete_note":
-                    delete_note_command(arguments["task_id"], todo_path=self.todo_path)
+# Phase 1: Task Management
 
-                elif name == "update_note":
-                    update_note_command(
-                        arguments["task_id"],
-                        arguments["new_note_text"],
-                        todo_path=self.todo_path,
-                    )
 
-                # Phase 3: Task Display and Relationships
-                elif name == "show_task":
-                    show_command(arguments["task_id"], todo_path=self.todo_path)
+@mcp.tool()
+def modify_task(task_id: str, description: str, tags: list[str] | None = None) -> str:
+    """Modify a task's description and/or tags."""
+    if tags is None:
+        tags = []
+    return _capture_output(modify_command, task_id, description, tags, todo_path=CURRENT_TODO_PATH)
 
-                elif name == "relate_task":
-                    relate_command(
-                        arguments["task_id"],
-                        arguments["rel_type"],
-                        arguments["target_ids"],
-                        todo_path=self.todo_path,
-                    )
 
-                # Phase 4: File Operations
-                elif name == "lint_todo":
-                    lint_command(todo_path=self.todo_path)
+@mcp.tool()
+def delete_task(task_id: str, with_subtasks: bool = False) -> str:
+    """Delete a task (move to Deleted section)."""
+    return _capture_output(delete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH)
 
-                elif name == "reformat_todo":
-                    dry_run = arguments.get("dry_run", False)
-                    reformat_command(dry_run, todo_path=self.todo_path)
 
-                elif name == "resolve_conflicts":
-                    dry_run = arguments.get("dry_run", False)
-                    resolve_conflicts_command(dry_run, todo_path=self.todo_path)
+@mcp.tool()
+def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = False) -> str:
+    """Archive a task (move to Recently Completed section)."""
+    # Note: archive_command doesn't support with_subtasks yet in CLI signature used here
+    return _capture_output(archive_command, [task_id], reason, todo_path=CURRENT_TODO_PATH)
 
-                # Phase 5: System Operations
-                elif name == "view_log":
-                    filter_text = arguments.get("filter")
-                    lines = arguments.get("lines")
-                    log_command(filter_text=filter_text, lines=lines, todo_path=self.todo_path)
 
-                elif name == "update_tool":
-                    update_tool_command()
+@mcp.tool()
+def restore_task(task_id: str) -> str:
+    """Restore a task from Deleted or Recently Completed back to Tasks section."""
+    return _capture_output(restore_command, task_id, todo_path=CURRENT_TODO_PATH)
 
-                elif name == "list_backups":
-                    backups_command(todo_path=self.todo_path)
 
-                elif name == "rollback":
-                    target = arguments.get("target")
-                    rollback_tool_command(target=target, todo_path=self.todo_path)
+@mcp.tool()
+def undo_task(task_id: str) -> str:
+    """Reopen (undo) a completed task."""
+    return _capture_output(undo_command, task_id, todo_path=CURRENT_TODO_PATH)
 
-                # Phase 6: Configuration and Setup
-                elif name == "show_config":
-                    config_command(todo_path=self.todo_path)
 
-                elif name == "detect_coordination":
-                    detect_coordination_tool_command(todo_path=self.todo_path)
+# Phase 2: Note Management
 
-                elif name == "setup_coordination":
-                    setup_coordination_tool_command(
-                        arguments["coord_type"],
-                        interactive=False,
-                        todo_path=self.todo_path,
-                    )
 
-                elif name == "switch_mode":
-                    switch_mode_tool_command(
-                        arguments["mode"],
-                        force=arguments.get("force", False),
-                        renumber=arguments.get("renumber", False),
-                        todo_path=self.todo_path,
-                    )
+@mcp.tool()
+def add_note(task_id: str, note_text: str) -> str:
+    """Add a note to a task."""
+    return _capture_output(note_command, task_id, note_text, todo_path=CURRENT_TODO_PATH)
 
-                # Phase 7: Utility Commands
-                elif name == "report_bug":
-                    report_bug_tool_command(
-                        arguments["error_description"],
-                        error_context=arguments.get("error_context"),
-                        command=arguments.get("command"),
-                    )
 
-                elif name == "uninstall_tool":
-                    uninstall_tool_command(
-                        remove_data=arguments.get("remove_data", False),
-                        remove_rules=arguments.get("remove_rules", False),
-                        force=arguments.get("force", False),
-                    )
+@mcp.tool()
+def delete_note(task_id: str) -> str:
+    """Delete all notes from a task."""
+    return _capture_output(delete_note_command, task_id, todo_path=CURRENT_TODO_PATH)
 
-                else:
-                    raise ValueError(f"Unknown tool: {name}")
 
-                # Get captured output
-                output = captured_output.getvalue()
-                return [types.TextContent(type="text", text=output or "Success")]
+@mcp.tool()
+def update_note(task_id: str, new_note_text: str) -> str:
+    """Replace existing notes with new text."""
+    return _capture_output(update_note_command, task_id, new_note_text, todo_path=CURRENT_TODO_PATH)
 
-            except Exception as e:
-                return [types.TextContent(type="text", text=f"Error: {str(e)}")]
-            finally:
-                sys.stdout = old_stdout
 
-    async def run(self):
-        """Run the MCP server."""
-        async with stdio_server() as (read_stream, write_stream):
-            await self.app.run(read_stream, write_stream, self.app.create_initialization_options())
+# Phase 3: Task Display and Relationships
+
+
+@mcp.tool()
+def show_task(task_id: str) -> str:
+    """Display task with subtasks, relationships, and notes."""
+    return _capture_output(show_command, task_id, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def relate_task(task_id: str, rel_type: str, target_ids: list[str]) -> str:
+    """Add task relationship (completed-by, depends-on, blocks, related-to, duplicate-of)."""
+    return _capture_output(
+        relate_command, task_id, rel_type, target_ids, todo_path=CURRENT_TODO_PATH
+    )
+
+
+# Phase 4: File Operations
+
+
+@mcp.tool()
+def lint_todo() -> str:
+    """Identify formatting issues (indentation, checkboxes)."""
+    return _capture_output(lint_command, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def reformat_todo(dry_run: bool = False) -> str:
+    """Apply formatting fixes."""
+    return _capture_output(reformat_command, dry_run, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def resolve_conflicts(dry_run: bool = False) -> str:
+    """Detect and resolve duplicate task IDs."""
+    return _capture_output(resolve_conflicts_command, dry_run, todo_path=CURRENT_TODO_PATH)
+
+
+# Phase 5: System Operations
+
+
+@mcp.tool()
+def view_log(filter: str | None = None, lines: int | None = None) -> str:
+    """View TODO operation log."""
+    return _capture_output(
+        log_command, filter_text=filter, lines=lines, todo_path=CURRENT_TODO_PATH
+    )
+
+
+@mcp.tool()
+def update_tool() -> str:
+    """Update todo.ai to latest version."""
+    return _capture_output(update_tool_command)
+
+
+@mcp.tool()
+def list_backups() -> str:
+    """List available backup versions."""
+    return _capture_output(backups_command, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def rollback(target: str | None = None) -> str:
+    """Rollback to previous version (by index or timestamp)."""
+    return _capture_output(rollback_tool_command, target=target, todo_path=CURRENT_TODO_PATH)
+
+
+# Phase 6: Configuration and Setup
+
+
+@mcp.tool()
+def show_config() -> str:
+    """Show current configuration."""
+    return _capture_output(config_command, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def detect_coordination() -> str:
+    """Detect available coordination options based on system."""
+    return _capture_output(detect_coordination_tool_command, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def setup_coordination(coord_type: str) -> str:
+    """Set up coordination service (github-issues, counterapi)."""
+    return _capture_output(
+        setup_coordination_tool_command,
+        coord_type,
+        interactive=False,
+        todo_path=CURRENT_TODO_PATH,
+    )
+
+
+@mcp.tool()
+def switch_mode(mode: str, force: bool = False, renumber: bool = False) -> str:
+    """Switch numbering mode (single-user, multi-user, branch, enhanced)."""
+    return _capture_output(
+        switch_mode_tool_command, mode, force, renumber, todo_path=CURRENT_TODO_PATH
+    )
+
+
+# Phase 7: Utility Commands
+
+
+@mcp.tool()
+def report_bug(
+    error_description: str, error_context: str | None = None, command: str | None = None
+) -> str:
+    """Report bugs to GitHub Issues (with duplicate detection)."""
+    return _capture_output(report_bug_tool_command, error_description, error_context, command)
+
+
+@mcp.tool()
+def uninstall_tool(
+    remove_data: bool = False, remove_rules: bool = False, force: bool = False
+) -> str:
+    """Uninstall todo.ai."""
+    return _capture_output(uninstall_tool_command, remove_data, remove_rules, force)
+
+
+def run_server(root_path: str = "."):
+    """Run the MCP server."""
+    global CURRENT_TODO_PATH
+    root = Path(root_path).resolve()
+    CURRENT_TODO_PATH = str(root / "TODO.md")
+
+    # Run the server using stdio transport
+    mcp.run(transport="stdio")
 
 
 async def main():
-    """Main entry point for MCP server."""
-    todo_path = Path.cwd() / "TODO.md"
-    server = MCPServer(str(todo_path))
-    await server.run()
+    """Entry point for direct execution (legacy)."""
+    # Default to current directory if run directly
+    run_server(".")
 
 
 if __name__ == "__main__":

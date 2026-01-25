@@ -39,11 +39,13 @@ from todo_ai.cli.commands import (
 
 @click.group()
 @click.option("--todo-file", envvar="TODO_FILE", default="TODO.md", help="Path to TODO.md file")
+@click.option("--root", envvar="TODO_AI_ROOT", help="Root directory for the project")
 @click.pass_context
-def cli(ctx, todo_file):
+def cli(ctx, todo_file, root):
     """todo.ai - AI-Agent First TODO List Tracker"""
     ctx.ensure_object(dict)
     ctx.obj["todo_file"] = todo_file
+    ctx.obj["root"] = root
 
 
 @cli.command()
@@ -397,6 +399,19 @@ def version_v():
 def version_long():
     """Show version information (alias)."""
     version_tool_command()
+
+
+@cli.command("serve")
+@click.pass_context
+def serve(ctx):
+    """Start the MCP server over stdio."""
+    from todo_ai.mcp.server import run_server
+
+    # Use the root from global options or default to current directory
+    root_path = ctx.obj.get("root") or "."
+
+    # Run the server
+    run_server(root_path)
 
 
 if __name__ == "__main__":

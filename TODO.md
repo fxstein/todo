@@ -18,11 +18,11 @@
   - [ ] **#193.7** Update documentation with 'start' command usage `#documentation`
 - [ ] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor`
   - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp`
-  - [ ] **#192.2** Create design document for unified executable architecture `#design` `#documentation`
-  - [ ] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation`
-  - [ ] **#192.4** Implement `--root` argument support for MCP server (via `serve` command) `#code` `#implementation`
-  - [ ] **#192.5** Add test cases for `serve` command and argument parsing `#test`
-  - [ ] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation`
+  - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation`
+  - [x] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation`
+  - [x] **#192.4** Implement `--root` argument support for MCP server (via `serve` command) `#code` `#implementation`
+  - [x] **#192.5** Add test cases for `serve` command and argument parsing `#test`
+  - [x] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation`
   - [ ] **#192.7** Release beta version with unified executable for testing `#release`
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.

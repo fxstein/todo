@@ -11,6 +11,7 @@ from pathlib import Path
 
 import pytest
 
+import todo_ai.mcp.server as mcp_server_module
 from todo_ai.cli.commands import (
     add_command,
     archive_command,
@@ -22,7 +23,7 @@ from todo_ai.cli.commands import (
     note_command,
     show_command,
 )
-from todo_ai.mcp.server import MCPServer
+from todo_ai.mcp.server import mcp
 
 
 @pytest.fixture
@@ -74,83 +75,34 @@ def capture_cli_output(func, *args, **kwargs) -> str:
         sys.stdout = old_stdout
 
 
-async def capture_mcp_output(server: MCPServer, tool_name: str, arguments: dict) -> str:
-    """Capture MCP tool output by calling the tool through the registered handler."""
-    # The call_tool handler is registered via decorator, we need to invoke it
-    # We'll simulate an MCP call by directly calling the handlers
-    import io
-    import sys
+async def capture_mcp_output(tool_name: str, arguments: dict, todo_path: str) -> str:
+    """Capture MCP tool output by calling the tool directly."""
+    # Set the global TODO path in the server module
+    mcp_server_module.CURRENT_TODO_PATH = todo_path
 
-    old_stdout = sys.stdout
-    sys.stdout = captured = io.StringIO()
-
+    # Find the tool function
+    # FastMCP stores tools in _tool_manager._tools dictionary
     try:
-        # Import the command functions and call them directly
-        # This simulates what the MCP server does internally
-        from todo_ai.cli.commands import (
-            add_command,
-            archive_command,
-            complete_command,
-            delete_command,
-            lint_command,
-            list_command,
-            modify_command,
-            note_command,
-            show_command,
-        )
-
-        if tool_name == "add_task":
-            add_command(
-                arguments["description"],
-                arguments.get("tags", []),
-                todo_path=server.todo_path,
-            )
-        elif tool_name == "complete_task":
-            complete_command(
-                [arguments["task_id"]],
-                arguments.get("with_subtasks", False),
-                todo_path=server.todo_path,
-            )
-        elif tool_name == "modify_task":
-            modify_command(
-                arguments["task_id"],
-                arguments["description"],
-                arguments.get("tags", []),
-                todo_path=server.todo_path,
-            )
-        elif tool_name == "delete_task":
-            delete_command(
-                [arguments["task_id"]],
-                arguments.get("with_subtasks", False),
-                todo_path=server.todo_path,
-            )
-        elif tool_name == "archive_task":
-            archive_command(
-                [arguments["task_id"]],
-                arguments.get("reason"),
-                todo_path=server.todo_path,
-            )
-        elif tool_name == "add_note":
-            note_command(
-                arguments["task_id"],
-                arguments["note_text"],
-                todo_path=server.todo_path,
-            )
-        elif tool_name == "show_task":
-            show_command(arguments["task_id"], todo_path=server.todo_path)
-        elif tool_name == "lint_todo":
-            lint_command(todo_path=server.todo_path)
-        elif tool_name == "list_tasks":
-            list_command(
-                tag=arguments.get("tag"),
-                todo_path=server.todo_path,
-            )
+        tool = mcp._tool_manager._tools.get(tool_name)
+        if tool:
+            tool_func = tool.fn
         else:
-            return f"Unknown tool: {tool_name}"
+            tool_func = None
+    except AttributeError:
+        # Fallback if internal structure changes, try public API if available
+        # But for now we rely on internal structure for testing
+        return "Error: Could not access tool manager"
 
-        return captured.getvalue()
-    finally:
-        sys.stdout = old_stdout
+    if not tool_func:
+        return f"Unknown tool: {tool_name}"
+
+    # Call the tool function with arguments
+    # We use the underlying function 'fn' to bypass FastMCP runtime overhead for unit testing
+    try:
+        result = tool.fn(**arguments)
+        return result
+    except Exception as e:
+        return f"Error calling tool {tool_name}: {e}"
 
 
 @pytest.mark.asyncio
@@ -186,9 +138,8 @@ class TestMCPCLIParity:
         )
 
         # MCP output
-        server = MCPServer(test_todo_file)
         mcp_output = await capture_mcp_output(
-            server, "add_task", {"description": "Test task", "tags": ["test", "feature"]}
+            "add_task", {"description": "Test task", "tags": ["test", "feature"]}, test_todo_file
         )
 
         # Compare (both should show "Added: #N Test task `#feature` `#test`")
@@ -235,9 +186,8 @@ class TestMCPCLIParity:
         )
 
         # MCP output
-        server = MCPServer(test_todo_file)
         mcp_output = await capture_mcp_output(
-            server, "complete_task", {"task_id": "1", "with_subtasks": False}
+            "complete_task", {"task_id": "1", "with_subtasks": False}, test_todo_file
         )
 
         # Compare
@@ -272,11 +222,10 @@ class TestMCPCLIParity:
         )
 
         # MCP output
-        server = MCPServer(test_todo_file)
         mcp_output = await capture_mcp_output(
-            server,
             "modify_task",
             {"task_id": "1", "description": "Modified task", "tags": ["test", "modified"]},
+            test_todo_file,
         )
 
         # Compare
@@ -311,9 +260,8 @@ class TestMCPCLIParity:
         )
 
         # MCP output
-        server = MCPServer(test_todo_file)
         mcp_output = await capture_mcp_output(
-            server, "delete_task", {"task_id": "1", "with_subtasks": False}
+            "delete_task", {"task_id": "1", "with_subtasks": False}, test_todo_file
         )
 
         # Compare
@@ -350,8 +298,7 @@ class TestMCPCLIParity:
         capture_cli_output(complete_command, ["1"], False, test_todo_file)
 
         # MCP output
-        server = MCPServer(test_todo_file)
-        mcp_output = await capture_mcp_output(server, "archive_task", {"task_id": "1"})
+        mcp_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
 
         # Compare
         assert cli_output.strip() == mcp_output.strip()
@@ -383,9 +330,9 @@ class TestMCPCLIParity:
 """,
             encoding="utf-8",
         )
-        server = MCPServer(test_todo_file)
+
         mcp_add_output = await capture_mcp_output(
-            server, "add_note", {"task_id": "1", "note_text": "Test note"}
+            "add_note", {"task_id": "1", "note_text": "Test note"}, test_todo_file
         )
 
         assert cli_add_output.strip() == mcp_add_output.strip()
@@ -396,8 +343,7 @@ class TestMCPCLIParity:
         cli_output = capture_cli_output(show_command, "2", todo_path=test_todo_file)
 
         # MCP output
-        server = MCPServer(test_todo_file)
-        mcp_output = await capture_mcp_output(server, "show_task", {"task_id": "2"})
+        mcp_output = await capture_mcp_output("show_task", {"task_id": "2"}, test_todo_file)
 
         # Compare
         assert cli_output.strip() == mcp_output.strip()
@@ -408,16 +354,14 @@ class TestMCPCLIParity:
         cli_output = capture_cli_output(lint_command, todo_path=test_todo_file)
 
         # MCP output
-        server = MCPServer(test_todo_file)
-        mcp_output = await capture_mcp_output(server, "lint_todo", {})
+        mcp_output = await capture_mcp_output("lint_todo", {}, test_todo_file)
 
         # Compare (lint output should be identical)
         assert cli_output.strip() == mcp_output.strip()
 
     async def test_list_tasks_output_format(self, test_todo_file):
         """Test list_tasks MCP tool produces correct format."""
-        server = MCPServer(test_todo_file)
-        mcp_output = await capture_mcp_output(server, "list_tasks", {})
+        mcp_output = await capture_mcp_output("list_tasks", {}, test_todo_file)
 
         # Should contain task markers
         assert "**#1**" in mcp_output
@@ -432,49 +376,12 @@ class TestMCPCLIParity:
 @pytest.mark.asyncio
 async def test_all_mcp_tools_exist():
     """Verify all expected MCP tools are registered."""
-    # Server is created to verify it initializes correctly
-    _ = MCPServer("TODO.md")
 
-    # The list_tools handler is registered via decorator
-    # We need to simulate how it's called by accessing the handlers
-    # For now, we'll manually verify the expected tools based on server.py
-    tool_names = {
-        # Basic
-        "add_task",
-        "add_subtask",
-        "complete_task",
-        "list_tasks",
-        # Phase 1
-        "modify_task",
-        "delete_task",
-        "archive_task",
-        "restore_task",
-        "undo_task",
-        # Phase 2
-        "add_note",
-        "delete_note",
-        "update_note",
-        # Phase 3
-        "show_task",
-        "relate_task",
-        # Phase 4
-        "lint_todo",
-        "reformat_todo",
-        "resolve_conflicts",
-        # Phase 5
-        "view_log",
-        "update_tool",
-        "list_backups",
-        "rollback",
-        # Phase 6
-        "show_config",
-        "detect_coordination",
-        "setup_coordination",
-        "switch_mode",
-        # Phase 7
-        "report_bug",
-        "uninstall_tool",
-    }
+    # Get registered tools from FastMCP instance
+    try:
+        tool_names = set(mcp._tool_manager._tools.keys())
+    except AttributeError:
+        pytest.fail("Could not access tools from FastMCP instance")
 
     # Expected tools (all phases)
     expected_tools = {

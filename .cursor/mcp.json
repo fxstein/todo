@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "todo-ai": {
+      "command": "uv",
+      "args": [
+        "run",
+        "todo-ai",
+        "serve",
+        "--root",
+        "${workspaceFolder}"
+      ]
+    }
+  }
+}

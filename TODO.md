@@ -14,6 +14,11 @@
   > Reopening to restore legacy Python support (3.10-3.13).
   > - Requirement: Keep 3.10+ support.
   > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
+  - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
+  - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
+  - [ ] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
+  - [ ] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`
+  - [ ] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
   - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
   - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
@@ -442,11 +447,6 @@
   - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#mcp` (2026-01-25)
   - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` (2026-01-25)
   - [x] **#201.13** Update `list_tasks` tool description to encourage checking  at start of chat `#code` `#mcp` (2026-01-25)
-  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation` (2026-01-25)
-  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test` (2026-01-25)
-  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies` (2026-01-25)
-  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd` (2026-01-25)
-  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.

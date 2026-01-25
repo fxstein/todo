@@ -30,6 +30,8 @@ def run_shell_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
     try:
         env = os.environ.copy()
         env["TODO_AI_TESTING"] = "1"
+        # Clear TODO_FILE to prevent pollution from other tests
+        env.pop("TODO_FILE", None)
 
         result = subprocess.run(
             [str(SHELL_SCRIPT)] + cmd,

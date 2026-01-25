@@ -3,6 +3,15 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
+- [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature`
+  - [ ] **#201.8** Document start command and usage `#documentation`
+  - [ ] **#201.7** Create tests for start command and tag lifecycle `#test`
+  - [ ] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp`
+  - [ ] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic`
+  - [ ] **#201.4** Implement `start` command in CLI `#cli` `#code`
+  - [ ] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#inprogress` `#logic`
+  - [ ] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#inprogress` `#mcp`
+  - [ ] **#201.1** Design `start` command to mark task as in progress with  tag `#design` `#inprogress`
 - [ ] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting`
   > This task aims to ensure `TODO.md` remains clean and consistent. We need to define strict rules for:
   > - Spacing between tasks
@@ -352,15 +361,15 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
-- [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python` (2026-01-25)
-  > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
-  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test` (2026-01-25)
-  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
   - [x] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test` (2026-01-25)
   - [x] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug` (2026-01-25)
+- [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python` (2026-01-25)
+  > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
+  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test` (2026-01-25)
+  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix` (2026-01-25)
 - [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor` (2026-01-25)
   - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp` (2026-01-25)
   - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation` (2026-01-25)

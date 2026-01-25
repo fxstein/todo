@@ -129,7 +129,7 @@ Perfect for AI agents - just works.
 
 ### Stable Release (Recommended)
 
-**Requires Python 3.14+**
+**Requires Python 3.10+**
 
 Install via uv (recommended) or pipx for standard CLI and MCP Server support:
 

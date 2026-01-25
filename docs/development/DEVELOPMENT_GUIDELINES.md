@@ -41,7 +41,7 @@ git commit -m "feat: add new feature"
 # 4. Push to trigger CI/CD
 git push
 # → PR: Runs quality check + unit tests (ubuntu + Python 3.14)
-# → Main: Runs full matrix (3 OS × 1 Python version)
+# → Main: Runs full matrix (3 OS × 5 Python versions)
 
 # 5. Release process handles bash conversion
 ./release/release.sh --prepare
@@ -61,8 +61,8 @@ git push
 - **Main Branch**: Granular testing strategy
   - Same quality checks
   - **Full test suite** on Python 3.14 × 3 OS (comprehensive bleeding-edge testing)
-  - **Unit tests only** on Python 3.14 × 3 OS (fast compatibility checks)
-  - Total: 3 comprehensive + 3 fast = 6 jobs
+  - **Unit tests only** on Python 3.10-3.13 × 3 OS (fast compatibility checks)
+  - Total: 3 comprehensive + 12 fast = 15 jobs
   - ~10-15 minutes total
 
 **Local Pre-commit Hooks:**
@@ -79,20 +79,21 @@ git push
 
 **What Runs Where:**
 
-| Check | Local | PR CI | Main CI (Py 3.14) |
-|-------|-------|-------|--------------------|
-| Ruff | ✅ | ✅ | ✅ |
-| Mypy | ✅ | ✅ | ✅ |
-| Spelling | ✅ | ✅ | ✅ |
-| Secrets | ✅ | ✅ | ✅ |
-| Unit tests | ✅ | ✅ | ✅ |
-| Integration tests | ❌ | ✅ | ✅ |
-| E2E tests | ❌ | ✅ | ✅ |
-| Multi-OS | ❌ | ❌ | ✅ (3 OS) |
-| Multi-Python | ❌ | ❌ | ✅ (3.14 only) |
+| Check | Local | PR CI | Main CI (Py 3.14) | Main CI (Py 3.10-3.13) |
+|-------|-------|-------|--------------------|------------------------|
+| Ruff | ✅ | ✅ | ✅ | ✅ |
+| Mypy | ✅ | ✅ | ✅ | ✅ |
+| Spelling | ✅ | ✅ | ✅ | ✅ |
+| Secrets | ✅ | ✅ | ✅ | ✅ |
+| Unit tests | ✅ | ✅ | ✅ | ✅ |
+| Integration tests | ❌ | ✅ | ✅ | ❌ |
+| E2E tests | ❌ | ✅ | ✅ | ❌ |
+| Multi-OS | ❌ | ❌ | ✅ (3 OS) | ✅ (3 OS) |
+| Multi-Python | ❌ | ❌ | ✅ (3.14 only) | ✅ (3.10-3.13) |
 
 **Key:**
 - **Main CI (Py 3.14)**: Comprehensive testing on bleeding edge (full test suite)
+- **Main CI (Py 3.10-3.13)**: Fast compatibility checks (unit tests only)
 
 ### File Status
 

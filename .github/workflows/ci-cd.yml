@@ -286,7 +286,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -413,7 +413,7 @@ jobs:
           echo "   - Documentation validation"
           echo "   - Log file validation"
           echo "   - Code quality checks"
-          echo "   - Quick tests (3.14 x 3 OSes)"
+          echo "   - Quick tests (3.10, 3.11, 3.12, 3.13, 3.14 x 3 OSes)"
           echo "   - Comprehensive tests (3.14 x 3 OSes)"
           echo ""
           echo "Ready to proceed with release validation and publishing"

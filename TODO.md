@@ -17,6 +17,11 @@
   > Added `stop` command to scope (subtasks #201.15 - #201.19).
   > - Allows removing `#inprogress` tag without completing the task.
   > - Mirrors `start` command functionality.
+  > Clarification: The `stop` command is optional and rarely needed.
+  > - `complete` implicitly stops a task (removes `#inprogress` tag).
+  > - `archive` implicitly stops a task.
+  > - `delete` implicitly stops a task.
+  > - `stop` is only for pausing work on a task without completing it.
   - [x] **#201.19** Document `stop` command usage `#documentation`
   - [x] **#201.18** Add tests for `stop` command `#test`
   - [x] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp`

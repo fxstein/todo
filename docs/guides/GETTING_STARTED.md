@@ -388,7 +388,7 @@ Re-run setup:
    ./todo.ai add "Implement feature X"
    ./todo.ai add-subtask 1 "Break into smaller tasks"
    ./todo.ai start 1
-   ./todo.ai complete 1
+   ./todo.ai complete 1  # Automatically stops the task
    ./todo.ai list --tag "#feature"
    ```
 
@@ -422,8 +422,8 @@ Re-run setup:
 ./todo.ai add "Task description" "#tags"
 ./todo.ai add-subtask 1 "Subtask description"
 ./todo.ai start 1
-./todo.ai stop 1
-./todo.ai complete 1
+./todo.ai complete 1  # Automatically stops task
+./todo.ai stop 1      # Optional: Pause without completing
 ./todo.ai list --tag "#tag"
 ./todo.ai show 1
 ./todo.ai modify 1 "Updated description"

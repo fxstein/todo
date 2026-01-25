@@ -147,7 +147,7 @@ This installs one unified command: `todo-ai`.
 ### Task Management
 
 - **Start:** `todo-ai start <task_id>` marks a task as in-progress.
-- **Stop:** `todo-ai stop <task_id>` stops progress on a task.
+- **Stop:** `todo-ai stop <task_id>` pauses work on a task (optional - `complete` handles this automatically).
 - **Complete:** `todo-ai complete <task_id>` marks a task as done.
 
 ### Linting and Reordering

@@ -3,6 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
+- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
+  - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
+  - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
+  - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
+  - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
+  - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
 - [ ] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
   - [ ] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
   - [ ] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`

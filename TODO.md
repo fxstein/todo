@@ -3,44 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
-- [x] **#207** Fix shell/Python parity issues discovered in validation tests `#bug`
-  > Discovered while fixing task#206. After clearing TODO_FILE env var, validation tests revealed Python CLI isn't modifying TODO.md in test directories. Pattern: Tests create separate shell_env/python_env dirs, shell version works correctly, Python version appears to run but doesn't modify files. Likely issue: Python CLI not respecting cwd parameter or using different TODO.md path. Tests failing: test_complete_with_dataset, test_modify_with_dataset, test_delete_with_dataset, test_archive_with_dataset, test_undo_with_dataset, test_note_with_dataset, test_workflow_sequence_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[show].
-  > CONFIRMED: Python CLI ignores --root parameter. When --root /tmp/test is passed, CLI still modifies project TODO.md instead of /tmp/test/TODO.md. Shell script respects ROOT_DIR. Fix: Modify Python CLI main.py to resolve todo_file relative to root when root is provided. Line 48: ctx.obj['todo_file'] should become Path(root) / todo_file if root else todo_file.
-  - [x] **#207.9** Verify all 9 parity tests pass after fixes `#bug`
-  - [x] **#207.8** Fix test_show_command_parity (shell can't find task, Python can) `#bug`
-  - [x] **#207.7** Fix test_undo_with_dataset and test_note_with_dataset failures `#bug`
-  - [x] **#207.6** Fix test_archive_with_dataset (Python not archiving tasks) `#bug`
-  - [x] **#207.5** Fix test_delete_with_dataset (Python not deleting tasks) `#bug`
-  - [x] **#207.4** Fix test_modify_with_dataset (Python not modifying tasks) `#bug`
-  - [x] **#207.3** Fix test_complete_with_dataset (Python not completing tasks) `#bug`
-  - [x] **#207.2** Analyze test fixture setup (test_env_shell vs python_env directories) `#bug`
-  - [x] **#207.1** Investigate why Python CLI doesn't modify TODO.md in parity tests `#bug`
-    > Root cause identified: Python CLI doesn't respect subprocess cwd parameter. FileOps(todo_path="TODO.md") resolves relative to Python process cwd, not the subprocess cwd. Solutions: (A) Add --root parameter to test commands, (B) Set TODO_AI_ROOT env var, (C) Pass absolute paths in tests, (D) Make FileOps resolve relative to os.getcwd() at runtime. Option B (env var) is cleanest - similar to our TODO_AI_TESTING fix.
-- [x] **#206** Fix shell script test failures (Cursor rules initialization during tests) `#bug`
-  > 5 parity tests failing: test_list_with_dataset, test_archive_with_dataset, test_note_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[command3-args3]. Root cause: Shell script outputs '⚠️ IMPORTANT: Cursor rules initialized' during test runs, causing exit code 1 instead of 0. Python version correctly returns exit code 0.
-  > Fix implemented: Added TODO_AI_TESTING environment variable check in todo.ai lines 1474-1476 (init_cursor_rules) and line 7134 (mode display). Test harnesses updated in test_dataset_parity.py lines 31-32 and test_feature_parity.py lines 40-41. When TODO_AI_TESTING=1, shell script suppresses all initialization output for clean test parity with Python version.
-  - [x] **#206.7** Document the fix and add test to prevent regression `#bug`
-  - [x] **#206.6** Verify all 5 parity tests pass (dataset_parity + feature_parity) `#bug`
-  - [x] **#206.5** Implement fix in shell script (todo.ai) `#bug`
-  - [x] **#206.4** Design fix to suppress Cursor rules initialization during tests `#bug`
-  - [x] **#206.3** Identify root cause (check if recent regression in shell script) `#bug`
-  - [x] **#206.2** Investigate why Cursor rules initialization triggers during test runs `#bug`
-  - [x] **#206.1** Reproduce shell script test failures locally `#bug`
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
   - [ ] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design`
   - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
-- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
-  > Reopening to restore legacy Python support (3.10-3.13).
-  > - Requirement: Keep 3.10+ support.
-  > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
-  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
-  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`
-  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
-  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
-  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
   - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
   - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
@@ -373,6 +341,15 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
+- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python` (2026-01-25)
+  > Reopening to restore legacy Python support (3.10-3.13).
+  > - Requirement: Keep 3.10+ support.
+  > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
+  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation` (2026-01-25)
+  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test` (2026-01-25)
+  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies` (2026-01-25)
+  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd` (2026-01-25)
+  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -485,6 +462,29 @@
   - [x] **#204.3** Verify fix with regression test `#test` (2026-01-25)
   - [x] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix` (2026-01-25)
   - [x] **#204.1** Create reproduction test case for restore subtask failure `#test` (2026-01-25)
+- [x] **#206** Fix shell script test failures (Cursor rules initialization during tests) `#bug` (2026-01-25)
+  > 5 parity tests failing: test_list_with_dataset, test_archive_with_dataset, test_note_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[command3-args3]. Root cause: Shell script outputs '⚠️ IMPORTANT: Cursor rules initialized' during test runs, causing exit code 1 instead of 0. Python version correctly returns exit code 0.
+  > Fix implemented: Added TODO_AI_TESTING environment variable check in todo.ai lines 1474-1476 (init_cursor_rules) and line 7134 (mode display). Test harnesses updated in test_dataset_parity.py lines 31-32 and test_feature_parity.py lines 40-41. When TODO_AI_TESTING=1, shell script suppresses all initialization output for clean test parity with Python version.
+  - [x] **#206.7** Document the fix and add test to prevent regression `#bug` (2026-01-25)
+  - [x] **#206.6** Verify all 5 parity tests pass (dataset_parity + feature_parity) `#bug` (2026-01-25)
+  - [x] **#206.5** Implement fix in shell script (todo.ai) `#bug` (2026-01-25)
+  - [x] **#206.4** Design fix to suppress Cursor rules initialization during tests `#bug` (2026-01-25)
+  - [x] **#206.3** Identify root cause (check if recent regression in shell script) `#bug` (2026-01-25)
+  - [x] **#206.2** Investigate why Cursor rules initialization triggers during test runs `#bug` (2026-01-25)
+  - [x] **#206.1** Reproduce shell script test failures locally `#bug` (2026-01-25)
+- [x] **#207** Fix shell/Python parity issues discovered in validation tests `#bug` (2026-01-25)
+  > Discovered while fixing task#206. After clearing TODO_FILE env var, validation tests revealed Python CLI isn't modifying TODO.md in test directories. Pattern: Tests create separate shell_env/python_env dirs, shell version works correctly, Python version appears to run but doesn't modify files. Likely issue: Python CLI not respecting cwd parameter or using different TODO.md path. Tests failing: test_complete_with_dataset, test_modify_with_dataset, test_delete_with_dataset, test_archive_with_dataset, test_undo_with_dataset, test_note_with_dataset, test_workflow_sequence_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[show].
+  > CONFIRMED: Python CLI ignores --root parameter. When --root /tmp/test is passed, CLI still modifies project TODO.md instead of /tmp/test/TODO.md. Shell script respects ROOT_DIR. Fix: Modify Python CLI main.py to resolve todo_file relative to root when root is provided. Line 48: ctx.obj['todo_file'] should become Path(root) / todo_file if root else todo_file.
+  - [x] **#207.9** Verify all 9 parity tests pass after fixes `#bug` (2026-01-25)
+  - [x] **#207.8** Fix test_show_command_parity (shell can't find task, Python can) `#bug` (2026-01-25)
+  - [x] **#207.7** Fix test_undo_with_dataset and test_note_with_dataset failures `#bug` (2026-01-25)
+  - [x] **#207.6** Fix test_archive_with_dataset (Python not archiving tasks) `#bug` (2026-01-25)
+  - [x] **#207.5** Fix test_delete_with_dataset (Python not deleting tasks) `#bug` (2026-01-25)
+  - [x] **#207.4** Fix test_modify_with_dataset (Python not modifying tasks) `#bug` (2026-01-25)
+  - [x] **#207.3** Fix test_complete_with_dataset (Python not completing tasks) `#bug` (2026-01-25)
+  - [x] **#207.2** Analyze test fixture setup (test_env_shell vs python_env directories) `#bug` (2026-01-25)
+  - [x] **#207.1** Investigate why Python CLI doesn't modify TODO.md in parity tests `#bug` (2026-01-25)
+    > Root cause identified: Python CLI doesn't respect subprocess cwd parameter. FileOps(todo_path="TODO.md") resolves relative to Python process cwd, not the subprocess cwd. Solutions: (A) Add --root parameter to test commands, (B) Set TODO_AI_ROOT env var, (C) Pass absolute paths in tests, (D) Make FileOps resolve relative to os.getcwd() at runtime. Option B (env var) is cleanest - similar to our TODO_AI_TESTING fix.
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.

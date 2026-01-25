@@ -144,6 +144,15 @@ This installs one unified command: `todo-ai`.
 - **CLI Usage:** `todo-ai [command]` (e.g., `todo-ai add "Task"`)
 - **MCP Server:** `todo-ai serve` (used by Cursor/Claude)
 
+### Linting and Reordering
+
+Keep your TODO list clean and organized:
+
+- **Lint:** `todo-ai lint` checks for issues (indentation, checkboxes, orphans, ordering).
+- **Reformat:** `todo-ai reformat` fixes indentation and checkboxes.
+- **Reorder:** `todo-ai reorder` sorts subtasks in reverse-chronological order (newest on top).
+- **Resolve Conflicts:** `todo-ai resolve-conflicts` fixes duplicate task IDs.
+
 **Documentation:**
 - [Python Migration Guide](docs/user/PYTHON_MIGRATION_GUIDE.md) - How to upgrade from v2.x (Shell).
 - [MCP Setup Guide](docs/user/MCP_SETUP.md) - How to set up Cursor AI integration.

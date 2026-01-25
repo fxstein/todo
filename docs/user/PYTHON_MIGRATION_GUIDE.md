@@ -12,7 +12,7 @@ Version 3.0 is a complete rewrite in Python, offering:
 
 ## Prerequisites
 
-- **Python 3.10+** installed on your system.
+- **Python 3.14+** installed on your system.
 - **uv** (recommended): A fast Python tool installer for isolated CLI tools.
 - **pipx** (alternative): A tool for installing and running Python applications in isolated environments.
 

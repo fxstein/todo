@@ -3,7 +3,7 @@ name = "ai-todo"
 version = "3.0.0b15"
 description = "AI-Agent First TODO List Tracker with MCP and CLI interfaces"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 license = { text = "Apache-2.0" }
 authors = [
     { name = "Oliver Ratzesberger", email = "fxstein@gmail.com" }
@@ -16,19 +16,17 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Utilities",
 ]
 dependencies = [
     "mcp>=0.1.0",
-    "click>=8.0.0",
-    "pyyaml>=6.0",
-    "requests>=2.28.0",
-    "pygithub>=1.59.0",
-    "fastmcp>=2.14.0,<3.0.0",
+    "click>=8.1.0",
+    "pyyaml>=6.0.1",
+    "requests>=2.32.0",
+    "pygithub>=2.5.0",
+    "fastmcp>=2.14.4,<3.0.0",
 ]
 
 [project.urls]
@@ -55,22 +53,22 @@ asyncio_mode = "auto"
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.0.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0.0",
-    "pre-commit>=3.0.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.5.0",
+    "mypy>=1.10.0",
+    "pre-commit>=3.7.0",
     "build>=1.0.0",
     "twine>=5.0.0",
     "ascii-guard>=0.1.0",
-    "types-requests>=2.28.0",
-    "types-pyyaml>=6.0",
+    "types-requests>=2.31.0",
+    "types-pyyaml>=6.0.12.12",
 ]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = [
@@ -90,7 +88,7 @@ ignore = [
 "tests/**" = ["E501"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.14"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false

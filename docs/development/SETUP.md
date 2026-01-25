@@ -4,7 +4,7 @@ This guide explains how to set up the todo.ai development environment using mode
 
 ## Prerequisites
 
-- Python 3.10 or higher
+- Python 3.14 or higher
 - Git
 - (Optional) `uv` - will be installed automatically if missing
 

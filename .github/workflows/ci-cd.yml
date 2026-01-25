@@ -146,10 +146,11 @@ jobs:
         with:
           version: "latest"
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.14
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
+          allow-prereleases: true
 
       - name: Install dependencies
         run: uv sync --all-extras
@@ -202,10 +203,11 @@ jobs:
         with:
           version: "latest"
 
-      - name: Set up Python 3.12
+      - name: Set up Python 3.14
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
+          allow-prereleases: true
 
       - name: Cache pre-commit hooks
         uses: actions/cache@v4
@@ -284,7 +286,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.14"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -329,7 +331,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.12"]
+        python-version: ["3.14"]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -411,7 +413,7 @@ jobs:
           echo "   - Documentation validation"
           echo "   - Log file validation"
           echo "   - Code quality checks"
-          echo "   - Quick tests (3.10, 3.11, 3.12, 3.13 x 3 OSes)"
+          echo "   - Quick tests (3.14 x 3 OSes)"
           echo "   - Comprehensive tests (3.14 x 3 OSes)"
           echo ""
           echo "Ready to proceed with release validation and publishing"
@@ -591,7 +593,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.14"
+          allow-prereleases: true
 
       - name: Install dependencies
         run: uv sync --all-extras

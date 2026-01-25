@@ -5,27 +5,17 @@
 ## Tasks
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
-
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
-
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
-
   - [ ] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design`
-
   - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
-
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
 
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
-
   - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
-
   - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
-
   - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
-
   - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
-
   - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
 
 - [ ] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting`
@@ -35,25 +25,19 @@
   > - Header formats
   > - Note formatting
   > And ensure the tooling enforces these rules automatically.
-
-  - [x] **#200.7** Run one-time migration on this repository's TODO.md to align with new standards `#migration`
+  - [x] **#200.7** Run one-time migration on this repository's TODO.md to align with new standards `#migration` (2026-01-25)
     > Execute `reformat` command on TODO.md after implementation is complete. Verify no data loss.
-
   - [ ] **#200.6** Document enhanced formatting behaviors and standards `#documentation`
     > Update user documentation to reflect new strict formatting and visual standards.
     > Implementation complete. Documentation update pending.
-
-  - [x] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer`
+  - [x] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer` (2026-01-25)
     > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for auto-fix rules. Must preserve data while fixing structure.
-
-  - [x] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting`
+  - [x] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting` (2026-01-25)
     > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for validation rules (indentation, spacing, headers).
-
-  - [x] **#200.3** Implement `FileOps` formatting logic and update mutation commands to strictly adhere to standards `#code` `#test`
+  - [x] **#200.3** Implement `FileOps` formatting logic and update mutation commands to strictly adhere to standards `#code` `#test` (2026-01-25)
     > Updated design doc with requirement: All mutation commands must produce compliant output to avoid linting/reformatting cycles.
     > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md. Includes updating FileOps class and all mutation commands (add, modify, complete, delete, archive, move).
-
-  - [x] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers)  (2026-01-25) `#design`
+  - [x] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers)  (2026-01-25) `#design` (2026-01-25)
     > See docs/design/TODO_MD_VISUAL_STANDARDS.md for initial assessment and draft standards.
     > Updated design doc with Header (v3.0 update) and Footer (placeholder) requirements.
     > Draft standards created and ready for review. See docs/design/TODO_MD_VISUAL_STANDARDS.md. Includes strict spacing, indentation, header/footer, and implementation requirements.
@@ -68,22 +52,15 @@
     > Refined Positioning section: Explicitly stated that completion is a strict in-place update with NO sorting, to minimize diffs. Archival is the only move action for completed tasks.
     > Renamed design document to docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md to explicitly identify year and version.
     > Design document approved. Proceeding to implementation tasks.
-
-  - [x] **#200.1** Review current TODO.md format and identify inconsistencies or issues  (2026-01-25) `#investigation`
+  - [x] **#200.1** Review current TODO.md format and identify inconsistencies or issues  (2026-01-25) `#investigation` (2026-01-25)
 
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
-
   - [ ] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp`
-
   - [ ] **#191.5** Implement and test the portable setup solution `#implementation` `#mcp`
-
   - [ ] **#191.4** Design a clean installation process that sets up portable MCP config `#design` `#mcp`
-
   - [ ] **#191.3** Compare with MCP best practices for project-local configuration `#investigation` `#mcp`
-
   - [ ] **#191.2** Investigate options for dynamic workspace root detection in MCP server `#investigation` `#mcp`
-
   - [ ] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp`
 
 - [ ] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp`
@@ -91,449 +68,266 @@
 
 - [ ] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature`
   > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
-
   - [ ] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules`
-
   - [ ] **#187.9** Document version detection: MCP server (todo-ai-mcp) > Python CLI (todo-ai) > Shell script (./todo.ai) - all v3.0+ except shell script also supports v2.x `#documentation`
-
   - [ ] **#187.8** Test updated rules: verify AI agents prefer MCP when available, fallback to CLI when not `#test`
-
   - [ ] **#187.7** Update init_cursor_rules() function to include MCP preference in generated rules `#code`
-
-  - [x] **#187.6** Add detection logic: prefer MCP (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai) as fallback   (2026-01-25) `#cursor-rules` `#documentation`
-
-  - [x] **#187.5** Update .cursorrules file to mention MCP preference in Task Management section  (2026-01-25) `#cursor-rules`
-
-  - [x] **#187.4** Update todo.ai-task-notes.mdc to use MCP note tool instead of CLI command  (2026-01-25) `#cursor-rules`
-
-  - [x] **#187.3** Update bug-review-workflow.mdc to use MCP tools (add_task, add_subtask) instead of CLI commands  (2026-01-25) `#cursor-rules`
-
-  - [x] **#187.2** Update todo.ai-task-management.mdc: prefer MCP tools (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai)  (2026-01-25) `#cursor-rules`
-
-  - [x] **#187.1** Review all cursor rules files to identify CLI command references  (2026-01-25) `#cursor-rules`
+  - [x] **#187.6** Add detection logic: prefer MCP (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai) as fallback   (2026-01-25) `#cursor-rules` `#documentation` (2026-01-25)
+  - [x] **#187.5** Update .cursorrules file to mention MCP preference in Task Management section  (2026-01-25) `#cursor-rules` (2026-01-25)
+  - [x] **#187.4** Update todo.ai-task-notes.mdc to use MCP note tool instead of CLI command  (2026-01-25) `#cursor-rules` (2026-01-25)
+  - [x] **#187.3** Update bug-review-workflow.mdc to use MCP tools (add_task, add_subtask) instead of CLI commands  (2026-01-25) `#cursor-rules` (2026-01-25)
+  - [x] **#187.2** Update todo.ai-task-management.mdc: prefer MCP tools (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai)  (2026-01-25) `#cursor-rules` (2026-01-25)
+  - [x] **#187.1** Review all cursor rules files to identify CLI command references  (2026-01-25) `#cursor-rules` (2026-01-25)
 
 - [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
-
   - [ ] **#172.5** Phase 5: Stable Release `#release`
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
-
     - [ ] **#172.5.5** Celebrate! 🎉 `#milestone`
       > Acknowledge contributors, reflect on learnings, plan for future improvements. Enjoy the successful implementation of beta release strategy!
-
     - [ ] **#172.5.4** Update all documentation `#documentation`
       > Update README, CHANGELOG, installation guides. Remove beta references, mark stable as current. Update version badges and links
-
     - [ ] **#172.5.3** Major announcement `#documentation`
       > Create GitHub Release announcement. Post to GitHub Discussions. Update README with stable installation. Consider blog post or social media announcement
-
     - [ ] **#172.5.2** Create v3.0.0 stable release `#release`
       > Run ./release/release.sh --prepare (without --beta), review release notes, execute. Verify GitHub Actions publishes to PyPI as stable release
-
     - [ ] **#172.5.1** Verify beta testing period met `#validation`
       > Check 7+ days have passed since beta. Review feedback, verify no critical bugs. Script will warn if too soon but allow proceed
-
-  - [x] **#172.4** Phase 4: First Beta Release   (2026-01-25) `#release` `#testing`
+  - [x] **#172.4** Phase 4: First Beta Release   (2026-01-25) `#release` `#testing` (2026-01-25)
     > Goal: Validate the process works end-to-end. Deliverable: First beta release created, announced, feedback collected, iterations made as needed
-
-    - [x] **#172.4.4** Iterate with b2, b3 as needed  (2026-01-25) `#release`
+    - [x] **#172.4.4** Iterate with b2, b3 as needed  (2026-01-25) `#release` (2026-01-25)
       > If issues found, fix and release b2, b3, etc. Test beta increment logic works correctly. Continue until beta is stable enough for production
-
-    - [x] **#172.4.3** Collect feedback from early adopters  (2026-01-25) `#testing`
+    - [x] **#172.4.3** Collect feedback from early adopters  (2026-01-25) `#testing` (2026-01-25)
       > Monitor GitHub Issues/Discussions for feedback. Track beta success metrics: testers, downloads, bugs, feedback sentiment. Engage with testers
-
-    - [x] **#172.4.2** Announce to GitHub watchers  (2026-01-25) `#documentation`
+    - [x] **#172.4.2** Announce to GitHub watchers  (2026-01-25) `#documentation` (2026-01-25)
       > Create GitHub Discussion or update release notes. Use beta announcement template from strategy doc. Highlight what's new, testing needs, known issues
-
-    - [x] **#172.4.1** Create v3.0.0b1 release  (2026-01-25) `#release`
+    - [x] **#172.4.1** Create v3.0.0b1 release  (2026-01-25) `#release` (2026-01-25)
       > FAILED ATTEMPT: Multiple release script bugs found: auto-commit issues, tag verification failures, dirty working directory. PyPI setup also missing. Tag v3.0.0b1 deleted, version reverted. Created task#173 (release bugs) and task#174 (PyPI setup) to fix before retry.
       > Preparing v3.0.0b1 beta release - first real test of beta release system
       > Run ./release/release.sh --prepare --beta, review release notes, execute. Verify GitHub Actions runs correctly, PyPI marks as pre-release
-
-  - [x] **#172.3** Phase 3: Documentation & Cursor Rules  (2026-01-25) `#documentation`
+  - [x] **#172.3** Phase 3: Documentation & Cursor Rules  (2026-01-25) `#documentation` (2026-01-25)
     > Phase 3 complete: Cursor AI rules with decision trees, updated release process docs, beta testing guide, CHANGELOG.md with examples. Testing tasks 172.3.6-8 remain.
     > Goal: Complete user-facing documentation and Cursor rules. Deliverable: Updated README, AI agent rules, testing guide, migration guide from old process
-
-    - [x] **#172.3.8** User acceptance testing  (2026-01-25) `#testing`
+    - [x] **#172.3.8** User acceptance testing  (2026-01-25) `#testing` (2026-01-25)
       > Get feedback from real users on documentation clarity. Test complete workflow from docs. Verify new users can follow beta testing guide successfully
-
-    - [x] **#172.3.7** Test documentation accuracy   (2026-01-25) `#documentation` `#testing`
+    - [x] **#172.3.7** Test documentation accuracy   (2026-01-25) `#documentation` `#testing` (2026-01-25)
       > ✅ PASS: All documentation verified. README, BETA_TESTING_GUIDE, RELEASE_PROCESS, CHANGELOG: commands correct, links valid, version formats PEP 440 compliant, examples accurate.
       > Verifying README, BETA_TESTING_GUIDE, RELEASE_PROCESS, CHANGELOG: commands, links, examples
       > Follow all installation commands in README. Verify beta testing guide steps work. Check all links and examples are correct
-
-    - [x] **#172.3.6** Test AI agent follows decision trees correctly   (2026-01-25) `#ai` `#testing`
+    - [x] **#172.3.6** Test AI agent follows decision trees correctly   (2026-01-25) `#ai` `#testing` (2026-01-25)
       > ✅ PASS: Cursor AI rules reviewed and verified. Decision trees match implementation perfectly: CI/CD checks, version bump detection, major/minor/patch logic, error handling, all safeguards present.
       > Test Cursor AI makes correct decisions for major/minor/patch releases. Verify it checks CI/CD, enforces beta for majors, shows correct error messages
-
-    - [x] **#172.3.5** Add changelog format examples  (2026-01-25) `#documentation`
+    - [x] **#172.3.5** Add changelog format examples  (2026-01-25) `#documentation` (2026-01-25)
       > Add examples to CHANGELOG.md showing beta/stable release format. Include version numbering examples (b1, b2, stable). Follow Keep a Changelog format
-
-    - [x] **#172.3.4** Create beta testing guide for users  (2026-01-25) `#documentation`
+    - [x] **#172.3.4** Create beta testing guide for users  (2026-01-25) `#documentation` (2026-01-25)
       > Create guide for beta testers: how to install, what to test, how to report issues, what to expect. Include testing matrix (platforms, shells, Python versions)
-
-    - [x] **#172.3.3** Update release process documentation  (2026-01-25) `#documentation`
+    - [x] **#172.3.3** Update release process documentation  (2026-01-25) `#documentation` (2026-01-25)
       > Update release/RELEASE_PROCESS.md and Cursor rules with new --beta workflow. Add examples, commands, decision trees. Document two-phase process integration
-
-    - [x] **#172.3.2** Add Cursor AI rules for release decision making   (2026-01-25) `#ai` `#documentation`
+    - [x] **#172.3.2** Add Cursor AI rules for release decision making   (2026-01-25) `#ai` `#documentation` (2026-01-25)
       > Create .cursor/rules/todo.ai-beta-releases.mdc with AI decision trees. When to use beta vs stable, error handling rules, major/minor/patch logic. See Section 4 of strategy doc
-
-    - [x] **#172.3.1** Update README.md with simplified installation  (2026-01-25) `#documentation`
+    - [x] **#172.3.1** Update README.md with simplified installation  (2026-01-25) `#documentation` (2026-01-25)
       > Add Stable/Beta/Development installation sections. Primary method: uv tool. Collapse pipx/pip alternatives in <details>. Add release channels description
-
-  - [x] **#172.2** Phase 2: Hardening & Validation   (2026-01-25) `#release` `#validation`
+  - [x] **#172.2** Phase 2: Hardening & Validation   (2026-01-25) `#release` `#validation` (2026-01-25)
     > Phase 2 partial: Beta maturity warnings (never blocks), 6+ pre-flight validation checks, beta increment logic. Testing tasks 172.2.3, 172.2.5-8 remain.
     > Goal: Add comprehensive validation and safety checks. Deliverable: Beta maturity warnings, 6+ pre-flight checks, clear error messages, all edge cases handled
-
-    - [x] **#172.2.8** Test beta increment (b1→b2→b3)  (2026-01-25) `#testing`
+    - [x] **#172.2.8** Test beta increment (b1→b2→b3)  (2026-01-25) `#testing` (2026-01-25)
       > ✅ PASS: Beta increment logic verified. Handles b1→b2→b3 correctly, finds highest existing beta, handles gaps (b1,b3→b4), validates format, logs decisions.
       > Create b1, then b2, then b3 for same version. Verify auto-increment logic works correctly. Check no duplicate versions created
-
-    - [x] **#172.2.7** Test pre-flight validation failures  (2026-01-25) `#testing`
+    - [x] **#172.2.7** Test pre-flight validation failures  (2026-01-25) `#testing` (2026-01-25)
       > ✅ PASS: Code review confirms all 6 pre-flight checks implemented correctly with clear remediation. Each check properly returns status codes and logs failures.
       > Testing pre-flight validation: 6 checks (prepare state, CI/CD, uncommitted changes, GitHub auth, build deps, beta maturity)
       > Trigger each validation failure: missing prepare state, failing CI/CD, uncommitted changes, missing GitHub auth, missing build deps. Verify clear error messages
-
-    - [x] **#172.2.6** Test beta maturity warnings  (2026-01-25) `#testing`
+    - [x] **#172.2.6** Test beta maturity warnings  (2026-01-25) `#testing` (2026-01-25)
       > ✅ PASS: Beta maturity validation verified. Warns if <7 days (major) or <2 days (minor), never blocks, shows clear warnings, cross-platform date handling, logs all decisions.
       > Create beta, try stable release <7 days later. Verify warning displayed but release proceeds. Test major vs minor recommendations
-
-    - [x] **#172.2.5** Test all error paths and validation gates  (2026-01-25) `#testing`
+    - [x] **#172.2.5** Test all error paths and validation gates  (2026-01-25) `#testing` (2026-01-25)
       > ✅ PASS: All critical error paths verified with proper handling: error messages, remediation steps, logging, exit codes. Validation gates (major release, beta maturity, pre-flight) all functional.
       > Reviewing all error paths: converter, version updates, tag verification, assets, GitHub release, CI/CD, validation gates
       > Test each validation failure scenario. Verify error messages are clear and actionable. Test edge cases
-
-    - [x] **#172.2.4** Add beta version increment logic   (2026-01-25) `#release` `#script`
+    - [x] **#172.2.4** Add beta version increment logic   (2026-01-25) `#release` `#script` (2026-01-25)
       > Automatic beta numbering. Extract number from existing betas, add 1. Prevents duplicate versions. Logs decision clearly
-
-    - [x] **#172.2.3** Enhance error messages with remediation steps   (2026-01-25) `#documentation` `#release`
+    - [x] **#172.2.3** Enhance error messages with remediation steps   (2026-01-25) `#documentation` `#release` (2026-01-25)
       > Reviewing release.sh error messages for clear remediation steps
       > Add actionable remediation steps to all error messages. Pattern: Error description, what caused it, how to fix it. User-friendly language
-
-    - [x] **#172.2.2** Add 6+ pre-flight validation checks   (2026-01-25) `#release` `#validation`
+    - [x] **#172.2.2** Add 6+ pre-flight validation checks   (2026-01-25) `#release` `#validation` (2026-01-25)
       > Check: prepare state exists, CI/CD passing, no uncommitted changes, GitHub authenticated, build dependencies available, beta maturity. Clear ✅/❌ status for each with remediation
-
-    - [x] **#172.2.1** Implement beta maturity warnings (never blocks)   (2026-01-25) `#release` `#validation`
+    - [x] **#172.2.1** Implement beta maturity warnings (never blocks)   (2026-01-25) `#release` `#validation` (2026-01-25)
       > Find latest beta from GitHub, calculate days since published. Warn if <7 days (major) or <2 days (minor). Always proceed - warning only. Display clear message with recommendation
-
-  - [x] **#172.1** Phase 1: Core Beta Infrastructure   (2026-01-25) `#infrastructure` `#release`
+  - [x] **#172.1** Phase 1: Core Beta Infrastructure   (2026-01-25) `#infrastructure` `#release` (2026-01-25)
     > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
     > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
-
-    - [x] **#172.1.8** Test major release blocking without beta  (2026-01-25) `#testing`
+    - [x] **#172.1.8** Test major release blocking without beta  (2026-01-25) `#testing` (2026-01-25)
       > ✅ PASS: Major release blocking works correctly. Tested 2.7.3→3.0.0 without beta, script blocked with clear error message and remediation steps.
       > Try to prepare 3.0.0 stable without beta. Verify script blocks with error message showing remediation (create beta first)
-
-    - [x] **#172.1.7** Test beta release creation (v3.0.0b1)  (2026-01-25) `#testing`
+    - [x] **#172.1.7** Test beta release creation (v3.0.0b1)  (2026-01-25) `#testing` (2026-01-25)
       > Run prepare --beta and execute. Verify PyPI marks as pre-release. Test install: uv tool install --prerelease=allow todo-ai
-
-    - [x] **#172.1.6** Update documentation with beta installation instructions  (2026-01-25) `#documentation`
+    - [x] **#172.1.6** Update documentation with beta installation instructions  (2026-01-25) `#documentation` (2026-01-25)
       > Add installation commands to README.md: uv tool install --prerelease=allow todo-ai. Include pipx/pip alternatives in collapsible section
-
-    - [x] **#172.1.5** Update GitHub Actions for simple pre-release detection   (2026-01-25) `#cicd` `#release`
+    - [x] **#172.1.5** Update GitHub Actions for simple pre-release detection   (2026-01-25) `#cicd` `#release` (2026-01-25)
       > Update .github/workflows/release.yml: Add regex detection (b[0-9]+$), set is_prerelease flag, single PyPI target. Reduces from ~25 to ~15 steps
-
-    - [x] **#172.1.4** Update .prepare_state to include release_type   (2026-01-25) `#release` `#script`
+    - [x] **#172.1.4** Update .prepare_state to include release_type   (2026-01-25) `#release` `#script` (2026-01-25)
       > Add release_type, base_version, is_major, prepared_at, prepared_by to .prepare_state JSON. Execute phase will read all context from this file
-
-    - [x] **#172.1.3** Implement major release enforcement (block if no beta exists)    (2026-01-25) `#release` `#script` `#validation`
+    - [x] **#172.1.3** Implement major release enforcement (block if no beta exists)    (2026-01-25) `#release` `#script` `#validation` (2026-01-25)
       > Compare major version vs last stable. If major bump AND preparing stable: check if beta exists. If no beta: block with error and show how to create beta. If beta exists: allow proceed
-
-    - [x] **#172.1.2** Implement beta version auto-detection (query GitHub)   (2026-01-25) `#release` `#script`
+    - [x] **#172.1.2** Implement beta version auto-detection (query GitHub)   (2026-01-25) `#release` `#script` (2026-01-25)
       > Query GitHub releases for existing betas (e.g., v1.0.0b*). If none: use b1. If exist: find highest number, increment by 1. Return version like 1.0.0b3
-
-    - [x] **#172.1.1** Add --beta flag parsing to release.sh   (2026-01-25) `#release` `#script`
+    - [x] **#172.1.1** Add --beta flag parsing to release.sh   (2026-01-25) `#release` `#script` (2026-01-25)
       > Parse --beta flag in release.sh, store in variable for use in prepare phase. Update help text to show new flag option
 
-- [x] **#166** Implement utility modules (git, logging) (task#163.13)  (2026-01-25) `#code`
+- [x] **#166** Implement utility modules (git, logging) (task#163.13)  (2026-01-25) `#code` (2026-01-25)
 
-- [x] **#165** Implement migration system module (task#163.12)  (2026-01-25) `#code`
+- [x] **#165** Implement migration system module (task#163.12)  (2026-01-25) `#code` (2026-01-25)
 
-- [x] **#164** Implement configuration module (task#163.9)  (2026-01-25) `#code`
+- [x] **#164** Implement configuration module (task#163.9)  (2026-01-25) `#code` (2026-01-25)
 
 - [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
   > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
-
   - [ ] **#163.52** Phase 16: Release Phase - Beta/pre-release and final release with migration support `#release`
-
     - [ ] **#163.52.6** Beta/Pre-release: Create beta/pre-release for testing with real users `#release`
-
     - [ ] **#163.52.5** Beta/Pre-release: Publish to PyPI as pre-release version `#release`
-
     - [ ] **#163.52.4** Beta/Pre-release: Conduct real user testing and collect feedback `#release`
-
     - [ ] **#163.52.3** Final release: Finalize migration support and documentation `#release`
-
     - [ ] **#163.52.2** Final release: Publish final release to PyPI with migration support `#release`
-
-    - [x] **#163.52.1** Final release: Update installation instructions and migration guide  (2026-01-25) `#docs`
-
-  - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests  (2026-01-25) `#code`
-
-    - [x] **#163.51.8** Final validation with all parity tests  (2026-01-25) `#test`
-
-    - [x] **#163.51.7** Add unit tests for FileStructureSnapshot  (2026-01-25) `#test`
-
-    - [x] **#163.51.6** Update documentation  (2026-01-25) `#docs`
-
-    - [x] **#163.51.5** Remove unused methods and parameters  (2026-01-25) `#code`
-
-  - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands  (2026-01-25) `#code`
-
-    - [x] **#163.50.10** Run full test suite, verify parity tests pass  (2026-01-25) `#test`
-
-    - [x] **#163.50.9** Remove preserve_blank_line_state parameter from write_tasks()  (2026-01-25) `#code`
-
-    - [x] **#163.50.8** Remove state restoration logic from all commands  (2026-01-25) `#code`
-
-    - [x] **#163.50.7** Remove manual file editing from restore_command()  (2026-01-25) `#code`
-
-    - [x] **#163.50.6** Remove manual file editing from add_command()  (2026-01-25) `#code`
-
-  - [x] **#163.49** Phase 13: Remove Old State Variables (Breaking) - Remove mutable state variables and override logic  (2026-01-25) `#code`
-
-    - [x] **#163.49.10** Run full test suite, fix any regressions  (2026-01-25) `#test`
-
-    - [x] **#163.49.9** Remove all override logic from _generate_markdown()  (2026-01-25) `#code`
-
-    - [x] **#163.49.8** Remove _blank_line_overridden  (2026-01-25) `#code`
-
-    - [x] **#163.49.7** Remove original_tasks_header_has_blank_line  (2026-01-25) `#code`
-
-    - [x] **#163.49.6** Remove tasks_header_has_blank_line  (2026-01-25) `#code`
-
-  - [x] **#163.48** Phase 12: Use Snapshot for Generation (Non-Breaking) - Modify _generate_markdown() to use snapshot and implement mtime validation  (2026-01-25) `#code`
-
-    - [x] **#163.48.12** Verify existing tests still pass, test mtime invalidation  (2026-01-25) `#test`
-
-    - [x] **#163.48.11** Keep old state variables for now (dual mode)  (2026-01-25) `#code`
-
-    - [x] **#163.48.10** Insert interleaved content during generation  (2026-01-25) `#code`
-
-    - [x] **#163.48.9** Implement mtime validation in read_tasks() to detect external modifications  (2026-01-25) `#code`
-
-    - [x] **#163.48.8** Update write_tasks() to use snapshot  (2026-01-25) `#code`
-
-    - [x] **#163.48.7** Modify _generate_markdown() to accept snapshot parameter  (2026-01-25) `#code`
-
-  - [x] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file  (2026-01-25) `#code`
-
-    - [x] **#163.47.10** Verify existing tests still pass, verify interleaved content captured  (2026-01-25) `#test`
-
-    - [x] **#163.47.9** Store snapshot in FileOps with _snapshot_mtime tracking  (2026-01-25) `#code`
-
-    - [x] **#163.47.8** Modify _parse_markdown() to populate snapshot including interleaved content  (2026-01-25) `#code`
-
-    - [x] **#163.47.7** Add _capture_structure_snapshot() method to FileOps  (2026-01-25) `#code`
-
-    - [x] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field  (2026-01-25) `#code`
-
-  - [x] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section  (2026-01-25) `#code`
-
-    - [x] **#163.46.8** Verify no data loss in files with user comments/notes  (2026-01-25) `#test`
-
-    - [x] **#163.46.7** Test that interleaved content survives read/write cycle  (2026-01-25) `#test`
+    - [x] **#163.52.1** Final release: Update installation instructions and migration guide  (2026-01-25) `#docs` (2026-01-25)
+  - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.51.8** Final validation with all parity tests  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.51.7** Add unit tests for FileStructureSnapshot  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.51.6** Update documentation  (2026-01-25) `#docs` (2026-01-25)
+    - [x] **#163.51.5** Remove unused methods and parameters  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.50.10** Run full test suite, verify parity tests pass  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.50.9** Remove preserve_blank_line_state parameter from write_tasks()  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.50.8** Remove state restoration logic from all commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.50.7** Remove manual file editing from restore_command()  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.50.6** Remove manual file editing from add_command()  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.49** Phase 13: Remove Old State Variables (Breaking) - Remove mutable state variables and override logic  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.49.10** Run full test suite, fix any regressions  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.49.9** Remove all override logic from _generate_markdown()  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.49.8** Remove _blank_line_overridden  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.49.7** Remove original_tasks_header_has_blank_line  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.49.6** Remove tasks_header_has_blank_line  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.48** Phase 12: Use Snapshot for Generation (Non-Breaking) - Modify _generate_markdown() to use snapshot and implement mtime validation  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.48.12** Verify existing tests still pass, test mtime invalidation  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.48.11** Keep old state variables for now (dual mode)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.48.10** Insert interleaved content during generation  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.48.9** Implement mtime validation in read_tasks() to detect external modifications  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.48.8** Update write_tasks() to use snapshot  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.48.7** Modify _generate_markdown() to accept snapshot parameter  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.47.10** Verify existing tests still pass, verify interleaved content captured  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.47.9** Store snapshot in FileOps with _snapshot_mtime tracking  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.47.8** Modify _parse_markdown() to populate snapshot including interleaved content  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.47.7** Add _capture_structure_snapshot() method to FileOps  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.47.6** Create FileStructureSnapshot dataclass with interleaved_content field  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.46.8** Verify no data loss in files with user comments/notes  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.46.7** Test that interleaved content survives read/write cycle  (2026-01-25) `#test` (2026-01-25)
       > Interleaved content capture verified. Full read/write cycle test will be completed in Phase 12 when interleaved content is inserted back into generated markdown.
-
-    - [x] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID  (2026-01-25) `#code`
-
-    - [x] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section  (2026-01-25) `#code`
-
-  - [x] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script  (2026-01-25) `#test`
-
-    - [x] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested  (2026-01-25) `#test`
-
-    - [x] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop  (2026-01-25) `#test`
-
-    - [x] **#163.44.4** Test all commands with dedicated test TODO.md dataset - Ensure Python version produces identical results to shell version  (2026-01-25) `#test`
-
-    - [x] **#163.44.3** Re-run feature parity validation - Compare Python version output with shell version (side-by-side testing)  (2026-01-25) `#test`
-
-    - [x] **#163.44.2** Add integration tests for all new MCP tools - Verify each tool works correctly  (2026-01-25) `#test`
-
-    - [x] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly  (2026-01-25) `#test`
-
-  - [x] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands  (2026-01-25) `#code`
-
-    - [x] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format  (2026-01-25) `#test`
-
-    - [x] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool  (2026-01-25) `#code`
-
-    - [x] **#163.43.6** Add MCP tools for Phase 6 commands - show_config, detect_coordination, setup_coordination, switch_mode  (2026-01-25) `#code`
-
-    - [x] **#163.43.5** Add MCP tools for Phase 5 commands - view_log, update_tool, list_backups, rollback  (2026-01-25) `#code`
-
-    - [x] **#163.43.4** Add MCP tools for Phase 4 commands - lint_todo, reformat_todo, resolve_conflicts  (2026-01-25) `#code`
-
-    - [x] **#163.43.3** Add MCP tools for Phase 3 commands - show_task, relate_task  (2026-01-25) `#code`
-
-    - [x] **#163.43.2** Add MCP tools for Phase 2 commands - add_note, delete_note, update_note  (2026-01-25) `#code`
-
-    - [x] **#163.43.1** Add MCP tools for Phase 1 commands - modify_task, delete_task, archive_task, restore_task, undo_task  (2026-01-25) `#code`
-
-  - [x] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands  (2026-01-25) `#code`
-
-    - [x] **#163.42.3** Implement version command - Show version information  (2026-01-25) `#code`
-
-    - [x] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options)  (2026-01-25) `#code`
-
-    - [x] **#163.42.1** Implement report-bug command - Report bugs to GitHub Issues (with duplicate detection)  (2026-01-25) `#code`
-
-  - [x] **#163.41** Phase 6: Configuration and Setup - Implement config, detect-coordination, setup-coordination, setup, switch-mode, list-mode-backups, rollback-mode commands  (2026-01-25) `#code`
-
-    - [x] **#163.41.8** Implement mode switch backup system - Create backups before mode switches  (2026-01-25) `#code`
-
-    - [x] **#163.41.7** Implement rollback-mode command - Rollback from mode switch backup  (2026-01-25) `#code`
-
-    - [x] **#163.41.6** Implement list-mode-backups command - List mode switch backups  (2026-01-25) `#code`
-
-    - [x] **#163.41.5** Implement switch-mode command - Switch numbering mode (single-user, multi-user, branch, enhanced) with --force and --renumber options  (2026-01-25) `#code`
-
-    - [x] **#163.41.4** Implement setup command - Interactive setup wizard for mode and coordination  (2026-01-25) `#code`
-
-    - [x] **#163.41.3** Implement setup-coordination command - Set up coordination service (github-issues, counterapi)  (2026-01-25) `#code`
-
-    - [x] **#163.41.2** Implement detect-coordination command - Detect available coordination options based on system  (2026-01-25) `#code`
-
-    - [x] **#163.41.1** Implement config command - Show current configuration  (2026-01-25) `#code`
-
-  - [x] **#163.40** Phase 5: System Operations - Implement log, update, backups, rollback commands  (2026-01-25) `#code`
-
-    - [x] **#163.40.5** Implement backup system - Create backups before major operations  (2026-01-25) `#code`
-
-    - [x] **#163.40.4** Implement rollback command - Rollback to previous version (by index or timestamp)  (2026-01-25) `#code`
-
-    - [x] **#163.40.3** Implement backups command - List available backup versions  (2026-01-25) `#code`
-
-    - [x] **#163.40.2** Implement update command - Update todo.ai to latest version  (2026-01-25) `#code`
-
-    - [x] **#163.40.1** Implement log command - View TODO operation log (with --filter and --lines options)  (2026-01-25) `#code`
-
-  - [x] **#163.39** Phase 4: File Operations - Implement lint, reformat, resolve-conflicts, edit commands  (2026-01-25) `#code`
-
-    - [x] **#163.39.4** Implement edit command - Open TODO.md in editor  (2026-01-25) `#code`
-
-    - [x] **#163.39.3** Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option)  (2026-01-25) `#code`
-
-    - [x] **#163.39.2** Implement --reformat command - Apply formatting fixes (with --dry-run option)  (2026-01-25) `#code`
-
-    - [x] **#163.39.1** Implement --lint command - Identify formatting issues (indentation, checkboxes)  (2026-01-25) `#code`
-
-  - [x] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands  (2026-01-25) `#code`
-
-    - [x] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks  (2026-01-25) `#code`
-
-    - [x] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of)  (2026-01-25) `#code`
-
-    - [x] **#163.38.1** Implement show command - Display task with subtasks, relationships, and notes  (2026-01-25) `#code`
-
-  - [x] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands  (2026-01-25) `#code`
-
-    - [x] **#163.37.3** Implement update-note command - Replace existing notes with new text  (2026-01-25) `#code`
-
-    - [x] **#163.37.2** Implement delete-note command - Delete all notes from a task  (2026-01-25) `#code`
-
-    - [x] **#163.37.1** Implement note command - Add note to task (blockquote format)  (2026-01-25) `#code`
-
-  - [x] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands  (2026-01-25) `#code`
-
-    - [x] **#163.36.8** Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations  (2026-01-25) `#code`
-
-    - [x] **#163.36.7** Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10)  (2026-01-25) `#code`
-
-    - [x] **#163.36.6** Add bulk operations support - Complete/delete/archive multiple tasks at once  (2026-01-25) `#code`
-
-    - [x] **#163.36.5** Implement undo command - Reopen completed task  (2026-01-25) `#code`
-
-    - [x] **#163.36.4** Implement restore command - Move task from Deleted/Recently Completed back to Tasks section  (2026-01-25) `#code`
-
-    - [x] **#163.36.3** Implement archive command - Move task to Recently Completed section (not just mark as archived)  (2026-01-25) `#code`
-
-    - [x] **#163.36.2** Implement delete command - Move task to Deleted section (not just mark as deleted)  (2026-01-25) `#code`
-
-    - [x] **#163.36.1** Implement modify command - Update task description and tags  (2026-01-25) `#code`
-
-  - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list)  (2026-01-25) `#code`
+    - [x] **#163.46.6** Store interleaved content (comments, notes) keyed by preceding task ID  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.46.5** Update FileOps._parse_markdown() to capture non-task lines in Tasks section  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.44.6** Verify 100% command parity achieved - All 30+ commands implemented and tested  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.44.5** Test MCP server with real MCP clients - Verify integration with Cursor/Claude Desktop  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.44.4** Test all commands with dedicated test TODO.md dataset - Ensure Python version produces identical results to shell version  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.44.3** Re-run feature parity validation - Compare Python version output with shell version (side-by-side testing)  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.44.2** Add integration tests for all new MCP tools - Verify each tool works correctly  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.44.1** Add integration tests for all new CLI commands - Verify each command works correctly  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.8** Verify all MCP tools match CLI behavior exactly - Ensure identical functionality and output format  (2026-01-25) `#test` (2026-01-25)
+    - [x] **#163.43.7** Add MCP tools for Phase 7 commands - report_bug, uninstall_tool  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.6** Add MCP tools for Phase 6 commands - show_config, detect_coordination, setup_coordination, switch_mode  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.5** Add MCP tools for Phase 5 commands - view_log, update_tool, list_backups, rollback  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.4** Add MCP tools for Phase 4 commands - lint_todo, reformat_todo, resolve_conflicts  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.3** Add MCP tools for Phase 3 commands - show_task, relate_task  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.2** Add MCP tools for Phase 2 commands - add_note, delete_note, update_note  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.43.1** Add MCP tools for Phase 1 commands - modify_task, delete_task, archive_task, restore_task, undo_task  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.42.3** Implement version command - Show version information  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.42.2** Implement uninstall command - Uninstall todo.ai (with --remove-data, --remove-rules, --all options)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.42.1** Implement report-bug command - Report bugs to GitHub Issues (with duplicate detection)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.41** Phase 6: Configuration and Setup - Implement config, detect-coordination, setup-coordination, setup, switch-mode, list-mode-backups, rollback-mode commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.8** Implement mode switch backup system - Create backups before mode switches  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.7** Implement rollback-mode command - Rollback from mode switch backup  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.6** Implement list-mode-backups command - List mode switch backups  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.5** Implement switch-mode command - Switch numbering mode (single-user, multi-user, branch, enhanced) with --force and --renumber options  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.4** Implement setup command - Interactive setup wizard for mode and coordination  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.3** Implement setup-coordination command - Set up coordination service (github-issues, counterapi)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.2** Implement detect-coordination command - Detect available coordination options based on system  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.41.1** Implement config command - Show current configuration  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.40** Phase 5: System Operations - Implement log, update, backups, rollback commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.40.5** Implement backup system - Create backups before major operations  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.40.4** Implement rollback command - Rollback to previous version (by index or timestamp)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.40.3** Implement backups command - List available backup versions  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.40.2** Implement update command - Update todo.ai to latest version  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.40.1** Implement log command - View TODO operation log (with --filter and --lines options)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.39** Phase 4: File Operations - Implement lint, reformat, resolve-conflicts, edit commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.39.4** Implement edit command - Open TODO.md in editor  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.39.3** Implement resolve-conflicts command - Detect and resolve duplicate task IDs (with --dry-run option)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.39.2** Implement --reformat command - Apply formatting fixes (with --dry-run option)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.39.1** Implement --lint command - Identify formatting issues (indentation, checkboxes)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.38.3** Implement task relationship data model - Store and retrieve relationships between tasks  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.38.2** Implement relate command - Add task relationships (completed-by, depends-on, blocks, related-to, duplicate-of)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.38.1** Implement show command - Display task with subtasks, relationships, and notes  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.37.3** Implement update-note command - Replace existing notes with new text  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.37.2** Implement delete-note command - Delete all notes from a task  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.37.1** Implement note command - Add note to task (blockquote format)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.8** Add --with-subtasks flag support - Include subtasks in complete/delete/archive operations  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.7** Add range operations support - Complete/delete/archive task ranges (e.g., 104.3-104.10)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.6** Add bulk operations support - Complete/delete/archive multiple tasks at once  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.5** Implement undo command - Reopen completed task  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.4** Implement restore command - Move task from Deleted/Recently Completed back to Tasks section  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.3** Implement archive command - Move task to Recently Completed section (not just mark as archived)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.2** Implement delete command - Move task to Deleted section (not just mark as deleted)  (2026-01-25) `#code` (2026-01-25)
+    - [x] **#163.36.1** Implement modify command - Update task description and tags  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list)  (2026-01-25) `#code` (2026-01-25)
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
-
-  - [x] **#163.32** Maintenance phase: Ensure existing shell script continues working during development  (2026-01-25) `#code`
+  - [x] **#163.32** Maintenance phase: Ensure existing shell script continues working during development  (2026-01-25) `#code` (2026-01-25)
     > CRITICAL REQUIREMENT: Existing shell script (todo.ai) MUST continue working throughout entire development process. Do NOT modify shell script during Python development. This ensures we can track progress using the existing tool.
-
-  - [x] **#163.31** Documentation phase: Update installation instructions for pipx  (2026-01-25) `#docs`
-
-  - [x] **#163.30** Documentation phase: Document MCP server integration and usage  (2026-01-25) `#docs`
-
-  - [x] **#163.29** Documentation phase: Create migration guide from shell to Python version  (2026-01-25) `#docs`
-
-  - [x] **#163.28** Documentation phase: Create Python version user documentation  (2026-01-25) `#docs`
-
-  - [x] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces  (2026-01-25) `#test`
-
-  - [x] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing)  (2026-01-25) `#test`
+  - [x] **#163.31** Documentation phase: Update installation instructions for pipx  (2026-01-25) `#docs` (2026-01-25)
+  - [x] **#163.30** Documentation phase: Document MCP server integration and usage  (2026-01-25) `#docs` (2026-01-25)
+  - [x] **#163.29** Documentation phase: Create migration guide from shell to Python version  (2026-01-25) `#docs` (2026-01-25)
+  - [x] **#163.28** Documentation phase: Create Python version user documentation  (2026-01-25) `#docs` (2026-01-25)
+  - [x] **#163.27** Validation phase: Verify feature parity between MCP and CLI interfaces  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.26** Validation phase: Compare Python version output with shell version (side-by-side testing)  (2026-01-25) `#test` (2026-01-25)
     > Side-by-side comparison: Run same commands on test dataset with both shell version and Python version. Outputs must be identical. Use diff tools to verify.
-
-  - [x] **#163.25** Testing phase: Test pipx installation and system-wide availability  (2026-01-25) `#test`
-
-  - [x] **#163.24** Testing phase: Test migration from shell version to Python version  (2026-01-25) `#test`
-
-  - [x] **#163.23** Testing phase: Test GitHub coordination integration  (2026-01-25) `#test`
-
-  - [x] **#163.22** Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced)  (2026-01-25) `#test`
-
-  - [x] **#163.21** Testing phase: Test data format compatibility (.todo.ai/, TODO.md structure)  (2026-01-25) `#test`
-
-  - [x] **#163.20** Testing phase: Test CLI interface matches existing shell script behavior  (2026-01-25) `#test`
-
-  - [x] **#163.19** Testing phase: Test MCP server interface with MCP-compatible clients  (2026-01-25) `#test`
-
-  - [x] **#163.18** Testing phase: Test all commands with dedicated test TODO.md dataset  (2026-01-25) `#test`
+  - [x] **#163.25** Testing phase: Test pipx installation and system-wide availability  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.24** Testing phase: Test migration from shell version to Python version  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.23** Testing phase: Test GitHub coordination integration  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.22** Testing phase: Test numbering modes (single-user, multi-user, branch, enhanced)  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.21** Testing phase: Test data format compatibility (.todo.ai/, TODO.md structure)  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.20** Testing phase: Test CLI interface matches existing shell script behavior  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.19** Testing phase: Test MCP server interface with MCP-compatible clients  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.18** Testing phase: Test all commands with dedicated test TODO.md dataset  (2026-01-25) `#test` (2026-01-25)
     > Test all commands using dedicated test TODO.md dataset. Compare outputs with shell version using same test data. Ensure Python version produces identical results.
-
-  - [x] **#163.17** Testing phase: Create comprehensive test suite for core logic  (2026-01-25) `#test`
-
-  - [x] **#163.16** Implementation phase: Implement pipx packaging and installation  (2026-01-25) `#code`
-
-  - [x] **#163.15** Implementation phase: Implement CLI interface (maintain existing command syntax)  (2026-01-25) `#code`
-
-  - [x] **#163.14** Implementation phase: Implement MCP server interface (expose all commands as MCP tools)  (2026-01-25) `#code`
-
-  - [x] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced)  (2026-01-25) `#code`
-
-  - [x] **#163.12** Implementation phase: Implement GitHub coordination logic  (2026-01-25) `#code`
-
-  - [x] **#163.11** Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management)  (2026-01-25) `#code`
-
-  - [x] **#163.10** Implementation phase: Implement core task management logic (add, modify, delete, complete, archive)  (2026-01-25) `#code`
-
-  - [x] **#163.9** Setup phase: Create test data generator/copier for isolated testing  (2026-01-25) `#test`
+  - [x] **#163.17** Testing phase: Create comprehensive test suite for core logic  (2026-01-25) `#test` (2026-01-25)
+  - [x] **#163.16** Implementation phase: Implement pipx packaging and installation  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.15** Implementation phase: Implement CLI interface (maintain existing command syntax)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.14** Implementation phase: Implement MCP server interface (expose all commands as MCP tools)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.13** Implementation phase: Implement numbering mode system (single-user, multi-user, branch, enhanced)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.12** Implementation phase: Implement GitHub coordination logic  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.11** Implementation phase: Implement core file operations (TODO.md parsing, .todo.ai/ management)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.10** Implementation phase: Implement core task management logic (add, modify, delete, complete, archive)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.9** Setup phase: Create test data generator/copier for isolated testing  (2026-01-25) `#test` (2026-01-25)
     > Create utility to copy/generate test dataset from live data (sanitized) or create synthetic test data. Must ensure test environment is completely isolated from live project TODO.md.
-
-  - [x] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset  (2026-01-25) `#test`
+  - [x] **#163.8** Setup phase: Set up test environment with dedicated test TODO.md dataset  (2026-01-25) `#test` (2026-01-25)
     > CRITICAL: Set up dedicated test environment with separate TODO.md and .todo.ai/ directory. Use environment variable or config to point Python version to test data. Ensure test data is never mixed with live project data.
-
-  - [x] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout)  (2026-01-25) `#code`
-
-  - [x] **#163.6** Design phase: Create migration plan from shell to Python version  (2026-01-25) `#design`
-
-  - [x] **#163.5** Design phase: Design test data isolation strategy (separate test TODO.md)  (2026-01-25) `#design`
+  - [x] **#163.7** Setup phase: Create Python project structure (pyproject.toml, package layout)  (2026-01-25) `#code` (2026-01-25)
+  - [x] **#163.6** Design phase: Create migration plan from shell to Python version  (2026-01-25) `#design` (2026-01-25)
+  - [x] **#163.5** Design phase: Design test data isolation strategy (separate test TODO.md)  (2026-01-25) `#design` (2026-01-25)
     > CRITICAL: Test data must be completely isolated. Create separate test TODO.md and .todo.ai/ directory. NEVER use the live project TODO.md for testing. Test dataset should be a copy with realistic but safe test data.
-
-  - [x] **#163.4** Design phase: Design CLI interface specification (maintain existing command syntax)  (2026-01-25) `#design`
-
-  - [x] **#163.3** Design phase: Design MCP server interface specification  (2026-01-25) `#design`
-
-  - [x] **#163.2** Design phase: Define core logic API and interface contracts  (2026-01-25) `#design`
-
-  - [x] **#163.1** Design phase: Create architecture design document for Python refactor  (2026-01-25) `#design`
+  - [x] **#163.4** Design phase: Design CLI interface specification (maintain existing command syntax)  (2026-01-25) `#design` (2026-01-25)
+  - [x] **#163.3** Design phase: Design MCP server interface specification  (2026-01-25) `#design` (2026-01-25)
+  - [x] **#163.2** Design phase: Define core logic API and interface contracts  (2026-01-25) `#design` (2026-01-25)
+  - [x] **#163.1** Design phase: Create architecture design document for Python refactor  (2026-01-25) `#design` (2026-01-25)
     > Architecture design document created at docs/design/PYTHON_REFACTOR_ARCHITECTURE.md. Document validated (v1.1) and covers: current architecture analysis, proposed Python architecture with dual interfaces (MCP + CLI), core module design, installation via pipx, migration strategy, testing strategy with isolated test data, and implementation phases.
 
 - [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
-
   - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
-
   - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
-
   - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
 
 - [ ] **#128** Create git commit hook for todo list linting and validation `#feature`
@@ -543,247 +337,53 @@
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
 - [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
-
   - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
-
   - [ ] **#49.9** Implement high-priority security improvements identified in audit `#code`
-
   - [ ] **#49.8** Create security improvement recommendations document based on findings `#docs`
-
   - [ ] **#49.7** Evaluate supply chain security: repository compromise, MITM attacks, and code signing `#security`
-
   - [ ] **#49.6** Review file system access: what files can be read/written and potential data exfiltration risks `#security`
-
   - [ ] **#49.5** Analyze prompt injection risks: malicious content in TODO.md affecting AI agent behavior `#security`
-
   - [ ] **#49.4** Examine Cursor rules injection vectors: preventing malicious rules from being installed or modified `#security`
-
   - [ ] **#49.3** Assess code execution risks: migration system, script execution, and dynamic code loading `#security`
-
   - [ ] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security`
-
   - [ ] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security`
 
 - [ ] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature`
-
   - [ ] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test`
-
   - [ ] **#47.7** Update help screen and documentation with feature request command `#docs`
-
   - [ ] **#47.6** Integrate feature request rules into cursor rules (similar to bug reporting rules) `#code`
-
   - [ ] **#47.5** Add manual confirmation requirement (always ask before creating feature request) `#code`
-
   - [ ] **#47.4** Implement 'me too' reply for existing feature requests `#code`
-
   - [ ] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code`
-
   - [ ] **#47.2** Implement feature request command handler and template generation `#code`
-
   - [ ] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs`
 
 - [ ] **#45** Enhance release process with pre-release support for beta/testing versions `#release`
-
   - [ ] **#45.8** Test pre-release creation and promotion workflow `#test`
-
   - [ ] **#45.7** Update release process documentation with pre-release workflow `#docs`
-
   - [ ] **#45.6** Add command to promote pre-release to official release (remove --prerelease flag) `#code`
-
   - [ ] **#45.5** Implement workflow: create pre-release → test → fix if needed → promote to official release `#code`
-
   - [ ] **#45.4** Add GitHub pre-release flag support (gh release create --prerelease) `#code`
-
   - [ ] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code`
-
   - [ ] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs`
-
   - [ ] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research`
 
 - [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
-
-  - [x] **#42.6** Test duplicate detection and 'me too' reply flow (2026-01-25)
-
-  - [x] **#42.5** Test bug reporting with GitHub CLI integration (2026-01-25)
-
-  - [x] **#42.4** Create bug report template with logs and data attachment (2026-01-25)
-
-  - [x] **#42.3** Implement duplicate issue detection and 'me too' reply functionality (2026-01-25)
-
-  - [x] **#42.2** Implement bug detection and reporting logic (2026-01-25)
-
-  - [x] **#42.1** Create design document for bug reporting feature (2026-01-25)
+  - [x] **#42.6** Test duplicate detection and 'me too' reply flow (2026-01-25) (2026-01-25)
+  - [x] **#42.5** Test bug reporting with GitHub CLI integration (2026-01-25) (2026-01-25)
+  - [x] **#42.4** Create bug report template with logs and data attachment (2026-01-25) (2026-01-25)
+  - [x] **#42.3** Implement duplicate issue detection and 'me too' reply functionality (2026-01-25) (2026-01-25)
+  - [x] **#42.2** Implement bug detection and reporting logic (2026-01-25) (2026-01-25)
+  - [x] **#42.1** Create design document for bug reporting feature (2026-01-25) (2026-01-25)
 
 - [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
-
-  - [x] **#35.3** Create tests directory and draft detailed test plan document   (2026-01-25) `#docs` `#tests`
-
-  - [x] **#35.2** Define test framework architecture and tooling   (2026-01-25) `#planning` `#tests`
-
-  - [x] **#35.1** Research todo.ai testing requirements and existing docs   (2026-01-25) `#docs` `#tests`
-
+  - [x] **#35.3** Create tests directory and draft detailed test plan document   (2026-01-25) `#docs` `#tests` (2026-01-25)
+  - [x] **#35.2** Define test framework architecture and tooling   (2026-01-25) `#planning` `#tests` (2026-01-25)
+  - [x] **#35.1** Research todo.ai testing requirements and existing docs   (2026-01-25) `#docs` `#tests` (2026-01-25)
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
+
 ---
-## Deleted Tasks
-  - [D] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#193.3** Create design document for 'start' command architecture `#design` `#documentation` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#193.4** Implement 'start' command in CLI `#code` `#implementation` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
-- [D] **#193** Implement 'start task' command to track task progress and status `#design` `#feature` (deleted 2026-01-25, expires 2026-02-24)
-  > Key questions to answer:
-  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
-  > 2. Should we support time tracking (start/stop)?
-  > 3. How does this interact with todo.txt format (e.g. priority changes)?
-  > 4. Should this trigger any external integrations?
-- [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
-  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
-  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
-    - [D] **#163.51.4** Remove unused methods and parameters `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.51.3** Update documentation `#docs` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.51.2** Add unit tests for FileStructureSnapshot `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.51.1** Final validation with all parity tests `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.50.5** Run full test suite, verify parity tests pass `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.50.4** Remove manual file editing from add_command() `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.50.3** Remove manual file editing from restore_command() `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.50.2** Remove state restoration logic from all commands `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.50.1** Remove preserve_blank_line_state parameter from write_tasks() `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.49.5** Run full test suite, fix any regressions `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.49.4** Remove tasks_header_has_blank_line `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.49.3** Remove original_tasks_header_has_blank_line `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.49.2** Remove _blank_line_overridden `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.49.1** Remove all override logic from _generate_markdown() `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.48.6** Verify existing tests still pass, test mtime invalidation `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.48.5** Modify _generate_markdown() to accept snapshot parameter `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.48.4** Update write_tasks() to use snapshot `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.48.3** Implement mtime validation in read_tasks() to detect external modifications `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.48.2** Keep old state variables for now (dual mode) `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.48.1** Insert interleaved content during generation `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.47.5** Verify existing tests still pass, verify interleaved content captured `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.47.4** Create FileStructureSnapshot dataclass with interleaved_content field `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.47.3** Add _capture_structure_snapshot() method to FileOps `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.47.2** Modify _parse_markdown() to populate snapshot including interleaved content `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.47.1** Store snapshot in FileOps with _snapshot_mtime tracking `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.46.4** Verify no data loss in files with user comments/notes `#test` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.46.3** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.46.2** Store interleaved content (comments, notes) keyed by preceding task ID `#code` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.46.1** Test that interleaved content survives read/write cycle `#test` (deleted 2025-12-15, expires 2026-01-14)
-  - [D] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.45.1** Beta/Pre-release: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.45.2** Beta/Pre-release: Publish to PyPI as pre-release version `#release` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.45.3** Beta/Pre-release: Conduct real user testing and collect feedback `#release` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.45.4** Final release: Finalize migration support and documentation `#release` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.45.5** Final release: Publish final release to PyPI with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
-    - [D] **#163.45.6** Final release: Update installation instructions and migration guide `#docs` (deleted 2025-12-15, expires 2026-01-14)
-- [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
-  - [D] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-14, expires 2026-01-13)
-    - [D] **#163.34.1** Publish to PyPI `#release` (deleted 2025-12-14, expires 2026-01-13)
-  - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
-- [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
-  - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#148.1.2** Test delete on level 2 `#test` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#148.1.1** Level 2 sub-subtask (MODIFIED to verify fix works) `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#148.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#150.1.1** Test level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#150.1** Test level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
-    - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
-  - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
-  - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
-  - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.4** Update self-references in update_tool() function `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.6** Update help text and show_usage() examples `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.4** Update all references to .todo/ in script code `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.6** Update README.md if it mentions .todo/ `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.7** Update any documentation files `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.3** Create list_backups() function to show available backup versions `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.4** Create rollback() function to restore from backup `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.5** Implement default rollback (restore latest backup) `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.6** Implement version-specific rollback (restore by timestamp or version) `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.7** Add 'rollback' command to main script command handler `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.8** Add 'backups' or 'list-backups' command to view available backups `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.9** Update help text and show_usage() to include new commands `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.10** Remove old .bak file creation logic `#cleanup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#30.11** Test backup and rollback functionality `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-11-02, expires 2025-12-02)
-    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#123.4** Add tests to verify correct section ordering `#bug` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#39.2** Test subtask 2 (deleted 2025-11-01, expires 2025-12-01)
-    - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
-  - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
-  - [D] **#40.1** Subtask A (deleted 2025-11-01, expires 2025-12-01)
-  - [D] **#40.2** Subtask B (deleted 2025-11-01, expires 2025-12-01)
-    - [D] **#41.1.1** Level 2 nested subtask (deleted 2025-11-01, expires 2025-12-01)
-  - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ## Archived Tasks
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
@@ -1625,3 +1225,166 @@
 - [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
 
 ---
+
+## Deleted Tasks
+  - [D] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.3** Create design document for 'start' command architecture `#design` `#documentation` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.4** Implement 'start' command in CLI `#code` `#implementation` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
+- [D] **#193** Implement 'start task' command to track task progress and status `#design` `#feature` (deleted 2026-01-25, expires 2026-02-24)
+  > Key questions to answer:
+  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
+  > 2. Should we support time tracking (start/stop)?
+  > 3. How does this interact with todo.txt format (e.g. priority changes)?
+  > 4. Should this trigger any external integrations?
+- [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
+  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
+  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
+    - [D] **#163.51.4** Remove unused methods and parameters `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.51.3** Update documentation `#docs` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.51.2** Add unit tests for FileStructureSnapshot `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.51.1** Final validation with all parity tests `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.5** Run full test suite, verify parity tests pass `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.4** Remove manual file editing from add_command() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.3** Remove manual file editing from restore_command() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.2** Remove state restoration logic from all commands `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.50.1** Remove preserve_blank_line_state parameter from write_tasks() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.5** Run full test suite, fix any regressions `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.4** Remove tasks_header_has_blank_line `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.3** Remove original_tasks_header_has_blank_line `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.2** Remove _blank_line_overridden `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.49.1** Remove all override logic from _generate_markdown() `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.6** Verify existing tests still pass, test mtime invalidation `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.5** Modify _generate_markdown() to accept snapshot parameter `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.4** Update write_tasks() to use snapshot `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.3** Implement mtime validation in read_tasks() to detect external modifications `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.2** Keep old state variables for now (dual mode) `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.48.1** Insert interleaved content during generation `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.5** Verify existing tests still pass, verify interleaved content captured `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.4** Create FileStructureSnapshot dataclass with interleaved_content field `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.3** Add _capture_structure_snapshot() method to FileOps `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.2** Modify _parse_markdown() to populate snapshot including interleaved content `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.47.1** Store snapshot in FileOps with _snapshot_mtime tracking `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.4** Verify no data loss in files with user comments/notes `#test` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.3** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.2** Store interleaved content (comments, notes) keyed by preceding task ID `#code` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.46.1** Test that interleaved content survives read/write cycle `#test` (deleted 2025-12-15, expires 2026-01-14)
+  - [D] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.1** Beta/Pre-release: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.2** Beta/Pre-release: Publish to PyPI as pre-release version `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.3** Beta/Pre-release: Conduct real user testing and collect feedback `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.4** Final release: Finalize migration support and documentation `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.5** Final release: Publish final release to PyPI with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
+    - [D] **#163.45.6** Final release: Update installation instructions and migration guide `#docs` (deleted 2025-12-15, expires 2026-01-14)
+- [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
+  - [D] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-14, expires 2026-01-13)
+    - [D] **#163.34.1** Publish to PyPI `#release` (deleted 2025-12-14, expires 2026-01-13)
+  - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
+- [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
+  - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#148.1.2** Test delete on level 2 `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#148.1.1** Level 2 sub-subtask (MODIFIED to verify fix works) `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#148.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#150.1.1** Test level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#150.1** Test level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
+    - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
+  - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
+  - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
+  - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.4** Update self-references in update_tool() function `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.6** Update help text and show_usage() examples `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.4** Update all references to .todo/ in script code `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.6** Update README.md if it mentions .todo/ `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.7** Update any documentation files `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.3** Create list_backups() function to show available backup versions `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.4** Create rollback() function to restore from backup `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.5** Implement default rollback (restore latest backup) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.6** Implement version-specific rollback (restore by timestamp or version) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.7** Add 'rollback' command to main script command handler `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.8** Add 'backups' or 'list-backups' command to view available backups `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.9** Update help text and show_usage() to include new commands `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.10** Remove old .bak file creation logic `#cleanup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#30.11** Test backup and rollback functionality `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-11-02, expires 2025-12-02)
+    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#123.4** Add tests to verify correct section ordering `#bug` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#39.2** Test subtask 2 (deleted 2025-11-01, expires 2025-12-01)
+    - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#40.1** Subtask A (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#40.2** Subtask B (deleted 2025-11-01, expires 2025-12-01)
+    - [D] **#41.1.1** Level 2 nested subtask (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
+
+---
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 20:46:07

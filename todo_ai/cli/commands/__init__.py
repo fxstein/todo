@@ -730,6 +730,85 @@ def lint_command(todo_path: str = "TODO.md"):
     in_tasks = False
     skip_line = False
 
+    # Check for spacing issues
+    print("📏 Checking spacing:")
+    spacing_issues = 0
+    last_line_was_blank = False
+    last_line_was_task = False
+    last_task_was_root = False
+
+    for _i, line in enumerate(lines):
+        line_stripped = line.strip()
+
+        # Detect section headers
+        if line_stripped == "## Tasks":
+            in_tasks = True
+            skip_line = False
+            last_line_was_blank = False
+            last_line_was_task = False
+            continue
+        elif line_stripped == "## Archived Tasks" or line_stripped == "## Recently Completed":
+            in_tasks = False
+            skip_line = True
+        elif line_stripped == "## Deleted Tasks":
+            in_tasks = False
+            skip_line = True
+        elif line_stripped.startswith("## "):
+            in_tasks = False
+            skip_line = True
+        elif line_stripped == "---":
+            continue
+
+        if skip_line:
+            continue
+
+        if in_tasks:
+            # Check for blank line
+            if not line_stripped:
+                last_line_was_blank = True
+                last_line_was_task = False
+                continue
+
+            # Check for task
+            is_task = re.match(r"^\s*- \[.*\] ", line)
+            if is_task:
+                is_root = re.match(r"^- \[.*\] ", line) is not None
+
+                # Rule 1: Root tasks must be separated by 1 blank line (unless first task)
+                if is_root:
+                    if last_line_was_task and not last_line_was_blank:
+                        # Previous line was a task, and no blank line
+                        print(f"  ❌ Missing blank line before root task: {line_stripped}")
+                        spacing_issues += 1
+                        issues_found += 1
+
+                # Rule 2: Subtasks must NOT have blank lines between them
+                if not is_root:
+                    if last_line_was_blank and last_task_was_root is False:
+                        # Previous was subtask (or note), and we have a blank line
+                        # Wait, we need to know if previous was subtask of SAME parent?
+                        # Simplified: No blank lines before subtasks
+                        print(f"  ❌ Unexpected blank line before subtask: {line_stripped}")
+                        spacing_issues += 1
+                        issues_found += 1
+
+                last_line_was_blank = False
+                last_line_was_task = True
+                last_task_was_root = is_root
+                continue
+
+            # Check for note
+            if line_stripped.startswith(">"):
+                last_line_was_blank = False
+                # Notes are part of the task block
+                continue
+
+    if spacing_issues == 0:
+        print("  ✅ Spacing is correct")
+    else:
+        print(f"  📊 Found {spacing_issues} spacing issues")
+    print("")
+
     # Check for indentation issues
     print("📋 Checking indentation:")
     indent_issues = 0

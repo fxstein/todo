@@ -309,15 +309,20 @@ class FileOps:
                 # Parse archive date if present: (YYYY-MM-DD) at end of description
                 archived_at = None
                 archive_date_match = re.search(r" \(([0-9]{4}-[0-9]{2}-[0-9]{2})\)$", description)
-                if archive_date_match and (
-                    current_section == "Recently Completed" or current_section == "Archived Tasks"
-                ):
+                if archive_date_match:
                     try:
-                        archived_at = datetime.strptime(archive_date_match.group(1), "%Y-%m-%d")
-                        # Remove date from description
+                        date_str = archive_date_match.group(1)
+                        # Always remove date from description to avoid duplication (format_task adds it back)
                         description = re.sub(
                             r" \(([0-9]{4}-[0-9]{2}-[0-9]{2})\)$", "", description
                         ).strip()
+
+                        # Only use as archived_at if in Archived section
+                        if (
+                            current_section == "Recently Completed"
+                            or current_section == "Archived Tasks"
+                        ):
+                            archived_at = datetime.strptime(date_str, "%Y-%m-%d")
                     except ValueError:
                         pass
 
@@ -727,12 +732,10 @@ class FileOps:
                 lines.extend(snapshot.interleaved_content[t.id])
 
             # Spacing Rules:
-            # Root tasks: 1 blank line between them
+            # Root tasks: 1 blank line between them (and before them if following a subtask)
             # Subtasks: 0 blank lines (handled by not adding one here)
-            is_root = "." not in t.id
-            is_last = i == len(active_tasks) - 1
-            if is_root and not is_last:
-                # Check if next task is also root
+            # Logic: Add blank line if NEXT task is a root task
+            if i < len(active_tasks) - 1:
                 next_task = active_tasks[i + 1]
                 if "." not in next_task.id:
                     lines.append("")

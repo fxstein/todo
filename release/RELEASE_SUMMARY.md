@@ -1,11 +1,5 @@
-This release introduces a major architectural unification, combining the CLI and MCP server into a single `todo-ai` executable. The MCP server has been completely rewritten using the modern FastMCP framework, significantly improving maintainability and performance. A new `serve` command (`todo-ai serve`) has been added to launch the MCP server, with support for a `--root` argument to ensure correct project context awareness.
+This beta release brings significant improvements to task workflow management and cross-version compatibility. The headline feature is the new `start` and `stop` commands, which allow you to mark tasks as in-progress and track active work across sessions. When you start a task, it automatically gets tagged with `#inprogress`, and AI agents using the MCP server can now see which tasks are actively being worked on through a dedicated status prompt. This makes it easier to maintain context across multiple coding sessions and prevents duplicate work on the same tasks.
 
-Documentation and Cursor rules have been updated to reflect these changes, guiding AI agents to prefer the MCP interface over CLI commands. The release also includes comprehensive updates to the installation guides and design documentation.
+The Python CLI has been upgraded to support Python 3.14 while maintaining full backward compatibility with Python 3.10 through 3.13, ensuring the tool works across a wide range of environments. We've also fixed several important bugs that improve reliability: the `restore` command now correctly restores subtasks in the proper order and preserves their completion status, the `--root` parameter now works correctly in the Python CLI (it was previously being ignored), and test isolation has been significantly improved to prevent cross-test contamination.
 
-Key changes include:
-- Unification of CLI and MCP server into `todo-ai`
-- FastMCP integration for the MCP server
-- New `serve` command with `--root` support
-- Updated Cursor rules and documentation
-- Various bug fixes and linting improvements
-- Removed obsolete integration tests to resolve CI failures
+Behind the scenes, we've enhanced the development infrastructure with integrated `todo-ai lint` checks in pre-commit hooks and CI/CD pipelines, ensuring consistent TODO.md formatting across all contributions. The test suite now includes comprehensive parity validation between the shell script and Python CLI, with better environment isolation and more robust path resolution. These improvements make todo.ai more reliable and maintainable for both users and contributors.

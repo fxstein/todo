@@ -19,20 +19,9 @@
   - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
 
 - [ ] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting`
-  > This task aims to ensure `TODO.md` remains clean and consistent. We need to define strict rules for:
-  > - Spacing between tasks
-  > - Indentation levels
-  > - Header formats
-  > - Note formatting
-  > And ensure the tooling enforces these rules automatically.
-  > Comprehensive unit tests implemented in tests/unit/test_visual_standards.py covering all 23 test requirements. All tests pass. Implementation includes spacing, header/footer format, section separators, tag formatting, indentation, ordering, completion/archive/delete behavior, note formatting, and lint/reformat functionality.
-  > Visual standards implementation complete:
-  > - Design document: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
-  > - Implementation: FileOps formatting logic in todo_ai/core/file_ops.py
-  > - Testing: 23 unit tests in tests/unit/test_visual_standards.py (all passing)
-  > - Lint/reformat: Commands updated to detect and fix violations
-  > - Documentation: Pending (subtask #200.6)
-  > All visual standards enforced: spacing, headers, footers, separators, tags, indentation, ordering, and lifecycle operations.
+  > Design doc: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
+  > Tests: tests/unit/test_visual_standards.py (23 tests, all passing)
+  > Remaining: Documentation (subtask #200.6)
   - [x] **#200.23** Test reformat command: verify all formatting violations are auto-fixed `#reformat` `#test` (2026-01-25)
     > Covered by FileOps.write_tasks() auto-formatting which applies all visual standards on every write
   - [x] **#200.22** Test lint command: verify all formatting violations are detected `#linting` `#test` (2026-01-25)
@@ -438,19 +427,6 @@
 ---
 
 ## Archived Tasks
-- [x] **#209** Tell at least 3 funny jokes `#test` (2026-01-25)
-  - [x] **#209.6** What do you call fake spaghetti? An impasta! `#joke` `#test` (2026-01-25)
-    > The joke plays on the word 'imposter' (someone pretending to be something they're not) combined with 'pasta' to create 'impasta' - fake pasta that's pretending to be real spaghetti.
-  - [x] **#209.5** Why don't scientists trust atoms? Because they make up everything! `#joke` `#test` (2026-01-25)
-    > This is a play on words. Atoms are the fundamental building blocks of matter - they literally 'make up' everything in the physical sense. But 'make up' also means to fabricate or lie, so the joke suggests atoms are untrustworthy because they invent things.
-  - [x] **#209.4** I invented a new word! Plagiarism! `#joke` `#test` (2026-01-25)
-    > The humor comes from the fact that 'plagiarism' itself is a real word meaning to copy someone else's work and claim it as your own. By claiming to have 'invented' the word plagiarism, the speaker is ironically demonstrating plagiarism - they didn't invent it, they're just using an existing word.
-  - [x] **#209.3** I told my wife she was drawing her eyebrows too high. She looked surprised. `#joke` `#test` (2026-01-25)
-    > This is visual wordplay. When someone draws their eyebrows too high on their face, they look perpetually surprised. So when the speaker says 'she looked surprised' in response to the criticism, it's because her eyebrows are positioned in a way that makes her look surprised - not because she was emotionally surprised by the comment.
-  - [x] **#209.2** Parallel lines have so much in common. It’s a shame they’ll never meet. `#joke` `#test` (2026-01-25)
-    > In geometry, parallel lines run alongside each other at the same distance forever but never intersect or 'meet'. The joke uses this mathematical fact as a metaphor for two things that are similar but will never come together, making it sound tragic or poetic when it's just a geometric property.
-  - [x] **#209.1** Why did the scarecrow win an award? Because he was outstanding in his field! `#joke` `#test` (2026-01-25)
-    > This is a double meaning joke. 'Outstanding in his field' is a common phrase meaning excellent or exceptional at what you do. But a scarecrow literally stands out in a field - that's its job. So the scarecrow won an award for being exceptional, but also because it physically stands in a field.
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -595,6 +571,19 @@
   - [x] **#207.2** Analyze test fixture setup (test_env_shell vs python_env directories) `#bug` (2026-01-25)
   - [x] **#207.1** Investigate why Python CLI doesn't modify TODO.md in parity tests `#bug` (2026-01-25)
     > Root cause identified: Python CLI doesn't respect subprocess cwd parameter. FileOps(todo_path="TODO.md") resolves relative to Python process cwd, not the subprocess cwd. Solutions: (A) Add --root parameter to test commands, (B) Set TODO_AI_ROOT env var, (C) Pass absolute paths in tests, (D) Make FileOps resolve relative to os.getcwd() at runtime. Option B (env var) is cleanest - similar to our TODO_AI_TESTING fix.
+- [x] **#209** Tell at least 3 funny jokes `#test` (2026-01-25)
+  - [x] **#209.6** What do you call fake spaghetti? An impasta! `#joke` `#test` (2026-01-25)
+    > The joke plays on the word 'imposter' (someone pretending to be something they're not) combined with 'pasta' to create 'impasta' - fake pasta that's pretending to be real spaghetti.
+  - [x] **#209.5** Why don't scientists trust atoms? Because they make up everything! `#joke` `#test` (2026-01-25)
+    > This is a play on words. Atoms are the fundamental building blocks of matter - they literally 'make up' everything in the physical sense. But 'make up' also means to fabricate or lie, so the joke suggests atoms are untrustworthy because they invent things.
+  - [x] **#209.4** I invented a new word! Plagiarism! `#joke` `#test` (2026-01-25)
+    > The humor comes from the fact that 'plagiarism' itself is a real word meaning to copy someone else's work and claim it as your own. By claiming to have 'invented' the word plagiarism, the speaker is ironically demonstrating plagiarism - they didn't invent it, they're just using an existing word.
+  - [x] **#209.3** I told my wife she was drawing her eyebrows too high. She looked surprised. `#joke` `#test` (2026-01-25)
+    > This is visual wordplay. When someone draws their eyebrows too high on their face, they look perpetually surprised. So when the speaker says 'she looked surprised' in response to the criticism, it's because her eyebrows are positioned in a way that makes her look surprised - not because she was emotionally surprised by the comment.
+  - [x] **#209.2** Parallel lines have so much in common. It’s a shame they’ll never meet. `#joke` `#test` (2026-01-25)
+    > In geometry, parallel lines run alongside each other at the same distance forever but never intersect or 'meet'. The joke uses this mathematical fact as a metaphor for two things that are similar but will never come together, making it sound tragic or poetic when it's just a geometric property.
+  - [x] **#209.1** Why did the scarecrow win an award? Because he was outstanding in his field! `#joke` `#test` (2026-01-25)
+    > This is a double meaning joke. 'Outstanding in his field' is a common phrase meaning excellent or exceptional at what you do. But a scarecrow literally stands out in a field - that's its job. So the scarecrow won an award for being exceptional, but also because it physically stands in a field.
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.
@@ -1452,4 +1441,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 21:21:03
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 21:53:00

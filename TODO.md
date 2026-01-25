@@ -22,11 +22,17 @@
   > - Header formats
   > - Note formatting
   > And ensure the tooling enforces these rules automatically.
+  - [ ] **#200.7** Run one-time migration on this repository's TODO.md to align with new standards `#migration`
+    > Execute `reformat` command on TODO.md after implementation is complete. Verify no data loss.
   - [ ] **#200.6** Document enhanced formatting behaviors and standards `#documentation`
+    > Update user documentation to reflect new strict formatting and visual standards.
   - [ ] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer`
+    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for auto-fix rules. Must preserve data while fixing structure.
   - [ ] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting`
-  - [ ] **#200.3** Ensure all operations (add, modify, etc.) preserve the new formatting standards `#code` `#test`
+    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for validation rules (indentation, spacing, headers).
+  - [ ] **#200.3** Implement `FileOps` formatting logic and update mutation commands to strictly adhere to standards `#code` `#test`
     > Updated design doc with requirement: All mutation commands must produce compliant output to avoid linting/reformatting cycles.
+    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md. Includes updating FileOps class and all mutation commands (add, modify, complete, delete, archive, move).
   - [x] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
     > See docs/design/TODO_MD_VISUAL_STANDARDS.md for initial assessment and draft standards.
     > Updated design doc with Header (v3.0 update) and Footer (placeholder) requirements.

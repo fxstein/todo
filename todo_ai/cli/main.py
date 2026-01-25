@@ -402,13 +402,14 @@ def version_long():
 
 
 @cli.command("serve")
+@click.option("--root", help="Root directory for the project")
 @click.pass_context
-def serve(ctx):
+def serve(ctx, root):
     """Start the MCP server over stdio."""
     from todo_ai.mcp.server import run_server
 
-    # Use the root from global options or default to current directory
-    root_path = ctx.obj.get("root") or "."
+    # Use the root from command option, global option, or default to current directory
+    root_path = root or ctx.obj.get("root") or "."
 
     # Run the server
     run_server(root_path)

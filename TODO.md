@@ -14,6 +14,14 @@
   > - Avoids "project" terminology.
   > - Provides zero-friction context retrieval.
   > - Replaces task #201.13 (deleted).
+  > Added `stop` command to scope (subtasks #201.15 - #201.19).
+  > - Allows removing `#inprogress` tag without completing the task.
+  > - Mirrors `start` command functionality.
+  - [ ] **#201.19** Document `stop` command usage `#documentation`
+  - [ ] **#201.18** Add tests for `stop` command `#test`
+  - [ ] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp`
+  - [ ] **#201.16** Implement `stop` command in CLI `#cli` `#code`
+  - [ ] **#201.15** Design and implement `stop` command to remove  tag without completing task `#design` `#feature` `#inprogress`
   - [ ] **#201.14** Design `get_active_tasks` tool (or `get_status`) instead of overloading `list_tasks` `#design` `#mcp`
   - [ ] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp`
   - [ ] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`

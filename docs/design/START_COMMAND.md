@@ -15,10 +15,13 @@ The `start` command allows users (and agents) to explicitly mark a task as "in p
      * Task status must be `PENDING`. (Cannot start a completed or archived task without restoring it first).
      * If task already has `#inprogress` tag, operation is idempotent (success, no change).
 
-2. **Stop Command (Optional/Future):**
+2. **Stop Command:**
    * **CLI:** `todo-ai stop <task_id>`
    * **MCP:** `stop_task(task_id)`
    * **Action:** Removes the `#inprogress` tag.
+   * **Validation:**
+     * Task must exist.
+     * If task does not have `#inprogress` tag, operation is idempotent (success, no change).
 
 3. **Tag Lifecycle (Automatic Removal):**
    * The `#inprogress` tag represents *current* activity. It should be removed when the task transitions to a non-active state.
@@ -48,24 +51,31 @@ The `start` command allows users (and agents) to explicitly mark a task as "in p
   * Add `#inprogress` tag if missing.
   * Save.
 
+* **`stop_task(task_id)` function:**
+  * Load task.
+  * Remove `#inprogress` tag if present.
+  * Save.
+
 * **Lifecycle Hooks:**
   * Modify `complete_task`, `archive_task`, `delete_task` to strip `#inprogress` tag before state change.
 
 ### 2. CLI Implementation (`todo_ai/cli/commands/task.py`)
 
 * Add `start_command` using `click`.
-* Calls core `start_task` logic.
+* Add `stop_command` using `click`.
+* Calls core logic.
 
 ### 3. MCP Implementation (`todo_ai/mcp/server.py`)
 
 * **Tools:**
   * Add `start_task` tool.
-  * Add `get_active_tasks` tool (wraps `list_tasks(tag="#inprogress")` logic but with better formatting).
+  * Add `stop_task` tool.
+  * Add `get_active_tasks` tool.
 * **Prompts:**
   * Add `active_context` prompt.
 
 ### 4. Tests
 
-* Unit tests for `start_task` logic.
+* Unit tests for `start_task` and `stop_task` logic.
 * Integration tests for lifecycle (start -> complete -> verify tag removed).
 * Verify `get_active_tasks` returns correct tasks.

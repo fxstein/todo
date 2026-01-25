@@ -9,12 +9,6 @@
   - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
   - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
   - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
-- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
-  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
-  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`
-  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
-  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
-  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
 - [ ] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting`
   > This task aims to ensure `TODO.md` remains clean and consistent. We need to define strict rules for:
   > - Spacing between tasks
@@ -341,6 +335,12 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
+- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python` (2026-01-25)
+  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation` (2026-01-25)
+  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test` (2026-01-25)
+  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies` (2026-01-25)
+  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd` (2026-01-25)
+  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.

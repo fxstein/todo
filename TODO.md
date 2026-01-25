@@ -49,10 +49,6 @@
   - [ ] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp`
 - [ ] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp`
   > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
-- [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python`
-  > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
-  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test`
-  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix`
 - [ ] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature`
   > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
   - [ ] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules`
@@ -356,14 +352,10 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
-- [x] **#195** Fix bug: Archiving a task does not archive its subtasks `#bug` `#critical` (2026-01-25)
-  > Decision: Archiving a task should ALWAYS archive its subtasks. We will not add an extra --with-subtasks option; instead, we will change the default behavior of archive_command to include subtasks automatically. This aligns with user expectations that archiving a parent implies archiving its children.
-  > Status: Fix implemented (default with_subtasks=True), but verification test failed due to unexpected ordering of archived tasks.
-  > Issue: Archived subtask (1.1) appears BEFORE parent (1) in 'Recently Completed', while we expected parent first.
-  > Action: Pausing work on #195 to fix the underlying ordering inconsistency in #188 first. We will return to verify #195 once ordering is deterministic and correct.
-  - [x] **#195.3** Verify fix with regression test `#test` (2026-01-25)
-  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix` (2026-01-25)
-  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test` (2026-01-25)
+- [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python` (2026-01-25)
+  > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
+  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test` (2026-01-25)
+  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -378,6 +370,14 @@
   - [x] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation` (2026-01-25)
   - [x] **#192.7** Release beta version with unified executable for testing `#release` (2026-01-25)
 - [x] **#194** Hello World Test Task `#test` (2026-01-25)
+- [x] **#195** Fix bug: Archiving a task does not archive its subtasks `#bug` `#critical` (2026-01-25)
+  > Decision: Archiving a task should ALWAYS archive its subtasks. We will not add an extra --with-subtasks option; instead, we will change the default behavior of archive_command to include subtasks automatically. This aligns with user expectations that archiving a parent implies archiving its children.
+  > Status: Fix implemented (default with_subtasks=True), but verification test failed due to unexpected ordering of archived tasks.
+  > Issue: Archived subtask (1.1) appears BEFORE parent (1) in 'Recently Completed', while we expected parent first.
+  > Action: Pausing work on #195 to fix the underlying ordering inconsistency in #188 first. We will return to verify #195 once ordering is deterministic and correct.
+  - [x] **#195.3** Verify fix with regression test `#test` (2026-01-25)
+  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix` (2026-01-25)
+  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test` (2026-01-25)
 - [x] **#197** Verify MCP server reload with ordering test `#mcp` `#test` (2026-01-25)
   - [x] **#197.2** Second subtask (should be at top) `#test` (2026-01-25)
   - [x] **#197.1** First subtask (should be at bottom) `#test` (2026-01-25)

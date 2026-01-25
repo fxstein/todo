@@ -639,7 +639,7 @@ class FileOps:
         archived_tasks.sort(
             key=lambda t: (
                 t.archived_at if t.archived_at else datetime.min,
-                -int(t.id.split(".")[0]) if t.id.split(".")[0].isdigit() else 0,
+                [int(x) for x in t.id.split(".")] if t.id.split(".")[0].isdigit() else [0],
             ),
             reverse=True,
         )
@@ -648,7 +648,7 @@ class FileOps:
         deleted_tasks.sort(
             key=lambda t: (
                 t.deleted_at if t.deleted_at else datetime.min,
-                -int(t.id.split(".")[0]) if t.id.split(".")[0].isdigit() else 0,
+                [int(x) for x in t.id.split(".")] if t.id.split(".")[0].isdigit() else [0],
             ),
             reverse=True,
         )

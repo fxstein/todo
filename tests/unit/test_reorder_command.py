@@ -119,3 +119,59 @@ def test_reorder_preserves_notes(test_todo_file):
     # Check notes are still attached (immediately following their task)
     assert lines[idx_1_2 + 1].strip() == "> Note for 1.2"
     assert lines[idx_1_1 + 1].strip() == "> Note for 1.1"
+
+
+def test_reorder_numerical_sorting(test_todo_file):
+    """Test that subtask IDs are sorted numerically, not alphabetically.
+
+    Bug: String sorting causes 1.10 to appear before 1.2 (alphabetical).
+    Fix: Should sort numerically so 1.11, 1.10, 1.9, ..., 1.2, 1.1 (newest first).
+    """
+    # Setup: Create tasks with IDs that would sort differently if treated as strings
+    Path(test_todo_file).write_text(
+        """# TODO
+
+## Tasks
+
+- [ ] **#1** Parent task with many subtasks
+  - [ ] **#1.1** First subtask
+  - [ ] **#1.10** Tenth subtask (would be 2nd alphabetically)
+  - [ ] **#1.11** Eleventh subtask (would be 3rd alphabetically)
+  - [ ] **#1.12** Twelfth subtask (would be 4th alphabetically)
+  - [ ] **#1.2** Second subtask (would be 5th alphabetically)
+  - [ ] **#1.3** Third subtask
+  - [ ] **#1.9** Ninth subtask
+
+## Recently Completed
+
+## Deleted Tasks
+""",
+        encoding="utf-8",
+    )
+
+    # Verify initial state (wrong alphabetical order)
+    file_ops = FileOps(test_todo_file)
+    tasks = file_ops.read_tasks()
+    assert len(tasks) == 8  # 1 parent + 7 subtasks
+    assert tasks[0].id == "1"
+    # Alphabetical order (wrong):
+    assert tasks[1].id == "1.1"
+    assert tasks[2].id == "1.10"
+    assert tasks[3].id == "1.11"
+
+    # Run reorder command
+    reorder_command(todo_path=test_todo_file)
+
+    # Verify tasks are now in correct numerical order (newest first)
+    tasks = file_ops.read_tasks()
+    assert len(tasks) == 8
+
+    # Correct numerical reverse order (newest on top):
+    assert tasks[0].id == "1"
+    assert tasks[1].id == "1.12"
+    assert tasks[2].id == "1.11"
+    assert tasks[3].id == "1.10"
+    assert tasks[4].id == "1.9"
+    assert tasks[5].id == "1.3"
+    assert tasks[6].id == "1.2"
+    assert tasks[7].id == "1.1"

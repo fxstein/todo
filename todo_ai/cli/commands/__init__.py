@@ -499,7 +499,11 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
             if parent_index != -1:
                 final_tasks = (
                     tasks_without_subtasks[: parent_index + 1]
-                    + sorted(restored_subtasks, key=lambda t: t.id, reverse=True)
+                    + sorted(
+                        restored_subtasks,
+                        key=lambda t: [int(x) for x in t.id.split(".")],
+                        reverse=True,
+                    )
                     + tasks_without_subtasks[parent_index + 1 :]
                 )
                 file_ops.write_tasks(final_tasks)

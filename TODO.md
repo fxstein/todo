@@ -9,7 +9,7 @@
   - [ ] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
   - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
   - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
-- [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` `#inprogress`
+- [x] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature`
   > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
   > - Avoids "project" terminology.
   > - Provides zero-friction context retrieval.
@@ -17,7 +17,7 @@
   > Added `stop` command to scope (subtasks #201.15 - #201.19).
   > - Allows removing `#inprogress` tag without completing the task.
   > - Mirrors `start` command functionality.
-  - [ ] **#201.19** Document `stop` command usage `#documentation`
+  - [x] **#201.19** Document `stop` command usage `#documentation`
   - [x] **#201.18** Add tests for `stop` command `#test`
   - [x] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp`
   - [x] **#201.16** Implement `stop` command in CLI `#cli` `#code`
@@ -27,7 +27,7 @@
   - [x] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
   - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
   - [x] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research`
-  - [ ] **#201.8** Document start command and usage `#documentation`
+  - [x] **#201.8** Document start command and usage `#documentation`
   - [x] **#201.7** Create tests for start command and tag lifecycle `#test`
   - [x] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp`
   - [x] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic`

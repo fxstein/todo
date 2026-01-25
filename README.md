@@ -144,6 +144,12 @@ This installs one unified command: `todo-ai`.
 - **CLI Usage:** `todo-ai [command]` (e.g., `todo-ai add "Task"`)
 - **MCP Server:** `todo-ai serve` (used by Cursor/Claude)
 
+### Task Management
+
+- **Start:** `todo-ai start <task_id>` marks a task as in-progress.
+- **Stop:** `todo-ai stop <task_id>` stops progress on a task.
+- **Complete:** `todo-ai complete <task_id>` marks a task as done.
+
 ### Linting and Reordering
 
 Keep your TODO list clean and organized:

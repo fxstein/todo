@@ -41,13 +41,55 @@ def test_restore_subtasks_reproduction(tmp_path, capsys):
     tasks = file_ops.read_tasks()
     manager = TaskManager(tasks)
 
-    # Parent should be pending
-    assert manager.get_task("1").status == TaskStatus.PENDING
+    # Parent should be COMPLETED (since it was archived)
+    assert manager.get_task("1").status == TaskStatus.COMPLETED
 
-    # Subtask SHOULD be pending, but bug causes it to remain archived
-    # We assert the CORRECT behavior here to fail until fixed
-    assert manager.get_task("1.1").status == TaskStatus.PENDING, (
+    # Subtask SHOULD be COMPLETED (since it was archived)
+    assert manager.get_task("1.1").status == TaskStatus.COMPLETED, (
         "Subtask 1.1 should be restored with parent"
+    )
+
+
+def test_restore_subtasks_preserves_completion(tmp_path, capsys):
+    """
+    Test for #204.6: Restore should preserve completion status.
+    """
+    # Setup
+    todo_file = tmp_path / "TODO.md"
+    os.environ["TODO_FILE"] = str(todo_file)
+
+    # Create parent and subtask
+    add_command("Parent Task", ["#test"], todo_path=str(todo_file))
+    add_subtask_command("1", "Subtask 1", ["#test"], todo_path=str(todo_file))
+
+    # Complete subtask
+    from todo_ai.cli.main import complete_command
+
+    complete_command(["1.1"], todo_path=str(todo_file))
+
+    # Verify initial state
+    file_ops = FileOps(str(todo_file))
+    tasks = file_ops.read_tasks()
+    manager = TaskManager(tasks)
+    assert manager.get_task("1").status == TaskStatus.PENDING
+    assert manager.get_task("1.1").status == TaskStatus.COMPLETED
+
+    # Archive parent (should archive subtask too)
+    archive_command(["1"], todo_path=str(todo_file))
+
+    # Restore parent
+    restore_command("1", todo_path=str(todo_file))
+
+    # Verify final state
+    tasks = file_ops.read_tasks()
+    manager = TaskManager(tasks)
+
+    # Parent should be COMPLETED (since it was archived and we treat archived tasks as completed)
+    assert manager.get_task("1").status == TaskStatus.COMPLETED
+
+    # Subtask should be COMPLETED (not PENDING)
+    assert manager.get_task("1.1").status == TaskStatus.COMPLETED, (
+        "Subtask 1.1 should preserve COMPLETED status after restore"
     )
 
 
@@ -79,7 +121,8 @@ def test_restore_subtasks_idempotency(tmp_path, capsys):
     # Verify broken state
     tasks = file_ops.read_tasks()
     manager = TaskManager(tasks)
-    assert manager.get_task("1").status == TaskStatus.PENDING
+    # Parent is COMPLETED because we called restore() manually on it
+    assert manager.get_task("1").status == TaskStatus.COMPLETED
     assert manager.get_task("1.1").status == TaskStatus.ARCHIVED
 
     # Run restore command again on parent
@@ -88,7 +131,7 @@ def test_restore_subtasks_idempotency(tmp_path, capsys):
     # Verify fixed state
     tasks = file_ops.read_tasks()
     manager = TaskManager(tasks)
-    assert manager.get_task("1").status == TaskStatus.PENDING
-    assert manager.get_task("1.1").status == TaskStatus.PENDING, (
+    assert manager.get_task("1").status == TaskStatus.COMPLETED
+    assert manager.get_task("1.1").status == TaskStatus.COMPLETED, (
         "Subtask 1.1 should be restored by idempotent run"
     )

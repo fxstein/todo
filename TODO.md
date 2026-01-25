@@ -3,7 +3,7 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
-- [ ] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix` `#inprogress`
+- [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix`
   > Requirement: `restore_command` should be idempotent and self-healing.
   > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.
   > Reopening task #204 to fix ordering bug in restore.
@@ -13,7 +13,7 @@
   > - Issue: `restore_command` currently resets task status to `PENDING`. This is incorrect.
   > - Requirement: `restore_command` should ONLY move the task (and subtasks) back to the "Tasks" section. It must PRESERVE the completion status (`[x]` or `[ ]`).
   > - This allows restoring a completed task tree without losing the completion state of subtasks.
-  - [ ] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix`
+  - [x] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix`
   - [ ] **#204.1** Create reproduction test case for restore subtask failure `#test`
   - [ ] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix`
   - [ ] **#204.3** Verify fix with regression test `#test`

@@ -32,8 +32,8 @@ def test_task_status_changes():
 
     # Restore
     task.restore()
-    assert task.status == TaskStatus.PENDING
-    assert task.completed_at is None
+    assert task.status == TaskStatus.COMPLETED
+    assert task.completed_at is not None
     assert task.archived_at is None
 
 
@@ -109,7 +109,7 @@ def test_manager_operations(task_manager):
 
     # Restore
     task_manager.restore_task(task.id)
-    assert task.status == TaskStatus.PENDING
+    assert task.status == TaskStatus.COMPLETED
 
     # Delete
     task_manager.delete_task(task.id)

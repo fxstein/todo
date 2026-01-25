@@ -87,10 +87,19 @@ class Task:
         self.remove_tag(IN_PROGRESS_TAG)
 
     def restore(self) -> None:
-        """Restore task to pending status."""
-        self.status = TaskStatus.PENDING
-        self.completed_at = None
+        """Restore task to pending status, preserving completion status if applicable."""
+        # Only reset to PENDING if it was DELETED or ARCHIVED (and not previously completed)
+        # If it was completed before archiving, we want to keep it completed but move it back to Tasks section.
+
+        # Check if completed_at is set (meaning it was completed before archiving)
+        # Note: mark_archived preserves completed_at if it was already set
+        if self.completed_at:
+            self.status = TaskStatus.COMPLETED
+        else:
+            self.status = TaskStatus.PENDING
+
         self.archived_at = None
+        self.deleted_at = None
         self.updated_at = datetime.now()
 
 
@@ -207,6 +216,8 @@ class TaskManager:
         if task.status != TaskStatus.COMPLETED:
             raise ValueError(f"Task {task_id} is not completed, cannot undo")
 
+        # Explicitly clear completed_at to ensure it goes back to PENDING
+        task.completed_at = None
         task.restore()
         return task
 

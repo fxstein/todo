@@ -3,16 +3,29 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
-- [ ] **#199** Enhance `archive_command` to enforce parent-child grouping in archive section `#archive` `#enhancement`
+- [ ] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting`
+  > This task aims to ensure `TODO.md` remains clean and consistent. We need to define strict rules for:
+  > - Spacing between tasks
+  > - Indentation levels
+  > - Header formats
+  > - Note formatting
+  > And ensure the tooling enforces these rules automatically.
+  - [ ] **#200.6** Document enhanced formatting behaviors and standards `#documentation`
+  - [ ] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer`
+  - [ ] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting`
+  - [ ] **#200.3** Ensure all operations (add, modify, etc.) preserve the new formatting standards `#code` `#test`
+  - [ ] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
+  - [ ] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation`
+- [x] **#199** Enhance `archive_command` to enforce parent-child grouping in archive section `#archive` `#enhancement`
   > Scenario to test:
   > 1. Parent #1 is already archived (at bottom of file).
   > 2. Subtask #1.1 is active (at top of file).
   > 3. Run `archive 1.1`.
   > 4. Result: #1.1 should move to bottom of file, immediately after #1.
   > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
-  - [ ] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test`
+  - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test`
   - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code`
-- [ ] **#198** Enhance linting to detect and fix out-of-order subtasks `#feature` `#linting`
+- [x] **#198** Enhance linting to detect and fix out-of-order subtasks `#feature` `#linting`
   > Goal: Enforce the "newest on top" rule for subtasks, matching the behavior we recently fixed in task creation (#188).
   > Current fixers:
   > - `reformat_command`: Fixes indentation and checkboxes.
@@ -20,7 +33,7 @@
   > We should likely add the reordering logic to `reformat_command` (optional or default?) or a new fixer. Given it changes content order, it should probably be part of `--reformat`.
   > Decision: Create a separate `reorder_command` (CLI: `reorder`) instead of overloading `reformat`.
   > Reasoning: Reordering changes content structure significantly, whereas reformat is cosmetic (indentation/checkboxes). Users should opt-in to reordering explicitly.
-  - [ ] **#198.4** Update documentation to reflect new linting capabilities `#documentation`
+  - [x] **#198.4** Update documentation to reflect new linting capabilities `#documentation`
   - [x] **#198.3** Add unit tests for subtask ordering detection and fixing `#test`
   - [x] **#198.2** Implement `reorder_command` as a separate fixer for subtask ordering (distinct from `reformat_command`) `#code`
   - [x] **#198.1** Update `lint_command` to detect subtasks that violate reverse-chronological order (newest on top) `#code`
@@ -58,13 +71,6 @@
   - [ ] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp`
   - [ ] **#193.6** Add unit and integration tests for 'start' command `#test`
   - [ ] **#193.7** Update documentation with 'start' command usage `#documentation`
-  - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp`
-  - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation`
-  - [x] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation`
-  - [x] **#192.4** Implement `--root` argument support for MCP server (via `serve` command) `#code` `#implementation`
-  - [x] **#192.5** Add test cases for `serve` command and argument parsing `#test`
-  - [x] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation`
-  - [x] **#192.7** Release beta version with unified executable for testing `#release`
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
   - [ ] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp`
@@ -388,6 +394,13 @@
   - [ ] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test`
 ## Recently Completed
 - [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor` (2026-01-25)
+  - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp` (2026-01-25)
+  - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation` (2026-01-25)
+  - [x] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation` (2026-01-25)
+  - [x] **#192.4** Implement `--root` argument support for MCP server (via `serve` command) `#code` `#implementation` (2026-01-25)
+  - [x] **#192.5** Add test cases for `serve` command and argument parsing `#test` (2026-01-25)
+  - [x] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation` (2026-01-25)
+  - [x] **#192.7** Release beta version with unified executable for testing `#release` (2026-01-25)
 - [x] **#194** Hello World Test Task `#test` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)

@@ -117,10 +117,12 @@ def delete_task(task_id: str, with_subtasks: bool = False) -> str:
 
 
 @mcp.tool()
-def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = False) -> str:
+def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = True) -> str:
     """Archive a task (move to Recently Completed section)."""
-    # Note: archive_command doesn't support with_subtasks yet in CLI signature used here
-    return _capture_output(archive_command, [task_id], reason, todo_path=CURRENT_TODO_PATH)
+    # Note: archive_command supports with_subtasks (defaults to True)
+    return _capture_output(
+        archive_command, [task_id], reason, with_subtasks, todo_path=CURRENT_TODO_PATH
+    )
 
 
 @mcp.tool()

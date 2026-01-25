@@ -26,14 +26,6 @@
   - [ ] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation`
   - [ ] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd`
   - [ ] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure`
-- [x] **#195** Fix bug: Archiving a task does not archive its subtasks `#bug` `#critical`
-  > Decision: Archiving a task should ALWAYS archive its subtasks. We will not add an extra --with-subtasks option; instead, we will change the default behavior of archive_command to include subtasks automatically. This aligns with user expectations that archiving a parent implies archiving its children.
-  > Status: Fix implemented (default with_subtasks=True), but verification test failed due to unexpected ordering of archived tasks.
-  > Issue: Archived subtask (1.1) appears BEFORE parent (1) in 'Recently Completed', while we expected parent first.
-  > Action: Pausing work on #195 to fix the underlying ordering inconsistency in #188 first. We will return to verify #195 once ordering is deterministic and correct.
-  - [x] **#195.3** Verify fix with regression test `#test`
-  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix`
-  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test`
 - [ ] **#193** Implement 'start task' command to track task progress and status `#design` `#feature`
   > Key questions to answer:
   > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
@@ -364,15 +356,14 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
-- [x] **#199** Enhance `archive_command` to enforce parent-child grouping in archive section `#archive` `#enhancement` (2026-01-25)
-  > Scenario to test:
-  > 1. Parent #1 is already archived (at bottom of file).
-  > 2. Subtask #1.1 is active (at top of file).
-  > 3. Run `archive 1.1`.
-  > 4. Result: #1.1 should move to bottom of file, immediately after #1.
-  > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
-  - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test` (2026-01-25)
-  - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code` (2026-01-25)
+- [x] **#195** Fix bug: Archiving a task does not archive its subtasks `#bug` `#critical` (2026-01-25)
+  > Decision: Archiving a task should ALWAYS archive its subtasks. We will not add an extra --with-subtasks option; instead, we will change the default behavior of archive_command to include subtasks automatically. This aligns with user expectations that archiving a parent implies archiving its children.
+  > Status: Fix implemented (default with_subtasks=True), but verification test failed due to unexpected ordering of archived tasks.
+  > Issue: Archived subtask (1.1) appears BEFORE parent (1) in 'Recently Completed', while we expected parent first.
+  > Action: Pausing work on #195 to fix the underlying ordering inconsistency in #188 first. We will return to verify #195 once ordering is deterministic and correct.
+  - [x] **#195.3** Verify fix with regression test `#test` (2026-01-25)
+  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix` (2026-01-25)
+  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -402,6 +393,15 @@
   - [x] **#198.3** Add unit tests for subtask ordering detection and fixing `#test` (2026-01-25)
   - [x] **#198.2** Implement `reorder_command` as a separate fixer for subtask ordering (distinct from `reformat_command`) `#code` (2026-01-25)
   - [x] **#198.1** Update `lint_command` to detect subtasks that violate reverse-chronological order (newest on top) `#code` (2026-01-25)
+- [x] **#199** Enhance `archive_command` to enforce parent-child grouping in archive section `#archive` `#enhancement` (2026-01-25)
+  > Scenario to test:
+  > 1. Parent #1 is already archived (at bottom of file).
+  > 2. Subtask #1.1 is active (at top of file).
+  > 3. Run `archive 1.1`.
+  > 4. Result: #1.1 should move to bottom of file, immediately after #1.
+  > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
+  - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test` (2026-01-25)
+  - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.

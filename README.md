@@ -139,9 +139,10 @@ uv tool install ai-todo
 pipx install ai-todo
 ```
 
-This installs two commands:
-- `todo-ai`: The CLI tool (replaces `./todo.ai`).
-- `todo-ai-mcp`: The MCP Server for AI agents (Cursor).
+This installs one unified command: `todo-ai`.
+
+- **CLI Usage:** `todo-ai [command]` (e.g., `todo-ai add "Task"`)
+- **MCP Server:** `todo-ai serve` (used by Cursor/Claude)
 
 **Documentation:**
 - [Python Migration Guide](docs/user/PYTHON_MIGRATION_GUIDE.md) - How to upgrade from v2.x (Shell).

@@ -3,6 +3,48 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
+- [ ] **#199** Enhance `archive_command` to enforce parent-child grouping in archive section `#archive` `#enhancement`
+  > Scenario to test:
+  > 1. Parent #1 is already archived (at bottom of file).
+  > 2. Subtask #1.1 is active (at top of file).
+  > 3. Run `archive 1.1`.
+  > 4. Result: #1.1 should move to bottom of file, immediately after #1.
+  > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
+  - [ ] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test`
+  - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code`
+- [ ] **#198** Enhance linting to detect and fix out-of-order subtasks `#feature` `#linting`
+  > Goal: Enforce the "newest on top" rule for subtasks, matching the behavior we recently fixed in task creation (#188).
+  > Current fixers:
+  > - `reformat_command`: Fixes indentation and checkboxes.
+  > - `resolve_conflicts_command`: Fixes duplicate IDs.
+  > We should likely add the reordering logic to `reformat_command` (optional or default?) or a new fixer. Given it changes content order, it should probably be part of `--reformat`.
+  > Decision: Create a separate `reorder_command` (CLI: `reorder`) instead of overloading `reformat`.
+  > Reasoning: Reordering changes content structure significantly, whereas reformat is cosmetic (indentation/checkboxes). Users should opt-in to reordering explicitly.
+  - [ ] **#198.4** Update documentation to reflect new linting capabilities `#documentation`
+  - [x] **#198.3** Add unit tests for subtask ordering detection and fixing `#test`
+  - [x] **#198.2** Implement `reorder_command` as a separate fixer for subtask ordering (distinct from `reformat_command`) `#code`
+  - [x] **#198.1** Update `lint_command` to detect subtasks that violate reverse-chronological order (newest on top) `#code`
+- [x] **#197** Verify MCP server reload with ordering test `#mcp` `#test`
+  - [x] **#197.2** Second subtask (should be at top) `#test`
+  - [x] **#197.1** First subtask (should be at bottom) `#test`
+- [ ] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality`
+  > Goal: Ensure `TODO.md` integrity is enforced automatically.
+  > - Pre-commit: Fast checks (linting, formatting).
+  > - CI: Deep checks (regression tests, logic validation).
+  > This prevents bugs like the "orphaned subtasks" from slipping through.
+  - [ ] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure`
+  - [ ] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd`
+  - [ ] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation`
+  - [ ] **#196.4** Add regression test suite to CI (running `tests/integration/`) to catch logic bugs like #195 `#cicd` `#test`
+  - [ ] **#196.5** Update documentation to reflect new quality gates `#documentation`
+- [x] **#195** Fix bug: Archiving a task does not archive its subtasks `#bug` `#critical`
+  > Decision: Archiving a task should ALWAYS archive its subtasks. We will not add an extra --with-subtasks option; instead, we will change the default behavior of archive_command to include subtasks automatically. This aligns with user expectations that archiving a parent implies archiving its children.
+  > Status: Fix implemented (default with_subtasks=True), but verification test failed due to unexpected ordering of archived tasks.
+  > Issue: Archived subtask (1.1) appears BEFORE parent (1) in 'Recently Completed', while we expected parent first.
+  > Action: Pausing work on #195 to fix the underlying ordering inconsistency in #188 first. We will return to verify #195 once ordering is deterministic and correct.
+  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test`
+  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix`
+  - [x] **#195.3** Verify fix with regression test `#test`
 - [ ] **#193** Implement 'start task' command to track task progress and status `#design` `#feature`
   > Key questions to answer:
   > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
@@ -16,7 +58,6 @@
   - [ ] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp`
   - [ ] **#193.6** Add unit and integration tests for 'start' command `#test`
   - [ ] **#193.7** Update documentation with 'start' command usage `#documentation`
-- [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor`
   - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp`
   - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation`
   - [x] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation`
@@ -34,8 +75,10 @@
   - [ ] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp`
 - [ ] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp`
   > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
-- [ ] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python`
+- [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python`
   > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
+  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix`
+  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test`
 - [ ] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature`
   > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
   - [x] **#187.1** Review all cursor rules files to identify CLI command references `#cursor-rules`
@@ -344,6 +387,7 @@
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
   - [ ] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test`
 ## Recently Completed
+- [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor` (2026-01-25)
 - [x] **#194** Hello World Test Task `#test` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)

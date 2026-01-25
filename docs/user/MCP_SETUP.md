@@ -4,9 +4,13 @@
 
 ## Prerequisites
 
-- `todo-ai` installed via pipx (v3.0+).
+- `todo-ai` installed via `uv` (recommended) or `pipx` (v3.0+).
     ```bash
-    pipx install todo-ai
+    # Using uv (recommended - faster, more reliable)
+    uv tool install ai-todo
+
+    # Alternative: pipx
+    pipx install ai-todo
     ```
 - Cursor IDE (latest version).
 
@@ -14,7 +18,7 @@
 
 1. **Locate the MCP Server Command:**
 
-    If you installed via `pipx`, the command `todo-ai-mcp` should be available globally.
+    After installation, the command `todo-ai-mcp` should be available globally.
     Verify it by running:
     ```bash
     which todo-ai-mcp

@@ -21,7 +21,6 @@
 - [x] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting` (2026-01-25)
   > Design doc: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
   > Tests: tests/unit/test_visual_standards.py (23 tests, all passing)
-  > Remaining: Documentation (subtask #200.6)
   - [x] **#200.23** Test reformat command: verify all formatting violations are auto-fixed `#reformat` `#test` (2026-01-25)
     > Covered by FileOps.write_tasks() auto-formatting which applies all visual standards on every write
   - [x] **#200.22** Test lint command: verify all formatting violations are detected `#linting` `#test` (2026-01-25)
@@ -1444,4 +1443,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:02:04
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:03:36

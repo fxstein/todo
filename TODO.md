@@ -12,7 +12,7 @@
   - [ ] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation`
   - [ ] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation`
   - [ ] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design`
-  - [ ] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security`
+  - [x] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security`
   - [x] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation` (2026-01-25)
     > Analysis complete. Key findings:
     > ✅ EXISTS: mtime tracking, passive warning header, pre-commit lint

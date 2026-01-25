@@ -140,16 +140,20 @@ TODO.md currently has a **passive warning system** but **no active enforcement**
 - No feedback loop for accidental edits
 - Difficult to diagnose data inconsistencies
 
-### 5. **Lack of Edit Attribution**
+### 5. **Limited Edit Attribution**
 
 **Risk Level:** 🟡 Medium
 
-**Description:** No tracking of WHO made changes or WHEN they were made outside of Git.
+**Description:** While `.todo.ai/.todo.ai.log` captures *what* changed (Action, User, Task ID), it lacks context on *how* the change was made (Interface: Shell, CLI, MCP).
+
+**Current State:**
+- Logs exist: `TIMESTAMP | USER | ACTION | TASK_ID | DESCRIPTION`
+- Missing context: No distinction between `./todo.ai` (Shell), `todo-ai` (CLI), or MCP tool usage.
+- Gap: Cannot easily trace if an edit came from an automated agent (MCP) or manual CLI usage.
 
 **Implications:**
-- Cannot determine if edit was intentional vs accidental
-- No audit trail for debugging
-- Difficult to identify source of corruption
+- Harder to debug agent behavior vs user actions.
+- "Manual" edits (text editor) leave no log trace at all (this remains a gap).
 
 ---
 
@@ -183,20 +187,21 @@ TODO.md currently has a **passive warning system** but **no active enforcement**
 
 ### Threat Actors
 
-1. **Accidental User Edit**
-   - Probability: High
-   - Intent: No malicious intent, just mistakes
-   - Example: User opens TODO.md in editor, accidentally saves changes
+1. **AI Agent Bypass (Primary Threat)**
+   - **Probability:** 🔴 Critical
+   - **Intent:** Benevolent but destructive. Agents often bypass the MCP server/CLI to perform "quick fixes" using primitive file editing tools.
+   - **Impact:** High data destruction risk. Agents may delete sections, corrupt formatting, or hallucinate task states when editing raw text.
+   - **Example:** Agent uses `sed` or `write_file` to modify a task, accidentally deleting the "Archived" section or corrupting the header.
 
-2. **Agent Bypass**
-   - Probability: Medium
-   - Intent: Agent tries to work around todo-ai limitations
-   - Example: Agent directly edits file to "fix" perceived issue
+2. **Accidental User Edit**
+   - **Probability:** High
+   - **Intent:** No malicious intent, just mistakes.
+   - **Example:** User opens TODO.md in editor, accidentally saves changes or resolves a merge conflict incorrectly.
 
 3. **Malicious Tampering**
-   - Probability: Low
-   - Intent: Deliberate corruption or sabotage
-   - Example: Disgruntled contributor manipulates task data
+   - **Probability:** Low
+   - **Intent:** Deliberate corruption or sabotage.
+   - **Example:** Disgruntled contributor manipulates task data.
 
 ### Failure Modes
 
@@ -217,6 +222,53 @@ TODO.md currently has a **passive warning system** but **no active enforcement**
 
 ---
 
+## Research Findings (Task #210.2)
+
+### 1. Hashing Strategy
+- **Algorithm:** SHA-256 is the industry standard for file integrity. It is fast, secure, and widely supported in Python's `hashlib`.
+- **Normalization:** To ensure cross-platform consistency (Windows CRLF vs Unix LF), file content **MUST** be normalized before hashing.
+  - **Recommendation:** Read file as text, normalize newlines to `\n`, encode to UTF-8, then hash.
+  - **Why:** Prevents false positives when a file is checked out on Windows but was committed on Linux.
+
+### 2. Storage Location
+- **Option A:** `.todo.ai/checksum` (Plain text file containing hash)
+  - Pros: Simple, easy to debug, atomic writes.
+  - Cons: Another file to manage.
+- **Option B:** Inside `.todo.ai/config.toml` or similar
+  - Pros: Consolidated config.
+  - Cons: Parsing overhead, risk of config corruption during write.
+- **Recommendation:** **Option A (`.todo.ai/checksum`)**. It isolates the integrity mechanism from configuration. If the checksum file is missing/corrupt, it's a clear signal of tampering or fresh install.
+
+### 3. Verification Workflow
+1. **Read:** `FileOps` reads `TODO.md`.
+2. **Hash:** Calculate SHA-256 of current content (normalized).
+3. **Compare:** Read stored hash from `.todo.ai/checksum`.
+4. **Result:**
+   - **Match:** Proceed normally.
+   - **Mismatch:** Raise `TamperError`.
+   - **Missing Checksum:** Treat as first run or "unverified state" (warn user, generate new hash).
+
+### 4. User Experience & Recovery
+When `TamperError` occurs, the CLI/MCP must handle it gracefully.
+- **CLI Prompt:**
+  ```text
+  ⚠️  External modification detected in TODO.md!
+  The file matches neither the last known state nor the expected format.
+
+  [A]ccept changes (Update checksum to match current file)
+  [D]iff (Show changes vs last known state - requires keeping a backup)
+  [C]ancel (Abort command)
+  ```
+- **MCP Behavior:**
+  - Since MCP is often headless/agent-driven, it should probably **fail with a clear error message** requiring human intervention or a specific "force" flag to proceed. Agents should not blindly accept tampering.
+
+### 5. Performance Impact
+- **Hashing:** SHA-256 on a 1MB file (approx 20k lines of text) takes < 5ms in Python.
+- **I/O:** One extra small file read (`.todo.ai/checksum`).
+- **Conclusion:** Negligible performance impact.
+
+---
+
 ## Recommendations
 
 ### Immediate Actions (High Priority)
@@ -227,7 +279,7 @@ TODO.md currently has a **passive warning system** but **no active enforcement**
    - Provide options: (a) Continue, (b) Review diff, (c) Abort
 
 2. **Implement Checksum Verification**
-   - Store SHA-256 hash of TODO.md in `.todo.ai/`
+   - Store SHA-256 hash of TODO.md in `.todo.ai/checksum`
    - Verify on each read operation
    - Alert on mismatch
 
@@ -242,9 +294,9 @@ TODO.md currently has a **passive warning system** but **no active enforcement**
    - Highlight suspicious changes (ID modifications, status flips)
 
 2. **Tamper-Evident Logging**
-   - Log all file modifications with timestamps
-   - Track operations vs external edits
-   - Enable forensic analysis
+   - **Enhance `.todo.ai.log`:** Add "Interface" column (Shell/CLI/MCP) to track *source* of changes.
+   - **Log External Edits:** When "Force" is used or external edit accepted, log it explicitly in `.todo.ai.log`.
+   - **Forensics:** Enable better auditing of Agent vs Human actions.
 
 3. **Recovery Mechanism**
    - Store snapshots of known-good states
@@ -282,7 +334,7 @@ TODO.md currently has a **passive warning system** but **no active enforcement**
 TODO.md is currently **vulnerable to undetected tampering**. While the system has basic structural preservation (FileStructureSnapshot) and formatting validation (lint), it lacks **active content integrity verification** and **user warnings**.
 
 **Next Steps:**
-1. Proceed to **task #210.2** (Research best practices)
+1. Proceed to **task #210.2** (Research best practices) - **COMPLETED**
 2. Design solution based on this analysis (**task #210.3**)
 3. Implement detection and warning system (**task #210.4**)
 

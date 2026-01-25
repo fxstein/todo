@@ -27,7 +27,7 @@ from todo_ai.cli.utility_ops import (
 from todo_ai.core.config import Config
 from todo_ai.core.coordination import CoordinationManager
 from todo_ai.core.file_ops import FileOps
-from todo_ai.core.task import Task, TaskManager
+from todo_ai.core.task import Task, TaskManager, TaskStatus
 
 # Global file_ops cache to preserve relationships across operations
 _file_ops_cache: dict[str, FileOps] = {}
@@ -443,6 +443,53 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
         file_ops.write_tasks(reordered_tasks)
 
         print(f"Restored task #{task.id} to Tasks section")
+
+        # Idempotent/Self-healing restore: Check for missing subtasks and restore them
+        # This handles cases where a previous restore failed or was incomplete
+        subtasks = manager.get_subtasks(task_id)
+        restored_subtasks = []
+        for subtask in subtasks:
+            if subtask.status != TaskStatus.PENDING:
+                # Subtask is not pending (likely archived/deleted), restore it
+                subtask.restore()
+                restored_subtasks.append(subtask)
+
+        if restored_subtasks:
+            # Re-write tasks to save restored subtasks
+            # We need to re-fetch the list to ensure correct order
+            all_tasks = manager.list_tasks()
+            # Ensure parent is still at top (it should be)
+            # Subtasks should follow parent naturally in the list or be reordered by `reorder` command later
+            # But for now, we just save the state.
+            # Ideally, we should insert subtasks after parent.
+            # But `write_tasks` preserves order.
+            # If subtasks were archived, they might be at the bottom (Recently Completed).
+            # We need to move them to be after the parent.
+
+            # Let's use the same logic as `add_subtask` to insert them after parent
+            # But we have multiple subtasks.
+            # Simplest approach: Filter out restored subtasks, then insert them after parent.
+
+            # 1. Remove restored subtasks from their current position
+            tasks_without_subtasks = [t for t in all_tasks if t not in restored_subtasks]
+
+            # 2. Find parent index
+            parent_index = -1
+            for i, t in enumerate(tasks_without_subtasks):
+                if t.id == task_id:
+                    parent_index = i
+                    break
+
+            # 3. Insert subtasks after parent
+            if parent_index != -1:
+                final_tasks = (
+                    tasks_without_subtasks[: parent_index + 1]
+                    + sorted(restored_subtasks, key=lambda t: t.id)
+                    + tasks_without_subtasks[parent_index + 1 :]
+                )
+                file_ops.write_tasks(final_tasks)
+                print(f"  Also restored {len(restored_subtasks)} subtask(s)")
+
     except ValueError as e:
         print(f"Error: {e}")
         import sys

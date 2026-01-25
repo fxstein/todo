@@ -3,13 +3,13 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
-- [ ] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix` `#inprogress`
+- [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix`
   > Requirement: `restore_command` should be idempotent and self-healing.
   > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.
-  - [ ] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix`
-  - [ ] **#204.3** Verify fix with regression test `#test`
-  - [ ] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix`
-  - [ ] **#204.1** Create reproduction test case for restore subtask failure `#test`
+  - [x] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix`
+  - [x] **#204.3** Verify fix with regression test `#test`
+  - [x] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix`
+  - [x] **#204.1** Create reproduction test case for restore subtask failure `#test`
 - [ ] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
   > Reopening to restore legacy Python support (3.10-3.13).
   > - Requirement: Keep 3.10+ support.

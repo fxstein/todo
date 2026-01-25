@@ -3,6 +3,12 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
+- [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
+  - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
+  - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
+  - [ ] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design`
+  - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
+  - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
 - [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix`
   > Requirement: `restore_command` should be idempotent and self-healing.
   > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.

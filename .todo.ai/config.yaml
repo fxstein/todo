@@ -20,3 +20,7 @@ conflict_resolution:
 display:
   show_prefix: false
   user_reference_style: number-only
+
+# Security settings
+security:
+  tamper_proof: true

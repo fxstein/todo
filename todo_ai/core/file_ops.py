@@ -173,13 +173,17 @@ class FileOps:
         relationship_pattern = re.compile(r"^([0-9\.]+):([a-z-]+):(.+)$")
 
         # Sections that contain tasks
-        TASK_SECTIONS = {"Tasks", "Recently Completed", "Deleted Tasks"}
+        TASK_SECTIONS = {"Tasks", "Recently Completed", "Archived Tasks", "Deleted Tasks"}
         in_relationships_section = False
         in_metadata_section = False
         in_metadata_section = False
 
         for line in lines:
             line_stripped = line.strip()
+
+            # Ignore separator lines
+            if line_stripped == "---":
+                continue
 
             # Check for single # Tasks section (common format)
             single_section_match = single_section_pattern.match(line)
@@ -305,7 +309,9 @@ class FileOps:
                 # Parse archive date if present: (YYYY-MM-DD) at end of description
                 archived_at = None
                 archive_date_match = re.search(r" \(([0-9]{4}-[0-9]{2}-[0-9]{2})\)$", description)
-                if archive_date_match and current_section == "Recently Completed":
+                if archive_date_match and (
+                    current_section == "Recently Completed" or current_section == "Archived Tasks"
+                ):
                     try:
                         archived_at = datetime.strptime(archive_date_match.group(1), "%Y-%m-%d")
                         # Remove date from description
@@ -319,7 +325,10 @@ class FileOps:
                 status = TaskStatus.PENDING
                 completed_at = None
                 if completed_char.lower() == "x":
-                    if current_section == "Recently Completed":
+                    if (
+                        current_section == "Recently Completed"
+                        or current_section == "Archived Tasks"
+                    ):
                         status = TaskStatus.ARCHIVED
                         # Fix for #204: Treat archived tasks as completed for restore purposes
                         # We use archived_at as completed_at if available, or current time
@@ -445,7 +454,7 @@ class FileOps:
         single_section_pattern = re.compile(r"^#\s+Tasks\s*$")
 
         # Sections that contain tasks
-        TASK_SECTIONS = {"Tasks", "Recently Completed", "Deleted Tasks"}
+        TASK_SECTIONS = {"Tasks", "Recently Completed", "Archived Tasks", "Deleted Tasks"}
         current_section = "Header"
         seen_tasks_section = False
         in_relationships_section = False
@@ -455,6 +464,10 @@ class FileOps:
 
         for line_idx, line in enumerate(lines):
             line_stripped = line.strip()
+
+            # Ignore separator lines
+            if line_stripped == "---":
+                continue
 
             # Check for single # Tasks section
             single_section_match = single_section_pattern.match(line)
@@ -492,7 +505,7 @@ class FileOps:
                             if next_line.strip() == "":
                                 blank_after_tasks_header = True
                         tasks_in_section = []  # Reset for Tasks section
-                    elif section_name == "Recently Completed":
+                    elif section_name == "Recently Completed" or section_name == "Archived Tasks":
                         # Check if there's a blank line before this section (after Tasks)
                         if current_section == "Tasks" and tasks_in_section:
                             if line_idx > 0 and lines[line_idx - 1].strip() == "":
@@ -641,30 +654,20 @@ class FileOps:
         if snapshot is None:
             raise ValueError("Structure snapshot must be available for generation")
 
-        # 1. Header (use snapshot)
-        if snapshot.header_lines:
-            lines.extend(snapshot.header_lines)
-            if lines and lines[-1].strip() != "":
-                lines.append("")
-        elif snapshot.has_original_header:
-            # Default header if file had one originally
-            lines.extend(
-                [
-                    "# todo.ai ToDo List",
-                    "",
-                    "> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**",
-                    "",
-                ]
-            )
-            if lines and lines[-1].strip() != "":
-                lines.append("")
+        # 1. Header (Enforced Standard)
+        lines.extend(
+            [
+                "# todo.ai ToDo List",
+                "",
+                "> ⚠️ **MANAGED FILE**: Do not edit manually. Use `todo-ai` (CLI/MCP) or `todo.ai` to manage tasks.",
+                "",
+            ]
+        )
 
-        # 2. Tasks Section - Phase 13: Always use snapshot (no fallback)
-        if snapshot is None:
-            raise ValueError("Structure snapshot must be available for generation")
-        tasks_header = snapshot.tasks_header_format
-        lines.append(tasks_header)
-        if snapshot.blank_after_tasks_header and active_tasks:
+        # 2. Tasks Section
+        lines.append("## Tasks")
+        # Enforce blank line after header if there are tasks
+        if active_tasks:
             lines.append("")
 
         def format_task(t: Task) -> str:
@@ -682,12 +685,16 @@ class FileOps:
             else:
                 checkbox = " "
 
-            indent = "  " * (t.id.count("."))
+            # Strict indentation: 0, 2, 4 spaces
+            indent_level = t.id.count(".")
+            if indent_level > 2:
+                indent_level = 2  # Max depth 2 (3 levels)
+            indent = "  " * indent_level
 
             # Format description with tags
             description = t.description
             if t.tags:
-                # Tags may or may not have leading # - preserve as-is
+                # Tags must be wrapped in backticks
                 tag_str = " ".join(
                     [f"`{tag}`" if tag.startswith("#") else f"`#{tag}`" for tag in sorted(t.tags)]
                 )
@@ -695,43 +702,47 @@ class FileOps:
 
             line = f"{indent}- [{checkbox}] **#{t.id}** {description}"
 
-            # Add deletion metadata for deleted tasks (shell script format)
+            # Add completed date for completed tasks
+            if t.status == TaskStatus.COMPLETED and t.completed_at:
+                completed_date = t.completed_at.strftime("%Y-%m-%d")
+                line += f" ({completed_date})"
+
+            # Add deletion metadata for deleted tasks
             if t.status == TaskStatus.DELETED and t.deleted_at and t.expires_at:
                 delete_date = t.deleted_at.strftime("%Y-%m-%d")
                 expire_date = t.expires_at.strftime("%Y-%m-%d")
                 line += f" (deleted {delete_date}, expires {expire_date})"
 
             for note in t.notes:
-                line += f"\n{indent}  > {note}"
+                # Strict note formatting: indent + 2 spaces + > + space
+                note_indent = indent + "  "
+                line += f"\n{note_indent}> {note}"
             return line
 
-        # Add tasks
-        # Phase 13: Always use snapshot for blank lines between tasks
-        if snapshot is None:
-            raise ValueError("Structure snapshot must be available for generation")
-        blank_between_tasks = snapshot.blank_between_tasks
-
-        # Phase 12: Generate tasks with interleaved content insertion
+        # Add active tasks
         for i, t in enumerate(active_tasks):
             lines.append(format_task(t))
-            # Phase 13: Insert interleaved content if any (preserves user comments/notes)
+            # Insert interleaved content if any
             if t.id in snapshot.interleaved_content:
                 lines.extend(snapshot.interleaved_content[t.id])
-            # Add blank line between tasks if snapshot indicates
-            if blank_between_tasks and i < len(active_tasks) - 1:
-                lines.append("")
 
-        # Add blank line after Tasks section if there are tasks AND other sections exist
-        if (
-            snapshot.blank_after_tasks_section
-            and active_tasks
-            and (archived_tasks or deleted_tasks)
-        ):
-            lines.append("")
+            # Spacing Rules:
+            # Root tasks: 1 blank line between them
+            # Subtasks: 0 blank lines (handled by not adding one here)
+            is_root = "." not in t.id
+            is_last = i == len(active_tasks) - 1
+            if is_root and not is_last:
+                # Check if next task is also root
+                next_task = active_tasks[i + 1]
+                if "." not in next_task.id:
+                    lines.append("")
 
-        # 3. Recently Completed Section
+        # 3. Archived Tasks Section
         if archived_tasks:
-            lines.append("## Recently Completed")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
+            lines.append("## Archived Tasks")
             for t in archived_tasks:
                 task_line = format_task(t)
                 # Add archive date if present (shell script format)
@@ -741,17 +752,19 @@ class FileOps:
                     if "\n" in task_line:
                         # Has notes - insert date before first note line
                         parts = task_line.split("\n", 1)
-                        task_line = f"{parts[0]} ({archive_date})\n{parts[1]}"
+                        # Check if date already exists (e.g. completed date)
+                        if f"({archive_date})" not in parts[0]:
+                            task_line = f"{parts[0]} ({archive_date})\n{parts[1]}"
                     else:
-                        task_line = f"{task_line} ({archive_date})"
+                        if f"({archive_date})" not in task_line:
+                            task_line = f"{task_line} ({archive_date})"
                 lines.append(task_line)
-            lines.append("")
 
         # 4. Deleted Tasks Section
         if deleted_tasks:
-            # Add blank line before Deleted Tasks section if Recently Completed section exists
-            if archived_tasks and lines and lines[-1].strip() != "":
-                lines.append("")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
             lines.append("## Deleted Tasks")
             for t in deleted_tasks:
                 lines.append(format_task(t))
@@ -759,8 +772,9 @@ class FileOps:
         # 5. Task Metadata Section (if relationships exist or section was present)
         metadata_lines_to_use = snapshot.metadata_lines
         if self.relationships or metadata_lines_to_use:
-            if lines[-1].strip() != "":
-                lines.append("")
+            lines.append("")
+            lines.append("---")
+            lines.append("")
             # If we have relationships, write them
             if self.relationships:
                 # Check if metadata section header exists in preserved lines
@@ -785,12 +799,13 @@ class FileOps:
                 if metadata_lines_to_use:
                     lines.extend(metadata_lines_to_use)
 
-        # 6. Footer (use snapshot)
-        footer_lines_to_use = snapshot.footer_lines
-        if footer_lines_to_use:
-            # Ensure spacing
-            if lines[-1].strip() != "":
-                lines.append("")
-            lines.extend(footer_lines_to_use)
+        # 6. Footer (Enforced Standard)
+        lines.extend(
+            [
+                "",
+                "---",
+                f"**todo-ai (mcp)** v3.0.0 | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            ]
+        )
 
         return "\n".join(lines) + "\n"

@@ -355,10 +355,12 @@ def test_generate_markdown_uses_snapshot(tmp_path):
     # Generate markdown using snapshot
     generated = ops._generate_markdown(tasks, snapshot)
 
-    # Verify snapshot structure is used
-    assert "# Custom Header" in generated
+    # Verify standard header is used (enforced)
+    assert "# todo.ai ToDo List" in generated
+    assert "⚠️ **MANAGED FILE**" in generated
     assert "## Tasks" in generated
-    assert "**Footer**" in generated
+    # Footer format changed
+    assert "**todo-ai (mcp)**" in generated
     # Verify interleaved content is inserted
     assert "# Comment between tasks" in generated
     # Verify it appears between tasks

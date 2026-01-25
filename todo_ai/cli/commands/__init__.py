@@ -398,14 +398,14 @@ def archive_command(
     with_subtasks: bool = True,  # Default to True for archive
     todo_path: str = "TODO.md",
 ):
-    """Move task(s) to Recently Completed section."""
+    """Move task(s) to Archived Tasks section."""
     manager = get_manager(todo_path)
 
     # Expand task IDs (with subtasks by default)
     expanded_ids = expand_task_ids(task_ids, with_subtasks, todo_path)
 
     archived_count = 0
-    # Process in reverse order so parent ends up on top (newest) in Recently Completed
+    # Process in reverse order so parent ends up on top (newest) in Archived Tasks
     for task_id in reversed(expanded_ids):
         try:
             task = manager.archive_task(task_id)
@@ -423,7 +423,7 @@ def archive_command(
 
 
 def restore_command(task_id: str, todo_path: str = "TODO.md"):
-    """Restore task from Deleted or Recently Completed to active Tasks."""
+    """Restore task from Deleted or Archived Tasks to active Tasks."""
 
     manager = get_manager(todo_path)
     try:
@@ -464,7 +464,7 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
             # But for now, we just save the state.
             # Ideally, we should insert subtasks after parent.
             # But `write_tasks` preserves order.
-            # If subtasks were archived, they might be at the bottom (Recently Completed).
+            # If subtasks were archived, they might be at the bottom (Archived Tasks).
             # We need to move them to be after the parent.
 
             # Let's use the same logic as `add_subtask` to insert them after parent
@@ -747,7 +747,7 @@ def lint_command(todo_path: str = "TODO.md"):
         if line_stripped == "## Tasks":
             in_tasks = True
             skip_line = False
-        elif line_stripped == "## Recently Completed":
+        elif line_stripped == "## Archived Tasks" or line_stripped == "## Recently Completed":
             in_tasks = False
             skip_line = True
         elif line_stripped == "## Deleted Tasks":
@@ -756,6 +756,9 @@ def lint_command(todo_path: str = "TODO.md"):
         elif line_stripped.startswith("## "):
             in_tasks = False
             skip_line = True
+        elif line_stripped == "---":
+            # Ignore separators
+            continue
 
         if skip_line:
             continue
@@ -778,14 +781,8 @@ def lint_command(todo_path: str = "TODO.md"):
                 # If we are in a subtask block (same parent)
                 if last_parent_id == current_parent_id:
                     # Check if current subtask number is smaller than previous (should be descending)
-                    # Wait, we want reverse chronological: 1.2 then 1.1
-                    # So current (1.2) should be > previous (1.1)? No.
-                    # If we read top to bottom:
-                    # Line 1: 1.2
-                    # Line 2: 1.1
-                    # Previous was 1.2 (2), Current is 1.1 (1). 1 < 2. Correct.
-                    # If we see 1.1 then 1.2:
-                    # Previous 1.1 (1), Current 1.2 (2). 2 > 1. Incorrect.
+                    # Reverse chronological: 1.2 then 1.1
+                    # So current (1.1) should be < previous (1.2).
 
                     if last_sub_num is not None and current_sub_num > last_sub_num:
                         print(
@@ -829,7 +826,7 @@ def lint_command(todo_path: str = "TODO.md"):
         if line_stripped == "## Tasks":
             in_tasks = True
             skip_line = False
-        elif line_stripped == "## Recently Completed":
+        elif line_stripped == "## Archived Tasks" or line_stripped == "## Recently Completed":
             in_tasks = False
             skip_line = True
         elif line_stripped == "## Deleted Tasks":
@@ -838,6 +835,8 @@ def lint_command(todo_path: str = "TODO.md"):
         elif line_stripped.startswith("## "):
             in_tasks = False
             skip_line = True
+        elif line_stripped == "---":
+            continue
 
         if skip_line:
             continue
@@ -872,7 +871,7 @@ def lint_command(todo_path: str = "TODO.md"):
         if line_stripped == "## Tasks":
             in_tasks = True
             skip_line = False
-        elif line_stripped == "## Recently Completed":
+        elif line_stripped == "## Archived Tasks" or line_stripped == "## Recently Completed":
             in_tasks = False
             skip_line = True
         elif line_stripped == "## Deleted Tasks":
@@ -881,6 +880,8 @@ def lint_command(todo_path: str = "TODO.md"):
         elif line_stripped.startswith("## "):
             in_tasks = False
             skip_line = True
+        elif line_stripped == "---":
+            continue
 
         if skip_line:
             continue
@@ -902,7 +903,7 @@ def lint_command(todo_path: str = "TODO.md"):
         if line_stripped == "## Tasks":
             in_tasks = True
             skip_line = False
-        elif line_stripped == "## Recently Completed":
+        elif line_stripped == "## Archived Tasks" or line_stripped == "## Recently Completed":
             in_tasks = False
             skip_line = True
         elif line_stripped == "## Deleted Tasks":
@@ -911,6 +912,8 @@ def lint_command(todo_path: str = "TODO.md"):
         elif line_stripped.startswith("## "):
             in_tasks = False
             skip_line = True
+        elif line_stripped == "---":
+            continue
 
         if skip_line:
             continue
@@ -948,7 +951,7 @@ def lint_command(todo_path: str = "TODO.md"):
         if line_stripped == "## Tasks":
             in_tasks = True
             skip_line = False
-        elif line_stripped == "## Recently Completed":
+        elif line_stripped == "## Archived Tasks" or line_stripped == "## Recently Completed":
             in_tasks = False
             skip_line = True
         elif line_stripped == "## Deleted Tasks":
@@ -957,6 +960,8 @@ def lint_command(todo_path: str = "TODO.md"):
         elif line_stripped.startswith("## "):
             in_tasks = False
             skip_line = True
+        elif line_stripped == "---":
+            continue
 
         if skip_line:
             continue
@@ -995,103 +1000,22 @@ def reformat_command(dry_run: bool = False, todo_path: str = "TODO.md"):
     """Apply formatting fixes (with --dry-run option)."""
     if dry_run:
         print("🔍 DRY RUN: Showing what would be fixed...")
-    else:
-        print("🔧 Applying formatting fixes...")
-    print("")
-
-    todo_file = Path(todo_path)
-    if not todo_file.exists():
-        print(f"Error: {todo_path} not found")
+        # For dry run, we can't easily show diffs without generating the file
+        # So we'll just say we would reformat
+        print("  🔄 Would reformat TODO.md to enforce standards (indentation, spacing, headers)")
+        print("  💡 Run './todo.ai --reformat' to apply these fixes")
         return
 
-    fixes_applied = 0
+    print("🔧 Applying formatting fixes...")
 
-    # Fix indentation issues
-    print("📋 Fixing indentation:")
-    indent_fixes = 0
-
-    content = todo_file.read_text(encoding="utf-8")
-    lines = content.splitlines()
-    new_lines = []
-
-    for line in lines:
-        # Check for subtasks not indented (should start with "  -")
-        if re.match(r"^- \[.*\] \*\*#[0-9]+\.[0-9]+\*\* ", line):
-            fixed_line = f"  {line}"
-            if dry_run:
-                print(f"  🔄 Would fix: {line}")
-                print(f"  ➡️  To:        {fixed_line}")
-            else:
-                print(f"  ✅ Fixed: {line}")
-            new_lines.append(fixed_line)
-            indent_fixes += 1
-            fixes_applied += 1
-        else:
-            new_lines.append(line)
-
-    if indent_fixes == 0:
-        print("  ✅ No indentation issues found")
-    else:
-        if dry_run:
-            print(f"  📊 Would fix {indent_fixes} indentation issues")
-        else:
-            print(f"  📊 Fixed {indent_fixes} indentation issues")
-    print("")
-
-    # Fix checkbox issues
-    print("☑️  Fixing checkboxes:")
-    checkbox_fixes = 0
-
-    # Check if there are malformed checkboxes
-    has_malformed = False
-    for line in new_lines:
-        if re.search(r"\[  \]|\[   \]|\[    \]|\[\]", line):
-            has_malformed = True
-            break
-
-    if has_malformed:
-        if dry_run:
-            print("  🔄 Would fix malformed checkboxes:")
-            for i, line in enumerate(new_lines, 1):
-                if re.search(r"\[  \]|\[   \]|\[    \]|\[\]", line):
-                    print(f"    Line {i}: {line}")
-        else:
-            # Normalize checkboxes
-            normalized_lines = []
-            for line in new_lines:
-                # Fix various malformed patterns
-                fixed = re.sub(r"\[  \]", "[ ]", line)
-                fixed = re.sub(r"\[   \]", "[ ]", fixed)
-                fixed = re.sub(r"\[    \]", "[ ]", fixed)
-                fixed = re.sub(r"\[\]", "[ ]", fixed)
-                # Fix any other malformed patterns with multiple spaces
-                fixed = re.sub(r"\[[ ]+\]", "[ ]", fixed)
-                normalized_lines.append(fixed)
-            new_lines = normalized_lines
-            print("  ✅ Fixed malformed checkboxes")
-        checkbox_fixes += 1
-        fixes_applied += 1
-
-    if checkbox_fixes == 0:
-        print("  ✅ No checkbox issues found")
-    else:
-        if dry_run:
-            print(f"  📊 Would fix {checkbox_fixes} checkbox patterns")
-        else:
-            print(f"  📊 Fixed {checkbox_fixes} checkbox patterns")
-    print("")
-
-    # Write changes if not dry run
-    if not dry_run and fixes_applied > 0:
-        todo_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-
-    # Summary
-    if dry_run:
-        print("💡 Run './todo.ai --reformat' to apply these fixes")
-    elif fixes_applied > 0:
-        print(f"🎉 Applied {fixes_applied} formatting fixes to TODO.md")
-    else:
-        print("🎉 No formatting issues found - TODO.md is already properly formatted!")
+    try:
+        # Simply reading and writing through FileOps enforces all standards
+        file_ops = FileOps(todo_path)
+        tasks = file_ops.read_tasks()
+        file_ops.write_tasks(tasks)
+        print("✅ Reformatted TODO.md")
+    except Exception as e:
+        print(f"Error reformatting file: {e}")
 
 
 def reorder_command(todo_path: str = "TODO.md"):
@@ -1099,169 +1023,43 @@ def reorder_command(todo_path: str = "TODO.md"):
     print("🔧 Reordering subtasks...")
     print("")
 
-    file_ops = FileOps(todo_path)
-    file_ops.read_tasks()  # Parse relationships
+    try:
+        file_ops = FileOps(todo_path)
+        tasks = file_ops.read_tasks()
 
-    # Read file content
-    todo_file = Path(todo_path)
-    if not todo_file.exists():
-        print(f"Error: {todo_path} not found")
-        return
+        # We need to reorder subtasks in the list
+        # 1. Identify root tasks and their subtasks
+        root_tasks = []
+        subtasks_map: dict[str, list[Task]] = {}  # parent_id -> list[Task]
 
-    content = todo_file.read_text(encoding="utf-8")
-    lines = content.splitlines()
-    new_lines = []
-
-    # Track subtasks to reorder
-    # parent_to_subtasks: dict[str, list[tuple[int, str]]] = {}  # parent_id -> list of (line_num, line_content)
-    current_parent_id = None
-
-    # First pass: identify subtasks that need reordering
-    # We need to process the file line by line to preserve comments/notes
-
-    # Actually, simpler approach:
-    # 1. Parse the file into a structure that groups subtasks under parents
-    # 2. Sort the subtasks for each parent
-    # 3. Reconstruct the file content
-
-    # But we need to preserve comments, empty lines, etc.
-
-    # Let's use a block-based approach
-    # Iterate lines. If we find a subtask block, collect all subtasks.
-    # When block ends (new parent or section), sort and emit the block.
-
-    # buffer: list[str] = []
-    subtask_block: list[tuple[int, str, str]] = []  # (sub_num, line_content, full_block)
-    # full_block includes notes attached to the subtask
-
-    in_tasks = False
-    # skip_line = False
-
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-        line_stripped = line.strip()
-
-        # Detect section headers
-        if line_stripped == "## Tasks":
-            in_tasks = True
-            # skip_line = False
-            new_lines.append(line)
-            i += 1
-            continue
-        elif line_stripped.startswith("## "):
-            in_tasks = False
-            # skip_line = True
-            # Flush any pending subtask block
-            if subtask_block:
-                # Sort descending by subtask number
-                subtask_block.sort(key=lambda x: x[0], reverse=True)
-                for _, _, block in subtask_block:
-                    new_lines.append(block)
-                subtask_block = []
-            new_lines.append(line)
-            i += 1
-            continue
-
-        if not in_tasks:
-            new_lines.append(line)
-            i += 1
-            continue
-
-        # Check for parent task
-        parent_match = re.match(r"^- \[.*\] \*\*#([0-9]+)\*\* ", line)
-        if parent_match:
-            # Flush previous subtask block if any
-            if subtask_block:
-                subtask_block.sort(key=lambda x: x[0], reverse=True)
-                for _, _, block in subtask_block:
-                    new_lines.append(block)
-                subtask_block = []
-
-            new_lines.append(line)
-            current_parent_id = parent_match.group(1)
-            i += 1
-            continue
-
-        # Check for subtask
-        subtask_match = re.match(r"^  - \[.*\] \*\*#([0-9]+)\.([0-9]+)\*\* ", line)
-        if subtask_match:
-            parent_id = subtask_match.group(1)
-            sub_num = int(subtask_match.group(2))
-
-            # If this subtask belongs to the current parent, collect it
-            if parent_id == current_parent_id:
-                # Collect this line and any following notes/comments until next task
-                block_content = line
-                i += 1
-                while i < len(lines):
-                    next_line = lines[i]
-                    # Check if next line is a task or section header
-                    if (
-                        re.match(r"^- \[", next_line)
-                        or re.match(r"^  - \[", next_line)
-                        or next_line.strip().startswith("## ")
-                    ):
-                        break
-                    block_content += "\n" + next_line
-                    i += 1
-
-                subtask_block.append((sub_num, line, block_content))
-                continue
+        for task in tasks:
+            if "." in task.id:
+                parent_id = task.id.rsplit(".", 1)[0]
+                if parent_id not in subtasks_map:
+                    subtasks_map[parent_id] = []
+                subtasks_map[parent_id].append(task)
             else:
-                # Orphaned or mismatched subtask - just append as is
-                # Flush block first
-                if subtask_block:
-                    subtask_block.sort(key=lambda x: x[0], reverse=True)
-                    for _, _, block in subtask_block:
-                        new_lines.append(block)
-                    subtask_block = []
-                new_lines.append(line)
-                i += 1
-                continue
+                root_tasks.append(task)
 
-        # Other lines (notes for parent, empty lines, etc.)
-        # If we have a subtask block, these lines terminate it?
-        # Notes usually follow the task immediately.
-        # If we are here, it's not a parent task start, and not a subtask start.
+        # 2. Reconstruct list with sorted subtasks
+        new_task_list = []
+        for root_task in root_tasks:
+            new_task_list.append(root_task)
+            if root_task.id in subtasks_map:
+                # Sort subtasks descending by ID (newest on top)
+                sorted_subtasks = sorted(
+                    subtasks_map[root_task.id],
+                    key=lambda t: [int(x) for x in t.id.split(".")],
+                    reverse=True,
+                )
+                new_task_list.extend(sorted_subtasks)
 
-        # If we have a pending subtask block, this line might belong to the *parent* (if it's after the block)?
-        # No, subtasks come *after* parent notes.
-        # Structure:
-        # - Parent
-        #   > Note for parent
-        #   - Subtask 1
-        #     > Note for subtask 1
-        #   - Subtask 2
+        # 3. Write back
+        file_ops.write_tasks(new_task_list)
+        print("✅ Reordered subtasks (newest on top)")
 
-        # So if we are collecting subtasks, and we hit a line that is NOT a subtask start,
-        # it must be part of the last subtask's block (handled in inner loop) OR it's something else.
-
-        # Wait, the inner loop consumes notes for the subtask.
-        # So if we are back in the outer loop, `line` is either a new task/subtask (handled above)
-        # or something else.
-
-        # If `subtask_block` is populated, and we hit something else (like an empty line separating tasks),
-        # we should flush the block.
-
-        if subtask_block:
-            subtask_block.sort(key=lambda x: x[0], reverse=True)
-            for _, _, block in subtask_block:
-                new_lines.append(block)
-            subtask_block = []
-
-        new_lines.append(line)
-        i += 1
-
-    # Flush any remaining block at end of file
-    if subtask_block:
-        subtask_block.sort(key=lambda x: x[0], reverse=True)
-        for _, _, block in subtask_block:
-            new_lines.append(block)
-
-    # Write changes
-    todo_file.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
-    print("✅ Reordered subtasks (newest on top)")
+    except Exception as e:
+        print(f"Error reordering tasks: {e}")
 
 
 def resolve_conflicts_command(dry_run: bool = False, todo_path: str = "TODO.md"):

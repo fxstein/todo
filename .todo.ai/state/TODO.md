@@ -12,24 +12,6 @@
   - [ ] **#212.2** Consolidate overlapping rules and simplify `#refactor`
   - [ ] **#212.1** Audit existing rules for legacy shell/CLI references `#audit`
 
-- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
-  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
-  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
-  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
-  - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
-  - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
-  - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
-  - [x] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design` (2026-01-26)
-  - [x] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security` (2026-01-26)
-  - [x] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation` (2026-01-26)
-    > Analysis complete. Key findings:
-    > ✅ EXISTS: mtime tracking, passive warning header, pre-commit lint
-    > ❌ MISSING: Content verification (checksums/hashes), active warnings, runtime detection
-    > 🔴 CRITICAL: No detection of content tampering, status changes, or ID manipulation
-    > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
-    > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
-    > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
-
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
@@ -211,6 +193,23 @@
 ---
 
 ## Archived Tasks
+- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
+  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
+  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
+  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
+  - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
+  - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
+  - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
+  - [x] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design` (2026-01-26)
+  - [x] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security` (2026-01-26)
+  - [x] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation` (2026-01-26)
+    > Analysis complete. Key findings:
+    > ✅ EXISTS: mtime tracking, passive warning header, pre-commit lint
+    > ❌ MISSING: Content verification (checksums/hashes), active warnings, runtime detection
+    > 🔴 CRITICAL: No detection of content tampering, status changes, or ID manipulation
+    > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
+    > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
+    > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
   - [x] **#211.4** Verify fix with task #125 (has subtasks 125.1-125.13) `#verification` (2026-01-25)
     > Verified with task #125 (has 13 subtasks).
     > After running `todo-ai reorder`, subtasks now appear in correct numerical order:
@@ -1216,4 +1215,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 00:28:40
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 00:30:23

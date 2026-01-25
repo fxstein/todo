@@ -9,15 +9,15 @@
   - [ ] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design`
   - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
-- [ ] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
+- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python`
   > Reopening to restore legacy Python support (3.10-3.13).
   > - Requirement: Keep 3.10+ support.
   > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
-  - [ ] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
-  - [ ] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`
-  - [ ] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
-  - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
-  - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
+  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation`
+  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test`
+  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
+  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
+  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
   - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
   - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
@@ -350,22 +350,6 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
-- [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix` (2026-01-25)
-  > Requirement: `restore_command` should be idempotent and self-healing.
-  > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.
-  > Reopening task #204 to fix ordering bug in restore.
-  > - Issue: Restored subtasks appear in chronological order (oldest first) instead of reverse-chronological (newest first).
-  > - Fix: Ensure `restore_command` sorts subtasks correctly before inserting them.
-  > Reopening task #204 to fix `restore_command` behavior.
-  > - Issue: `restore_command` currently resets task status to `PENDING`. This is incorrect.
-  > - Requirement: `restore_command` should ONLY move the task (and subtasks) back to the "Tasks" section. It must PRESERVE the completion status (`[x]` or `[ ]`).
-  > - This allows restoring a completed task tree without losing the completion state of subtasks.
-  - [x] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix` (2026-01-25)
-  - [x] **#204.5** Fix `restore_command` to restore subtasks in correct reverse-chronological order `#bug` `#fix` (2026-01-25)
-  - [x] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix` (2026-01-25)
-  - [x] **#204.3** Verify fix with regression test `#test` (2026-01-25)
-  - [x] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix` (2026-01-25)
-  - [x] **#204.1** Create reproduction test case for restore subtask failure `#test` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -462,6 +446,22 @@
   - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#mcp` (2026-01-25)
   - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` (2026-01-25)
   - [x] **#201.13** Update `list_tasks` tool description to encourage checking  at start of chat `#code` `#mcp` (2026-01-25)
+- [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix` (2026-01-25)
+  > Requirement: `restore_command` should be idempotent and self-healing.
+  > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.
+  > Reopening task #204 to fix ordering bug in restore.
+  > - Issue: Restored subtasks appear in chronological order (oldest first) instead of reverse-chronological (newest first).
+  > - Fix: Ensure `restore_command` sorts subtasks correctly before inserting them.
+  > Reopening task #204 to fix `restore_command` behavior.
+  > - Issue: `restore_command` currently resets task status to `PENDING`. This is incorrect.
+  > - Requirement: `restore_command` should ONLY move the task (and subtasks) back to the "Tasks" section. It must PRESERVE the completion status (`[x]` or `[ ]`).
+  > - This allows restoring a completed task tree without losing the completion state of subtasks.
+  - [x] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix` (2026-01-25)
+  - [x] **#204.5** Fix `restore_command` to restore subtasks in correct reverse-chronological order `#bug` `#fix` (2026-01-25)
+  - [x] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix` (2026-01-25)
+  - [x] **#204.3** Verify fix with regression test `#test` (2026-01-25)
+  - [x] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix` (2026-01-25)
+  - [x] **#204.1** Create reproduction test case for restore subtask failure `#test` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.

@@ -26,8 +26,23 @@
   - [ ] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer`
   - [ ] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting`
   - [ ] **#200.3** Ensure all operations (add, modify, etc.) preserve the new formatting standards `#code` `#test`
-  - [ ] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
-  - [ ] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation`
+    > Updated design doc with requirement: All mutation commands must produce compliant output to avoid linting/reformatting cycles.
+  - [x] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
+    > See docs/design/TODO_MD_VISUAL_STANDARDS.md for initial assessment and draft standards.
+    > Updated design doc with Header (v3.0 update) and Footer (placeholder) requirements.
+    > Draft standards created and ready for review. See docs/design/TODO_MD_VISUAL_STANDARDS.md. Includes strict spacing, indentation, header/footer, and implementation requirements.
+    > Updated design doc with Footer requirement: Include tool variant (todo.ai, cli, mcp).
+    > Updated design doc with Tag formatting requirement: Tags must be wrapped in backticks (e.g., `#tag`).
+    > Finalized spacing rules: 1 blank line between all root tasks, 0 blank lines between subtasks.
+    > Updated Ordering section to define movement rules: Subtasks stay in place, Root tasks may move to Recently Completed.
+    > Correction: Ordering is reverse chronological (newest on top) for all sections and lists. Updated design doc.
+    > Clarified Ordering: Only 'archive' command moves root tasks to 'Recently Completed'. Simple completion keeps them in place.
+    > Renamed 'Recently Completed' section to 'Archived Tasks' to clearly distinguish between completed state (in-place) and archived location (moved).
+    > Refined Ordering section: Separated 'Completed Tasks' (in-place) and 'Archived Tasks' (moved) into distinct top-level list items.
+    > Refined Positioning section: Explicitly stated that completion is a strict in-place update with NO sorting, to minimize diffs. Archival is the only move action for completed tasks.
+    > Renamed design document to docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md to explicitly identify year and version.
+    > Design document approved. Proceeding to implementation tasks.
+  - [x] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation`
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
   - [ ] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp`
@@ -341,15 +356,6 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
-- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python` (2026-01-25)
-  > Reopening to restore legacy Python support (3.10-3.13).
-  > - Requirement: Keep 3.10+ support.
-  > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
-  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation` (2026-01-25)
-  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test` (2026-01-25)
-  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies` (2026-01-25)
-  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd` (2026-01-25)
-  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -446,6 +452,15 @@
   - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#mcp` (2026-01-25)
   - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` (2026-01-25)
   - [x] **#201.13** Update `list_tasks` tool description to encourage checking  at start of chat `#code` `#mcp` (2026-01-25)
+- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python` (2026-01-25)
+  > Reopening to restore legacy Python support (3.10-3.13).
+  > - Requirement: Keep 3.10+ support.
+  > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
+  - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation` (2026-01-25)
+  - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test` (2026-01-25)
+  - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies` (2026-01-25)
+  - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd` (2026-01-25)
+  - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration` (2026-01-25)
 - [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix` (2026-01-25)
   > Requirement: `restore_command` should be idempotent and self-healing.
   > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.

@@ -69,6 +69,8 @@ repos:
 
       - id: todo-ai-lint
         name: todo.ai lint
+        # EXCEPTION: We are developing todo.ai, so we must run the local source code directly.
+        # For normal projects using todo.ai, use: entry: uv run todo-ai lint
         entry: uv run python -m todo_ai.cli.main lint
         language: system
         types: [markdown]

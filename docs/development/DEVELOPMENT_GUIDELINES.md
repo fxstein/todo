@@ -132,7 +132,7 @@ git push
 
 ## File Integrity & Tamper Detection
 
-todo.ai uses a strict tamper detection system to protect `TODO.md` integrity.
+todo.ai uses a simple tamper detection system to protect `TODO.md` integrity.
 
 ### Key Concepts
 - **Checksum:** SHA-256 hash stored in `.todo.ai/state/checksum`.

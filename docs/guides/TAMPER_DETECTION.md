@@ -79,5 +79,4 @@ The system maintains a comprehensive audit trail:
 ## Best Practices
 
 - **Keep Active Mode ON** when working with AI Agents to prevent them from bypassing the toolset.
-- **Use `todo-ai edit`** if you must edit manually; the system is aware of this command (future feature).
 - **Check `todo-ai log`** to see who (or what) modified your tasks.

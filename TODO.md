@@ -3,6 +3,19 @@
 > **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
+- [ ] **#193** Implement 'start task' command to track task progress and status `#design` `#feature`
+  > Key questions to answer:
+  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
+  > 2. Should we support time tracking (start/stop)?
+  > 3. How does this interact with todo.txt format (e.g. priority changes)?
+  > 4. Should this trigger any external integrations?
+  - [ ] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research`
+  - [ ] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design`
+  - [ ] **#193.3** Create design document for 'start' command architecture `#design` `#documentation`
+  - [ ] **#193.4** Implement 'start' command in CLI `#code` `#implementation`
+  - [ ] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp`
+  - [ ] **#193.6** Add unit and integration tests for 'start' command `#test`
+  - [ ] **#193.7** Update documentation with 'start' command usage `#documentation`
 - [ ] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor`
   - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp`
   - [ ] **#192.2** Create design document for unified executable architecture `#design` `#documentation`

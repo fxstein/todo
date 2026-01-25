@@ -15,19 +15,28 @@ When reviewing new bugs and setting up tasks:
    - Examine issue details for context
 
 2. **Create task in TODO.md with issue number:**
-   ```zsh
-   ./todo.ai add "Fix issue#XX: [bug description]" "#bug"
-   ```
+   - **Preferred (MCP):** Use `add_task` tool
+     - description: "Fix issue#XX: [bug description]"
+     - tags: ["#bug"]
+   - **Fallback (CLI):**
+     ```zsh
+     todo-ai add "Fix issue#XX: [bug description]" "#bug"
+     ```
    - Always include `issue#XX` in task description (e.g., "Fix issue#25: ...")
    - Use `#bug` tag
    - Include issue number so commits can reference both task and issue
 
 3. **Add subtasks for investigation and fix:**
-   ```zsh
-   ./todo.ai add-subtask <task-id> "Investigate [component/cause]" "#bug"
-   ./todo.ai add-subtask <task-id> "Fix [specific issue]" "#bug"
-   ./todo.ai add-subtask <task-id> "Add tests for [fix verification]" "#bug"
-   ```
+   - **Preferred (MCP):** Use `add_subtask` tool
+     - parent_id: <task-id>
+     - description: "Investigate [component/cause]" (or "Fix ...", "Add tests ...")
+     - tags: ["#bug"]
+   - **Fallback (CLI):**
+     ```zsh
+     todo-ai add-subtask <task-id> "Investigate [component/cause]" "#bug"
+     todo-ai add-subtask <task-id> "Fix [specific issue]" "#bug"
+     todo-ai add-subtask <task-id> "Add tests for [fix verification]" "#bug"
+     ```
 
 4. **Format commits with both task and issue numbers:**
    - Use `task#nn` format for todo.ai task numbers (prevents GitHub auto-linking)

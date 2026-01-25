@@ -4,7 +4,17 @@ alwaysApply: true
 ---
 When creating or working with todo.ai tasks, add notes to provide implementation context. **NEVER use notes for status updates or completion summaries on parent tasks.**
 
-**Command:** `./todo.ai note <task-id> "Your note here"`
+## Adding Notes
+
+**Preferred (MCP):**
+Use the `add_note` tool:
+- task_id: <task-id>
+- note: "Your note here"
+
+**Fallback (CLI):**
+`todo-ai note <task-id> "Your note here"`
+
+## Content Guidelines
 
 **What to put in notes:**
 - Implementation details (file paths, line numbers, function names)
@@ -19,10 +29,10 @@ When creating or working with todo.ai tasks, add notes to provide implementation
 - ❌ Duplicates of subtask information that's already visible
 
 **Examples:**
-- ✅ `./todo.ai note 42 "Modify archive_task() lines 2600-2850. Pattern from delete_task() lines 2926-2935"`
-- ✅ `./todo.ai note 42.1 "Depends on task#42 completing first - needs collect_notes() function"`
-- ✅ `./todo.ai note 50 "See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for migration cleanup details"`
-- ❌ `./todo.ai note 42 "Fix it"` - Too vague, no actionable context
-- ❌ `./todo.ai note 42 "✅ #42.1 done, ✅ #42.2 done, ✅ #42.3 done"` - Status updates belong in subtasks, not notes
+- ✅ Note on task #42: "Modify archive_task() lines 2600-2850. Pattern from delete_task() lines 2926-2935"
+- ✅ Note on task #42.1: "Depends on task#42 completing first - needs collect_notes() function"
+- ✅ Note on task #50: "See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for migration cleanup details"
+- ❌ Note on task #42: "Fix it" - Too vague, no actionable context
+- ❌ Note on task #42: "✅ #42.1 done, ✅ #42.2 done, ✅ #42.3 done" - Status updates belong in subtasks, not notes
 
 **The subtasks show completion status - don't duplicate it in notes!**

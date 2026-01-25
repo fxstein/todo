@@ -1,0 +1,21 @@
+---
+description: "Task management rules for todo.ai"
+alwaysApply: true
+---
+It is required to track tasks and subtasks using todo.ai and not via built in TODO tools
+TODO.md and .todo.ai/ must always be committed together
+Always ask for user confirmation before archiving completed tasks using todo.ai
+NEVER modify TODO.md directly using sed or similar - ALWAYS use todo.ai to manipulate it.
+
+## Interface Preference
+When managing tasks, use the following preference order:
+1. **MCP Server** (v3.0+): Use MCP tools (`add_task`, `list_tasks`, `complete_task`, etc.) when available.
+2. **Python CLI** (v3.0+): Use `todo-ai [command]` if MCP is unavailable.
+3. **Shell Script** (v2.x+): Use `./todo.ai [command]` as a legacy fallback.
+
+## MCP Tool Mapping
+- Add task: `add_task(description, tags)`
+- Add subtask: `add_subtask(parent_id, description, tags)`
+- Complete: `complete_task(task_id)`
+- List: `list_tasks(status, tag)`
+- Modify: `modify_task(task_id, description, tags)`

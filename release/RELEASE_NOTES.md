@@ -1,3 +1,38 @@
+## Release 3.0.0b15
+
+This release introduces a major architectural unification, combining the CLI and MCP server into a single `todo-ai` executable. The MCP server has been completely rewritten using the modern FastMCP framework, significantly improving maintainability and performance. A new `serve` command (`todo-ai serve`) has been added to launch the MCP server, with support for a `--root` argument to ensure correct project context awareness.
+
+Documentation and Cursor rules have been updated to reflect these changes, guiding AI agents to prefer the MCP interface over CLI commands. The release also includes comprehensive updates to the installation guides and design documentation.
+
+Key changes include:
+- Unification of CLI and MCP server into `todo-ai`
+- FastMCP integration for the MCP server
+- New `serve` command with `--root` support
+- Updated Cursor rules and documentation
+- Various bug fixes and linting improvements
+
+---
+
+### ✨ Features
+
+- Unify CLI and MCP server into single executable with FastMCP ([4228a45](https://github.com/fxstein/todo.ai/commit/4228a453036c11c2ea819f1421c6407f87e9c4ee))
+
+### 🐛 Bug Fixes
+
+- Add --root option to serve command ([7f77756](https://github.com/fxstein/todo.ai/commit/7f777564e5c382512341031fdb70ba33bd9c3115))
+
+### 🔧 Other Changes
+
+- docs: Update AI release summary for unified executable beta ([bea6002](https://github.com/fxstein/todo.ai/commit/bea6002eb7fc462141418bfa8d695bc41b4d3a70))
+- docs: Add unified executable architecture design document ([ea5686a](https://github.com/fxstein/todo.ai/commit/ea5686a629de94010e942983fa4ea0bb787dac45))
+- docs: Add task #193 for 'start task' command implementation ([d9001cf](https://github.com/fxstein/todo.ai/commit/d9001cf98eba90717d1df83ce0021ebf4818f0f6))
+- style: Fix formatting in coordination.py ([c4816fa](https://github.com/fxstein/todo.ai/commit/c4816fac852d8aa70f0b3525e1ce69649bb554d2))
+- docs: Update task list with MCP migration and hardening tasks ([90f7905](https://github.com/fxstein/todo.ai/commit/90f790589fd253e18cc1c10bc5a447a64c34fde2))
+- rules: Update cursor rules to prefer MCP tools over CLI ([9012c3b](https://github.com/fxstein/todo.ai/commit/9012c3bb3c5a32be0daa3b95dc94dc7bb9be686a))
+- docs: Add MCP migration analysis and server parameters analysis ([4429458](https://github.com/fxstein/todo.ai/commit/44294585ed8d47a52c1926c5591801464defa0c5))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b14
 
 This beta release enhances release quality validation by ensuring all quality checks run on every release build. Previously, documentation and log validation were skipped on tag pushes, but now all checks execute to provide comprehensive validation.

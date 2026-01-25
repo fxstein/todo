@@ -16,14 +16,14 @@
   - [ ] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp`
   - [ ] **#193.6** Add unit and integration tests for 'start' command `#test`
   - [ ] **#193.7** Update documentation with 'start' command usage `#documentation`
-- [ ] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor`
+- [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor`
   - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp`
   - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation`
   - [x] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation`
   - [x] **#192.4** Implement `--root` argument support for MCP server (via `serve` command) `#code` `#implementation`
   - [x] **#192.5** Add test cases for `serve` command and argument parsing `#test`
   - [x] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation`
-  - [ ] **#192.7** Release beta version with unified executable for testing `#release`
+  - [x] **#192.7** Release beta version with unified executable for testing `#release`
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
   - [ ] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp`
@@ -344,6 +344,7 @@
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
   - [ ] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test`
 ## Recently Completed
+- [x] **#194** Hello World Test Task `#test` (2026-01-25)
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.

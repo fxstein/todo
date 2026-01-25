@@ -25,16 +25,20 @@
   - [ ] **#200.3** Ensure all operations (add, modify, etc.) preserve the new formatting standards `#code` `#test`
   - [ ] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
   - [ ] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation`
-- [ ] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality`
+- [x] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality`
   > Goal: Ensure `TODO.md` integrity is enforced automatically.
   > - Pre-commit: Fast checks (linting, formatting).
   > - CI: Deep checks (regression tests, logic validation).
   > This prevents bugs like the "orphaned subtasks" from slipping through.
-  - [ ] **#196.5** Update documentation to reflect new quality gates `#documentation`
-  - [ ] **#196.4** Add regression test suite to CI (running `tests/integration/`) to catch logic bugs like #195 `#cicd` `#test`
-  - [ ] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation`
-  - [ ] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd`
-  - [ ] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure`
+  - [x] **#196.5** Update documentation to reflect new quality gates `#documentation`
+  - [x] **#196.4** Add regression test suite to CI (running `tests/integration/`) to catch logic bugs like #195 `#cicd` `#test`
+  - [x] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation`
+    > Investigation results for #196.3:
+    > - `todo-ai reformat` fixes indentation and checkboxes.
+    > - It is suitable for a pre-commit hook.
+    > - Recommendation: Add as `todo-ai-reformat` hook before linting.
+  - [x] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd`
+  - [x] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure`
 - [ ] **#193** Implement 'start task' command to track task progress and status `#design` `#feature`
   > Key questions to answer:
   > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?

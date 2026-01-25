@@ -67,14 +67,13 @@ repos:
       #   pass_filenames: true
       #   files: \.(md|mdc)$
 
-      # Disabled: Requires zsh which may not be available in CI
-      # - id: todo-ai-lint
-      #   name: todo.ai lint
-      #   entry: ./todo.ai --lint
-      #   language: system
-      #   types: [markdown]
-      #   files: ^TODO\.md$
-      #   pass_filenames: false
+      - id: todo-ai-lint
+        name: todo.ai lint
+        entry: uv run todo-ai lint
+        language: system
+        types: [markdown]
+        files: ^TODO\.md$
+        pass_filenames: false
 
       - id: pytest
         name: pytest (unit tests only)

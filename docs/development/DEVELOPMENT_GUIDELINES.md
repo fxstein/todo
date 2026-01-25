@@ -74,7 +74,7 @@ git push
 - Markdownlint
 - Codespell (spelling)
 - Detect-secrets (security)
-- `todo.ai --lint` (TODO.md validation)
+- `todo-ai lint` (TODO.md validation)
 - Pytest (unit tests only - fast!)
 
 **What Runs Where:**

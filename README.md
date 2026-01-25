@@ -153,6 +153,13 @@ Keep your TODO list clean and organized:
 - **Reorder:** `todo-ai reorder` sorts subtasks in reverse-chronological order (newest on top).
 - **Resolve Conflicts:** `todo-ai resolve-conflicts` fixes duplicate task IDs.
 
+### Quality Gates
+
+todo.ai enforces quality through automated checks:
+
+- **Pre-commit:** `todo-ai lint` runs automatically on commit to block invalid TODO.md files.
+- **CI/CD:** GitHub Actions workflow verifies `TODO.md` integrity and runs regression tests.
+
 **Documentation:**
 - [Python Migration Guide](docs/user/PYTHON_MIGRATION_GUIDE.md) - How to upgrade from v2.x (Shell).
 - [MCP Setup Guide](docs/user/MCP_SETUP.md) - How to set up Cursor AI integration.

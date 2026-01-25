@@ -52,3 +52,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Local audit log (persists across checkouts)
+.todo.ai/state/audit.log

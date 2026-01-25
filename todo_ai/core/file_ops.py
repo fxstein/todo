@@ -59,6 +59,7 @@ class FileOps:
         self.checksum_path = self.state_dir / "checksum"
         self.shadow_path = self.state_dir / "TODO.md"
         self.log_path = self.config_dir / ".todo.ai.log"
+        self.audit_log_path = self.state_dir / "audit.log"
         self.tamper_mode_path = self.state_dir / "tamper_mode"
         self.interface = interface
 
@@ -181,18 +182,30 @@ class FileOps:
         return new_hash
 
     def _log_action(self, action: str, task_id: str, checksum: str, description: str = "") -> None:
-        """Log action to .todo.ai.log."""
+        """Log action to .todo.ai.log and local audit.log."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         user = os.environ.get("USER") or os.environ.get("USERNAME") or "unknown"
 
         # Format: TIMESTAMP | USER | INTERFACE | ACTION | TASK_ID | CHECKSUM | DESCRIPTION
         log_entry = f"{timestamp} | {user} | {self.interface} | {action} | {task_id} | {checksum} | {description}"
 
+        # Write to shared log (git-tracked)
         try:
             with open(self.log_path, "a", encoding="utf-8") as f:
                 f.write(log_entry + "\n")
         except Exception as e:
-            print(f"Warning: Failed to write to log: {e}")
+            print(f"Warning: Failed to write to shared log: {e}")
+
+        # Write to local audit log (untracked, persists across checkouts)
+        try:
+            # Ensure state directory exists
+            if not self.state_dir.exists():
+                self.state_dir.mkdir(parents=True, exist_ok=True)
+
+            with open(self.audit_log_path, "a", encoding="utf-8") as f:
+                f.write(log_entry + "\n")
+        except Exception as e:
+            print(f"Warning: Failed to write to audit log: {e}")
 
     def accept_tamper(self, reason: str) -> None:
         """Accept external changes and update integrity."""

@@ -9,18 +9,18 @@
   - [ ] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies`
   - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
   - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
-- [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature`
+- [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` `#inprogress`
   - [ ] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
-  - [ ] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
-  - [ ] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research`
+  - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
+  - [x] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research`
   - [ ] **#201.8** Document start command and usage `#documentation`
   - [ ] **#201.7** Create tests for start command and tag lifecycle `#test`
   - [ ] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp`
   - [ ] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic`
   - [ ] **#201.4** Implement `start` command in CLI `#cli` `#code`
-  - [ ] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#inprogress` `#logic`
-  - [ ] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#inprogress` `#mcp`
-  - [ ] **#201.1** Design `start` command to mark task as in progress with  tag `#design` `#inprogress`
+  - [x] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#inprogress` `#logic`
+  - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#inprogress` `#mcp`
+  - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` `#inprogress`
 - [ ] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting`
   > This task aims to ensure `TODO.md` remains clean and consistent. We need to define strict rules for:
   > - Spacing between tasks

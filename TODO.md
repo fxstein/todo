@@ -13,7 +13,14 @@
   - [ ] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation`
   - [ ] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design`
   - [ ] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security`
-  - [ ] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation`
+  - [x] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation` (2026-01-25)
+    > Analysis complete. Key findings:
+    > ✅ EXISTS: mtime tracking, passive warning header, pre-commit lint
+    > ❌ MISSING: Content verification (checksums/hashes), active warnings, runtime detection
+    > 🔴 CRITICAL: No detection of content tampering, status changes, or ID manipulation
+    > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
+    > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
+    > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
@@ -361,84 +368,6 @@
 ---
 
 ## Archived Tasks
-- [x] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting` (2026-01-25)
-  > Design doc: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
-  > Tests: tests/unit/test_visual_standards.py (23 tests, all passing)
-  - [x] **#200.23** Test reformat command: verify all formatting violations are auto-fixed `#reformat` `#test` (2026-01-25)
-    > Covered by FileOps.write_tasks() auto-formatting which applies all visual standards on every write
-  - [x] **#200.22** Test lint command: verify all formatting violations are detected `#linting` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestLintCommand
-    > test_lint_detects_missing_blank_line
-  - [x] **#200.21** Test full lifecycle: add → start → complete → archive → delete → restore maintains formatting `#lifecycle` `#test` (2026-01-25)
-    > Full lifecycle verified by unit and integration tests - each operation maintains formatting via FileOps
-  - [x] **#200.20** Test note formatting: verify blockquote markers and proper indentation at all nesting levels `#notes` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestNoteFormatting
-    > test_single_line_note and test_multiline_note
-  - [x] **#200.19** Test restore subtask: verify restored subtasks appear after their parent `#restore` `#test` (2026-01-25)
-    > Covered by integration tests in tests/integration/test_restore_subtasks.py and fix in restore_command
-  - [x] **#200.18** Test restore root task: verify restored root tasks appear at top of Tasks section `#restore` `#test` (2026-01-25)
-    > Covered by integration tests in tests/integration/test_restore_subtasks.py and fix in restore_command
-  - [x] **#200.17** Test delete: verify tasks move to Deleted Tasks section at top `#delete` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestDelete
-    > test_deleted_task_in_deleted_section
-  - [x] **#200.16** Test archive: verify completed tasks move to Archived Tasks section at top `#archive` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestArchive
-    > test_archived_task_in_archived_section and test_archived_tasks_in_archived_section
-  - [x] **#200.15** Test completion: verify completed tasks stay in place (not moved) `#completion` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestCompletion
-    > test_completed_task_stays_in_tasks_section
-  - [x] **#200.14** Test ordering: verify newest-on-top for both root tasks and subtasks `#ordering` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestOrdering
-    > test_root_tasks_newest_first and test_subtasks_newest_first
-  - [x] **#200.13** Test indentation: verify proper 2-space indentation for each nesting level `#indentation` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestIndentation
-    > test_subtask_indentation, test_note_indentation_for_root_task, test_note_indentation_for_subtask
-  - [x] **#200.12** Test tag formatting: verify tags are wrapped in backticks `#tags` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestTagFormatting
-    > test_tags_wrapped_in_backticks
-  - [x] **#200.11** Test section separators: verify '---' between Tasks, Archived Tasks, and Deleted Tasks sections `#sections` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestSectionSeparators
-    > test_separator_between_tasks_and_archived, test_separator_between_archived_and_deleted, test_separator_before_footer
-  - [x] **#200.10** Test footer format: verify tool variant and timestamp formatting `#footer` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestFooterFormat
-    > test_footer_contains_tool_variant, test_footer_contains_version, test_footer_contains_timestamp
-  - [x] **#200.9** Test header format: verify warning header text and MCP/CLI variant detection `#header` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestHeaderFormat
-    > test_header_contains_managed_file_warning and test_header_references_tool_variants
-  - [x] **#200.8** Test spacing rules: one blank line between root tasks, zero blank lines between subtasks `#spacing` `#test` (2026-01-25)
-    > Implemented in test_visual_standards.py::TestSpacingRules
-    > test_blank_line_between_root_tasks and test_no_blank_lines_between_subtasks
-  - [x] **#200.7** Run one-time migration on this repository's TODO.md to align with new standards `#migration` (2026-01-25)
-    > Execute `reformat` command on TODO.md after implementation is complete. Verify no data loss.
-  - [x] **#200.6** Document enhanced formatting behaviors and standards `#documentation` (2026-01-25)
-    > Updated documentation files:
-    > 1. docs/guides/GETTING_STARTED.md - Added comprehensive "TODO.md Format and Standards" section with Python CLI syntax (todo-ai)
-    > 2. docs/guides/GETTING_STARTED.md - Updated Quick Reference and command examples to use Python CLI
-    > 3. docs/guides/GETTING_STARTED.md - Added legacy shell script note for v2.x users
-    > 4. README.md - Enhanced formatting standards section with Python CLI syntax and legacy note
-  - [x] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer` (2026-01-25)
-    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for auto-fix rules. Must preserve data while fixing structure.
-  - [x] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting` (2026-01-25)
-    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for validation rules (indentation, spacing, headers).
-  - [x] **#200.3** Implement `FileOps` formatting logic and update mutation commands to strictly adhere to standards `#code` `#test` (2026-01-25)
-    > Updated design doc with requirement: All mutation commands must produce compliant output to avoid linting/reformatting cycles.
-    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md. Includes updating FileOps class and all mutation commands (add, modify, complete, delete, archive, move).
-  - [x] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers)  (2026-01-25) `#design`
-    > See docs/design/TODO_MD_VISUAL_STANDARDS.md for initial assessment and draft standards.
-    > Updated design doc with Header (v3.0 update) and Footer (placeholder) requirements.
-    > Draft standards created and ready for review. See docs/design/TODO_MD_VISUAL_STANDARDS.md. Includes strict spacing, indentation, header/footer, and implementation requirements.
-    > Updated design doc with Footer requirement: Include tool variant (todo.ai, cli, mcp).
-    > Updated design doc with Tag formatting requirement: Tags must be wrapped in backticks (e.g., `#tag`).
-    > Finalized spacing rules: 1 blank line between all root tasks, 0 blank lines between subtasks.
-    > Updated Ordering section to define movement rules: Subtasks stay in place, Root tasks may move to Recently Completed.
-    > Correction: Ordering is reverse chronological (newest on top) for all sections and lists. Updated design doc.
-    > Clarified Ordering: Only 'archive' command moves root tasks to 'Recently Completed'. Simple completion keeps them in place.
-    > Renamed 'Recently Completed' section to 'Archived Tasks' to clearly distinguish between completed state (in-place) and archived location (moved).
-    > Refined Ordering section: Separated 'Completed Tasks' (in-place) and 'Archived Tasks' (moved) into distinct top-level list items.
-    > Refined Positioning section: Explicitly stated that completion is a strict in-place update with NO sorting, to minimize diffs. Archival is the only move action for completed tasks.
-    > Renamed design document to docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md to explicitly identify year and version.
-    > Design document approved. Proceeding to implementation tasks.
-  - [x] **#200.1** Review current TODO.md format and identify inconsistencies or issues  (2026-01-25) `#investigation`
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -503,6 +432,84 @@
   > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
   - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test` (2026-01-25)
   - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code` (2026-01-25)
+- [x] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting` (2026-01-25)
+  > Design doc: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
+  > Tests: tests/unit/test_visual_standards.py (23 tests, all passing)
+  - [x] **#200.23** Test reformat command: verify all formatting violations are auto-fixed `#reformat` `#test` (2026-01-25)
+    > Covered by FileOps.write_tasks() auto-formatting which applies all visual standards on every write
+  - [x] **#200.22** Test lint command: verify all formatting violations are detected `#linting` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestLintCommand
+    > test_lint_detects_missing_blank_line
+  - [x] **#200.21** Test full lifecycle: add → start → complete → archive → delete → restore maintains formatting `#lifecycle` `#test` (2026-01-25)
+    > Full lifecycle verified by unit and integration tests - each operation maintains formatting via FileOps
+  - [x] **#200.20** Test note formatting: verify blockquote markers and proper indentation at all nesting levels `#notes` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestNoteFormatting
+    > test_single_line_note and test_multiline_note
+  - [x] **#200.19** Test restore subtask: verify restored subtasks appear after their parent `#restore` `#test` (2026-01-25)
+    > Covered by integration tests in tests/integration/test_restore_subtasks.py and fix in restore_command
+  - [x] **#200.18** Test restore root task: verify restored root tasks appear at top of Tasks section `#restore` `#test` (2026-01-25)
+    > Covered by integration tests in tests/integration/test_restore_subtasks.py and fix in restore_command
+  - [x] **#200.17** Test delete: verify tasks move to Deleted Tasks section at top `#delete` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestDelete
+    > test_deleted_task_in_deleted_section
+  - [x] **#200.16** Test archive: verify completed tasks move to Archived Tasks section at top `#archive` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestArchive
+    > test_archived_task_in_archived_section and test_archived_tasks_in_archived_section
+  - [x] **#200.15** Test completion: verify completed tasks stay in place (not moved) `#completion` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestCompletion
+    > test_completed_task_stays_in_tasks_section
+  - [x] **#200.14** Test ordering: verify newest-on-top for both root tasks and subtasks `#ordering` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestOrdering
+    > test_root_tasks_newest_first and test_subtasks_newest_first
+  - [x] **#200.13** Test indentation: verify proper 2-space indentation for each nesting level `#indentation` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestIndentation
+    > test_subtask_indentation, test_note_indentation_for_root_task, test_note_indentation_for_subtask
+  - [x] **#200.12** Test tag formatting: verify tags are wrapped in backticks `#tags` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestTagFormatting
+    > test_tags_wrapped_in_backticks
+  - [x] **#200.11** Test section separators: verify '---' between Tasks, Archived Tasks, and Deleted Tasks sections `#sections` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestSectionSeparators
+    > test_separator_between_tasks_and_archived, test_separator_between_archived_and_deleted, test_separator_before_footer
+  - [x] **#200.10** Test footer format: verify tool variant and timestamp formatting `#footer` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestFooterFormat
+    > test_footer_contains_tool_variant, test_footer_contains_version, test_footer_contains_timestamp
+  - [x] **#200.9** Test header format: verify warning header text and MCP/CLI variant detection `#header` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestHeaderFormat
+    > test_header_contains_managed_file_warning and test_header_references_tool_variants
+  - [x] **#200.8** Test spacing rules: one blank line between root tasks, zero blank lines between subtasks `#spacing` `#test` (2026-01-25)
+    > Implemented in test_visual_standards.py::TestSpacingRules
+    > test_blank_line_between_root_tasks and test_no_blank_lines_between_subtasks
+  - [x] **#200.7** Run one-time migration on this repository's TODO.md to align with new standards `#migration` (2026-01-25)
+    > Execute `reformat` command on TODO.md after implementation is complete. Verify no data loss.
+  - [x] **#200.6** Document enhanced formatting behaviors and standards `#documentation` (2026-01-25)
+    > Updated documentation files:
+    > 1. docs/guides/GETTING_STARTED.md - Added comprehensive "TODO.md Format and Standards" section with Python CLI syntax (todo-ai)
+    > 2. docs/guides/GETTING_STARTED.md - Updated Quick Reference and command examples to use Python CLI
+    > 3. docs/guides/GETTING_STARTED.md - Added legacy shell script note for v2.x users
+    > 4. README.md - Enhanced formatting standards section with Python CLI syntax and legacy note
+  - [x] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer` (2026-01-25)
+    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for auto-fix rules. Must preserve data while fixing structure.
+  - [x] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting` (2026-01-25)
+    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for validation rules (indentation, spacing, headers).
+  - [x] **#200.3** Implement `FileOps` formatting logic and update mutation commands to strictly adhere to standards `#code` `#test` (2026-01-25)
+    > Updated design doc with requirement: All mutation commands must produce compliant output to avoid linting/reformatting cycles.
+    > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md. Includes updating FileOps class and all mutation commands (add, modify, complete, delete, archive, move).
+  - [x] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design` (2026-01-25)
+    > See docs/design/TODO_MD_VISUAL_STANDARDS.md for initial assessment and draft standards.
+    > Updated design doc with Header (v3.0 update) and Footer (placeholder) requirements.
+    > Draft standards created and ready for review. See docs/design/TODO_MD_VISUAL_STANDARDS.md. Includes strict spacing, indentation, header/footer, and implementation requirements.
+    > Updated design doc with Footer requirement: Include tool variant (todo.ai, cli, mcp).
+    > Updated design doc with Tag formatting requirement: Tags must be wrapped in backticks (e.g., `#tag`).
+    > Finalized spacing rules: 1 blank line between all root tasks, 0 blank lines between subtasks.
+    > Updated Ordering section to define movement rules: Subtasks stay in place, Root tasks may move to Recently Completed.
+    > Correction: Ordering is reverse chronological (newest on top) for all sections and lists. Updated design doc.
+    > Clarified Ordering: Only 'archive' command moves root tasks to 'Recently Completed'. Simple completion keeps them in place.
+    > Renamed 'Recently Completed' section to 'Archived Tasks' to clearly distinguish between completed state (in-place) and archived location (moved).
+    > Refined Ordering section: Separated 'Completed Tasks' (in-place) and 'Archived Tasks' (moved) into distinct top-level list items.
+    > Refined Positioning section: Explicitly stated that completion is a strict in-place update with NO sorting, to minimize diffs. Archival is the only move action for completed tasks.
+    > Renamed design document to docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md to explicitly identify year and version.
+    > Design document approved. Proceeding to implementation tasks.
+  - [x] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation` (2026-01-25)
 - [x] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` (2026-01-25)
   > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
   > - Avoids "project" terminology.
@@ -1453,4 +1460,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:08:13
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:11:32

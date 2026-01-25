@@ -135,9 +135,7 @@ class CoordinationManager:
         """
         Get next task ID for a new task.
         Wrapper around generate_next_task_id that extracts current_max and stored_serial from TaskManager.
-        """
-
-        # Get current max task ID from manager
+        """  # Get current max task ID from manager
         tasks = task_manager.list_tasks()
         current_max = 0
         for task in tasks:

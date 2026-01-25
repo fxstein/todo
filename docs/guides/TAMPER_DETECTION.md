@@ -1,6 +1,6 @@
 # Tamper Detection System
 
-todo.ai includes a robust **Tamper Detection System** to ensure the integrity of your `TODO.md` file. This system protects your task data from accidental manual edits, unauthorized modifications, and corruption.
+todo.ai includes a simple **Tamper Detection System** to ensure the integrity of your `TODO.md` file. This system protects your task data from accidental manual edits, unauthorized modifications, and corruption.
 
 ## How It Works
 

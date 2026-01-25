@@ -1,32 +1,41 @@
 # todo.ai ToDo List
 
-> **⚠️ IMPORTANT: This file should ONLY be edited through the `todo.ai` script!**
+> **⚠️ IMPORTANT: This file should ONLY be modified through `todo-ai` MCP or CLI or `todo.ai` script!**
 
 ## Tasks
-- [x] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug`
-  > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
-  - [x] **#186.7** Verify release artifacts published successfully `#bug`
-    > VERIFIED: v3.0.0b13 published successfully. GitHub release created with 7 assets (whl, tar.gz, attestations, install.sh, todo.ai, todo.bash). PyPI publish completed. First successful release since v3.0.0b7.
-  - [x] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug`
-    > SUCCESS with v3.0.0b13! All jobs ran: ✓ all-tests-pass (3s), ✓ validate-release (15s), ✓ release (35s). Published to GitHub with 7 assets. Root cause: all-tests-pass had if: always() instead of if: startsWith(github.ref, 'refs/tags/v'). Fixed by matching v3.0.0b7 config exactly.
-    > CRITICAL FINDING: Fix was deployed but still failing! Tag detection works (is_tag=true confirmed in logs), all-tests-pass shows is_tag: 'true', but validate-release still skipped. Condition 'if: needs.changes.outputs.is_tag == true' present in v3.0.0b9 workflow but not evaluated correctly by GitHub Actions. Need to investigate GitHub Actions expression syntax or output type mismatch.
-  - [x] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug`
-    > COMPLETE FIX: all-tests-pass job had if: always() instead of if: startsWith(github.ref, 'refs/tags/v'). Matched v3.0.0b7 config for all three jobs (all-tests-pass, validate-release, release). Removed extra dependencies and invalid references.
-    > ACTUAL ROOT CAUSE FOUND: Debug steps referenced needs.changes but changes wasn't in needs array! GitHub Actions skips jobs with invalid dependency references. Fixed by removing ALL needs.changes references and matching v3.0.0b7 config exactly.
-    > FINAL FIX: The issue was needs: [all-tests-pass, changes] - having 'changes' dependency caused GitHub Actions to skip job. Removed 'changes' from needs array to match v3.0.0b7 (successful). Now only depends on all-tests-pass.
-    > REVISED: Job output comparison didn't work. Switched to direct GitHub context: 'if: startsWith(github.ref, 'refs/tags/v')' - same approach as v3.0.0b7 (successful). This bypasses job outputs entirely, using reliable built-in context.
-    > Restored 'if: needs.changes.outputs.is_tag == true' condition to validate-release job (line 420). This was removed in dd9a222 causing GitHub Actions to skip the job. Fix eliminates ambiguity about when job should run.
-  - [x] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug`
-    > Added comprehensive debug logging: 1) changes job - verbose tag detection with condition evaluation, 2) all-tests-pass - outputs display, 3) validate-release - full workflow context with dependencies and outputs, 4) release - dependency outputs and conditional evaluation. Future-proofed for debugging.
-    > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
-  - [x] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug`
-    > Tag detection VERIFIED working correctly. v3.0.0b8 logs show: Ref=refs/tags/v3.0.0b8, Ref type=tag, Ref name=v3.0.0b8. Both detection conditions (ref match and ref_type) work. Issue is NOT with tag detection.
-  - [x] **#186.2** Analyze is_tag output propagation through changes → validate-release → release jobs `#bug`
-    > Output chain correctly implemented but validate-release has NO if condition. GitHub Actions skips job without explicit condition. Solution: Restore 'if: needs.changes.outputs.is_tag == true' removed in dd9a222.
-  - [x] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug`
-    > Root cause: Commit dd9a222 removed job-level if condition from validate-release. Changes job outputs is_tag=true correctly, but validate-release skips entirely (no logs). Hypothesis: output not exported or GitHub Actions implicit skipping.
-    > Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
-- [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#release` `#infrastructure`
+- [ ] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor`
+  - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp`
+  - [ ] **#192.2** Create design document for unified executable architecture `#design` `#documentation`
+  - [ ] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation`
+  - [ ] **#192.4** Implement `--root` argument support for MCP server (via `serve` command) `#code` `#implementation`
+  - [ ] **#192.5** Add test cases for `serve` command and argument parsing `#test`
+  - [ ] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation`
+  - [ ] **#192.7** Release beta version with unified executable for testing `#release`
+- [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
+  > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
+  - [ ] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp`
+  - [ ] **#191.2** Investigate options for dynamic workspace root detection in MCP server `#investigation` `#mcp`
+  - [ ] **#191.3** Compare with MCP best practices for project-local configuration `#investigation` `#mcp`
+  - [ ] **#191.4** Design a clean installation process that sets up portable MCP config `#design` `#mcp`
+  - [ ] **#191.5** Implement and test the portable setup solution `#implementation` `#mcp`
+  - [ ] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp`
+- [ ] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp`
+  > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
+- [ ] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python`
+  > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
+- [ ] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature`
+  > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
+  - [x] **#187.1** Review all cursor rules files to identify CLI command references `#cursor-rules`
+  - [x] **#187.2** Update todo.ai-task-management.mdc: prefer MCP tools (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai) `#cursor-rules`
+  - [x] **#187.3** Update bug-review-workflow.mdc to use MCP tools (add_task, add_subtask) instead of CLI commands `#cursor-rules`
+  - [x] **#187.4** Update todo.ai-task-notes.mdc to use MCP note tool instead of CLI command `#cursor-rules`
+  - [x] **#187.5** Update .cursorrules file to mention MCP preference in Task Management section `#cursor-rules`
+  - [x] **#187.6** Add detection logic: prefer MCP (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai) as fallback `#cursor-rules` `#documentation`
+  - [ ] **#187.7** Update init_cursor_rules() function to include MCP preference in generated rules `#code`
+  - [ ] **#187.8** Test updated rules: verify AI agents prefer MCP when available, fallback to CLI when not `#test`
+  - [ ] **#187.9** Document version detection: MCP server (todo-ai-mcp) > Python CLI (todo-ai) > Shell script (./todo.ai) - all v3.0+ except shell script also supports v2.x `#documentation`
+  - [ ] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules`
+- [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release`
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [ ] **#172.5** Phase 5: Stable Release `#release`
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
@@ -57,11 +66,11 @@
     > Goal: Complete user-facing documentation and Cursor rules. Deliverable: Updated README, AI agent rules, testing guide, migration guide from old process
     - [x] **#172.3.8** User acceptance testing `#testing`
       > Get feedback from real users on documentation clarity. Test complete workflow from docs. Verify new users can follow beta testing guide successfully
-    - [x] **#172.3.7** Test documentation accuracy `#testing` `#documentation`
+    - [x] **#172.3.7** Test documentation accuracy `#documentation` `#testing`
       > ✅ PASS: All documentation verified. README, BETA_TESTING_GUIDE, RELEASE_PROCESS, CHANGELOG: commands correct, links valid, version formats PEP 440 compliant, examples accurate.
       > Verifying README, BETA_TESTING_GUIDE, RELEASE_PROCESS, CHANGELOG: commands, links, examples
       > Follow all installation commands in README. Verify beta testing guide steps work. Check all links and examples are correct
-    - [x] **#172.3.6** Test AI agent follows decision trees correctly `#testing` `#ai`
+    - [x] **#172.3.6** Test AI agent follows decision trees correctly `#ai` `#testing`
       > ✅ PASS: Cursor AI rules reviewed and verified. Decision trees match implementation perfectly: CI/CD checks, version bump detection, major/minor/patch logic, error handling, all safeguards present.
       > Test Cursor AI makes correct decisions for major/minor/patch releases. Verify it checks CI/CD, enforces beta for majors, shows correct error messages
     - [x] **#172.3.5** Add changelog format examples `#documentation`
@@ -70,7 +79,7 @@
       > Create guide for beta testers: how to install, what to test, how to report issues, what to expect. Include testing matrix (platforms, shells, Python versions)
     - [x] **#172.3.3** Update release process documentation `#documentation`
       > Update release/RELEASE_PROCESS.md and Cursor rules with new --beta workflow. Add examples, commands, decision trees. Document two-phase process integration
-    - [x] **#172.3.2** Add Cursor AI rules for release decision making `#documentation` `#ai`
+    - [x] **#172.3.2** Add Cursor AI rules for release decision making `#ai` `#documentation`
       > Create .cursor/rules/todo.ai-beta-releases.mdc with AI decision trees. When to use beta vs stable, error handling rules, major/minor/patch logic. See Section 4 of strategy doc
     - [x] **#172.3.1** Update README.md with simplified installation `#documentation`
       > Add Stable/Beta/Development installation sections. Primary method: uv tool. Collapse pipx/pip alternatives in <details>. Add release channels description
@@ -93,14 +102,14 @@
       > Test each validation failure scenario. Verify error messages are clear and actionable. Test edge cases
     - [x] **#172.2.4** Add beta version increment logic `#release` `#script`
       > Automatic beta numbering. Extract number from existing betas, add 1. Prevents duplicate versions. Logs decision clearly
-    - [x] **#172.2.3** Enhance error messages with remediation steps `#release` `#documentation`
+    - [x] **#172.2.3** Enhance error messages with remediation steps `#documentation` `#release`
       > Reviewing release.sh error messages for clear remediation steps
       > Add actionable remediation steps to all error messages. Pattern: Error description, what caused it, how to fix it. User-friendly language
     - [x] **#172.2.2** Add 6+ pre-flight validation checks `#release` `#validation`
       > Check: prepare state exists, CI/CD passing, no uncommitted changes, GitHub authenticated, build dependencies available, beta maturity. Clear ✅/❌ status for each with remediation
     - [x] **#172.2.1** Implement beta maturity warnings (never blocks) `#release` `#validation`
       > Find latest beta from GitHub, calculate days since published. Warn if <7 days (major) or <2 days (minor). Always proceed - warning only. Display clear message with recommendation
-  - [x] **#172.1** Phase 1: Core Beta Infrastructure `#release` `#infrastructure`
+  - [x] **#172.1** Phase 1: Core Beta Infrastructure `#infrastructure` `#release`
     > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
     > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
     - [x] **#172.1.8** Test major release blocking without beta `#testing`
@@ -110,7 +119,7 @@
       > Run prepare --beta and execute. Verify PyPI marks as pre-release. Test install: uv tool install --prerelease=allow todo-ai
     - [x] **#172.1.6** Update documentation with beta installation instructions `#documentation`
       > Add installation commands to README.md: uv tool install --prerelease=allow todo-ai. Include pipx/pip alternatives in collapsible section
-    - [x] **#172.1.5** Update GitHub Actions for simple pre-release detection `#release` `#cicd`
+    - [x] **#172.1.5** Update GitHub Actions for simple pre-release detection `#cicd` `#release`
       > Update .github/workflows/release.yml: Add regex detection (b[0-9]+$), set is_prerelease flag, single PyPI target. Reduces from ~25 to ~15 steps
     - [x] **#172.1.4** Update .prepare_state to include release_type `#release` `#script`
       > Add release_type, base_version, is_major, prepared_at, prepared_by to .prepare_state JSON. Execute phase will read all context from this file
@@ -311,13 +320,16 @@
   - [x] **#42.2** Implement bug detection and reporting logic
   - [x] **#42.1** Create design document for bug reporting feature
 - [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
-  - [x] **#35.3** Create tests directory and draft detailed test plan document `#tests` `#docs`
-  - [x] **#35.2** Define test framework architecture and tooling `#tests` `#planning`
-  - [x] **#35.1** Research todo.ai testing requirements and existing docs `#tests` `#docs`
-
-
-------------------
-
+  - [x] **#35.3** Create tests directory and draft detailed test plan document `#docs` `#tests`
+  - [x] **#35.2** Define test framework architecture and tooling `#planning` `#tests`
+  - [x] **#35.1** Research todo.ai testing requirements and existing docs `#docs` `#tests`
+  - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug`
+  - [ ] **#125.12** Test new bug report format with real GitHub issue creation `#test`
+    > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
+    > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
+    - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
+      > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
+  - [ ] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test`
 ## Recently Completed
 - [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
@@ -326,8 +338,45 @@
   - [x] **#183.3** Implement optimized CI/CD workflow changes `#infra` (2026-01-24)
   - [x] **#183.2** Design CI/CD optimization plan (path filters, tiers) `#infra` (2026-01-24)
   - [x] **#183.1** Analyze current CI/CD triggers and test matrix `#infra` (2026-01-24)
-- [x] **#185** Remove confirmation prompt when updating task notes `#feature` (2026-01-24)
 - [x] **#184** Remove confirmation prompt when deleting task notes `#feature` (2026-01-24)
+- [x] **#185** Remove confirmation prompt when updating task notes `#feature` (2026-01-24)
+- [x] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug` (2026-01-24)
+  > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
+  - [x] **#186.7** Verify release artifacts published successfully `#bug` (2026-01-24)
+    > VERIFIED: v3.0.0b13 published successfully. GitHub release created with 7 assets (whl, tar.gz, attestations, install.sh, todo.ai, todo.bash). PyPI publish completed. First successful release since v3.0.0b7.
+  - [x] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug` (2026-01-24)
+    > SUCCESS with v3.0.0b13! All jobs ran: ✓ all-tests-pass (3s), ✓ validate-release (15s), ✓ release (35s). Published to GitHub with 7 assets. Root cause: all-tests-pass had if: always() instead of if: startsWith(github.ref, 'refs/tags/v'). Fixed by matching v3.0.0b7 config exactly.
+    > CRITICAL FINDING: Fix was deployed but still failing! Tag detection works (is_tag=true confirmed in logs), all-tests-pass shows is_tag: 'true', but validate-release still skipped. Condition 'if: needs.changes.outputs.is_tag == true' present in v3.0.0b9 workflow but not evaluated correctly by GitHub Actions. Need to investigate GitHub Actions expression syntax or output type mismatch.
+  - [x] **#186.5** Based on data, implement appropriate fix (Fix #1, #2, or #3 from analysis) `#bug` (2026-01-24)
+    > COMPLETE FIX: all-tests-pass job had if: always() instead of if: startsWith(github.ref, 'refs/tags/v'). Matched v3.0.0b7 config for all three jobs (all-tests-pass, validate-release, release). Removed extra dependencies and invalid references.
+    > ACTUAL ROOT CAUSE FOUND: Debug steps referenced needs.changes but changes wasn't in needs array! GitHub Actions skips jobs with invalid dependency references. Fixed by removing ALL needs.changes references and matching v3.0.0b7 config exactly.
+    > FINAL FIX: The issue was needs: [all-tests-pass, changes] - having 'changes' dependency caused GitHub Actions to skip job. Removed 'changes' from needs array to match v3.0.0b7 (successful). Now only depends on all-tests-pass.
+    > REVISED: Job output comparison didn't work. Switched to direct GitHub context: 'if: startsWith(github.ref, 'refs/tags/v')' - same approach as v3.0.0b7 (successful). This bypasses job outputs entirely, using reliable built-in context.
+    > Restored 'if: needs.changes.outputs.is_tag == true' condition to validate-release job (line 420). This was removed in dd9a222 causing GitHub Actions to skip the job. Fix eliminates ambiguity about when job should run.
+  - [x] **#186.4** Implement Fix #4: Add debug workflow context to validate-release job `#bug` (2026-01-24)
+    > Added comprehensive debug logging: 1) changes job - verbose tag detection with condition evaluation, 2) all-tests-pass - outputs display, 3) validate-release - full workflow context with dependencies and outputs, 4) release - dependency outputs and conditional evaluation. Future-proofed for debugging.
+    > Add debug step at line 393 in validate-release job. Show github.event_name, github.ref, github.ref_type, github.ref_name, and needs.changes.outputs.is_tag value.
+  - [x] **#186.3** Verify tag detection logic in changes job (GITHUB_REF, GITHUB_REF_TYPE values) `#bug` (2026-01-24)
+    > Tag detection VERIFIED working correctly. v3.0.0b8 logs show: Ref=refs/tags/v3.0.0b8, Ref type=tag, Ref name=v3.0.0b8. Both detection conditions (ref match and ref_type) work. Issue is NOT with tag detection.
+  - [x] **#186.2** Analyze is_tag output propagation through changes → validate-release → release jobs `#bug` (2026-01-24)
+    > Output chain correctly implemented but validate-release has NO if condition. GitHub Actions skips job without explicit condition. Solution: Restore 'if: needs.changes.outputs.is_tag == true' removed in dd9a222.
+  - [x] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug` (2026-01-24)
+    > Root cause: Commit dd9a222 removed job-level if condition from validate-release. Changes job outputs is_tag=true correctly, but validate-release skips entirely (no logs). Hypothesis: output not exported or GitHub Actions implicit skipping.
+    > Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
+- [x] **#189** Verify MCP server task creation with another test task `#mcp` `#test` (2026-01-24)
+  > Why do programmers prefer dark mode? Because light attracts bugs. 🐛
+- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug` (2026-01-23)
+  > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
+  - [x] **#179.3** Implement fix and add regression test `#bug` (2026-01-23)
+  - [x] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug` (2026-01-23)
+  - [x] **#179.1** Reproduce stale summary detection in release.sh `#bug` (2026-01-23)
+- [x] **#180** Investigate missing --set-version in release.sh `#bug` (2026-01-23)
+  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
+  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
+  - [x] **#180.3** Implement change and update docs/tests `#bug` (2026-01-23)
+  - [x] **#180.2** Decide whether to add --set-version or document alternative `#bug` (2026-01-23)
+  - [x] **#180.1** Confirm supported release.sh options and expected override workflow `#bug` (2026-01-23)
+    > release.sh does not support --help; running ./release/release.sh --help returns 'Unknown option' but prints usage. Usage currently lists --prepare/--execute/--abort, --beta, --summary, --set-version, --dry-run.
 - [x] **#181** Stabilize release process (no failures) `#release` (2026-01-23)
   > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
   > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
@@ -365,42 +414,6 @@
     > Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
   - [x] **#182.1** Investigate current directory resolution & init flow `#feature` (2026-01-23)
     > Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md
-- [x] **#180** Investigate missing --set-version in release.sh `#bug` (2026-01-23)
-  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
-  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
-  - [x] **#180.3** Implement change and update docs/tests `#bug` (2026-01-23)
-  - [x] **#180.2** Decide whether to add --set-version or document alternative `#bug` (2026-01-23)
-  - [x] **#180.1** Confirm supported release.sh options and expected override workflow `#bug` (2026-01-23)
-    > release.sh does not support --help; running ./release/release.sh --help returns 'Unknown option' but prints usage. Usage currently lists --prepare/--execute/--abort, --beta, --summary, --set-version, --dry-run.
-- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug` (2026-01-23)
-  > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
-  - [x] **#179.3** Implement fix and add regression test `#bug` (2026-01-23)
-  - [x] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug` (2026-01-23)
-  - [x] **#179.1** Reproduce stale summary detection in release.sh `#bug` (2026-01-23)
-- [x] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug` (2026-01-17)
-  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
-  - [x] **#178.3** Add tests for multiple parents/subtasks `#bug` (2026-01-17)
-  - [x] **#178.2** Fix subtask insertion to correct parent `#bug` (2026-01-17)
-  - [x] **#178.1** Investigate subtask placement logic `#bug` (2026-01-17)
-- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure` (2026-01-17)
-  - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure` (2026-01-17)
-  - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure` (2026-01-17)
-  - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure` (2026-01-17)
-- [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure` (2026-01-17)
-- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure` (2026-01-17)
-  - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure` (2026-01-17)
-  - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure` (2026-01-17)
-  - [x] **#175.1** Add pre-commit hook to detect forbidden flags `#infrastructure` (2026-01-17)
-- [x] **#174** Set up PyPI project for todo-ai package `#release` (2026-01-17)
-  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
-  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
-  - [x] **#174.7** Test first beta release with trusted publisher `#testing` (2026-01-17)
-  - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure` (2026-01-17)
-  - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup` (2026-01-17)
-  - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup` (2026-01-17)
-  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15) (2026-01-17)
-  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15) (2026-01-17)
-  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15) (2026-01-17)
 - [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug` (2026-01-17)
   - [x] **#173.12** Remove --no-verify from release script (ETERNALLY FORBIDDEN) `#critical` (2026-01-17)
   - [x] **#173.11** Fix pre-commit hook handling - committed files don't include hook fixes `#bug` (2026-01-17)
@@ -416,12 +429,27 @@
   - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug` (2026-01-17)
   - [x] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug` (2026-01-17)
     > Problem: todo.bash converted during --prepare (line 1034) but only added to git during --execute (lines 1297-1300). Leaves uncommitted file after prepare. Fix: Move bash conversion to execute phase OR commit it during prepare.
-- [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement` (2025-12-16)
-  > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
-  > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
-  > Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
-- [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization` (2025-12-16)
-  > Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
+- [x] **#174** Set up PyPI project for todo-ai package `#release` (2026-01-17)
+  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
+  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
+  - [x] **#174.7** Test first beta release with trusted publisher `#testing` (2026-01-17)
+  - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure` (2026-01-17)
+  - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup` (2026-01-17)
+  - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup` (2026-01-17)
+- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure` (2026-01-17)
+  - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure` (2026-01-17)
+  - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure` (2026-01-17)
+  - [x] **#175.1** Add pre-commit hook to detect forbidden flags `#infrastructure` (2026-01-17)
+- [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure` (2026-01-17)
+- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure` (2026-01-17)
+  - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure` (2026-01-17)
+  - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure` (2026-01-17)
+  - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure` (2026-01-17)
+- [x] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug` (2026-01-17)
+  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
+  - [x] **#178.3** Add tests for multiple parents/subtasks `#bug` (2026-01-17)
+  - [x] **#178.2** Fix subtask insertion to correct parent `#bug` (2026-01-17)
+  - [x] **#178.1** Investigate subtask placement logic `#bug` (2026-01-17)
 - [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization` (2025-12-16)
   - [x] **#169.3** Phase 3: Cleanup and documentation `#cicd` (2025-12-16)
     - [x] **#169.3.4** Update development docs with new workflow `#cicd` `#docs` (2025-12-16)
@@ -458,6 +486,12 @@
       > Implemented conditional matrix: PRs run ubuntu+3.12 only, main branch runs full 3 OS x 5 Python versions
     - [x] **#169.1.1** Split CI workflow into quality and test jobs `#cicd` (2025-12-16)
       > Split workflow into quality (pre-commit, markdownlint) and test (pytest with coverage) jobs running in parallel
+- [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization` (2025-12-16)
+  > Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
+- [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement` (2025-12-16)
+  > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
+  > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
+  > Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
 - [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd` (2025-12-14)
   > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
   - [x] **#167.9** Phase 3.3: Add documentation automation `#cicd` (2025-12-14)
@@ -476,34 +510,10 @@
     > Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
   - [x] **#167.1** Phase 1.1: Add uv dependency management `#cicd` (2025-12-14)
     > Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
-- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2025-12-12)
-  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
-  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2025-12-12)
-    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
-  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug` (2025-12-12)
-    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
-  - [ ] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug` (2025-12-12)
-  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug` (2025-12-12)
-  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug` (2025-12-12)
-    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
-- [x] **#160** Fix issue#35: Task not found after successful modify command `#bug` (2025-12-12)
-  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
-  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
-  - [x] **#160.5** Add tests to prevent regression `#bug` (2025-12-12)
-  - [x] **#160.4** Fix task ID resolution in modify command if bug confirmed `#bug` (2025-12-12)
-    > FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
-    > FIXED: Updated modify_todo() sed patterns to match both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats using extended regex. Also updated add_note() grep pattern to search for both formats. Updated sed_inplace() to support -E flag for extended regex. This ensures modify command can replace tasks regardless of formatting, and note command can find them afterward.
-  - [x] **#160.3** Test modify command with various task IDs and nesting levels `#bug` (2025-12-12)
-  - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug` (2025-12-12)
-  - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug` (2025-12-12)
-    > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
 - [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2025-12-12)
   > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
   - [x] **#125.13** Update bug reporting design document with new implementation details `#docs` (2025-12-12)
     > Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
-  - [ ] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2025-12-12)
-    > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
-    > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
   - [x] **#125.11** Update cursor rules to reflect new agent-friendly bug reporting workflow `#docs` (2025-12-12)
     > Update .cursor/rules/todo.ai-bug-reporting.mdc: (1) Remove mention of user prompts for agents, (2) Add note that agents can use report-bug directly without prompts, (3) Humans still get confirmation prompts, (4) Show updated example of agent usage: 'When error occurs, call ./todo.ai report-bug and it will auto-submit'. Keep rule concise (<25 lines).
   - [x] **#125.10** Add intelligent error categorization and suggested labels `#feature` (2025-12-12)
@@ -516,11 +526,26 @@
     > Use GitHub markdown features: (1) Callout blocks for System Info (> [!NOTE]), Error sections (> [!WARNING]), (2) Clean section headers with --- separators, (3) Proper code blocks with language tags, (4) Collapsible <details> for logs, (5) Table format for system information. Mirror the structure from bug_report.yml template. Located in todo.ai around line 5834.
   - [x] **#125.6** Create GitHub issue template for bug reports (.github/ISSUE_TEMPLATE/bug_report.yml) `#feature` (2025-12-12)
     > Create .github/ISSUE_TEMPLATE/bug_report.yml with structured fields: Error Description (textarea), Command Used (input), Error Context (textarea), System Info (auto-filled), Logs (auto-attached). Use GitHub's form schema for issue templates. This will be used as the reference template for generate_bug_report() function.
-  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
-  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
-  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
-  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
-  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12) (2025-12-12)
+- [x] **#160** Fix issue#35: Task not found after successful modify command `#bug` (2025-12-12)
+  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
+  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
+  - [x] **#160.5** Add tests to prevent regression `#bug` (2025-12-12)
+  - [x] **#160.4** Fix task ID resolution in modify command if bug confirmed `#bug` (2025-12-12)
+    > FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
+    > FIXED: Updated modify_todo() sed patterns to match both bold (\*\*#task_id\*\*) and non-bold (#task_id) formats using extended regex. Also updated add_note() grep pattern to search for both formats. Updated sed_inplace() to support -E flag for extended regex. This ensures modify command can replace tasks regardless of formatting, and note command can find them afterward.
+  - [x] **#160.3** Test modify command with various task IDs and nesting levels `#bug` (2025-12-12)
+  - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug` (2025-12-12)
+  - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug` (2025-12-12)
+    > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
+- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2025-12-12)
+  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
+  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2025-12-12)
+    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
+  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug` (2025-12-12)
+    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
+  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug` (2025-12-12)
+  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug` (2025-12-12)
+    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
 - [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug` (2025-11-16)
   > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
   - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug` (2025-11-16)
@@ -598,13 +623,13 @@
     >
     > All lines properly formatted with indent + '  > ' prefix. Fix verified!
   - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug` (2025-11-16)
-  > Fixed add_note() function with 3 key changes:
-  >
-  > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
-  > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces
-  > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
-  >
-  > This note itself tests the fix - all lines should have proper blockquote markers!
+    > Fixed add_note() function with 3 key changes:
+    >
+    > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
+    > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces
+    > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
+    >
+    > This note itself tests the fix - all lines should have proper blockquote markers!
   - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug` (2025-11-16)
     > Bug located at line 4355 in add_note() function:
     >
@@ -620,14 +645,14 @@
     > Current behavior vs expected:
     >
     > CURRENT (broken):
-    >   > First line of note
+    > > First line of note
     > Line 2 without marker
     > Line 3 without marker
     >
     > EXPECTED (correct):
-    >   > First line of note
-    >   > Line 2 with marker
-    >   > Line 3 with marker
+    > > First line of note
+    > > Line 2 with marker
+    > > Line 3 with marker
     >
     > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
 - [x] **#152** Test bug reporting feature before v2.5.0 release `#testing` (2025-11-16)
@@ -679,8 +704,8 @@
     >
     > Could be wrapper function:
     > update_note() {
-    >   delete_note_internal $task_id  # No prompt version
-    >   add_note $task_id $new_text
+    > delete_note_internal $task_id  # No prompt version
+    > add_note $task_id $new_text
     > }
     >
     > Reuse existing add_note() multi-line formatting logic from fix #149.
@@ -703,25 +728,25 @@
     > - Ends when next non-blockquote line encountered
     >
     > Example level-1 subtask:
-    >   - [ ] **#42.1** Task description
-    >     > Note line 1
-    >     > Note line 2
-    >     > Note line 3
+    > - [ ] **#42.1** Task description
+    > > Note line 1
+    > > Note line 2
+    > > Note line 3
     >
     > Need to identify all note lines for delete/update operations.
   - [x] **#153.1** Design command syntax for update-note and delete-note `#feature` (2025-11-16)
     > Proposed command syntax:
     >
     > ./todo.ai delete-note <task-id>
-    >   - Removes ALL notes from specified task
-    >   - Confirmation prompt: 'Delete all notes from task #X? (y/N)'
-    >   - Returns error if task has no notes
+    > - Removes ALL notes from specified task
+    > - Confirmation prompt: 'Delete all notes from task #X? (y/N)'
+    > - Returns error if task has no notes
     >
     > ./todo.ai update-note <task-id> "new note text"
-    >   - Replaces ALL existing notes with new text
-    >   - Supports multi-line notes (like add note)
-    >   - Shows preview: 'Replace N lines with M lines?'
-    >   - Returns error if task has no notes to update
+    > - Replaces ALL existing notes with new text
+    > - Supports multi-line notes (like add note)
+    > - Shows preview: 'Replace N lines with M lines?'
+    > - Returns error if task has no notes to update
     >
     > Alternative: Could add --force to skip confirmations for both commands.
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug` (2025-11-16)
@@ -761,6 +786,17 @@
     > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
   - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs` (2025-11-12)
     > Analysis document created at docs/analysis/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
+- [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature` (2025-11-12)
+  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). Installs from releases (not main branch) to avoid incomplete/broken commits. Clear dev workflow: develop in zsh, auto-convert to bash during release. Released in v2.4.0.
+  - [x] **#144.9** Update release script to include both todo.ai and todo.bash as assets `#release` (2025-11-12)
+  - [x] **#144.8** Add cursor rule to prevent accidental todo.bash editing `#docs` (2025-11-12)
+  - [x] **#144.7** Update GETTING_STARTED.md and other documentation references `#docs` (2025-11-12)
+  - [x] **#144.6** Update README.md with smart installer as primary method `#docs` (2025-11-12)
+  - [x] **#144.5** Create concise smart installer documentation `#docs` (2025-11-12)
+  - [x] **#144.4** Test smart installer on multiple platforms and scenarios `#test` (2025-11-12)
+  - [x] **#144.3** Create release-aware smart installer script (install.sh) `#installer` (2025-11-12)
+  - [x] **#144.2** Add automated bash conversion to release script `#release` (2025-11-12)
+  - [x] **#144.1** Create development guidelines document for zsh-first workflow `#docs` (2025-11-12)
 - [x] **#146** Test task#144 implementation before release `#test` (2025-11-12)
   > Validate all task#144 features before creating release: bash conversion, smart installer, release assets. All tests passed successfully. Release v2.4.0 is LIVE with smart installer, bash version, and automated conversion workflow.
   - [x] **#146.7** Clean up pre-release and verify ready for production release `#test` (2025-11-12)
@@ -773,17 +809,48 @@
     > Installer correctly detects v.3.1 but assets don't exist (404). This is expected - v2.3.1 was before task#144. Need pre-release with new assets to test full flow. Fallback logic working correctly.
   - [x] **#146.2** Test bash version functionality matches zsh version `#test` (2025-11-12)
   - [x] **#146.1** Test bash conversion with release.sh --prepare `#test` (2025-11-12)
-- [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature` (2025-11-12)
-  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). Installs from releases (not main branch) to avoid incomplete/broken commits. Clear dev workflow: develop in zsh, auto-convert to bash during release. Released in v2.4.0.
-  - [x] **#144.9** Update release script to include both todo.ai and todo.bash as assets `#release` (2025-11-12)
-  - [x] **#144.8** Add cursor rule to prevent accidental todo.bash editing `#docs` (2025-11-12)
-  - [x] **#144.7** Update GETTING_STARTED.md and other documentation references `#docs` (2025-11-12)
-  - [x] **#144.6** Update README.md with smart installer as primary method `#docs` (2025-11-12)
-  - [x] **#144.5** Create concise smart installer documentation `#docs` (2025-11-12)
-  - [x] **#144.4** Test smart installer on multiple platforms and scenarios `#test` (2025-11-12)
-  - [x] **#144.3** Create release-aware smart installer script (install.sh) `#installer` (2025-11-12)
-  - [x] **#144.2** Add automated bash conversion to release script `#release` (2025-11-12)
-  - [x] **#144.1** Create development guidelines document for zsh-first workflow `#docs` (2025-11-12)
+- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature` (2025-11-11)
+  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
+  - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test` (2025-11-11)
+  - [x] **#139.6** Test: verify subtask notes displayed for all subtasks `#test` (2025-11-11)
+    > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
+  - [x] **#139.5** Test: verify parent task note displayed `#test` (2025-11-11)
+  - [x] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code` (2025-11-11)
+    > Modify show_task() to call collect_task_notes() for each displayed task/subtask. Display notes immediately after each task line.
+  - [x] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design` (2025-11-11)
+  - [x] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug` (2025-11-11)
+  - [x] **#139.1** Investigate show_task function: find where notes are displayed `#research` (2025-11-11)
+    > Find show_task() function in todo.ai script. Look for note display logic around lines 4000-4100.
+- [x] **#140** Fix bug: Note command doesn't work for nested sub-subtasks (4-space indentation) `#bug` (2025-11-11)
+  > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
+- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature` (2025-11-11)
+  > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
+  - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs` (2025-11-11)
+  - [x] **#141.8** Test execute mode: verify release completes without any prompts `#test` (2025-11-11)
+  - [x] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test` (2025-11-11)
+  - [x] **#141.6** Add highlighted execution command at end of prepare step output `#code` (2025-11-11)
+    > Display: 'To execute this release, run: ./release/release.sh --execute' in green/highlighted text at end of prepare output.
+  - [x] **#141.5** Remove all interactive prompts from both modes `#code` (2025-11-11)
+  - [x] **#141.4** Implement --execute mode: perform release without prompts (version, tag, push, GitHub) `#code` (2025-11-11)
+    > Read prepared release data from temp/cache. Update version, commit, tag, push to GitHub, create release. Exit with error if prepare not run first.
+  - [x] **#141.3** Implement --prepare mode (default): analyze commits, generate notes, show preview only `#code` (2025-11-11)
+    > Default behavior when called without --execute. Generate preview, save to temp file, display release notes. End with highlighted command to execute.
+  - [x] **#141.2** Design new workflow: prepare (default) vs execute modes `#design` (2025-11-11)
+  - [x] **#141.1** Analyze current release.sh: identify all prompts and manual confirmation points `#research` (2025-11-11)
+- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug` (2025-11-11)
+  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
+  - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test` (2025-11-11)
+  - [x] **#142.3** Fix: Get correct commit hash when 'no commit needed' returned `#code` (2025-11-11)
+  - [x] **#142.2** Fix: Handle case where version already correct in working directory `#code` (2025-11-11)
+  - [x] **#142.1** Investigate execute_release: why version verification fails `#bug` (2025-11-11)
+- [x] **#143** Prevent stale release summaries from being used in releases `#bug` (2025-11-11)
+  > Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
+  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
+  - [x] **#143.5** Test: Verify detection works with old and new summary files `#bug` (2025-11-11)
+  - [x] **#143.4** Option: Prompt to continue or abort if stale summary detected `#bug` (2025-11-11)
+  - [x] **#143.3** Add warning if summary appears stale (older than last release) `#bug` (2025-11-11)
+  - [x] **#143.2** Add validation: Compare summary file mtime with last release tag date `#bug` (2025-11-11)
+  - [x] **#143.1** Investigate: How to detect if summary file is stale `#bug` (2025-11-11)
 - [x] **#145** Reorganize docs folder with logical subdirectory structure `#docs` (2025-11-11)
   > Proposed structure: guides/ (user docs), design/ (technical specs), development/ (contributor docs), analysis/ (research), archive/ (historical). Currently 29 files in flat structure need categorization and organization. Must update all cross-references, docs/README.md, and main README.md links.
   - [x] **#145.11** Verify all links work and no broken references remain `#docs` (2025-11-11)
@@ -808,59 +875,6 @@
     > Create directories: mkdir -p docs/{guides,design,development,analysis,archive}. Verify structure with tree or ls. Do not move files yet - that's next step.
   - [x] **#145.1** Define and document docs folder structure with categories `#docs` (2025-11-11)
     > Create docs/STRUCTURE.md documenting: guides/ (GETTING_STARTED, INSTALLATION, USAGE_PATTERNS, NUMBERING_MODES_GUIDE, COORDINATION_SETUP), design/ (8 design docs), development/ (DEVELOPMENT_GUIDELINES, MIGRATION_GUIDE, test plans), analysis/ (7 analysis/research docs), archive/ (migration/historical docs). Keep README.md at root with overview.
-- [x] **#143** Prevent stale release summaries from being used in releases `#bug` (2025-11-11)
-  > Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
-  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
-  - [x] **#143.5** Test: Verify detection works with old and new summary files `#bug` (2025-11-11)
-  - [x] **#143.4** Option: Prompt to continue or abort if stale summary detected `#bug` (2025-11-11)
-  - [x] **#143.3** Add warning if summary appears stale (older than last release) `#bug` (2025-11-11)
-  - [x] **#143.2** Add validation: Compare summary file mtime with last release tag date `#bug` (2025-11-11)
-  - [x] **#143.1** Investigate: How to detect if summary file is stale `#bug` (2025-11-11)
-- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug` (2025-11-11)
-  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
-  - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test` (2025-11-11)
-  - [x] **#142.3** Fix: Get correct commit hash when 'no commit needed' returned `#code` (2025-11-11)
-  - [x] **#142.2** Fix: Handle case where version already correct in working directory `#code` (2025-11-11)
-  - [x] **#142.1** Investigate execute_release: why version verification fails `#bug` (2025-11-11)
-- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature` (2025-11-11)
-  > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
-  - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs` (2025-11-11)
-  - [x] **#141.8** Test execute mode: verify release completes without any prompts `#test` (2025-11-11)
-  - [x] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test` (2025-11-11)
-  - [x] **#141.6** Add highlighted execution command at end of prepare step output `#code` (2025-11-11)
-    > Display: 'To execute this release, run: ./release/release.sh --execute' in green/highlighted text at end of prepare output.
-  - [x] **#141.5** Remove all interactive prompts from both modes `#code` (2025-11-11)
-  - [x] **#141.4** Implement --execute mode: perform release without prompts (version, tag, push, GitHub) `#code` (2025-11-11)
-    > Read prepared release data from temp/cache. Update version, commit, tag, push to GitHub, create release. Exit with error if prepare not run first.
-  - [x] **#141.3** Implement --prepare mode (default): analyze commits, generate notes, show preview only `#code` (2025-11-11)
-    > Default behavior when called without --execute. Generate preview, save to temp file, display release notes. End with highlighted command to execute.
-  - [x] **#141.2** Design new workflow: prepare (default) vs execute modes `#design` (2025-11-11)
-  - [x] **#141.1** Analyze current release.sh: identify all prompts and manual confirmation points `#research` (2025-11-11)
-- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature` (2025-11-11)
-  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
-  - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test` (2025-11-11)
-  - [x] **#139.6** Test: verify subtask notes displayed for all subtasks `#test` (2025-11-11)
-    > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
-    - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test` (2025-11-11)
-      > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
-  - [x] **#139.5** Test: verify parent task note displayed `#test` (2025-11-11)
-  - [x] **#139.4** Implement fix: modify show_task to display notes after each task/subtask line `#code` (2025-11-11)
-    > Modify show_task() to call collect_task_notes() for each displayed task/subtask. Display notes immediately after each task line.
-  - [x] **#139.3** Design solution: show notes for parent task and all displayed subtasks `#design` (2025-11-11)
-  - [x] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug` (2025-11-11)
-  - [x] **#139.1** Investigate show_task function: find where notes are displayed `#research` (2025-11-11)
-    > Find show_task() function in todo.ai script. Look for note display logic around lines 4000-4100.
-- [x] **#140** Fix bug: Note command doesn't work for nested sub-subtasks (4-space indentation) `#bug` (2025-11-11)
-  > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
-- [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
-  > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
-- [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
-  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
-  - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test` (2025-11-09)
-  - [x] **#131.4** Add rule to init_cursor_rules() function in todo.ai script `#code` (2025-11-09)
-  - [x] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code` (2025-11-09)
-  - [x] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs` (2025-11-09)
-  - [x] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research` (2025-11-09)
 - [x] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug` (2025-11-09)
   - [x] **#130.10** Verify no orphaned notes remain in active section after archiving `#bug` (2025-11-09)
   - [x] **#130.9** Test with nested subtasks (2 levels) with notes at each level `#bug` (2025-11-09)
@@ -872,25 +886,77 @@
   - [x] **#130.3** Design solution: create function to collect notes for a task and all its subtasks `#bug` (2025-11-09)
   - [x] **#130.2** Analyze delete_task function: study how it properly removes notes (lines 2926-2935) `#bug` (2025-11-09)
   - [x] **#130.1** Investigate archive_task function: how notes are currently handled (or not handled) `#bug` (2025-11-09)
-- [x] **#135** Test nested subtasks with notes `#test` (2025-11-09)
-  - [x] **#135.1** Level 1 subtask `#test` (2025-11-09)
-    - [x] **#135.1.1** Level 2 subtask `#test` (2025-11-09)
-    > Level 1 note
-  > Level 0 parent note
+- [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
+  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
+  - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test` (2025-11-09)
+  - [x] **#131.4** Add rule to init_cursor_rules() function in todo.ai script `#code` (2025-11-09)
+  - [x] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code` (2025-11-09)
+  - [x] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs` (2025-11-09)
+  - [x] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research` (2025-11-09)
+- [x] **#133** Test task with note for archive bug fix `#test` (2025-11-09)
+  > This is a test note that should move with the task when archived
 - [x] **#134** Test parent task with subtasks and notes `#test` (2025-11-09)
   - [x] **#134.2** Subtask two with note `#test` (2025-11-09)
     > Subtask two note - should move with subtask
   - [x] **#134.1** Subtask one with note `#test` (2025-11-09)
     > Subtask one note - should move with subtask
-  > Parent task note - should move with parent
-- [x] **#133** Test task with note for archive bug fix `#test` (2025-11-09)
-  > This is a test note that should move with the task when archived
-- [x] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode) `#bug` (2025-11-02)
-  - [ ] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test` (2025-11-02)
-  - [x] **#126.3** Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode) `#bug` (2025-11-02)
-  - [x] **#126.2** Verify coordination should work with single-user mode without forcing enhanced (verified - validation supports single-user + coordination) `#bug` (2025-11-02)
-  - [x] **#126.1** Investigate setup-coordination command mode switching logic (completed - found hardcoded mode: enhanced on line 3353) `#bug` (2025-11-02)
-- [x] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#feature` `#MAJOR` (2025-11-02)
+    > Parent task note - should move with parent
+- [x] **#135** Test nested subtasks with notes `#test` (2025-11-09)
+  - [x] **#135.1** Level 1 subtask `#test` (2025-11-09)
+    - [x] **#135.1.1** Level 2 subtask `#test` (2025-11-09)
+      > Level 1 note
+      > Level 0 parent note
+- [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
+  > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
+- [x] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#git` `#setup` (2025-11-02)
+- [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup` (2025-11-02)
+- [x] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature` (2025-11-02)
+  - [x] **#37.12** Update release process documentation to include migration workflow (2025-11-02)
+  - [x] **#37.11** Document migration creation process for developers (2025-11-02)
+  - [x] **#37.10** Test migration system with real TODO.md files (wrong section order) (2025-11-02)
+  - [x] **#37.9** Create integration tests for migration execution during update (2025-11-02)
+  - [x] **#37.8** Create unit tests for migration system (version comparison, idempotency) (2025-11-02)
+  - [x] **#37.7** Add migration execution to script startup (after version check) (2025-11-02)
+  - [x] **#37.6** Implement first migration: section order fix (v1.3.5) (2025-11-02)
+  - [x] **#37.5** Create migration lock mechanism to prevent concurrent execution (2025-11-02)
+  - [x] **#37.4** Implement migration execution system with run_migrations function (2025-11-02)
+  - [x] **#37.3** Implement version comparison function for semantic versioning (2025-11-02)
+  - [x] **#37.2** Create migration registry structure in todo.ai script (2025-11-02)
+  - [x] **#37.1** Create design document for migration/cleanup system architecture (2025-11-02)
+- [x] **#43** Create uninstall feature (2025-11-02)
+  - [x] **#43.4** Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope `#code` (2025-11-02)
+  - [x] **#43.3** Enhance README.md to show simple uninstall command (2025-11-02)
+  - [x] **#43.2** Implement and test uninstall feature (2025-11-02)
+  - [x] **#43.1** Write design document for uninstall feature (2025-11-02)
+- [x] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration` (2025-11-02)
+  - [x] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code` (2025-11-02)
+  - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code` (2025-11-02)
+  - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs` (2025-11-02)
+  - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs` (2025-11-02)
+  - [x] **#44.6** Test migration with existing .cursorrules files `#test` (2025-11-02)
+  - [x] **#44.5** Create migration to convert existing .cursorrules to .cursor/rules/ on update `#migration` (2025-11-02)
+  - [x] **#44.4** Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file `#code` (2025-11-02)
+  - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code` (2025-11-02)
+  - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs` (2025-11-02)
+  - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research` (2025-11-02)
+- [x] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug` (2025-11-02)
+  - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs` (2025-11-02)
+  - [x] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test` (2025-11-02)
+  - [x] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code` (2025-11-02)
+  - [x] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code` (2025-11-02)
+  - [x] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs` (2025-11-02)
+  - [x] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research` (2025-11-02)
+- [x] **#48** Fix update logic error: new version update logic never executes (2025-11-02)
+  - [x] **#48.4** Test update workflow: verify migrations execute in new version after update `#test` (2025-11-02)
+  - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code` (2025-11-02)
+  - [x] **#48.2** Design solution: download → execute new version → replace old version `#docs` (2025-11-02)
+  - [x] **#48.1** Research update execution pattern: how to execute new version's code after download `#research` (2025-11-02)
+- [x] **#50** Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages `#research` (2025-11-02)
+  - [x] **#50.4** Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them `#code` (2025-11-02)
+  - [x] **#50.3** Propose solution: design numbering schema or commit message format to avoid conflicts `#docs` (2025-11-02)
+  - [x] **#50.2** Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs `#research` (2025-11-02)
+  - [x] **#50.1** Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers `#docs` (2025-11-02)
+- [x] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#MAJOR` `#feature` (2025-11-02)
   - [x] **#52.24** Document setup instructions for each coordination service: prerequisites, configuration steps, and verification `#docs` (2025-11-02)
   - [x] **#52.23** Add setup wizard/command that guides users through mode and coordination selection with validation `#feature` (2025-11-02)
   - [x] **#52.22** Create comprehensive documentation for all mode and coordination combinations (single-user, multi-user, branch, enhanced with github-issues, counterapi, none) `#docs` (2025-11-02)
@@ -923,54 +989,19 @@
   - [x] **#55.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2025-11-02)
   - [x] **#55.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2025-11-02)
 - [x] **#56** Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check `#bug` (2025-11-02)
-- [x] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug` (2025-11-02)
-  - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs` (2025-11-02)
-  - [x] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test` (2025-11-02)
-  - [x] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code` (2025-11-02)
-  - [x] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code` (2025-11-02)
-  - [x] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs` (2025-11-02)
-  - [x] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research` (2025-11-02)
-- [x] **#50** Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages `#research` (2025-11-02)
-  - [x] **#50.4** Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them `#code` (2025-11-02)
-  - [x] **#50.3** Propose solution: design numbering schema or commit message format to avoid conflicts `#docs` (2025-11-02)
-  - [x] **#50.2** Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs `#research` (2025-11-02)
-  - [x] **#50.1** Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers `#docs` (2025-11-02)
-- [x] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#setup` `#git` (2025-11-02)
-- [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup` (2025-11-02)
-- [x] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature` (2025-11-02)
-  - [x] **#37.12** Update release process documentation to include migration workflow (2025-11-02)
-  - [x] **#37.11** Document migration creation process for developers (2025-11-02)
-  - [x] **#37.10** Test migration system with real TODO.md files (wrong section order) (2025-11-02)
-  - [x] **#37.9** Create integration tests for migration execution during update (2025-11-02)
-  - [x] **#37.8** Create unit tests for migration system (version comparison, idempotency) (2025-11-02)
-  - [x] **#37.7** Add migration execution to script startup (after version check) (2025-11-02)
-  - [x] **#37.6** Implement first migration: section order fix (v1.3.5) (2025-11-02)
-  - [x] **#37.5** Create migration lock mechanism to prevent concurrent execution (2025-11-02)
-  - [x] **#37.4** Implement migration execution system with run_migrations function (2025-11-02)
-  - [x] **#37.3** Implement version comparison function for semantic versioning (2025-11-02)
-  - [x] **#37.2** Create migration registry structure in todo.ai script (2025-11-02)
-  - [x] **#37.1** Create design document for migration/cleanup system architecture (2025-11-02)
-- [x] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration` (2025-11-02)
-  - [x] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code` (2025-11-02)
-  - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code` (2025-11-02)
-  - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs` (2025-11-02)
-  - [x] **#44.7** Update documentation to reflect .cursor/rules/ structure `#docs` (2025-11-02)
-  - [x] **#44.6** Test migration with existing .cursorrules files `#test` (2025-11-02)
-  - [x] **#44.5** Create migration to convert existing .cursorrules to .cursor/rules/ on update `#migration` (2025-11-02)
-  - [x] **#44.4** Update init_cursor_rules to create .cursor/rules/ structure instead of .cursorrules file `#code` (2025-11-02)
-  - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code` (2025-11-02)
-  - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs` (2025-11-02)
-  - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research` (2025-11-02)
-- [x] **#43** Create uninstall feature (2025-11-02)
-  - [x] **#43.4** Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope `#code` (2025-11-02)
-  - [x] **#43.3** Enhance README.md to show simple uninstall command (2025-11-02)
-  - [x] **#43.2** Implement and test uninstall feature (2025-11-02)
-  - [x] **#43.1** Write design document for uninstall feature (2025-11-02)
-- [x] **#48** Fix update logic error: new version update logic never executes (2025-11-02)
-  - [x] **#48.4** Test update workflow: verify migrations execute in new version after update `#test` (2025-11-02)
-  - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code` (2025-11-02)
-  - [x] **#48.2** Design solution: download → execute new version → replace old version `#docs` (2025-11-02)
-  - [x] **#48.1** Research update execution pattern: how to execute new version's code after download `#research` (2025-11-02)
+- [x] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode) `#bug` (2025-11-02)
+  - [x] **#126.3** Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode) `#bug` (2025-11-02)
+  - [x] **#126.2** Verify coordination should work with single-user mode without forcing enhanced (verified - validation supports single-user + coordination) `#bug` (2025-11-02)
+  - [x] **#126.1** Investigate setup-coordination command mode switching logic (completed - found hardcoded mode: enhanced on line 3353) `#bug` (2025-11-02)
+- [x] **#5** Initialize repository structure and configuration `#repo` `#setup` (2025-11-01)
+- [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#git` `#setup` (2025-11-01)
+- [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
+- [x] **#36** Create release process for todo.ai on GitHub (2025-11-01)
+  - [x] **#36.5** Review and finetune release numbering logic (2025-11-01)
+  - [x] **#36.4** Create permanent release log file with detailed timestamps (2025-11-01)
+  - [x] **#36.3** Create release management process (2025-11-01)
+  - [x] **#36.2** Review release process document (2025-11-01)
+  - [x] **#36.1** Create release process document (2025-11-01)
 - [x] **#38** Fix orphaned subtasks bug: delete subtasks when deleting parent task `#bug` (2025-11-01)
   - [x] **#38.6** Verify orphaned subtask detection still works correctly (2025-11-01)
   - [x] **#38.5** Test deletion of subtask only (should not delete parent or siblings) (2025-11-01)
@@ -978,32 +1009,26 @@
   - [x] **#38.3** Test deletion of parent task with subtasks (verify subtasks deleted) (2025-11-01)
   - [x] **#38.2** Implement automatic subtask deletion when deleting parent task (2025-11-01)
   - [x] **#38.1** Analyze current delete_task function behavior (2025-11-01)
-- [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
-- [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#setup` `#git` (2025-11-01)
-- [x] **#5** Initialize repository structure and configuration `#setup` `#repo` (2025-11-01)
-- [x] **#36** Create release process for todo.ai on GitHub (2025-11-01)
-  - [x] **#36.5** Review and finetune release numbering logic (2025-11-01)
-  - [x] **#36.4** Create permanent release log file with detailed timestamps (2025-11-01)
-  - [x] **#36.3** Create release management process (2025-11-01)
-  - [x] **#36.2** Review release process document (2025-11-01)
-  - [x] **#36.1** Create release process document (2025-11-01)
-- [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
-- [x] **#28** Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial `#setup` (2025-10-30)
-- [x] **#17** Create Cursor rules for repository `#setup` `#docs` (2025-10-30)
-- [x] **#26** Rename .todo/ directory to .todo.ai/ `#setup` (2025-10-30)
-- [x] **#25** Rename repository from todo to todo.ai `#setup` (2025-10-30)
-- [x] **#23** Rename todo.ai to todo.ai `#setup` (2025-10-30)
-- [x] **#22** Create update instructions and functions for todo.ai `#setup` (2025-10-30)
-- [x] **#20** Create radically simplified README.md `#docs` (2025-10-30)
-- [x] **#6** Update TODO.md template for this repository `#setup` `#docs` (2025-10-30)
-- [x] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup` (2025-10-30)
-- [x] **#13** All formatting fixes complete `#setup` (2025-10-30)
-- [x] **#12** Final formatting test `#test` (2025-10-30)
-- [x] **#11** Test new append method `#test` (2025-10-30)
+- [x] **#6** Update TODO.md template for this repository `#docs` `#setup` (2025-10-30)
+- [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#fix` `#setup` (2025-10-30)
 - [x] **#10** Verify formatting works correctly `#test` (2025-10-30)
-- [x] **#8** Fix all sed -i calls to use sed_inplace for macOS compatibility `#setup` `#fix` (2025-10-30)
+- [x] **#11** Test new append method `#test` (2025-10-30)
+- [x] **#12** Final formatting test `#test` (2025-10-30)
+- [x] **#13** All formatting fixes complete `#setup` (2025-10-30)
+- [x] **#17** Create Cursor rules for repository `#docs` `#setup` (2025-10-30)
+- [x] **#18** Fix TODO.md header upon initialization - use repo name dynamically `#fix` `#setup` (2025-10-30)
+- [x] **#20** Create radically simplified README.md `#docs` (2025-10-30)
+- [x] **#22** Create update instructions and functions for todo.ai `#setup` (2025-10-30)
+- [x] **#23** Rename todo.ai to todo.ai `#setup` (2025-10-30)
+- [x] **#25** Rename repository from todo to todo.ai `#setup` (2025-10-30)
+- [x] **#26** Rename .todo/ directory to .todo.ai/ `#setup` (2025-10-30)
+- [x] **#28** Rename files in .todo.ai/ to .todo.ai.log and .todo.ai_serial `#setup` (2025-10-30)
+- [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
+  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
+  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
     - [D] **#163.51.4** Remove unused methods and parameters `#code` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.51.3** Update documentation `#docs` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.51.2** Add unit tests for FileStructureSnapshot `#test` (deleted 2025-12-15, expires 2026-01-14)
@@ -1033,7 +1058,6 @@
     - [D] **#163.46.3** Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.46.2** Store interleaved content (comments, notes) keyed by preceding task ID `#code` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.46.1** Test that interleaved content survives read/write cycle `#test` (deleted 2025-12-15, expires 2026-01-14)
-- [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
   - [D] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.45.1** Beta/Pre-release: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.45.2** Beta/Pre-release: Publish to PyPI as pre-release version `#release` (deleted 2025-12-15, expires 2026-01-14)
@@ -1041,10 +1065,10 @@
     - [D] **#163.45.4** Final release: Finalize migration support and documentation `#release` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.45.5** Final release: Publish final release to PyPI with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
     - [D] **#163.45.6** Final release: Update installation instructions and migration guide `#docs` (deleted 2025-12-15, expires 2026-01-14)
+- [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
   - [D] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-14, expires 2026-01-13)
     - [D] **#163.34.1** Publish to PyPI `#release` (deleted 2025-12-14, expires 2026-01-13)
   - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
-- [D] #163 Test task for complete fix `#test` (deleted 2025-12-12, expires 2026-01-11)
 - [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
   - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
@@ -1055,23 +1079,70 @@
   - [D] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-    - [D] **#150.1.1** Test level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#150.1** Test level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#148.1.2** Test delete on level 2 `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#148.1.1** Level 2 sub-subtask (MODIFIED to verify fix works) `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#148.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#150.1.1** Test level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#150.1** Test level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#151.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+    - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
+  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12)
+  - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
     - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.2** Second subtask after multiple notes `#test` (deleted 2025-11-09, expires 2025-12-09)
-  - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
-  - [  D] **#123.1** Investigate delete command placement logic for Deleted Tasks section (completed - found footer boundary check missing) `#bug`
-  - [  D] **#123.2** Verify expected section order: Tasks -> Recently Completed -> Deleted Tasks -> Footer (verified - order is now correct) `#bug`
-  - [  D] **#123.3** Fix delete command to place Deleted Tasks section before footer (completed - updated ensure_deleted_section function) `#bug`
-  - [D] **#123.4** Add tests to verify correct section ordering `#bug` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.4** Update self-references in update_tool() function `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.6** Update help text and show_usage() examples `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.4** Update all references to .todo/ in script code `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.6** Update README.md if it mentions .todo/ `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.7** Update any documentation files `#docs` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.1** Create .todo.ai/backups/ directory for storing versioned backups `#setup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.2** Modify update_tool() to save backups with timestamp to .todo.ai/backups/ `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.3** Create list_backups() function to show available backup versions `#code` (deleted 2025-11-02, expires 2025-12-02)
@@ -1083,71 +1154,21 @@
   - [D] **#30.9** Update help text and show_usage() to include new commands `#docs` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.10** Remove old .bak file creation logic `#cleanup` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#30.11** Test backup and rollback functionality `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.4** Update all references to .todo/ in script code `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.6** Update README.md if it mentions .todo/ `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.7** Update any documentation files `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.4** Update self-references in update_tool() function `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.6** Update help text and show_usage() examples `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#fxstein-5.1** Test subtask in multi-user mode `#deleteme` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02) (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-11-02, expires 2025-12-02)
+    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#34.1** Level 1 subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-    - [D] **#34.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#33.1** Add subtask to main task `#test` (deleted 2025-11-02, expires 2025-12-02)
-    - [D] **#33.1.1** Test sub-subtask creation `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#57.1** Test subtask `#test` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#123.4** Add tests to verify correct section ordering `#bug` (deleted 2025-11-02, expires 2025-12-02)
+  - [D] **#39.2** Test subtask 2 (deleted 2025-11-01, expires 2025-12-01)
+    - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
+  - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#40.1** Subtask A (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#40.2** Subtask B (deleted 2025-11-01, expires 2025-12-01)
     - [D] **#41.1.1** Level 2 nested subtask (deleted 2025-11-01, expires 2025-12-01)
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
-  - [D] **#39.2** Test subtask 2 (deleted 2025-11-01, expires 2025-12-01)
-    - [D] **#39.1.1** Test nested subtask (deleted 2025-11-01, expires 2025-12-01)
-  - [D] **#39.1** Test subtask 1 (deleted 2025-11-01, expires 2025-12-01)
 
----
-
-**Last Updated:** Sat Jan 24 19:48:25 CET 2026
-**Repository:** https://github.com/fxstein/todo.ai
-**Maintenance:** Use `todo.ai` script only
+------------------

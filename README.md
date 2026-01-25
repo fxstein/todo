@@ -152,14 +152,32 @@ This installs one unified command: `todo-ai`.
 - **Stop:** `todo-ai stop <task_id>` pauses work on a task (optional - `complete` handles this automatically).
 - **Complete:** `todo-ai complete <task_id>` marks a task as done.
 
-### Linting and Reordering
+### TODO.md Formatting Standards
 
-Keep your TODO list clean and organized:
+todo.ai enforces strict formatting standards (v3.0+) for consistency and parseability:
 
-- **Lint:** `todo-ai lint` checks for issues (indentation, checkboxes, orphans, ordering).
-- **Reformat:** `todo-ai reformat` fixes indentation and checkboxes.
-- **Reorder:** `todo-ai reorder` sorts subtasks in reverse-chronological order (newest on top).
-- **Resolve Conflicts:** `todo-ai resolve-conflicts` fixes duplicate task IDs.
+**Visual Structure:**
+- Managed file with warning header
+- Three sections: Tasks, Archived Tasks, Deleted Tasks
+- Section separators and consistent spacing
+- Footer with tool variant and timestamp
+
+**Formatting Rules:**
+- 2-space indentation per nesting level
+- One blank line between root tasks
+- No blank lines between subtasks
+- Tags wrapped in backticks (`` `#tag` ``)
+- Notes use blockquote format with proper indentation
+
+**Commands (Python CLI v3.0+):**
+- **Lint:** `todo-ai lint` checks formatting violations
+- **Reformat:** `todo-ai reformat` automatically fixes violations (preserves all data)
+- **Reorder:** `todo-ai reorder` sorts tasks (newest on top)
+- **Resolve Conflicts:** `todo-ai resolve-conflicts` fixes duplicate task IDs
+
+**Legacy Shell Script (v2.x):** Use `./todo.ai` prefix instead of `todo-ai`.
+
+> **Important:** TODO.md is a managed file. Always use todo-ai commands instead of manual edits to maintain formatting integrity.
 
 ### Quality Gates
 

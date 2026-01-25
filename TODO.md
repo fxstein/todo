@@ -68,9 +68,12 @@
     > test_blank_line_between_root_tasks and test_no_blank_lines_between_subtasks
   - [x] **#200.7** Run one-time migration on this repository's TODO.md to align with new standards `#migration` (2026-01-25)
     > Execute `reformat` command on TODO.md after implementation is complete. Verify no data loss.
-  - [ ] **#200.6** Document enhanced formatting behaviors and standards `#documentation`
-    > Update user documentation to reflect new strict formatting and visual standards.
-    > Implementation complete. Documentation update pending.
+  - [x] **#200.6** Document enhanced formatting behaviors and standards `#documentation` (2026-01-25)
+    > Updated documentation files:
+    > 1. docs/guides/GETTING_STARTED.md - Added comprehensive "TODO.md Format and Standards" section with Python CLI syntax (todo-ai)
+    > 2. docs/guides/GETTING_STARTED.md - Updated Quick Reference and command examples to use Python CLI
+    > 3. docs/guides/GETTING_STARTED.md - Added legacy shell script note for v2.x users
+    > 4. README.md - Enhanced formatting standards section with Python CLI syntax and legacy note
   - [x] **#200.5** Update `reformat_command` to auto-fix new formatting violations `#code` `#fixer` (2026-01-25)
     > See docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md for auto-fix rules. Must preserve data while fixing structure.
   - [x] **#200.4** Update `lint_command` to detect violations of new formatting standards `#code` `#linting` (2026-01-25)
@@ -1441,4 +1444,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 21:53:00
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:00:49

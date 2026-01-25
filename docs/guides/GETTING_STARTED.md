@@ -376,6 +376,94 @@ Re-run setup:
 
 ---
 
+## TODO.md Format and Standards
+
+### Understanding TODO.md
+
+The `TODO.md` file is a **managed file** - it should not be edited manually. All modifications should be made through todo.ai commands to ensure consistent formatting and prevent data corruption.
+
+The file header includes a warning:
+```markdown
+# todo.ai ToDo List
+
+> ⚠️ **MANAGED FILE**: Do not edit manually. Use `todo-ai` (CLI/MCP) or `todo.ai` to manage tasks.
+```
+
+### Visual Structure
+
+TODO.md uses a strict visual structure for consistency and parseability:
+
+**Sections:**
+- `## Tasks` - Active and completed tasks
+- `## Archived Tasks` - Completed tasks moved out of active section
+- `## Deleted Tasks` - Soft-deleted tasks (retained for 30 days)
+
+**Separators:**
+- Horizontal rules (`---`) separate each section
+- Consistent spacing ensures readability
+
+**Footer:**
+- Tool variant identifier (e.g., `todo-ai (mcp)`)
+- Version number
+- Last updated timestamp
+
+### Formatting Standards
+
+**Task Format:**
+```markdown
+- [ ] **#1** Task description `#tag1` `#tag2`
+  - [ ] **#1.1** Subtask description
+    > Note with implementation details
+```
+
+**Key Rules:**
+1. **Indentation:** 2 spaces per nesting level (0, 2, or 4 spaces)
+2. **Spacing:** One blank line between root tasks, no blank lines between subtasks
+3. **Tags:** Wrapped in backticks (e.g., `` `#bug` ``)
+4. **Notes:** Blockquote format with proper indentation
+5. **Task Order:** Newest tasks at the top of their section
+
+### Lint and Reformat Commands
+
+**Check Formatting:**
+```bash
+todo-ai lint
+```
+The linter detects formatting violations without making changes:
+- Incorrect indentation
+- Missing blank lines between root tasks
+- Malformed tags or notes
+- Missing or invalid sections
+
+**Fix Formatting:**
+```bash
+todo-ai reformat
+```
+The reformatter automatically fixes violations:
+- Corrects indentation to 0, 2, or 4 spaces
+- Adds missing blank lines
+- Fixes note formatting
+- Regenerates header/footer if needed
+- **Preserves all task data** (IDs, descriptions, tags, dates)
+
+**When to Use:**
+- Run `lint` before committing to catch issues
+- Run `reformat` after manual edits (if unavoidable)
+- Use `reformat` during migrations to v3.0 standards
+
+**Legacy Shell Script:**
+For v2.x shell script users, the syntax is `./todo.ai lint` and `./todo.ai reformat`.
+
+### Best Practices
+
+1. **Never edit TODO.md directly** - Always use todo-ai commands
+2. **Run lint regularly** - Catch formatting issues early
+3. **Commit TODO.md with tasks** - Task changes should be version-controlled
+4. **Keep notes concise** - Use notes for implementation details, not status updates
+5. **Use tags consistently** - Establish team conventions for tag names
+
+---
+
 ## Next Steps
 
 1. **Read the documentation:**
@@ -385,23 +473,25 @@ Re-run setup:
 
 2. **Try common commands:**
    ```bash
-   ./todo.ai add "Implement feature X"
-   ./todo.ai add-subtask 1 "Break into smaller tasks"
-   ./todo.ai start 1
-   ./todo.ai complete 1  # Automatically stops the task
-   ./todo.ai list --tag "#feature"
+   todo-ai add "Implement feature X"
+   todo-ai add-subtask 1 "Break into smaller tasks"
+   todo-ai start 1
+   todo-ai complete 1  # Automatically stops the task
+   todo-ai list --tag "#feature"
+   todo-ai lint         # Check formatting
    ```
 
 3. **Configure team workflow:**
    - Share `.todo.ai/config.yaml` via Git
    - Ensure all team members run `./todo.ai setup`
    - Document your numbering mode choice
+   - Establish tag naming conventions
 
 4. **Get help:**
    ```bash
-   ./todo.ai --help
-   ./todo.ai show 1
-   ./todo.ai log --lines 20
+   todo-ai --help
+   todo-ai show 1
+   todo-ai log --lines 20
    ```
 
 ---
@@ -434,12 +524,18 @@ Re-run setup:
 ./todo.ai archive 1
 ```
 
+### Formatting Commands
+```bash
+todo-ai lint                        # Check TODO.md formatting
+todo-ai reformat                    # Fix formatting violations
+```
+
 ### Information Commands
 ```bash
-./todo.ai --help                      # Show help
-./todo.ai config                      # Show configuration
-./todo.ai log                         # View operation log
-./todo.ai version                     # Show version
+todo-ai --help                      # Show help
+todo-ai config                      # Show configuration
+todo-ai log                         # View operation log
+todo-ai version                     # Show version
 ```
 
 ---

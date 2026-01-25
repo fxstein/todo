@@ -317,13 +317,20 @@ class FileOps:
 
                 # Determine status
                 status = TaskStatus.PENDING
+                completed_at = None
                 if completed_char.lower() == "x":
                     if current_section == "Recently Completed":
                         status = TaskStatus.ARCHIVED
+                        # Fix for #204: Treat archived tasks as completed for restore purposes
+                        # We use archived_at as completed_at if available, or current time
+                        completed_at = archived_at or datetime.now()
                     elif current_section == "Deleted Tasks":
                         status = TaskStatus.DELETED
                     else:
                         status = TaskStatus.COMPLETED
+                        completed_at = (
+                            datetime.now()
+                        )  # Approximate since we don't store separate completed_at in file
                 elif current_section == "Deleted Tasks":
                     status = TaskStatus.DELETED
 
@@ -360,6 +367,8 @@ class FileOps:
                     task.expires_at = expires_at
                 if archived_at:
                     task.archived_at = archived_at
+                if completed_at:
+                    task.completed_at = completed_at
                 # Preserve original checkbox format for deleted tasks (for tasks already in Deleted section)
                 if status == TaskStatus.DELETED and current_section == "Deleted Tasks":
                     self.deleted_task_formats[task_id] = completed_char

@@ -449,8 +449,9 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
         subtasks = manager.get_subtasks(task_id)
         restored_subtasks = []
         for subtask in subtasks:
-            if subtask.status != TaskStatus.PENDING:
-                # Subtask is not pending (likely archived/deleted), restore it
+            # Check if subtask is "missing" (not in Tasks section)
+            # A subtask is missing if it is ARCHIVED or DELETED
+            if subtask.status in (TaskStatus.ARCHIVED, TaskStatus.DELETED):
                 subtask.restore()
                 restored_subtasks.append(subtask)
 

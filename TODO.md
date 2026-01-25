@@ -18,20 +18,20 @@
   > - Allows removing `#inprogress` tag without completing the task.
   > - Mirrors `start` command functionality.
   - [ ] **#201.19** Document `stop` command usage `#documentation`
-  - [ ] **#201.18** Add tests for `stop` command `#test`
-  - [ ] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp`
-  - [ ] **#201.16** Implement `stop` command in CLI `#cli` `#code`
-  - [ ] **#201.15** Design and implement `stop` command to remove  tag without completing task `#design` `#feature` `#inprogress`
-  - [ ] **#201.14** Design `get_active_tasks` tool (or `get_status`) instead of overloading `list_tasks` `#design` `#mcp`
-  - [ ] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp`
-  - [ ] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
+  - [x] **#201.18** Add tests for `stop` command `#test`
+  - [x] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp`
+  - [x] **#201.16** Implement `stop` command in CLI `#cli` `#code`
+  - [x] **#201.15** Design and implement `stop` command to remove  tag without completing task `#design` `#feature` `#inprogress`
+  - [x] **#201.14** Design `get_active_tasks` tool (or `get_status`) instead of overloading `list_tasks` `#design` `#mcp`
+  - [x] **#201.12** Implement MCP Prompt (`active_context`) to surface in-progress tasks `#code` `#mcp`
+  - [x] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
   - [x] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
   - [x] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research`
   - [ ] **#201.8** Document start command and usage `#documentation`
-  - [ ] **#201.7** Create tests for start command and tag lifecycle `#test`
-  - [ ] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp`
-  - [ ] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic`
-  - [ ] **#201.4** Implement `start` command in CLI `#cli` `#code`
+  - [x] **#201.7** Create tests for start command and tag lifecycle `#test`
+  - [x] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp`
+  - [x] **#201.5** Implement tag removal logic (complete, delete, archive) `#code` `#logic`
+  - [x] **#201.4** Implement `start` command in CLI `#cli` `#code`
   - [x] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#inprogress` `#logic`
   - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#inprogress` `#mcp`
   - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` `#inprogress`

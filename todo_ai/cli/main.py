@@ -97,6 +97,26 @@ def modify(ctx, task_id, description, tags):
 
 
 @cli.command()
+@click.argument("task_id")
+@click.pass_context
+def start(ctx, task_id):
+    """Mark a task as in progress."""
+    from todo_ai.cli.commands import start_command
+
+    start_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.argument("task_id")
+@click.pass_context
+def stop(ctx, task_id):
+    """Stop progress on a task."""
+    from todo_ai.cli.commands import stop_command
+
+    stop_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
 @click.argument("task_ids", nargs=-1, required=True)
 @click.option("--with-subtasks", is_flag=True, help="Include subtasks in operation")
 @click.pass_context

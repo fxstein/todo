@@ -349,6 +349,28 @@ def modify_command(
         print(f"Error: {e}")
 
 
+def start_command(task_id: str, todo_path: str = "TODO.md"):
+    """Mark a task as in progress."""
+    manager = get_manager(todo_path)
+    try:
+        task = manager.start_task(task_id)
+        save_changes(manager, todo_path)
+        print(f"Started task #{task.id}: {task.description}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
+def stop_command(task_id: str, todo_path: str = "TODO.md"):
+    """Stop progress on a task."""
+    manager = get_manager(todo_path)
+    try:
+        task = manager.stop_task(task_id)
+        save_changes(manager, todo_path)
+        print(f"Stopped task #{task.id}: {task.description}")
+    except ValueError as e:
+        print(f"Error: {e}")
+
+
 def delete_command(task_ids: list[str], with_subtasks: bool = False, todo_path: str = "TODO.md"):
     """Soft delete task(s) to Deleted section."""
     manager = get_manager(todo_path)

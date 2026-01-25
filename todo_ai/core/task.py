@@ -3,6 +3,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+IN_PROGRESS_TAG = "inprogress"
+
 
 class TaskStatus(Enum):
     PENDING = "pending"
@@ -60,12 +62,14 @@ class Task:
         self.status = TaskStatus.COMPLETED
         self.completed_at = datetime.now()
         self.updated_at = datetime.now()
+        self.remove_tag(IN_PROGRESS_TAG)
 
     def mark_archived(self) -> None:
         """Mark task as archived."""
         self.status = TaskStatus.ARCHIVED
         self.archived_at = datetime.now()
         self.updated_at = datetime.now()
+        self.remove_tag(IN_PROGRESS_TAG)
         # If task was completed, preserve completed_at
         if not self.completed_at and self.status == TaskStatus.ARCHIVED:
             # Task is being archived directly (not from completed state)
@@ -80,6 +84,7 @@ class Task:
 
         self.expires_at = self.deleted_at + timedelta(days=30)
         self.updated_at = datetime.now()
+        self.remove_tag(IN_PROGRESS_TAG)
 
     def restore(self) -> None:
         """Restore task to pending status."""
@@ -203,6 +208,27 @@ class TaskManager:
             raise ValueError(f"Task {task_id} is not completed, cannot undo")
 
         task.restore()
+        return task
+
+    def start_task(self, task_id: str) -> Task:
+        """Mark a task as in progress."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        if task.status != TaskStatus.PENDING:
+            raise ValueError(f"Task {task_id} is not pending (status: {task.status.value})")
+
+        task.add_tag(IN_PROGRESS_TAG)
+        return task
+
+    def stop_task(self, task_id: str) -> Task:
+        """Stop progress on a task."""
+        task = self.get_task(task_id)
+        if not task:
+            raise ValueError(f"Task {task_id} not found")
+
+        task.remove_tag(IN_PROGRESS_TAG)
         return task
 
     def get_subtasks(self, parent_id: str) -> list[Task]:

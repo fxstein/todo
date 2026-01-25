@@ -117,12 +117,10 @@ def delete_task(task_id: str, with_subtasks: bool = False) -> str:
 
 
 @mcp.tool()
-def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = True) -> str:
+def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = False) -> str:
     """Archive a task (move to Recently Completed section)."""
-    # Note: archive_command supports with_subtasks (defaults to True)
-    return _capture_output(
-        archive_command, [task_id], reason, with_subtasks, todo_path=CURRENT_TODO_PATH
-    )
+    # Note: archive_command doesn't support with_subtasks yet in CLI signature used here
+    return _capture_output(archive_command, [task_id], reason, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()
@@ -135,6 +133,38 @@ def restore_task(task_id: str) -> str:
 def undo_task(task_id: str) -> str:
     """Reopen (undo) a completed task."""
     return _capture_output(undo_command, task_id, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def start_task(task_id: str) -> str:
+    """Mark a task as in progress."""
+    from todo_ai.cli.commands import start_command
+
+    return _capture_output(start_command, task_id, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def stop_task(task_id: str) -> str:
+    """Stop progress on a task."""
+    from todo_ai.cli.commands import stop_command
+
+    return _capture_output(stop_command, task_id, todo_path=CURRENT_TODO_PATH)
+
+
+@mcp.tool()
+def get_active_tasks() -> str:
+    """Get a list of all currently active tasks (marked #inprogress)."""
+    return _capture_output(
+        list_command, tag="inprogress", incomplete_only=True, todo_path=CURRENT_TODO_PATH
+    )
+
+
+@mcp.prompt()
+def active_context() -> str:
+    """Get the current active context (in-progress tasks)."""
+    return _capture_output(
+        list_command, tag="inprogress", incomplete_only=True, todo_path=CURRENT_TODO_PATH
+    )
 
 
 # Phase 2: Note Management

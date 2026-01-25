@@ -4,6 +4,8 @@ todo.ai includes a simple **Tamper Detection System** to ensure the integrity of
 
 > **Note:** This system is **not cryptographic security** and is not designed to prevent malicious attacks. It is a simple integrity check to track and manage manual modifications to `TODO.md` that happen outside the tool's workflow.
 
+**The system is optional and runs in logging-only mode by default.** It will detect and log external changes without blocking your workflow unless you explicitly enable strict mode.
+
 ## How It Works
 
 The system maintains a cryptographic checksum (SHA-256) of your `TODO.md` file. Every time you use a valid `todo-ai` command (CLI or MCP), this checksum is updated.

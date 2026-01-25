@@ -1,5 +1,10 @@
 {
   "files.readonlyInclude": {
-    "TODO.md": true
+    "TODO.md": true,
+    ".todo.ai/state/checksum": true,
+    ".todo.ai/state/tamper_mode": true,
+    ".todo.ai/state/TODO.md": true,
+    ".todo.ai/.todo.ai.serial": true,
+    ".todo.ai/.todo.ai.log": true
   }
 }

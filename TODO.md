@@ -25,20 +25,6 @@
   - [ ] **#200.3** Ensure all operations (add, modify, etc.) preserve the new formatting standards `#code` `#test`
   - [ ] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
   - [ ] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation`
-- [x] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality`
-  > Goal: Ensure `TODO.md` integrity is enforced automatically.
-  > - Pre-commit: Fast checks (linting, formatting).
-  > - CI: Deep checks (regression tests, logic validation).
-  > This prevents bugs like the "orphaned subtasks" from slipping through.
-  - [x] **#196.5** Update documentation to reflect new quality gates `#documentation`
-  - [x] **#196.4** Add regression test suite to CI (running `tests/integration/`) to catch logic bugs like #195 `#cicd` `#test`
-  - [x] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation`
-    > Investigation results for #196.3:
-    > - `todo-ai reformat` fixes indentation and checkboxes.
-    > - It is suitable for a pre-commit hook.
-    > - Recommendation: Add as `todo-ai-reformat` hook before linting.
-  - [x] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd`
-  - [x] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure`
 - [ ] **#193** Implement 'start task' command to track task progress and status `#design` `#feature`
   > Key questions to answer:
   > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
@@ -365,6 +351,20 @@
     - [ ] **#139.6.1** Nested sub-subtask with note for testing `#test`
       > This nested sub-subtask note should also appear in show output after fix - verifies all nesting levels work.
 ## Recently Completed
+- [x] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality` (2026-01-25)
+  > Goal: Ensure `TODO.md` integrity is enforced automatically.
+  > - Pre-commit: Fast checks (linting, formatting).
+  > - CI: Deep checks (regression tests, logic validation).
+  > This prevents bugs like the "orphaned subtasks" from slipping through.
+  - [x] **#196.5** Update documentation to reflect new quality gates `#documentation` (2026-01-25)
+  - [x] **#196.4** Add regression test suite to CI (running `tests/integration/`) to catch logic bugs like #195 `#cicd` `#test` (2026-01-25)
+  - [x] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation` (2026-01-25)
+    > Investigation results for #196.3:
+    > - `todo-ai reformat` fixes indentation and checkboxes.
+    > - It is suitable for a pre-commit hook.
+    > - Recommendation: Add as `todo-ai-reformat` hook before linting.
+  - [x] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd` (2026-01-25)
+  - [x] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure` (2026-01-25)
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.

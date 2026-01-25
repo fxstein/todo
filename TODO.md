@@ -10,6 +10,9 @@
   - [ ] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd`
   - [ ] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration`
 - [ ] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature`
+  - [ ] **#201.11** Implement `start_task` tool in MCP server `#code` `#mcp`
+  - [ ] **#201.10** Create design document for 'start' command architecture `#design` `#documentation`
+  - [ ] **#201.9** Research existing 'start' command patterns and define requirements `#design` `#research`
   - [ ] **#201.8** Document start command and usage `#documentation`
   - [ ] **#201.7** Create tests for start command and tag lifecycle `#test`
   - [ ] **#201.6** Implement MCP server surfacing of in-progress tasks `#code` `#mcp`
@@ -31,19 +34,6 @@
   - [ ] **#200.3** Ensure all operations (add, modify, etc.) preserve the new formatting standards `#code` `#test`
   - [ ] **#200.2** Define enhanced formatting standards (e.g., spacing, indentation, headers) `#design`
   - [ ] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation`
-- [ ] **#193** Implement 'start task' command to track task progress and status `#design` `#feature`
-  > Key questions to answer:
-  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
-  > 2. Should we support time tracking (start/stop)?
-  > 3. How does this interact with todo.txt format (e.g. priority changes)?
-  > 4. Should this trigger any external integrations?
-  - [ ] **#193.7** Update documentation with 'start' command usage `#documentation`
-  - [ ] **#193.6** Add unit and integration tests for 'start' command `#test`
-  - [ ] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp`
-  - [ ] **#193.4** Implement 'start' command in CLI `#code` `#implementation`
-  - [ ] **#193.3** Create design document for 'start' command architecture `#design` `#documentation`
-  - [ ] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design`
-  - [ ] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research`
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
   - [ ] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp`
@@ -1116,6 +1106,19 @@
 - [x] **#32** Implement nested subtasks support (2-level limit) `#feature` (2025-10-30)
 
 ## Deleted Tasks
+  - [D] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.3** Create design document for 'start' command architecture `#design` `#documentation` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.4** Implement 'start' command in CLI `#code` `#implementation` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
+  - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
+- [D] **#193** Implement 'start task' command to track task progress and status `#design` `#feature` (deleted 2026-01-25, expires 2026-02-24)
+  > Key questions to answer:
+  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
+  > 2. Should we support time tracking (start/stop)?
+  > 3. How does this interact with todo.txt format (e.g. priority changes)?
+  > 4. Should this trigger any external integrations?
   - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)

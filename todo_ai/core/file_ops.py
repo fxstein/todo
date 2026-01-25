@@ -172,7 +172,7 @@ class FileOps:
             self.state_dir.mkdir(parents=True, exist_ok=True)
 
         # Write checksum
-        self.checksum_path.write_text(new_hash, encoding="utf-8")
+        self.checksum_path.write_text(new_hash + "\n", encoding="utf-8")
 
         # Update shadow copy
         # Atomic write for shadow copy not strictly necessary but good practice

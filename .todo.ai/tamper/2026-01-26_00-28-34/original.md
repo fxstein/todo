@@ -12,11 +12,11 @@
   - [ ] **#212.2** Consolidate overlapping rules and simplify `#refactor`
   - [ ] **#212.1** Audit existing rules for legacy shell/CLI references `#audit`
 
-- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
+- [ ] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security`
   > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
   > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
   > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
-  - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
+  - [ ] **#210.6** Document tamper detection feature for users and developers `#documentation` `#inprogress`
   - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
   - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
   - [x] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design` (2026-01-26)
@@ -1216,4 +1216,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 00:28:40
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 00:01:26

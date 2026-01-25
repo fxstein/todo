@@ -4,6 +4,17 @@
 
 ## Tasks
 
+- [ ] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security`
+  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
+  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
+  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
+  - [ ] **#210.6** Document tamper detection feature for users and developers `#documentation`
+  - [ ] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation`
+  - [ ] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation`
+  - [ ] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design`
+  - [ ] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security`
+  - [ ] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation`
+
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
@@ -1443,4 +1454,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:03:36
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:06:53

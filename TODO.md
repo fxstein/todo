@@ -9,9 +9,9 @@
   - [ ] **#206.6** Verify all 5 parity tests pass (dataset_parity + feature_parity) `#bug`
   - [ ] **#206.5** Implement fix in shell script (todo.ai) `#bug`
   - [ ] **#206.4** Design fix to suppress Cursor rules initialization during tests `#bug`
-  - [ ] **#206.3** Identify root cause (check if recent regression in shell script) `#bug`
-  - [ ] **#206.2** Investigate why Cursor rules initialization triggers during test runs `#bug`
-  - [ ] **#206.1** Reproduce shell script test failures locally `#bug`
+  - [x] **#206.3** Identify root cause (check if recent regression in shell script) `#bug`
+  - [x] **#206.2** Investigate why Cursor rules initialization triggers during test runs `#bug`
+  - [x] **#206.1** Reproduce shell script test failures locally `#bug`
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`

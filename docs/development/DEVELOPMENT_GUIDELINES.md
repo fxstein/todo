@@ -129,3 +129,20 @@ git push
 - `.cursor/rules/zsh-first-development.mdc` - Cursor rule enforcing this workflow
 - `docs/analysis/BASH_VS_ZSH_ANALYSIS.md` - Why we support both versions
 - `release/release.sh` - Automated conversion logic
+
+## File Integrity & Tamper Detection
+
+todo.ai uses a strict tamper detection system to protect `TODO.md` integrity.
+
+### Key Concepts
+- **Checksum:** SHA-256 hash stored in `.todo.ai/state/checksum`.
+- **Shadow Copy:** Last valid file state stored in `.todo.ai/state/TODO.md`.
+- **Tamper Mode:** Configured in `config.yaml` (`security.tamper_proof`).
+  - `false` (Passive): Logs warning, auto-accepts changes.
+  - `true` (Active): Blocks execution until resolved.
+
+### Developer Implications
+- **Never edit `TODO.md` manually** during development unless testing tamper detection.
+- **Use `FileOps` class** for all file operations—it handles checksums automatically.
+- **Testing:** Use `tests/unit/test_tamper_detection.py` to verify integrity logic.
+- **Recovery:** If you accidentally corrupt `TODO.md` during dev, use `git checkout TODO.md` to revert to the last committed state.

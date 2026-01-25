@@ -544,5 +544,6 @@ todo-ai version                     # Show version
 
 - **Documentation:** See `docs/` directory for detailed guides
 - **Report bugs:** `./todo.ai report-bug "description" "context" "command"`
+- **Tamper Detection:** See [Tamper Detection Guide](TAMPER_DETECTION.md) for file integrity protection.
 - **GitHub:** https://github.com/fxstein/todo.ai
 - **Issues:** https://github.com/fxstein/todo.ai/issues

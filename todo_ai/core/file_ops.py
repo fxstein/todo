@@ -1,8 +1,13 @@
+import hashlib
+import os
 import re
+import shutil
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+from todo_ai.core.config import Config
+from todo_ai.core.exceptions import TamperError
 from todo_ai.core.task import Task, TaskStatus
 
 
@@ -44,10 +49,17 @@ class FileStructureSnapshot:
 class FileOps:
     """Handles file operations for TODO.md and .todo.ai directory."""
 
-    def __init__(self, todo_path: str = "TODO.md"):
+    def __init__(
+        self, todo_path: str = "TODO.md", interface: str = "CLI", skip_verify: bool = False
+    ):
         self.todo_path = Path(todo_path)
         self.config_dir = self.todo_path.parent / ".todo.ai"
         self.serial_path = self.config_dir / ".todo.ai.serial"
+        self.checksum_path = self.config_dir / "checksum"
+        self.shadow_path = self.config_dir / "shadow" / "TODO.md"
+        self.log_path = self.config_dir / ".todo.ai.log"
+        self.tamper_mode_path = self.config_dir / "tamper_mode"
+        self.interface = interface
 
         # State to preserve file structure
         self.header_lines: list[str] = []
@@ -78,6 +90,133 @@ class FileOps:
         if not self.config_dir.exists():
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
+        # Verify integrity on init (Gatekeeper)
+        if not skip_verify:
+            self.verify_integrity()
+
+    def calculate_checksum(self, content: str) -> str:
+        """Calculate SHA-256 hash of normalized content."""
+        # Normalize newlines to \n
+        normalized = content.replace("\r\n", "\n").replace("\r", "\n")
+        # Encode to UTF-8
+        encoded = normalized.encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()
+
+    def verify_integrity(self) -> None:
+        """Verify TODO.md integrity against stored checksum."""
+        if not self.todo_path.exists():
+            return
+
+        try:
+            content = self.todo_path.read_text(encoding="utf-8")
+            current_hash = self.calculate_checksum(content)
+        except Exception:
+            # If we can't read the file, we can't verify it.
+            # Let other methods handle file not found or permission errors.
+            return
+
+        # Check configuration for tamper proof mode
+        config = Config(str(self.config_dir / "config.yaml"))
+        tamper_proof = config.get("security.tamper_proof", False)
+
+        # Update tamper mode state file if changed
+        current_mode_str = "true" if tamper_proof else "false"
+        last_mode_str = ""
+        if self.tamper_mode_path.exists():
+            last_mode_str = self.tamper_mode_path.read_text(encoding="utf-8").strip()
+
+        if current_mode_str != last_mode_str:
+            self.tamper_mode_path.write_text(current_mode_str, encoding="utf-8")
+            self._log_action(
+                "SETTING_CHANGE",
+                "system",
+                current_hash[:8],
+                f"Tamper proof mode changed to {tamper_proof}",
+            )
+
+        if not self.checksum_path.exists():
+            # First run or missing checksum - initialize it
+            self.update_integrity(content)
+            return
+
+        stored_hash = self.checksum_path.read_text(encoding="utf-8").strip()
+
+        if current_hash != stored_hash:
+            if tamper_proof:
+                raise TamperError(
+                    "External modification detected in TODO.md",
+                    expected_hash=stored_hash,
+                    actual_hash=current_hash,
+                )
+            else:
+                # Passive mode: Log warning and auto-accept
+                self._log_action(
+                    "TAMPER_DETECTED",
+                    "system",
+                    current_hash[:8],
+                    "External modification detected (Passive Mode) - Auto-accepting",
+                )
+                self.update_integrity(content)
+
+    def update_integrity(self, content: str) -> str:
+        """Update checksum and shadow copy."""
+        # Calculate new hash
+        new_hash = self.calculate_checksum(content)
+
+        # Write checksum
+        self.checksum_path.write_text(new_hash, encoding="utf-8")
+
+        # Update shadow copy
+        if not self.shadow_path.parent.exists():
+            self.shadow_path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Atomic write for shadow copy not strictly necessary but good practice
+        # We'll just write directly for now
+        self.shadow_path.write_text(content, encoding="utf-8")
+
+        return new_hash
+
+    def _log_action(self, action: str, task_id: str, checksum: str, description: str = "") -> None:
+        """Log action to .todo.ai.log."""
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        user = os.environ.get("USER") or os.environ.get("USERNAME") or "unknown"
+
+        # Format: TIMESTAMP | USER | INTERFACE | ACTION | TASK_ID | CHECKSUM | DESCRIPTION
+        log_entry = f"{timestamp} | {user} | {self.interface} | {action} | {task_id} | {checksum} | {description}"
+
+        try:
+            with open(self.log_path, "a", encoding="utf-8") as f:
+                f.write(log_entry + "\n")
+        except Exception as e:
+            print(f"Warning: Failed to write to log: {e}")
+
+    def accept_tamper(self, reason: str) -> None:
+        """Accept external changes and update integrity."""
+        if not self.todo_path.exists():
+            raise FileNotFoundError("TODO.md not found")
+
+        content = self.todo_path.read_text(encoding="utf-8")
+
+        # Archive the event
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        event_dir = self.config_dir / "tamper" / timestamp
+        event_dir.mkdir(parents=True, exist_ok=True)
+
+        # Save shadow copy (original) if it exists
+        if self.shadow_path.exists():
+            shutil.copy2(self.shadow_path, event_dir / "original.md")
+
+        # Save current file (forced)
+        shutil.copy2(self.todo_path, event_dir / "forced.md")
+
+        # Update integrity
+        new_hash = self.update_integrity(content)
+
+        # Log event
+        self._log_action(
+            "FORCE_ACCEPT", "system", new_hash[:8], f"Accepted external changes: {reason}"
+        )
+
     def read_tasks(self) -> list[Task]:
         """Read tasks from TODO.md.
 
@@ -106,11 +245,13 @@ class FileOps:
         content = self.todo_path.read_text(encoding="utf-8")
         return self._parse_markdown(content)
 
-    def write_tasks(self, tasks: list[Task]) -> None:
+    def write_tasks(self, tasks: list[Task], action: str = "UPDATE", task_id: str = "") -> None:
         """Write tasks to TODO.md using preserved structure snapshot.
 
         Args:
             tasks: List of tasks to write
+            action: Action name for logging (default: UPDATE)
+            task_id: Task ID associated with action (default: empty)
         """
         # Phase 14: Ensure snapshot is available (should always be set by read_tasks())
         if self._structure_snapshot is None:
@@ -122,6 +263,20 @@ class FileOps:
 
         content = self._generate_markdown(tasks, self._structure_snapshot)
         self.todo_path.write_text(content, encoding="utf-8")
+
+        # Update integrity and log
+        checksum = self.update_integrity(content)
+
+        # Determine description based on action (simplified)
+        description = ""
+        if action == "ADD" and task_id:
+            # Find the task to get description
+            for t in tasks:
+                if t.id == task_id:
+                    description = t.description
+                    break
+
+        self._log_action(action, task_id, checksum[:8], description)
 
     def get_serial(self) -> int:
         """Get the current serial number from file."""

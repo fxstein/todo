@@ -36,6 +36,7 @@ from todo_ai.cli.commands import (
     update_tool_command,
     version_tool_command,
 )
+from todo_ai.core.exceptions import TamperError
 
 
 @click.group()
@@ -53,6 +54,27 @@ def cli(ctx, todo_file, root):
     else:
         ctx.obj["todo_file"] = todo_file
     ctx.obj["root"] = root
+
+
+def main():
+    """Entry point for the CLI with error handling."""
+    try:
+        cli()
+    except TamperError as e:
+        print("")
+        print("⛔ TAMPER DETECTED: TODO.md has been modified externally.")
+        print(f"Expected hash: {e.expected_hash[:8]}...")
+        print(f"Actual hash:   {e.actual_hash[:8]}...")
+        print("")
+        print("Use 'todo-ai tamper diff' to see changes.")
+        print("Use 'todo-ai tamper accept \"reason\"' to accept external changes.")
+        print("")
+        import sys
+
+        sys.exit(1)
+    except Exception as e:
+        # Let other exceptions bubble up or handle them if needed
+        raise e
 
 
 @cli.command()
@@ -449,5 +471,31 @@ def serve(ctx, root):
     run_server(root_path)
 
 
+# Phase 8: Tamper Detection
+@cli.group()
+def tamper():
+    """Manage file integrity and tamper detection."""
+    pass
+
+
+@tamper.command("diff")
+@click.pass_context
+def tamper_diff(ctx):
+    """Show diff between current file and last valid state."""
+    from todo_ai.cli.tamper_ops import tamper_diff_command
+
+    tamper_diff_command(todo_path=ctx.obj["todo_file"])
+
+
+@tamper.command("accept")
+@click.argument("reason")
+@click.pass_context
+def tamper_accept(ctx, reason):
+    """Accept external changes."""
+    from todo_ai.cli.tamper_ops import tamper_accept_command
+
+    tamper_accept_command(reason, todo_path=ctx.obj["todo_file"])
+
+
 if __name__ == "__main__":
-    cli()
+    main()

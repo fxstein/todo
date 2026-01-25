@@ -37,6 +37,7 @@ from todo_ai.cli.commands import (
     update_note_command,
     update_tool_command,
 )
+from todo_ai.core.exceptions import TamperError
 
 # Initialize FastMCP
 mcp = FastMCP("todo-ai")
@@ -52,6 +53,13 @@ def _capture_output(func, *args, **kwargs) -> str:
     try:
         func(*args, **kwargs)
         return captured_output.getvalue() or "Success"
+    except TamperError as e:
+        return (
+            f"⛔ TAMPER DETECTED: TODO.md has been modified externally.\n"
+            f"Expected hash: {e.expected_hash[:8]}...\n"
+            f"Actual hash:   {e.actual_hash[:8]}...\n\n"
+            f"Use 'accept_tamper' tool to resolve."
+        )
     except Exception as e:
         return f"Error: {str(e)}"
     finally:
@@ -312,6 +320,17 @@ def uninstall_tool(
 ) -> str:
     """Uninstall todo.ai."""
     return _capture_output(uninstall_tool_command, remove_data, remove_rules, force)
+
+
+# Phase 8: Tamper Detection
+
+
+@mcp.tool()
+def accept_tamper(reason: str) -> str:
+    """Accept external changes to TODO.md."""
+    from todo_ai.cli.tamper_ops import tamper_accept_command
+
+    return _capture_output(tamper_accept_command, reason, todo_path=CURRENT_TODO_PATH)
 
 
 def run_server(root_path: str = "."):

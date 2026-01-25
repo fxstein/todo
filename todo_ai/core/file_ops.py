@@ -735,10 +735,27 @@ class FileOps:
             # Root tasks: 1 blank line between them (and before them if following a subtask)
             # Subtasks: 0 blank lines (handled by not adding one here)
             # Logic: Add blank line if NEXT task is a root task
+            # BUT: Do not add blank line if the current task is a subtask and the next task is a subtask of the SAME parent
+            # Actually, the rule is simpler:
+            # - Between root tasks: Blank line
+            # - Between subtasks of same parent: No blank line
+            # - Between subtask and NEXT root task: Blank line
+
             if i < len(active_tasks) - 1:
                 next_task = active_tasks[i + 1]
+                # Debug print (remove later)
+                # print(f"DEBUG: Current: {t.id}, Next: {next_task.id}, Dot in next: {'.' in next_task.id}")
+
+                # If next task is a root task, always add a blank line
                 if "." not in next_task.id:
                     lines.append("")
+                # If next task is a subtask, check if it belongs to a different parent
+                # (This shouldn't happen in a sorted list where subtasks follow parents,
+                # but if we have orphaned subtasks or mixed hierarchy, we might want separation)
+                # For now, strictly following: Root tasks get separation. Subtasks don't.
+                # If current is root and next is subtask (child), NO blank line.
+                # If current is subtask and next is subtask (sibling), NO blank line.
+                # If current is subtask and next is root (new parent), YES blank line (handled by first check).
 
         # 3. Archived Tasks Section
         if archived_tasks:

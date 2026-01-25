@@ -433,10 +433,35 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
 
         task = manager.restore_task(task_id)
 
-        # CRITICAL: Restored tasks must appear at the TOP of the Tasks section
-        # Reorder tasks to put restored task first
+        # CRITICAL: Positioning depends on whether this is a root task or subtask
         all_tasks = manager.list_tasks()
-        reordered_tasks = [task] + [t for t in all_tasks if t.id != task.id]
+
+        # Check if this is a subtask (contains a dot in the ID)
+        if "." in task_id:
+            # Subtask: Insert after parent
+            parent_id = task_id.rsplit(".", 1)[0]
+            tasks_without_restored = [t for t in all_tasks if t.id != task.id]
+
+            # Find parent index
+            parent_index = -1
+            for i, t in enumerate(tasks_without_restored):
+                if t.id == parent_id:
+                    parent_index = i
+                    break
+
+            if parent_index != -1:
+                # Insert after parent
+                reordered_tasks = (
+                    tasks_without_restored[: parent_index + 1]
+                    + [task]
+                    + tasks_without_restored[parent_index + 1 :]
+                )
+            else:
+                # Parent not found, put at top as fallback
+                reordered_tasks = [task] + tasks_without_restored
+        else:
+            # Root task: Put at the TOP of the Tasks section
+            reordered_tasks = [task] + [t for t in all_tasks if t.id != task.id]
 
         # Phase 14: Structure preservation is handled automatically by snapshot
         # No manual file editing needed
@@ -457,22 +482,11 @@ def restore_command(task_id: str, todo_path: str = "TODO.md"):
 
         if restored_subtasks:
             # Re-write tasks to save restored subtasks
-            # We need to re-fetch the list to ensure correct order
-            all_tasks = manager.list_tasks()
-            # Ensure parent is still at top (it should be)
-            # Subtasks should follow parent naturally in the list or be reordered by `reorder` command later
-            # But for now, we just save the state.
-            # Ideally, we should insert subtasks after parent.
-            # But `write_tasks` preserves order.
-            # If subtasks were archived, they might be at the bottom (Archived Tasks).
-            # We need to move them to be after the parent.
+            # CRITICAL: Use reordered_tasks (with parent at top), not a fresh fetch
+            # If we re-fetch from manager, we lose the top position!
 
-            # Let's use the same logic as `add_subtask` to insert them after parent
-            # But we have multiple subtasks.
-            # Simplest approach: Filter out restored subtasks, then insert them after parent.
-
-            # 1. Remove restored subtasks from their current position
-            tasks_without_subtasks = [t for t in all_tasks if t not in restored_subtasks]
+            # 1. Remove restored subtasks from their current position in reordered_tasks
+            tasks_without_subtasks = [t for t in reordered_tasks if t not in restored_subtasks]
 
             # 2. Find parent index
             parent_index = -1

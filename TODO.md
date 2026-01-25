@@ -386,6 +386,19 @@
 ---
 
 ## Archived Tasks
+- [x] **#209** Tell at least 3 funny jokes `#test` (2026-01-25)
+  - [x] **#209.6** What do you call fake spaghetti? An impasta! `#joke` `#test` (2026-01-25)
+    > The joke plays on the word 'imposter' (someone pretending to be something they're not) combined with 'pasta' to create 'impasta' - fake pasta that's pretending to be real spaghetti.
+  - [x] **#209.5** Why don't scientists trust atoms? Because they make up everything! `#joke` `#test` (2026-01-25)
+    > This is a play on words. Atoms are the fundamental building blocks of matter - they literally 'make up' everything in the physical sense. But 'make up' also means to fabricate or lie, so the joke suggests atoms are untrustworthy because they invent things.
+  - [x] **#209.4** I invented a new word! Plagiarism! `#joke` `#test` (2026-01-25)
+    > The humor comes from the fact that 'plagiarism' itself is a real word meaning to copy someone else's work and claim it as your own. By claiming to have 'invented' the word plagiarism, the speaker is ironically demonstrating plagiarism - they didn't invent it, they're just using an existing word.
+  - [x] **#209.3** I told my wife she was drawing her eyebrows too high. She looked surprised. `#joke` `#test` (2026-01-25)
+    > This is visual wordplay. When someone draws their eyebrows too high on their face, they look perpetually surprised. So when the speaker says 'she looked surprised' in response to the criticism, it's because her eyebrows are positioned in a way that makes her look surprised - not because she was emotionally surprised by the comment.
+  - [x] **#209.2** Parallel lines have so much in common. It’s a shame they’ll never meet. `#joke` `#test` (2026-01-25)
+    > In geometry, parallel lines run alongside each other at the same distance forever but never intersect or 'meet'. The joke uses this mathematical fact as a metaphor for two things that are similar but will never come together, making it sound tragic or poetic when it's just a geometric property.
+  - [x] **#209.1** Why did the scarecrow win an award? Because he was outstanding in his field! `#joke` `#test` (2026-01-25)
+    > This is a double meaning joke. 'Outstanding in his field' is a common phrase meaning excellent or exceptional at what you do. But a scarecrow literally stands out in a field - that's its job. So the scarecrow won an award for being exceptional, but also because it physically stands in a field.
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
@@ -1387,4 +1400,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 20:46:07
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 21:21:03

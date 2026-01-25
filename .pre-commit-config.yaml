@@ -69,7 +69,7 @@ repos:
 
       - id: todo-ai-lint
         name: todo.ai lint
-        entry: uv run todo-ai lint
+        entry: uv run python -m todo_ai.cli.main lint
         language: system
         types: [markdown]
         files: ^TODO\.md$

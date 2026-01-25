@@ -368,11 +368,45 @@
 ---
 
 ## Archived Tasks
+- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2026-01-25)
+  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
+  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2026-01-25)
+    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
+  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug` (2026-01-25)
+    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
+  - [x] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug` (2026-01-25)
+  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug` (2026-01-25)
+  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug` (2026-01-25)
+    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
+- [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2026-01-25)
+  > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
+  - [x] **#125.9** Enhance context auto-collection: add git status, recent commands, TODO.md state `#code` (2026-01-25)
+    > Expand collect_error_context() function: (1) Git status: branch, dirty state, last commit, (2) Shell history: last 5 commands from .todo.ai.log, (3) TODO.md state: active task count, mode, coordination type, (4) Environment: TERM, EDITOR, relevant env vars, (5) File context: if error in specific file, include relevant lines. Format all in collapsible sections to keep bug report clean.
+  - [x] **#125.8** Remove prompts from suggest_bug_report() - make fully automated for AI agents `#code` (2026-01-25)
+    > Currently suggest_bug_report() (line 6245) prompts user with 'Report this bug? (y/N)'. For agents: (1) Detect if running in AI agent context (check for CURSOR_AI, AI_AGENT env vars), (2) If agent: show preview but proceed automatically after 2 second delay, (3) If human: keep existing prompt workflow. Agent flow: Show preview → 'Auto-submitting in 2 seconds...' → Submit. Maintains user control for humans, enables automation for agents.
+  - [x] **#125.7** Rewrite generate_bug_report() to use GitHub callout blocks and better markdown structure `#code` (2026-01-25)
+    > Use GitHub markdown features: (1) Callout blocks for System Info (> [!NOTE]), Error sections (> [!WARNING]), (2) Clean section headers with --- separators, (3) Proper code blocks with language tags, (4) Collapsible <details> for logs, (5) Table format for system information. Mirror the structure from bug_report.yml template. Located in todo.ai around line 5834.
+  - [x] **#125.6** Create GitHub issue template for bug reports (.github/ISSUE_TEMPLATE/bug_report.yml) `#feature` (2026-01-25)
+    > Create .github/ISSUE_TEMPLATE/bug_report.yml with structured fields: Error Description (textarea), Command Used (input), Error Context (textarea), System Info (auto-filled), Logs (auto-attached). Use GitHub's form schema for issue templates. This will be used as the reference template for generate_bug_report() function.
+  - [x] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (2026-01-25)
+  - [x] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (2026-01-25)
+  - [x] **#125.3** Improve bug report formatting with better markdown structure `#bug` (2026-01-25)
+  - [x] **#125.2** Update bug report template for better readability and structure `#bug` (2026-01-25)
+  - [x] **#125.13** Update bug reporting design document with new implementation details `#docs` (2026-01-25)
+    > Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
     > Implementation complete. Test before next release: (1) Set AI_AGENT=true to test agent flow, (2) Unset to test human flow, (3) Trigger error and call report-bug, (4) Verify markdown renders correctly, (5) Check labels applied, (6) Verify all context sections populated. Should test both flows to ensure proper detection and different behaviors.
     > Create test bug report with all new features: (1) Trigger error in test environment, (2) Run report-bug command, (3) Verify markdown renders correctly on GitHub (callout blocks, tables, code blocks), (4) Test with agent simulation (set AI_AGENT=true env var), (5) Verify duplicate detection still works, (6) Check auto-labels applied correctly, (7) Validate all context sections populated.
+  - [x] **#125.11** Update cursor rules to reflect new agent-friendly bug reporting workflow `#docs` (2026-01-25)
+    > Update .cursor/rules/todo.ai-bug-reporting.mdc: (1) Remove mention of user prompts for agents, (2) Add note that agents can use report-bug directly without prompts, (3) Humans still get confirmation prompts, (4) Show updated example of agent usage: 'When error occurs, call ./todo.ai report-bug and it will auto-submit'. Keep rule concise (<25 lines).
+  - [x] **#125.10** Add intelligent error categorization and suggested labels `#feature` (2026-01-25)
+    > Auto-detect error type from error message/context and suggest GitHub labels: (1) 'bug' always, (2) 'crash' if segfault/core dump, (3) 'performance' if timeout/slow, (4) 'data-loss' if file corruption, (5) 'coordination' if GitHub API/coordination issues, (6) OS-specific: 'macos', 'linux', 'wsl', (7) Shell-specific: 'zsh', 'bash'. Use pattern matching on error message. Add labels via gh issue create --label.
+  - [x] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (2026-01-25)
+- [x] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode) `#bug` (2026-01-25)
   - [x] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test` (2026-01-25)
-  - [x] **#161.3** Test migration execution when installed to /usr/local/bin or /usr/bin `#bug` (2026-01-25)
+  - [x] **#126.3** Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode) `#bug` (2026-01-25)
+  - [x] **#126.2** Verify coordination should work with single-user mode without forcing enhanced (verified - validation supports single-user + coordination) `#bug` (2026-01-25)
+  - [x] **#126.1** Investigate setup-coordination command mode switching logic (completed - found hardcoded mode: enhanced on line 3353) `#bug` (2026-01-25)
 - [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python` (2026-01-25)
   > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
   - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test` (2026-01-25)
@@ -782,22 +816,6 @@
     > Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
   - [x] **#167.1** Phase 1.1: Add uv dependency management `#cicd` (2025-12-14)
     > Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
-- [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2025-12-12)
-  > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
-  - [x] **#125.13** Update bug reporting design document with new implementation details `#docs` (2025-12-12)
-    > Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
-  - [x] **#125.11** Update cursor rules to reflect new agent-friendly bug reporting workflow `#docs` (2025-12-12)
-    > Update .cursor/rules/todo.ai-bug-reporting.mdc: (1) Remove mention of user prompts for agents, (2) Add note that agents can use report-bug directly without prompts, (3) Humans still get confirmation prompts, (4) Show updated example of agent usage: 'When error occurs, call ./todo.ai report-bug and it will auto-submit'. Keep rule concise (<25 lines).
-  - [x] **#125.10** Add intelligent error categorization and suggested labels `#feature` (2025-12-12)
-    > Auto-detect error type from error message/context and suggest GitHub labels: (1) 'bug' always, (2) 'crash' if segfault/core dump, (3) 'performance' if timeout/slow, (4) 'data-loss' if file corruption, (5) 'coordination' if GitHub API/coordination issues, (6) OS-specific: 'macos', 'linux', 'wsl', (7) Shell-specific: 'zsh', 'bash'. Use pattern matching on error message. Add labels via gh issue create --label.
-  - [x] **#125.9** Enhance context auto-collection: add git status, recent commands, TODO.md state `#code` (2025-12-12)
-    > Expand collect_error_context() function: (1) Git status: branch, dirty state, last commit, (2) Shell history: last 5 commands from .todo.ai.log, (3) TODO.md state: active task count, mode, coordination type, (4) Environment: TERM, EDITOR, relevant env vars, (5) File context: if error in specific file, include relevant lines. Format all in collapsible sections to keep bug report clean.
-  - [x] **#125.8** Remove prompts from suggest_bug_report() - make fully automated for AI agents `#code` (2025-12-12)
-    > Currently suggest_bug_report() (line 6245) prompts user with 'Report this bug? (y/N)'. For agents: (1) Detect if running in AI agent context (check for CURSOR_AI, AI_AGENT env vars), (2) If agent: show preview but proceed automatically after 2 second delay, (3) If human: keep existing prompt workflow. Agent flow: Show preview → 'Auto-submitting in 2 seconds...' → Submit. Maintains user control for humans, enables automation for agents.
-  - [x] **#125.7** Rewrite generate_bug_report() to use GitHub callout blocks and better markdown structure `#code` (2025-12-12)
-    > Use GitHub markdown features: (1) Callout blocks for System Info (> [!NOTE]), Error sections (> [!WARNING]), (2) Clean section headers with --- separators, (3) Proper code blocks with language tags, (4) Collapsible <details> for logs, (5) Table format for system information. Mirror the structure from bug_report.yml template. Located in todo.ai around line 5834.
-  - [x] **#125.6** Create GitHub issue template for bug reports (.github/ISSUE_TEMPLATE/bug_report.yml) `#feature` (2025-12-12)
-    > Create .github/ISSUE_TEMPLATE/bug_report.yml with structured fields: Error Description (textarea), Command Used (input), Error Context (textarea), System Info (auto-filled), Logs (auto-attached). Use GitHub's form schema for issue templates. This will be used as the reference template for generate_bug_report() function.
 - [x] **#160** Fix issue#35: Task not found after successful modify command `#bug` (2025-12-12)
   > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
   > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
@@ -809,15 +827,6 @@
   - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug` (2025-12-12)
   - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug` (2025-12-12)
     > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
-- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2025-12-12)
-  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
-  - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2025-12-12)
-    > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
-  - [x] **#161.4** Fix migration path detection for system-wide installations `#bug` (2025-12-12)
-    > FIXED: Added ORIGINAL_WORKING_DIR variable captured at script startup. Updated run_migrations() to use ORIGINAL_WORKING_DIR instead of $(pwd) for migrations_dir. This ensures migrations always run in the user's working directory (where .todo.ai exists), not the script's directory (e.g., /usr/local/bin). Fixes issue where update command changes directory to script_dir before executing new version, causing run_migrations() to look in wrong location.
-  - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug` (2025-12-12)
-  - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug` (2025-12-12)
-    > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
 - [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug` (2025-11-16)
   > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
   - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug` (2025-11-16)
@@ -1261,10 +1270,6 @@
   - [x] **#55.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2025-11-02)
   - [x] **#55.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2025-11-02)
 - [x] **#56** Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check `#bug` (2025-11-02)
-- [x] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode) `#bug` (2025-11-02)
-  - [x] **#126.3** Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode) `#bug` (2025-11-02)
-  - [x] **#126.2** Verify coordination should work with single-user mode without forcing enhanced (verified - validation supports single-user + coordination) `#bug` (2025-11-02)
-  - [x] **#126.1** Investigate setup-coordination command mode switching logic (completed - found hardcoded mode: enhanced on line 3353) `#bug` (2025-11-02)
 - [x] **#5** Initialize repository structure and configuration `#repo` `#setup` (2025-11-01)
 - [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#git` `#setup` (2025-11-01)
 - [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
@@ -1376,11 +1381,6 @@
   - [D] **#151.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
     - [D] **#154.1.1** Level 2 sub-subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#154.1** Level 1 subtask `#test` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#125.5** Test bug reporting flow with automated agent execution `#bug` `#test` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.4** Add context detection to auto-fill relevant information without prompts `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.3** Improve bug report formatting with better markdown structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.2** Update bug report template for better readability and structure `#bug` (deleted 2025-11-12, expires 2025-12-12)
-  - [D] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (deleted 2025-11-12, expires 2025-12-12)
   - [D] **#137.1** First subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
     - [D] **#138.1.1** Nested sub-subtask `#test` (deleted 2025-11-09, expires 2025-12-09)
   - [D] **#138.1** First subtask after fix `#test` (deleted 2025-11-09, expires 2025-12-09)
@@ -1460,4 +1460,4 @@
   - [D] **#41.1** Level 1 subtask (deleted 2025-11-01, expires 2025-12-01)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:11:32
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-25 22:19:19

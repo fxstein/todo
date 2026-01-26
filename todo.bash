@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.0b16
+# Version: 3.0.0b17
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 
@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.0b16"
+VERSION="3.0.0b17"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 
@@ -1472,6 +1472,12 @@ EOF
 init_cursor_rules() {
     # Skip cursor rules initialization during tests
     if [[ -n "$TODO_AI_TESTING" ]]; then
+        return 0
+    fi
+
+    # Skip in development repository (has todo_ai/ Python package and pyproject.toml)
+    # Development repo has manually maintained rules that shouldn't be overwritten
+    if [[ -d "${ROOT_DIR}/todo_ai" ]] && [[ -f "${ROOT_DIR}/pyproject.toml" ]]; then
         return 0
     fi
 

@@ -1474,7 +1474,13 @@ init_cursor_rules() {
     if [[ -n "$TODO_AI_TESTING" ]]; then
         return 0
     fi
-    
+
+    # Skip in development repository (has todo_ai/ Python package and pyproject.toml)
+    # Development repo has manually maintained rules that shouldn't be overwritten
+    if [[ -d "${ROOT_DIR}/todo_ai" ]] && [[ -f "${ROOT_DIR}/pyproject.toml" ]]; then
+        return 0
+    fi
+
     local rules_dir="${ROOT_DIR}/.cursor/rules"
     local cursor_rules_file="${ROOT_DIR}/.cursorrules"
     local rules_created=0

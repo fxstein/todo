@@ -23,9 +23,8 @@ RELEASE_SUMMARY.md
 .cursor/rules/ai-todo-*.mdc
 .cursor/rules/todo.ai-*.mdc
 
-# Data directories (for development repo - don't commit local state)
-# In user projects, these would NOT be ignored
-/.ai-todo/
+# Legacy data directory (shell script creates .todo.ai/, Python uses .ai-todo/)
+# Only ignore the old naming to prevent accidental commits from shell tests
 /.todo.ai/
 
 # Backup files created by mode switching and rollback operations

@@ -333,11 +333,48 @@ def accept_tamper(reason: str) -> str:
     return _capture_output(tamper_accept_command, reason, todo_path=CURRENT_TODO_PATH)
 
 
+AI_TODO_CURSOR_RULE = """---
+description: "Task management via ai-todo MCP server"
+alwaysApply: true
+---
+# ai-todo Task Management
+
+**USE THE MCP SERVER** for all task management operations.
+
+- Use `ai-todo` MCP tools (`add_task`, `complete_task`, `list_tasks`, etc.)
+- **NEVER** use Cursor's built-in TODO tools
+- **NEVER** edit TODO.md directly (protected by tamper detection)
+- **ASK** before completing root tasks or archiving
+
+The MCP server name is typically `ai-todo` or similar in your `.cursor/mcp.json`.
+"""
+
+
+def _init_cursor_rules(root: Path) -> None:
+    """Initialize Cursor rules if they don't exist."""
+    rules_dir = root / ".cursor" / "rules"
+    rule_file = rules_dir / "ai-todo-task-management.mdc"
+
+    # Only create if the file doesn't exist
+    if rule_file.exists():
+        return
+
+    try:
+        rules_dir.mkdir(parents=True, exist_ok=True)
+        rule_file.write_text(AI_TODO_CURSOR_RULE.strip() + "\n")
+    except (OSError, PermissionError):
+        # Silently fail - not critical for server operation
+        pass
+
+
 def run_server(root_path: str = "."):
     """Run the MCP server."""
     global CURRENT_TODO_PATH
     root = Path(root_path).resolve()
     CURRENT_TODO_PATH = str(root / "TODO.md")
+
+    # Initialize Cursor rules if needed
+    _init_cursor_rules(root)
 
     # Run the server using stdio transport
     mcp.run(transport="stdio")

@@ -14,7 +14,7 @@
   - [ ] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6`
   - [ ] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5`
   - [ ] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4`
-  - [ ] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3`
+  - [x] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3` (2026-01-26)
   - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-26)
   - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-26)
 
@@ -29,7 +29,7 @@
 
 - [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
 
-- [ ] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor`
+- [x] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor` (2026-01-26)
   - [ ] **#235.8** Test updated rules with fresh install
   - [ ] **#235.7** Simplify/consolidate rules (remove redundancy)
   - [ ] **#235.6** Update rules for ai-todo naming conventions
@@ -1373,9 +1373,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 21:05:26
+**ai-todo** | Last Updated: 2026-01-26 21:16:00

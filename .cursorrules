@@ -1,6 +1,6 @@
 ## Task Management
 It is required to track tasks and subtasks using ai-todo and not via built in TODO tools
-TODO.md and .todo.ai/ must always be committed together
+TODO.md and .ai-todo/ must always be committed together
 Always ask for user confirmation before archiving completed tasks using ai-todo
 
 **Interface Preference:**

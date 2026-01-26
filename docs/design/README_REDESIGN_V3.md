@@ -258,14 +258,6 @@ For existing users:
 2. **CLI → MCP**: Add `.cursor/mcp.json` config, agents use MCP automatically
 3. **Shell → MCP**: Install uv, add `.cursor/mcp.json` config
 
-## Next Steps
-
-1. [ ] Review this design with stakeholders
-2. [ ] Create draft README with new structure
-3. [ ] Update related documentation to match
-4. [ ] Remove/relocate deprecated sections
-5. [ ] Test all installation paths work as documented
-
 ## Design Decisions
 
 | Question | Decision |

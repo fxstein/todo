@@ -17,13 +17,13 @@ def runner():
 def isolated_cli(runner, tmp_path):
     """Isolated CLI environment with temporary directory."""
     with runner.isolated_filesystem(temp_dir=tmp_path):
-        # Create .todo.ai directory structure
-        todo_ai_dir = Path(".todo.ai")
+        # Create .ai-todo directory structure
+        todo_ai_dir = Path(".ai-todo")
         todo_ai_dir.mkdir(exist_ok=True)
         (todo_ai_dir / "config.yaml").write_text(
             "numbering_mode: single-user\ncoordination_type: none\n"
         )
-        (todo_ai_dir / ".todo.ai.serial").write_text("0")
+        (todo_ai_dir / ".ai-todo.serial").write_text("0")
         yield runner
 
 

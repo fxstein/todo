@@ -13,21 +13,21 @@ import pytest
 # Skip all tests in this module on Windows
 pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="Shell script requires Zsh")
 
-# Path to shell script (todo.ai in repo root)
-SHELL_SCRIPT = Path(__file__).parent.parent.parent / "todo.ai"
-PYTHON_CLI = "todo-ai"  # Installed CLI command
+# Path to shell script (legacy/todo.ai)
+SHELL_SCRIPT = Path(__file__).parent.parent.parent / "legacy" / "todo.ai"
+PYTHON_CLI = "ai-todo"  # Installed CLI command
 
 
 @pytest.fixture
 def test_env(tmp_path):
     """Create isolated test environment."""
-    # Create .todo.ai directory structure
-    todo_ai_dir = tmp_path / ".todo.ai"
+    # Create .ai-todo directory structure
+    todo_ai_dir = tmp_path / ".ai-todo"
     todo_ai_dir.mkdir(exist_ok=True)
     (todo_ai_dir / "config.yaml").write_text(
         "numbering_mode: single-user\ncoordination_type: none\n"
     )
-    (todo_ai_dir / ".todo.ai.serial").write_text("0")
+    (todo_ai_dir / ".ai-todo.serial").write_text("0")
 
     # Create TODO.md
     (tmp_path / "TODO.md").write_text("# Tasks\n\n")
@@ -109,7 +109,7 @@ def test_add_command_parity(test_env, tmp_path):
 
     # Reset environment
     (test_env / "TODO.md").write_text("# Tasks\n\n")
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("0")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("0")
 
     # Run Python version
     python_output, python_code = run_python_command(["add", "Test task", "#tag1"], test_env)
@@ -132,7 +132,7 @@ def test_list_command_parity(test_env, tmp_path):
 
     # Add a task first (using Python to set up)
     run_python_command(["add", "Task 1"], test_env)
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run shell version
     shell_output, shell_code = run_shell_command(["list"], test_env)
@@ -153,14 +153,14 @@ def test_complete_command_parity(test_env, tmp_path):
 
     # Add a task first (using shell to match shell script behavior)
     run_shell_command(["add", "Task to complete"], test_env)
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run shell version
     shell_output, shell_code = run_shell_command(["complete", "1"], test_env)
 
     # Reset and add task again for Python
     (test_env / "TODO.md").write_text("# Tasks\n\n- [ ] **#1** Task to complete\n")
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run Python version
     python_output, python_code = run_python_command(["complete", "1"], test_env)
@@ -182,14 +182,14 @@ def test_modify_command_parity(test_env, tmp_path):
 
     # Add a task first
     run_python_command(["add", "Original task"], test_env)
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run shell version
     shell_output, shell_code = run_shell_command(["modify", "1", "Modified task"], test_env)
 
     # Reset and add task again
     (test_env / "TODO.md").write_text("# Tasks\n\n- [ ] **#1** Original task\n")
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run Python version
     python_output, python_code = run_python_command(["modify", "1", "Modified task"], test_env)
@@ -207,7 +207,7 @@ def test_show_command_parity(test_env, tmp_path):
 
     # Add a task first
     run_python_command(["add", "Task to show"], test_env)
-    (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+    (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run shell version
     shell_output, shell_code = run_shell_command(["show", "1"], test_env)
@@ -277,7 +277,7 @@ def test_basic_commands_exit_codes(test_env, tmp_path, command, args):
     # Set up test data if needed
     if command[0] in ["complete", "show"]:
         run_python_command(["add", "Test task"], test_env)
-        (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+        (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run shell version
     shell_output, shell_code = run_shell_command(command + args, test_env)
@@ -285,7 +285,7 @@ def test_basic_commands_exit_codes(test_env, tmp_path, command, args):
     # Reset if needed
     if command[0] in ["complete"]:
         (test_env / "TODO.md").write_text("# Tasks\n\n- [ ] **#1** Test task\n")
-        (test_env / ".todo.ai" / ".todo.ai.serial").write_text("1")
+        (test_env / ".ai-todo" / ".ai-todo.serial").write_text("1")
 
     # Run Python version
     python_output, python_code = run_python_command(command + args, test_env)

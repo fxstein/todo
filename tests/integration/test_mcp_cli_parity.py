@@ -50,8 +50,8 @@ def test_todo_file(tmp_path):
         encoding="utf-8",
     )
 
-    # Create .todo.ai directory
-    todo_ai_dir = tmp_path / ".todo.ai"
+    # Create .ai-todo directory
+    todo_ai_dir = tmp_path / ".ai-todo"
     todo_ai_dir.mkdir(exist_ok=True)
     (todo_ai_dir / "serial").write_text("2", encoding="utf-8")
     (todo_ai_dir / "config.yaml").write_text(

@@ -32,7 +32,7 @@ def main():
     test_dir.mkdir()
 
     repo_root = Path.cwd()
-    todo_sh = repo_root / "todo.ai"
+    todo_sh = repo_root / "legacy" / "todo.ai"
 
     print(f"Testing in {test_dir}")
 
@@ -47,8 +47,8 @@ def main():
         "# todo.ai ToDo List\n\n## Tasks\n\n------------------\n**Maintenance:** Use `todo.ai` script only\n",
         encoding="utf-8",
     )
-    (test_dir / ".todo.ai").mkdir()
-    (test_dir / ".todo.ai" / "config.yaml").write_text("mode: single-user\n", encoding="utf-8")
+    (test_dir / ".ai-todo").mkdir()
+    (test_dir / ".ai-todo" / "config.yaml").write_text("mode: single-user\n", encoding="utf-8")
 
     print("Step 2: Add task with Python")
     res = run_python(["add", "Python Task"], cwd=test_dir)

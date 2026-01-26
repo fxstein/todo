@@ -8,8 +8,8 @@ def reset_test_data():
     # Create directory if it doesn't exist
     base_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create .todo.ai directory
-    config_dir = base_dir / ".todo.ai"
+    # Create .ai-todo directory
+    config_dir = base_dir / ".ai-todo"
     config_dir.mkdir(exist_ok=True)
 
     # Create default TODO.md
@@ -30,8 +30,8 @@ def reset_test_data():
 
     # Create config files
     (config_dir / "config.yaml").write_text("mode: single-user\ncoordination:\n  type: none\n")
-    (config_dir / ".todo.ai.serial").write_text("6")
-    (config_dir / ".todo.ai.log").write_text("")
+    (config_dir / ".ai-todo.serial").write_text("6")
+    (config_dir / ".ai-todo.log").write_text("")
 
     print(f"Test data reset in {base_dir}")
 

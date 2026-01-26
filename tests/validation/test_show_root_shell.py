@@ -15,7 +15,7 @@ def _run_show_root(
     args: list[str],
     env: dict[str, str] | None = None,
 ) -> str:
-    script = script_root / "todo.ai"
+    script = script_root / "legacy" / "todo.ai"
     result = subprocess.run(
         [str(script), "show-root", *args],
         cwd=cwd,

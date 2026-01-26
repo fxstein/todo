@@ -12,7 +12,7 @@ def test_start_from_shell_repo():
     with runner.isolated_filesystem():
         # 1. Setup shell-like environment
         todo_path = Path("TODO.md")
-        config_dir = Path(".todo.ai")
+        config_dir = Path(".ai-todo")
         config_dir.mkdir()
 
         # Existing TODO.md
@@ -35,10 +35,10 @@ def test_start_from_shell_repo():
         (config_dir / "config.yaml").write_text("mode: single-user\n", encoding="utf-8")
 
         # Existing Serial (Last Used)
-        (config_dir / ".todo.ai.serial").write_text("2", encoding="utf-8")
+        (config_dir / ".ai-todo.serial").write_text("2", encoding="utf-8")
 
         # Existing Log
-        (config_dir / ".todo.ai.log").write_text(
+        (config_dir / ".ai-todo.log").write_text(
             "2025-01-01 | user | ADD | 1 | Legacy Task 1\n", encoding="utf-8"
         )
 
@@ -55,7 +55,7 @@ def test_start_from_shell_repo():
         assert "Added: #3 New Python Task" in result.output
 
         # C. Verify Serial Update
-        assert (config_dir / ".todo.ai.serial").read_text(encoding="utf-8") == "3"
+        assert (config_dir / ".ai-todo.serial").read_text(encoding="utf-8") == "3"
 
         # D. Verify File Structure Preservation
         content = todo_path.read_text(encoding="utf-8")

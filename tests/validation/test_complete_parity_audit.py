@@ -20,7 +20,7 @@ def get_shell_commands() -> set[str]:
     """Extract all commands from shell script usage output."""
     # Find the shell script
     repo_root = Path(__file__).parent.parent.parent
-    shell_script = repo_root / "todo.ai"
+    shell_script = repo_root / "legacy" / "todo.ai"
 
     if not shell_script.exists():
         pytest.skip("Shell script not found")

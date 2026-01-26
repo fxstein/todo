@@ -21,12 +21,6 @@ When user says "add a task list with X items", create:
 1. One parent task describing the list
 2. X subtasks under it using `add_subtask`
 
-Example: "add a task list with 3 bugs" →
-- `add_task("Bug fixes")` → #50
-- `add_subtask(50, "Bug 1")` → #50.1
-- `add_subtask(50, "Bug 2")` → #50.2
-- `add_subtask(50, "Bug 3")` → #50.3
-
 ## Workflow
 
 - Start the root task AND current subtask when beginning work

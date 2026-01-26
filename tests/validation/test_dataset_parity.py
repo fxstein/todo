@@ -58,7 +58,7 @@ def run_python_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
         env["TODO_AI_ROOT"] = str(cwd)
 
         result = subprocess.run(
-            ["uv", "run", "python", "-m", "todo_ai.cli.main"] + cmd,
+            ["uv", "run", "python", "-m", "ai_todo.cli.main"] + cmd,
             cwd=cwd,
             capture_output=True,
             text=True,

@@ -16,7 +16,7 @@ def run_python(args, cwd=None):
     repo_root = str(Path.cwd())
     env["PYTHONPATH"] = repo_root
 
-    cmd = [sys.executable, "-m", "todo_ai.cli.main", "--todo-file", "TODO.md"] + args
+    cmd = [sys.executable, "-m", "ai_todo.cli.main", "--todo-file", "TODO.md"] + args
     return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, env=env)
 
 

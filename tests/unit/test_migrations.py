@@ -1,6 +1,6 @@
 import pytest
 
-from todo_ai.core.migrations import MigrationRegistry
+from ai_todo.core.migrations import MigrationRegistry
 
 
 @pytest.fixture

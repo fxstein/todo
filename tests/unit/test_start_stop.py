@@ -1,6 +1,6 @@
 import pytest
 
-from todo_ai.core.task import IN_PROGRESS_TAG, Task, TaskManager, TaskStatus
+from ai_todo.core.task import IN_PROGRESS_TAG, Task, TaskManager, TaskStatus
 
 
 def test_start_task():

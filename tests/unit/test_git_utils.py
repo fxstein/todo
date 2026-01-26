@@ -1,7 +1,7 @@
 import subprocess
 from unittest.mock import patch
 
-from todo_ai.utils import git
+from ai_todo.utils import git
 
 
 @patch("subprocess.check_output")

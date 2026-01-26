@@ -2,8 +2,8 @@
 
 import pytest
 
-from todo_ai.cli.commands import add_command, add_subtask_command, archive_command
-from todo_ai.core.file_ops import FileOps
+from ai_todo.cli.commands import add_command, add_subtask_command, archive_command
+from ai_todo.core.file_ops import FileOps
 
 
 @pytest.fixture

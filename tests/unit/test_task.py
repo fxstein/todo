@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pytest
 
-from todo_ai.core.task import Task, TaskManager, TaskStatus
+from ai_todo.core.task import Task, TaskManager, TaskStatus
 
 # ... (previous Task tests remain) ...
 

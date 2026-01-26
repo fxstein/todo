@@ -1,4 +1,4 @@
-from todo_ai.utils.logging import get_logger, setup_logging
+from ai_todo.utils.logging import get_logger, setup_logging
 
 
 def test_setup_logging_console(capsys):
@@ -23,4 +23,4 @@ def test_setup_logging_file(tmp_path):
 
 def test_get_logger():
     logger = get_logger()
-    assert logger.name == "todo_ai"
+    assert logger.name == "ai_todo"

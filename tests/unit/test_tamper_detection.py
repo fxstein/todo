@@ -1,7 +1,7 @@
 import pytest
 
-from todo_ai.core.exceptions import TamperError
-from todo_ai.core.file_ops import FileOps
+from ai_todo.core.exceptions import TamperError
+from ai_todo.core.file_ops import FileOps
 
 
 @pytest.fixture

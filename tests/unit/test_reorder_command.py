@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from todo_ai.cli.commands import reorder_command
-from todo_ai.core.file_ops import FileOps
+from ai_todo.cli.commands import reorder_command
+from ai_todo.core.file_ops import FileOps
 
 
 @pytest.fixture

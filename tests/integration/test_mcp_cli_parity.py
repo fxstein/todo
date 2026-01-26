@@ -11,8 +11,8 @@ from pathlib import Path
 
 import pytest
 
-import todo_ai.mcp.server as mcp_server_module
-from todo_ai.cli.commands import (
+import ai_todo.mcp.server as mcp_server_module
+from ai_todo.cli.commands import (
     add_command,
     archive_command,
     complete_command,
@@ -23,7 +23,7 @@ from todo_ai.cli.commands import (
     note_command,
     show_command,
 )
-from todo_ai.mcp.server import mcp
+from ai_todo.mcp.server import mcp
 
 
 @pytest.fixture

@@ -2,9 +2,9 @@ import os
 
 import pytest
 
-from todo_ai.cli.main import add_command, add_subtask_command, archive_command, restore_command
-from todo_ai.core.file_ops import FileOps
-from todo_ai.core.task import TaskManager, TaskStatus
+from ai_todo.cli.main import add_command, add_subtask_command, archive_command, restore_command
+from ai_todo.core.file_ops import FileOps
+from ai_todo.core.task import TaskManager, TaskStatus
 
 
 @pytest.fixture(autouse=True)
@@ -76,7 +76,7 @@ def test_restore_subtasks_preserves_completion(tmp_path, capsys):
     add_subtask_command("1", "Subtask 1", ["#test"], todo_path=str(todo_file))
 
     # Complete subtask
-    from todo_ai.cli.main import complete_command
+    from ai_todo.cli.main import complete_command
 
     complete_command(["1.1"], todo_path=str(todo_file))
 

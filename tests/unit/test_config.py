@@ -1,7 +1,7 @@
 import pytest
 import yaml
 
-from todo_ai.core.config import Config
+from ai_todo.core.config import Config
 
 
 @pytest.fixture

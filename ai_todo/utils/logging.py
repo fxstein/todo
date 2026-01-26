@@ -5,7 +5,7 @@ from pathlib import Path
 
 def setup_logging(log_file: Path | None = None, verbose: bool = False) -> logging.Logger:
     """Set up logging configuration."""
-    logger = logging.getLogger("todo_ai")
+    logger = logging.getLogger("ai_todo")
     logger.setLevel(logging.DEBUG if verbose else logging.INFO)
 
     # Clear existing handlers
@@ -38,5 +38,5 @@ def setup_logging(log_file: Path | None = None, verbose: bool = False) -> loggin
 
 
 def get_logger() -> logging.Logger:
-    """Get the todo_ai logger."""
-    return logging.getLogger("todo_ai")
+    """Get the ai_todo logger."""
+    return logging.getLogger("ai_todo")

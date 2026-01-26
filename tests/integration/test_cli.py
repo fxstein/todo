@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 
-from todo_ai.cli.main import cli
+from ai_todo.cli.main import cli
 
 
 @pytest.fixture

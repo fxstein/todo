@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from todo_ai.core.github_client import GitHubClient
+from ai_todo.core.github_client import GitHubClient
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ def test_get_headers_from_gh(mock_subprocess):
 
 
 @patch("requests.post")
-@patch("todo_ai.core.github_client.GitHubClient._get_repo_info")
+@patch("ai_todo.core.github_client.GitHubClient._get_repo_info")
 def test_create_issue(mock_repo_info, mock_post, github_client):
     mock_repo_info.return_value = ("owner", "repo")
     mock_response = MagicMock()
@@ -58,7 +58,7 @@ def test_create_issue(mock_repo_info, mock_post, github_client):
 
 
 @patch("requests.get")
-@patch("todo_ai.core.github_client.GitHubClient._get_repo_info")
+@patch("ai_todo.core.github_client.GitHubClient._get_repo_info")
 def test_get_issue(mock_repo_info, mock_get, github_client):
     mock_repo_info.return_value = ("owner", "repo")
     mock_response = MagicMock()
@@ -74,7 +74,7 @@ def test_get_issue(mock_repo_info, mock_get, github_client):
 
 
 @patch("requests.get")
-@patch("todo_ai.core.github_client.GitHubClient._get_repo_info")
+@patch("ai_todo.core.github_client.GitHubClient._get_repo_info")
 def test_get_issue_comments(mock_repo_info, mock_get, github_client):
     mock_repo_info.return_value = ("owner", "repo")
     mock_response = MagicMock()

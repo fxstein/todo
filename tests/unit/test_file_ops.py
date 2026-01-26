@@ -1,7 +1,7 @@
 import pytest
 
-from todo_ai.core.file_ops import FileOps, FileStructureSnapshot
-from todo_ai.core.task import Task, TaskStatus
+from ai_todo.core.file_ops import FileOps, FileStructureSnapshot
+from ai_todo.core.task import Task, TaskStatus
 
 
 @pytest.fixture

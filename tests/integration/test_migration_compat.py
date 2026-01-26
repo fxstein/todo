@@ -2,7 +2,7 @@ from pathlib import Path
 
 from click.testing import CliRunner
 
-from todo_ai.cli.main import cli
+from ai_todo.cli.main import cli
 
 
 def test_start_from_shell_repo():

@@ -98,7 +98,7 @@ def get_shell_commands() -> set[str]:
 def get_python_cli_commands() -> set[str]:
     """Extract all commands from Python CLI implementation."""
     # Import CLI main to get registered commands
-    from todo_ai.cli import main
+    from ai_todo.cli import main
 
     # Get all command names from click app
     commands = set()

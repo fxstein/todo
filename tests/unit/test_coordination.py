@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from todo_ai.core.config import Config
-from todo_ai.core.coordination import CoordinationManager
+from ai_todo.core.config import Config
+from ai_todo.core.coordination import CoordinationManager
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def test_single_user_simple(manager, mock_config):
 def test_multi_user(manager, mock_config):
     mock_config.get_numbering_mode.return_value = "multi-user"
 
-    with patch("todo_ai.core.coordination.CoordinationManager._get_github_user_id") as mock_user:
+    with patch("ai_todo.core.coordination.CoordinationManager._get_github_user_id") as mock_user:
         mock_user.return_value = "devuser"
         # stored=20, current=10 -> max=20 -> next=21
         assert manager.generate_next_task_id(10, stored_serial=20) == "devuser-21"
@@ -45,7 +45,7 @@ def test_multi_user(manager, mock_config):
 def test_branch_mode(manager, mock_config):
     mock_config.get_numbering_mode.return_value = "branch"
 
-    with patch("todo_ai.core.coordination.CoordinationManager._get_branch_name") as mock_branch:
+    with patch("ai_todo.core.coordination.CoordinationManager._get_branch_name") as mock_branch:
         mock_branch.return_value = "feature"
         # stored=5, current=10 -> max=10 -> next=11
         assert manager.generate_next_task_id(10, stored_serial=5) == "feature-11"

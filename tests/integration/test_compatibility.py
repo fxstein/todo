@@ -1,5 +1,5 @@
-from todo_ai.core.file_ops import FileOps
-from todo_ai.core.task import Task
+from ai_todo.core.file_ops import FileOps
+from ai_todo.core.task import Task
 
 
 def test_preserve_file_structure(tmp_path):

@@ -4,6 +4,8 @@
 
 ## Tasks
 
+- [ ] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix`
+  > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
   - [ ] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code`
   - [ ] **#220.2** Update config.py to use .ai-todo/ paths `#code`
   - [ ] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code`
@@ -1288,4 +1290,4 @@
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:55:04
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:56:53

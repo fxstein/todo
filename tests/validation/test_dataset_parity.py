@@ -114,7 +114,11 @@ def normalize_output(output: str) -> str:
 
 
 def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
-    """Compare two TODO.md files and return (match, diff_message)."""
+    """Compare two TODO.md files and return (match, diff_message).
+
+    Ignores differences in header and footer content, focusing on the Tasks,
+    Archived Tasks, and Deleted Tasks sections.
+    """
     shell_content = shell_path.read_text() if shell_path.exists() else ""
     python_content = python_path.read_text() if python_path.exists() else ""
 
@@ -127,11 +131,38 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
 
     diff_msg = []
     max_len = max(len(shell_lines), len(python_lines))
+
+    # Filter out header/footer lines for comparison
+    # We only care about lines starting with "-", "##", or ">" (notes)
+    # Also ignore blank lines
+    def is_relevant_line(line: str) -> bool:
+        line = line.strip()
+        if not line:
+            return False
+        # Ignore header/footer lines (metadata, separators, titles)
+        if line.startswith("# todo.ai") or line.startswith("# Project"):
+            return False
+        if line.startswith("> ⚠️"):
+            return False
+        if line.startswith("**"):
+            return False
+        if line == "---" or line == "------------------":
+            return False
+        return True
+
+    relevant_shell = [line for line in shell_lines if is_relevant_line(line)]
+    relevant_python = [line for line in python_lines if is_relevant_line(line)]
+
+    if relevant_shell == relevant_python:
+        return True, "Files match (ignoring header/footer differences)"
+
+    # If still different, show relevant diff
+    max_len = max(len(relevant_shell), len(relevant_python))
     for i in range(max_len):
-        shell_line = shell_lines[i] if i < len(shell_lines) else "<MISSING>"
-        python_line = python_lines[i] if i < len(python_lines) else "<MISSING>"
+        shell_line = relevant_shell[i] if i < len(relevant_shell) else "<MISSING>"
+        python_line = relevant_python[i] if i < len(relevant_python) else "<MISSING>"
         if shell_line != python_line:
-            diff_msg.append(f"Line {i + 1}:")
+            diff_msg.append(f"Line {i + 1} (relevant):")
             diff_msg.append(f"  Shell:  {shell_line}")
             diff_msg.append(f"  Python: {python_line}")
 

@@ -4,6 +4,8 @@
 
 ## Tasks
 
+- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
+
 - [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
@@ -1244,4 +1246,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:55:59
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 02:02:13

@@ -17,6 +17,7 @@
   - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
   - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
   - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` `#inprogress`
+    > Design document: docs/design/README_REDESIGN_V3.md
 
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
@@ -1250,4 +1251,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:31:26
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:42:16

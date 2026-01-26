@@ -1,21 +1,7 @@
-# Release Summary: v3.0.0b18
+# ai-todo v3.0.0 Release Summary
 
-## Major Naming Unification
+**ai-todo v3.0.0** marks the completion of a comprehensive Python rewrite, transforming the project from a shell-based tool into a modern, production-ready Python package. The MCP server and CLI are now unified into a single executable (`ai-todo`), providing seamless integration with AI assistants like Cursor while maintaining a powerful command-line interface. Installation is as simple as `pip install ai-todo` or `uv tool install ai-todo`.
 
-This release completes a comprehensive rename from `todo.ai` to `ai-todo` across the entire project. The unified naming eliminates confusion between the various component names by standardizing on `ai-todo` everywhere: CLI command, PyPI package, GitHub repository, and data directory.
+This release introduces several key features for data integrity and workflow safety. A **tamper detection system** now protects TODO.md from unintended external modifications, with configurable security modes and automatic recovery options. An **archive cooldown** (60-second default) prevents AI agents from prematurely archiving completed tasks, requiring human review for root tasks. The **delete command** now removes subtasks by default, fixing orphaned subtask issues that plagued earlier versions.
 
-**Key changes:**
-- **CLI command:** `todo-ai` → `ai-todo`
-- **Data directory:** `.todo.ai/` → `.ai-todo/` (automatic migration on startup)
-- **Python package:** `todo_ai/` → `ai_todo/`
-- **GitHub repository:** Renamed to `ai-todo`
-- **Shell scripts:** Moved to `legacy/` directory (deprecated)
-
-The migration is fully transparent - the tool automatically detects and migrates old `.todo.ai/` directories to `.ai-todo/` on first run.
-
-## Additional Improvements
-
-- **3-level task nesting:** Tasks can now have sub-subtasks (e.g., #1.2.3)
-- **Simplified MCP configuration:** `uvx` config no longer requires redundant `--from` flag
-- **Test isolation:** Shell tests now properly isolated to prevent pollution of project root
-- **Documentation overhaul:** All docs updated with MCP-first approach and simplified examples
+The internal architecture has been significantly streamlined. The MCP/CLI tool set was audited and reduced from 37 to 27 tools, removing redundant operations (update, uninstall, rollback, report_bug) and standardizing naming conventions. The data directory migrated from `.todo.ai/` to `.ai-todo/` for better discoverability, with automatic migration for existing users. The Cursor rules system was consolidated from a monolithic `.cursorrules` file to modular `.cursor/rules/*.mdc` documents, and legacy shell scripts are now deprecated in favor of the Python implementation.

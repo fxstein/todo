@@ -2,6 +2,10 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-26 22:54:31 | fxstein | PREPARE | Release preview prepared for v3.0.0 (stable)
+2026-01-26 22:54:30 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 3.0.0b18 - File version (legacy/todo.ai): 3.0.0b18 - Proposed version: 3.0.0 - Release type: stable - Bump type: minor - Last tag: v3.0.0b18 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-26 22:54:29 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-26 22:54:29 | fxstein | BETA CYCLE | In beta cycle for 3.0.0, next beta will use same base version
 2026-01-26 16:58:58 | fxstein | CI FAILED | CI workflow failed for version commit: failure
 2026-01-26 16:56:59 | fxstein | WAIT CI | Waiting for CI workflow to pass on version commit
 2026-01-26 16:56:57 | fxstein | PUSH MAIN | Pushing main branch to origin

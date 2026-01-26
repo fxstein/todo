@@ -146,11 +146,13 @@ def stop(ctx, task_id):
 
 @cli.command()
 @click.argument("task_ids", nargs=-1, required=True)
-@click.option("--with-subtasks", is_flag=True, help="Include subtasks in operation")
+@click.option(
+    "--no-subtasks", is_flag=True, help="Delete only the specified task(s), not their subtasks"
+)
 @click.pass_context
-def delete(ctx, task_ids, with_subtasks):
-    """Delete task(s) - move to Deleted section."""
-    delete_command(list(task_ids), with_subtasks, todo_path=ctx.obj["todo_file"])
+def delete(ctx, task_ids, no_subtasks):
+    """Delete task(s) and their subtasks - move to Deleted section."""
+    delete_command(list(task_ids), with_subtasks=not no_subtasks, todo_path=ctx.obj["todo_file"])
 
 
 @cli.command()

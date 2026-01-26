@@ -139,6 +139,36 @@ def test_delete_command(isolated_cli):
     assert result.exit_code == 0
 
 
+def test_delete_command_with_subtasks(isolated_cli):
+    """Test delete command removes subtasks by default (task#221 fix)."""
+    # Create parent task
+    isolated_cli.invoke(cli, ["add", "Parent task"])
+    # Add subtasks
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 2"])
+
+    # Delete parent - should delete subtasks too (default behavior)
+    result = isolated_cli.invoke(cli, ["delete", "1"])
+    assert result.exit_code == 0
+    # Should report 3 tasks deleted (parent + 2 subtasks)
+    assert "Deleted 3 task(s)" in result.output
+
+
+def test_delete_command_no_subtasks_flag(isolated_cli):
+    """Test delete --no-subtasks only deletes the parent task."""
+    # Create parent task
+    isolated_cli.invoke(cli, ["add", "Parent task"])
+    # Add subtasks
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 2"])
+
+    # Delete parent with --no-subtasks flag
+    result = isolated_cli.invoke(cli, ["delete", "1", "--no-subtasks"])
+    assert result.exit_code == 0
+    # Should report only 1 task deleted (just the parent)
+    assert "Deleted 1 task(s)" in result.output
+
+
 def test_archive_command(isolated_cli):
     """Test archive command."""
     isolated_cli.invoke(cli, ["add", "Task to archive"])

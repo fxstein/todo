@@ -4,6 +4,8 @@
 
 ## Tasks
 
+- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md) `#enhancement` `#v3.1`
+
 - [ ] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor`
   - [ ] **#235.8** Test updated rules with fresh install
   - [ ] **#235.7** Simplify/consolidate rules (remove redundancy)
@@ -1336,14 +1338,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 19:52:27
+**ai-todo** | Last Updated: 2026-01-26 20:30:04

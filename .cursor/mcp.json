@@ -1,10 +1,9 @@
 {
   "mcpServers": {
-    "todo-ai": {
+    "ai-todo": {
       "command": "uv",
       "args": [
         "run",
-        "--directory", "/Users/oratzes/cursor/todo.ai",
         "ai-todo",
         "serve",
         "--root",

@@ -1,4 +1,4 @@
-"""MCP server for todo.ai."""
+"""MCP server for ai-todo."""
 
 import asyncio
 import io

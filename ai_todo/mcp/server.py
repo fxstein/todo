@@ -3,6 +3,7 @@
 import asyncio
 import io
 import sys
+from datetime import datetime
 from pathlib import Path
 
 from fastmcp import FastMCP
@@ -38,6 +39,11 @@ mcp = FastMCP("ai-todo")
 
 # Global state for todo path (set by run_server)
 CURRENT_TODO_PATH: str = "TODO.md"
+
+# Session-based tracking for archive cooldown
+# Maps task_id -> completion timestamp (only tracks completions in current session)
+SESSION_COMPLETIONS: dict[str, datetime] = {}
+ARCHIVE_COOLDOWN_SECONDS = 60
 
 
 def _capture_output(func, *args, **kwargs) -> str:
@@ -84,7 +90,13 @@ def add_subtask(parent_id: str, description: str, tags: list[str] | None = None)
 @mcp.tool()
 def complete_task(task_id: str, with_subtasks: bool = False) -> str:
     """Mark a task as complete."""
-    return _capture_output(complete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH)
+    result = _capture_output(
+        complete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH
+    )
+    # Track completion time for archive cooldown (session-based)
+    if "Completed:" in result or "Error" not in result:
+        SESSION_COMPLETIONS[task_id] = datetime.now()
+    return result
 
 
 @mcp.tool()
@@ -121,6 +133,11 @@ def delete_task(task_id: str, with_subtasks: bool = True) -> str:
 @mcp.tool()
 def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = False) -> str:
     """Archive a task (move to Recently Completed section)."""
+    # Session-based cooldown check for root tasks completed in this session
+    if "." not in task_id and task_id in SESSION_COMPLETIONS:
+        elapsed = (datetime.now() - SESSION_COMPLETIONS[task_id]).total_seconds()
+        if elapsed < ARCHIVE_COOLDOWN_SECONDS:
+            return f"Task #{task_id} requires human review before archiving."
     # Note: archive_command doesn't support with_subtasks yet in CLI signature used here
     return _capture_output(archive_command, [task_id], reason, todo_path=CURRENT_TODO_PATH)
 

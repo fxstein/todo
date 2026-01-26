@@ -177,8 +177,8 @@ def test_archive_command(isolated_cli):
     assert "Archived" in result.output
 
 
-def test_archive_cooldown_blocks_immediate_archive(isolated_cli):
-    """Test archive cooldown prevents immediate archiving of completed root tasks with subtasks."""
+def test_archive_cli_no_cooldown(isolated_cli):
+    """Test CLI archive has no cooldown (cooldown is session-based in MCP server only)."""
     # Create parent task with subtasks
     isolated_cli.invoke(cli, ["add", "Parent task"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
@@ -187,22 +187,21 @@ def test_archive_cooldown_blocks_immediate_archive(isolated_cli):
     # Complete the parent (and subtasks)
     isolated_cli.invoke(cli, ["complete", "1", "--with-subtasks"])
 
-    # Try to archive immediately - should be blocked by cooldown
+    # Archive immediately - CLI has no cooldown (cooldown is MCP session-based only)
     result = isolated_cli.invoke(cli, ["archive", "1"])
-    assert "requires human review" in result.output
-    # Should NOT have archived any tasks
-    assert "Archived" not in result.output
+    assert result.exit_code == 0
+    assert "Archived 3 task(s)" in result.output
 
 
-def test_archive_cooldown_allows_single_task(isolated_cli):
-    """Test archive cooldown does NOT block single tasks without subtasks."""
+def test_archive_single_task(isolated_cli):
+    """Test archiving a single task without subtasks."""
     # Create single task (no subtasks)
     isolated_cli.invoke(cli, ["add", "Single task"])
 
     # Complete it
     isolated_cli.invoke(cli, ["complete", "1"])
 
-    # Try to archive immediately - should work (no subtasks = no cooldown)
+    # Archive immediately
     result = isolated_cli.invoke(cli, ["archive", "1"])
     assert result.exit_code == 0
     assert "Archived 1 task(s)" in result.output

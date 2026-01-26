@@ -405,34 +405,11 @@ def archive_command(
     todo_path: str = "TODO.md",
 ):
     """Move task(s) to Archived Tasks section."""
-    from datetime import datetime
-
     manager = get_manager(todo_path)
 
-    # Get cooldown setting from config
-    todo_dir = Path(todo_path).parent
-    config_path = todo_dir / ".ai-todo" / "config.yaml"
-    if not config_path.exists():
-        config_path = Path(".ai-todo") / "config.yaml"
-    config = Config(str(config_path))
-    cooldown_seconds = config.get("safety.archive_cooldown_seconds", 60)
-
-    # Check cooldown for root tasks with subtasks BEFORE any archiving
-    for task_id in task_ids:
-        if "." in task_id:
-            continue  # Skip subtasks in cooldown check
-        task = manager.get_task(task_id)
-        if not task or not task.completed_at or cooldown_seconds <= 0:
-            continue
-        # Check if task has subtasks
-        subtask_ids = [t.id for t in manager.list_tasks() if t.id.startswith(f"{task_id}.")]
-        if not subtask_ids:
-            continue
-        # This is a root task with subtasks - check cooldown
-        elapsed = (datetime.now() - task.completed_at).total_seconds()
-        if elapsed < cooldown_seconds:
-            print(f"Task #{task_id} requires human review before archiving.")
-            return
+    # Note: Archive cooldown is now handled session-based in MCP server (server.py)
+    # The file-based approach was broken because completed_at is set to datetime.now()
+    # when parsing, not the actual completion time.
 
     # Expand task IDs (with subtasks by default)
     expanded_ids = expand_task_ids(task_ids, with_subtasks, todo_path)

@@ -269,19 +269,17 @@ class TestMCPCLIParity:
 
     async def test_archive_task_parity(self, test_todo_file):
         """Test archive_task MCP tool matches archive CLI command."""
-        # Mark task as completed first
-        capture_cli_output(complete_command, ["1"], False, test_todo_file)
+        # Clear session completions to avoid cooldown from previous tests
+        mcp_server_module.SESSION_COMPLETIONS.clear()
 
-        # CLI output
-        cli_output = capture_cli_output(archive_command, ["1"], None, todo_path=test_todo_file)
-
-        # Reset file and mark completed
+        # Start with a pre-completed task (not completed in this session)
+        # This avoids the MCP session-based archive cooldown
         Path(test_todo_file).write_text(
             """# TODO
 
 ## Tasks
 
-- [ ] **#1** First task `#test`
+- [x] **#1** First task `#test` (2026-01-01)
   > This is a note
 - [ ] **#2** Second task `#feature`
   - [ ] **#2.1** Subtask one
@@ -295,9 +293,32 @@ class TestMCPCLIParity:
 """,
             encoding="utf-8",
         )
-        capture_cli_output(complete_command, ["1"], False, test_todo_file)
 
-        # MCP output
+        # CLI output
+        cli_output = capture_cli_output(archive_command, ["1"], None, todo_path=test_todo_file)
+
+        # Reset file with pre-completed task
+        Path(test_todo_file).write_text(
+            """# TODO
+
+## Tasks
+
+- [x] **#1** First task `#test` (2026-01-01)
+  > This is a note
+- [ ] **#2** Second task `#feature`
+  - [ ] **#2.1** Subtask one
+  - [ ] **#2.2** Subtask two
+
+## Recently Completed
+
+## Deleted Tasks
+
+**Repository:** https://github.com/fxstein/ai-todo
+""",
+            encoding="utf-8",
+        )
+
+        # MCP output (no cooldown since task wasn't completed in this session)
         mcp_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
 
         # Compare
@@ -430,6 +451,51 @@ async def test_all_mcp_tools_exist():
     assert len(tool_names) >= len(expected_tools), (
         f"Expected at least {len(expected_tools)} tools, got {len(tool_names)}"
     )
+
+
+@pytest.mark.asyncio
+async def test_mcp_archive_cooldown_blocks_immediate_archive(test_todo_file):
+    """Test MCP archive cooldown blocks archiving tasks completed in the same session."""
+    # Clear any previous session state
+    mcp_server_module.SESSION_COMPLETIONS.clear()
+
+    # Complete a task via MCP (this adds it to SESSION_COMPLETIONS)
+    complete_output = await capture_mcp_output("complete_task", {"task_id": "1"}, test_todo_file)
+    assert "Completed:" in complete_output
+
+    # Try to archive immediately via MCP - should be blocked by session cooldown
+    archive_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
+    assert "requires human review" in archive_output
+    assert "Archived" not in archive_output
+
+
+@pytest.mark.asyncio
+async def test_mcp_archive_cooldown_allows_non_session_tasks(test_todo_file):
+    """Test MCP archive allows archiving tasks NOT completed in current session."""
+    # Clear any previous session state
+    mcp_server_module.SESSION_COMPLETIONS.clear()
+
+    # Write a pre-completed task (simulating task completed in previous session)
+    Path(test_todo_file).write_text(
+        """# TODO
+
+## Tasks
+
+- [x] **#1** First task `#test` (2026-01-01)
+- [ ] **#2** Second task `#feature`
+
+## Recently Completed
+
+## Deleted Tasks
+
+**Repository:** https://github.com/fxstein/ai-todo
+""",
+        encoding="utf-8",
+    )
+
+    # Archive via MCP - should work (task wasn't completed in this session)
+    archive_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
+    assert "Archived 1 task(s)" in archive_output
 
 
 if __name__ == "__main__":

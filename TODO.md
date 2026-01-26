@@ -4,9 +4,16 @@
 
 ## Tasks
 
-- [ ] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release`
-  - [ ] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12`
-  - [ ] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11`
+- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
+  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
+  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
+  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
+  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
+  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
+
+- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-26)
+  - [x] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12` (2026-01-26)
+  - [x] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11` (2026-01-26)
   - [x] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10` (2026-01-26)
   - [x] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9` (2026-01-26)
   - [x] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8` (2026-01-26)
@@ -30,23 +37,23 @@
 - [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
 
 - [x] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor` (2026-01-26)
-  - [ ] **#235.8** Test updated rules with fresh install
-  - [ ] **#235.7** Simplify/consolidate rules (remove redundancy)
-  - [ ] **#235.6** Update rules for ai-todo naming conventions
-  - [ ] **#235.5** Update rules to prioritize MCP tools over CLI commands
-  - [ ] **#235.4** Identify rules that are obsolete (shell-specific, pre-MCP)
-  - [ ] **#235.3** Compare embedded rules vs .cursor/rules in this repo
-  - [ ] **#235.2** Inventory legacy shell script rules (todo.ai-*.mdc templates)
-  - [ ] **#235.1** Inventory embedded rules in Python code (init_cursor_rules)
+  - [x] **#235.8** Test updated rules with fresh install (2026-01-26)
+  - [x] **#235.7** Simplify/consolidate rules (remove redundancy) (2026-01-26)
+  - [x] **#235.6** Update rules for ai-todo naming conventions (2026-01-26)
+  - [x] **#235.5** Update rules to prioritize MCP tools over CLI commands (2026-01-26)
+  - [x] **#235.4** Identify rules that are obsolete (shell-specific, pre-MCP) (2026-01-26)
+  - [x] **#235.3** Compare embedded rules vs .cursor/rules in this repo (2026-01-26)
+  - [x] **#235.2** Inventory legacy shell script rules (todo.ai-*.mdc templates) (2026-01-26)
+  - [x] **#235.1** Inventory embedded rules in Python code (init_cursor_rules) (2026-01-26)
 
-- [ ] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor`
-  - [ ] **#234.7** Document recommendations for removals/additions
-  - [ ] **#234.6** Review tool naming consistency (ai-todo conventions)
-  - [ ] **#234.5** Identify missing MCP tools that should exist
-  - [ ] **#234.4** Identify deprecated/obsolete tools (shell-specific, legacy)
-  - [ ] **#234.3** Compare MCP tools vs CLI commands for parity
-  - [ ] **#234.2** Inventory current CLI commands (list all available commands)
-  - [ ] **#234.1** Inventory current MCP tools (list all available tools)
+- [x] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor` (2026-01-26)
+  - [x] **#234.7** Document recommendations for removals/additions (2026-01-26)
+  - [x] **#234.6** Review tool naming consistency (ai-todo conventions) (2026-01-26)
+  - [x] **#234.5** Identify missing MCP tools that should exist (2026-01-26)
+  - [x] **#234.4** Identify deprecated/obsolete tools (shell-specific, legacy) (2026-01-26)
+  - [x] **#234.3** Compare MCP tools vs CLI commands for parity (2026-01-26)
+  - [x] **#234.2** Inventory current CLI commands (list all available commands) (2026-01-26)
+  - [x] **#234.1** Inventory current MCP tools (list all available tools) (2026-01-26)
 
 - [x] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix` (2026-01-26)
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
@@ -125,9 +132,9 @@
   - [x] **#187.2** Update todo.ai-task-management.mdc: prefer MCP tools (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai)  (2026-01-25) `#cursor-rules` (2026-01-26)
   - [x] **#187.1** Review all cursor rules files to identify CLI command references  (2026-01-25) `#cursor-rules` (2026-01-26)
 
-- [ ] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release`
+- [x] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release` (2026-01-26)
   > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
-  - [ ] **#172.5** Phase 5: Stable Release `#release`
+  - [x] **#172.5** Phase 5: Stable Release `#release` (2026-01-26)
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
   - [x] **#172.4** Phase 4: First Beta Release   (2026-01-25) `#release` `#testing` (2026-01-26)
     > Goal: Validate the process works end-to-end. Deliverable: First beta release created, announced, feedback collected, iterations made as needed
@@ -147,10 +154,10 @@
 
 - [x] **#164** Implement configuration module (task#163.9)  (2026-01-25) `#code` (2026-01-26)
 
-- [ ] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature`
+- [x] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature` (2026-01-26)
   > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
   > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
-  - [ ] **#163.52** Phase 16: Release Phase - Beta/pre-release and final release with migration support `#release`
+  - [x] **#163.52** Phase 16: Release Phase - Beta/pre-release and final release with migration support `#release` (2026-01-26)
   - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.49** Phase 13: Remove Old State Variables (Breaking) - Remove mutable state variables and override logic  (2026-01-25) `#code` (2026-01-26)
@@ -213,9 +220,9 @@
   - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
   - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
 
-- [ ] **#128** Create git commit hook for todo list linting and validation `#feature`
+- [x] **#128** Create git commit hook for todo list linting and validation `#feature` (2026-01-26)
 
-- [ ] **#127** Enhance --lint command with additional detection features `#feature`
+- [x] **#127** Enhance --lint command with additional detection features `#feature` (2026-01-26)
 
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
@@ -231,27 +238,29 @@
   - [ ] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security`
   - [ ] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security`
 
-- [ ] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature`
-  - [ ] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test`
-  - [ ] **#47.7** Update help screen and documentation with feature request command `#docs`
-  - [ ] **#47.6** Integrate feature request rules into cursor rules (similar to bug reporting rules) `#code`
-  - [ ] **#47.5** Add manual confirmation requirement (always ask before creating feature request) `#code`
-  - [ ] **#47.4** Implement 'me too' reply for existing feature requests `#code`
-  - [ ] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code`
-  - [ ] **#47.2** Implement feature request command handler and template generation `#code`
-  - [ ] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs`
+- [x] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature` `#wontfix` (2026-01-26)
+  > Decided not to implement. The bug reporting feature was removed in the v3.0 MCP/CLI audit, and feature requests would follow the same pattern. Users can create GitHub issues directly for feature requests.
+  - [x] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test` (2026-01-26)
+  - [x] **#47.7** Update help screen and documentation with feature request command `#docs` (2026-01-26)
+  - [x] **#47.6** Integrate feature request rules into cursor rules (similar to bug reporting rules) `#code` (2026-01-26)
+  - [x] **#47.5** Add manual confirmation requirement (always ask before creating feature request) `#code` (2026-01-26)
+  - [x] **#47.4** Implement 'me too' reply for existing feature requests `#code` (2026-01-26)
+  - [x] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code` (2026-01-26)
+  - [x] **#47.2** Implement feature request command handler and template generation `#code` (2026-01-26)
+  - [x] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs` (2026-01-26)
 
-- [ ] **#45** Enhance release process with pre-release support for beta/testing versions `#release`
-  - [ ] **#45.8** Test pre-release creation and promotion workflow `#test`
-  - [ ] **#45.7** Update release process documentation with pre-release workflow `#docs`
-  - [ ] **#45.6** Add command to promote pre-release to official release (remove --prerelease flag) `#code`
-  - [ ] **#45.5** Implement workflow: create pre-release → test → fix if needed → promote to official release `#code`
-  - [ ] **#45.4** Add GitHub pre-release flag support (gh release create --prerelease) `#code`
-  - [ ] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code`
-  - [ ] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs`
-  - [ ] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research`
+- [x] **#45** Enhance release process with pre-release support for beta/testing versions `#release` (2026-01-26)
+  - [x] **#45.8** Test pre-release creation and promotion workflow `#test` (2026-01-26)
+  - [x] **#45.7** Update release process documentation with pre-release workflow `#docs` (2026-01-26)
+  - [x] **#45.6** Add command to promote pre-release to official release (remove --prerelease flag) `#code` (2026-01-26)
+  - [x] **#45.5** Implement workflow: create pre-release → test → fix if needed → promote to official release `#code` (2026-01-26)
+  - [x] **#45.4** Add GitHub pre-release flag support (gh release create --prerelease) `#code` (2026-01-26)
+  - [x] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code` (2026-01-26)
+  - [x] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs` (2026-01-26)
+  - [x] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research` (2026-01-26)
 
-- [ ] **#42** Implement self-reporting bug feature for GitHub Issues `#feature`
+- [x] **#42** Implement self-reporting bug feature for GitHub Issues `#feature` (2026-01-26)
+  > Feature removed as part of v3.0.0 MCP/CLI audit. The bug reporting tools (report_bug, backups, rollback) were eliminated to streamline the tool set. Users can report issues directly on GitHub.
   - [x] **#42.6** Test duplicate detection and 'me too' reply flow (2026-01-25) (2026-01-26)
   - [x] **#42.5** Test bug reporting with GitHub CLI integration (2026-01-25) (2026-01-26)
   - [x] **#42.4** Create bug report template with logs and data attachment (2026-01-25) (2026-01-26)
@@ -259,7 +268,7 @@
   - [x] **#42.2** Implement bug detection and reporting logic (2026-01-25) (2026-01-26)
   - [x] **#42.1** Create design document for bug reporting feature (2026-01-25) (2026-01-26)
 
-- [ ] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai`
+- [x] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai` (2026-01-26)
   - [x] **#35.3** Create tests directory and draft detailed test plan document   (2026-01-25) `#docs` `#tests` (2026-01-26)
   - [x] **#35.2** Define test framework architecture and tooling   (2026-01-25) `#planning` `#tests` (2026-01-26)
   - [x] **#35.1** Research todo.ai testing requirements and existing docs   (2026-01-25) `#docs` `#tests` (2026-01-26)
@@ -267,12 +276,6 @@
 ---
 
 ## Archived Tasks
-  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
-  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
-  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
-  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
-  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
-- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
 - [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
 - [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
   - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
@@ -1373,9 +1376,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 22:31:36
+**ai-todo** | Last Updated: 2026-01-26 23:45:10

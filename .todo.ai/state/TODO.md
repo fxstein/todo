@@ -4,13 +4,14 @@
 
 ## Tasks
 
-- [ ] **#212** Clean up .cursor rules for MCP-first workflow `#maintenance` `#rules`
+- [x] **#212** Clean up .cursor rules for MCP-first workflow `#maintenance` `#rules` (2026-01-26)
   > Requirement: Remove all references to shell tool (./todo.ai) and CLI (todo-ai) in the rules. Focus exclusively on MCP tools.
-  - [ ] **#212.5** Verify new rules are concise and effective `#verify`
-  - [ ] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup`
-  - [ ] **#212.3** Update rules to mandate MCP tool usage `#mcp`
-  - [ ] **#212.2** Consolidate overlapping rules and simplify `#refactor`
-  - [ ] **#212.1** Audit existing rules for legacy shell/CLI references `#audit`
+  - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
+  - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
+  - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
+  - [x] **#212.2** Consolidate overlapping rules and simplify `#refactor` (2026-01-26)
+  - [x] **#212.1** Audit existing rules for legacy shell/CLI references `#audit` (2026-01-26)
+    > Create initial audit document for review
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
@@ -193,10 +194,6 @@
 ---
 
 ## Archived Tasks
-- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
-  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
-  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
-  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
   - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
   - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
   - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
@@ -210,6 +207,10 @@
     > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
     > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
     > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
+- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
+  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
+  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
+  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
   - [x] **#211.4** Verify fix with task #125 (has subtasks 125.1-125.13) `#verification` (2026-01-25)
     > Verified with task #125 (has 13 subtasks).
     > After running `todo-ai reorder`, subtasks now appear in correct numerical order:
@@ -1215,4 +1216,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 00:30:23
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:03:58

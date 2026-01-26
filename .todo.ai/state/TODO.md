@@ -4,12 +4,12 @@
 
 ## Tasks
 
-- [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming`
+- [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
   - [ ] **#219.4** Decision: Proceed with rename or keep current naming `#decision`
   - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation`
   - [ ] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis`
-  - [ ] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation`
+  - [ ] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` `#inprogress`
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
@@ -1277,4 +1277,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:28:57
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:29:54

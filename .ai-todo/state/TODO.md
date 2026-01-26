@@ -4,26 +4,10 @@
 
 ## Tasks
 
-- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
-  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
-  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
-  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
-  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
-  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
-
-- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-26)
-  - [x] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12` (2026-01-26)
-  - [x] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11` (2026-01-26)
-  - [x] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10` (2026-01-26)
-  - [x] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9` (2026-01-26)
-  - [x] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8` (2026-01-26)
-  - [x] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7` (2026-01-26)
-  - [x] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6` (2026-01-26)
-  - [x] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5` (2026-01-26)
-  - [x] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4` (2026-01-26)
-  - [x] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3` (2026-01-26)
-  - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-26)
-  - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-26)
+- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
+  - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
+  - [x] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2026-01-27)
+  - [x] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2026-01-27)
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
   - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
@@ -36,69 +20,122 @@
 
 - [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
 
-- [x] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor` (2026-01-26)
-  - [x] **#235.8** Test updated rules with fresh install (2026-01-26)
-  - [x] **#235.7** Simplify/consolidate rules (remove redundancy) (2026-01-26)
-  - [x] **#235.6** Update rules for ai-todo naming conventions (2026-01-26)
-  - [x] **#235.5** Update rules to prioritize MCP tools over CLI commands (2026-01-26)
-  - [x] **#235.4** Identify rules that are obsolete (shell-specific, pre-MCP) (2026-01-26)
-  - [x] **#235.3** Compare embedded rules vs .cursor/rules in this repo (2026-01-26)
-  - [x] **#235.2** Inventory legacy shell script rules (todo.ai-*.mdc templates) (2026-01-26)
-  - [x] **#235.1** Inventory embedded rules in Python code (init_cursor_rules) (2026-01-26)
+- [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
+  - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
+  - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
+  - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
 
-- [x] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor` (2026-01-26)
-  - [x] **#234.7** Document recommendations for removals/additions (2026-01-26)
-  - [x] **#234.6** Review tool naming consistency (ai-todo conventions) (2026-01-26)
-  - [x] **#234.5** Identify missing MCP tools that should exist (2026-01-26)
-  - [x] **#234.4** Identify deprecated/obsolete tools (shell-specific, legacy) (2026-01-26)
-  - [x] **#234.3** Compare MCP tools vs CLI commands for parity (2026-01-26)
-  - [x] **#234.2** Inventory current CLI commands (list all available commands) (2026-01-26)
-  - [x] **#234.1** Inventory current MCP tools (list all available tools) (2026-01-26)
+---
 
-- [x] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix` (2026-01-26)
+## Archived Tasks
+- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-27)
+  - [x] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12` (2026-01-27)
+  - [x] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11` (2026-01-27)
+  - [x] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10` (2026-01-27)
+  - [x] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9` (2026-01-27)
+  - [x] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8` (2026-01-27)
+  - [x] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7` (2026-01-27)
+  - [x] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6` (2026-01-27)
+  - [x] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5` (2026-01-27)
+  - [x] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4` (2026-01-27)
+  - [x] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3` (2026-01-27)
+  - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-27)
+  - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-27)
+  - [x] **#235.8** Test updated rules with fresh install (2026-01-27)
+  - [x] **#235.7** Simplify/consolidate rules (remove redundancy) (2026-01-27)
+  - [x] **#235.6** Update rules for ai-todo naming conventions (2026-01-27)
+  - [x] **#235.5** Update rules to prioritize MCP tools over CLI commands (2026-01-27)
+  - [x] **#235.4** Identify rules that are obsolete (shell-specific, pre-MCP) (2026-01-27)
+  - [x] **#235.3** Compare embedded rules vs .cursor/rules in this repo (2026-01-27)
+  - [x] **#235.2** Inventory legacy shell script rules (todo.ai-*.mdc templates) (2026-01-27)
+  - [x] **#235.1** Inventory embedded rules in Python code (init_cursor_rules) (2026-01-27)
+- [x] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor` (2026-01-27)
+  - [x] **#234.7** Document recommendations for removals/additions (2026-01-27)
+  - [x] **#234.6** Review tool naming consistency (ai-todo conventions) (2026-01-27)
+  - [x] **#234.5** Identify missing MCP tools that should exist (2026-01-27)
+  - [x] **#234.4** Identify deprecated/obsolete tools (shell-specific, legacy) (2026-01-27)
+  - [x] **#234.3** Compare MCP tools vs CLI commands for parity (2026-01-27)
+  - [x] **#234.2** Inventory current CLI commands (list all available commands) (2026-01-27)
+  - [x] **#234.1** Inventory current MCP tools (list all available tools) (2026-01-27)
+- [x] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor` (2026-01-27)
+- [x] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix` (2026-01-27)
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
-
-- [x] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix` (2026-01-26)
+- [x] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix` (2026-01-27)
   > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
-
-- [x] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming` (2026-01-26)
-  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
-  - [x] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification` (2026-01-26)
-  - [x] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation` (2026-01-26)
-  - [x] **#219.11** Cleanup: Update test fixtures (GitHub URLs fxstein/todo.ai → ai-todo) `#cleanup` `#testing` (2026-01-26)
-  - [x] **#219.10** Cleanup: Update ai_todo/ source code (pip commands, FastMCP name, tamper hints) `#cleanup` `#code` (2026-01-26)
-  - [x] **#219.9** Post-migration audit: Document remaining old naming references `#audit` `#documentation` (2026-01-26)
-  - [x] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` (2026-01-26)
+  - [x] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification` (2026-01-27)
+  - [x] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation` (2026-01-27)
+  - [x] **#219.11** Cleanup: Update test fixtures (GitHub URLs fxstein/todo.ai → ai-todo) `#cleanup` `#testing` (2026-01-27)
+  - [x] **#219.10** Cleanup: Update ai_todo/ source code (pip commands, FastMCP name, tamper hints) `#cleanup` `#code` (2026-01-27)
+  - [x] **#219.9** Post-migration audit: Document remaining old naming references `#audit` `#documentation` (2026-01-27)
+  - [x] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` (2026-01-27)
     > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
-  - [x] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration` (2026-01-26)
-    - [x] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing` (2026-01-26)
-    - [x] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code` (2026-01-26)
-    - [x] **#219.6.5** Add migration logging and user notification `#code` `#ux` (2026-01-26)
-    - [x] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration` (2026-01-26)
-    - [x] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code` (2026-01-26)
-    - [x] **#219.6.2** Update config.py to use .ai-todo/ paths `#code` (2026-01-26)
-    - [x] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code` (2026-01-26)
-  - [x] **#219.4** Decision: Proceed with rename or keep current naming `#decision` (2026-01-26)
-  - [x] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` (2026-01-26)
+    - [x] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing` (2026-01-27)
+    - [x] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code` (2026-01-27)
+    - [x] **#219.6.5** Add migration logging and user notification `#code` `#ux` (2026-01-27)
+    - [x] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration` (2026-01-27)
+    - [x] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code` (2026-01-27)
+    - [x] **#219.6.2** Update config.py to use .ai-todo/ paths `#code` (2026-01-27)
+    - [x] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code` (2026-01-27)
+  - [x] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration` (2026-01-27)
+  - [x] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (2026-01-27)
+    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
+  - [x] **#219.4** Decision: Proceed with rename or keep current naming `#decision` (2026-01-27)
+  - [x] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` (2026-01-27)
     > Implementation plan: docs/design/NAMING_IMPLEMENTATION_PLAN.md
-  - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-26)
-  - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-26)
+  - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-27)
+  - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-27)
     > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
-
-- [x] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety` (2026-01-26)
+- [x] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming` (2026-01-27)
+  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
+  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-27)
+  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-27)
+  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-27)
+  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-27)
+  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-27)
+- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-27)
+- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
+- [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
+  - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
+  - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
+  - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
+  - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
+  - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
+  - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
+  - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
+  - [x] **#212.2** Consolidate overlapping rules and simplify `#refactor` (2026-01-26)
+  - [x] **#212.1** Audit existing rules for legacy shell/CLI references `#audit` (2026-01-26)
+    > Create initial audit document for review
+- [x] **#212** Clean up .cursor rules for MCP-first workflow `#maintenance` `#rules` (2026-01-26)
+  > Requirement: Remove all references to shell tool (./todo.ai) and CLI (todo-ai) in the rules. Focus exclusively on MCP tools.
+  - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
+  - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
+  - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
+  - [x] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design` (2026-01-26)
+  - [x] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security` (2026-01-26)
+  - [x] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation` (2026-01-26)
+    > Analysis complete. Key findings:
+    > ✅ EXISTS: mtime tracking, passive warning header, pre-commit lint
+    > ❌ MISSING: Content verification (checksums/hashes), active warnings, runtime detection
+    > 🔴 CRITICAL: No detection of content tampering, status changes, or ID manipulation
+    > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
+    > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
+    > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
+- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
+  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
+  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
+  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
   - [x] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation` (2026-01-26)
   - [x] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp` (2026-01-26)
   - [x] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design` (2026-01-26)
   - [x] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research` (2026-01-26)
   - [x] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis` (2026-01-26)
-
-- [x] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` (2026-01-26)
-  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
-  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
+- [x] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety` (2026-01-26)
   - [x] **#203.9** Final review and publish README.md changes `#release` `#review` (2026-01-26)
   - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
   - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
   - [x] **#203.6** Update docs/guides/GETTING_STARTED.md for MCP-first approach `#documentation` (2026-01-26)
+  - [x] **#203.5** Final review and publish README.md changes `#release` `#review` (2026-01-26)
   - [x] **#203.4** Test all installation paths (uvx MCP, uv CLI, shell script) `#testing` (2026-01-26)
     > Test in isolated environment (temp directory outside repo) to avoid polluting files, content, or cursor rules.
   - [x] **#203.3** Implement new README.md with MCP-first structure `#implementation` (2026-01-26)
@@ -106,21 +143,19 @@
   - [x] **#203.2** Create docs/FAQ.md with 'Why not GitHub Issues?' content `#documentation` `#faq` (2026-01-26)
   - [x] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` (2026-01-26)
     > Design document: docs/design/README_REDESIGN_V3.md
-
-- [x] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp` (2026-01-26)
-  > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
+- [x] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` (2026-01-26)
+  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
+  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
   - [x] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp` (2026-01-26)
   - [x] **#191.5** Implement and test the portable setup solution `#implementation` `#mcp` (2026-01-26)
   - [x] **#191.4** Design a clean installation process that sets up portable MCP config `#design` `#mcp` (2026-01-26)
   - [x] **#191.3** Compare with MCP best practices for project-local configuration `#investigation` `#mcp` (2026-01-26)
   - [x] **#191.2** Investigate options for dynamic workspace root detection in MCP server `#investigation` `#mcp` (2026-01-26)
   - [x] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp` (2026-01-26)
-
+- [x] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp` (2026-01-26)
+  > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
 - [x] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp` (2026-01-26)
   > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
-
-- [x] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature` (2026-01-26)
-  > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
   - [x] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules` (2026-01-26)
   - [x] **#187.9** Document version detection: MCP server (todo-ai-mcp) > Python CLI (todo-ai) > Shell script (./todo.ai) - all v3.0+ except shell script also supports v2.x `#documentation` (2026-01-26)
   - [x] **#187.8** Test updated rules: verify AI agents prefer MCP when available, fallback to CLI when not `#test` (2026-01-26)
@@ -131,9 +166,8 @@
   - [x] **#187.3** Update bug-review-workflow.mdc to use MCP tools (add_task, add_subtask) instead of CLI commands  (2026-01-25) `#cursor-rules` (2026-01-26)
   - [x] **#187.2** Update todo.ai-task-management.mdc: prefer MCP tools (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai)  (2026-01-25) `#cursor-rules` (2026-01-26)
   - [x] **#187.1** Review all cursor rules files to identify CLI command references  (2026-01-25) `#cursor-rules` (2026-01-26)
-
-- [x] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release` (2026-01-26)
-  > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
+- [x] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature` (2026-01-26)
+  > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
   - [x] **#172.5** Phase 5: Stable Release `#release` (2026-01-26)
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
   - [x] **#172.4** Phase 4: First Beta Release   (2026-01-25) `#release` `#testing` (2026-01-26)
@@ -147,16 +181,11 @@
   - [x] **#172.1** Phase 1: Core Beta Infrastructure   (2026-01-25) `#infrastructure` `#release` (2026-01-26)
     > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
     > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
-
+- [x] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release` (2026-01-26)
+  > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
 - [x] **#166** Implement utility modules (git, logging) (task#163.13)  (2026-01-25) `#code` (2026-01-26)
-
 - [x] **#165** Implement migration system module (task#163.12)  (2026-01-25) `#code` (2026-01-26)
-
 - [x] **#164** Implement configuration module (task#163.9)  (2026-01-25) `#code` (2026-01-26)
-
-- [x] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature` (2026-01-26)
-  > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
-  > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
   - [x] **#163.52** Phase 16: Release Phase - Beta/pre-release and final release with migration support `#release` (2026-01-26)
   - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands  (2026-01-25) `#code` (2026-01-26)
@@ -164,6 +193,7 @@
   - [x] **#163.48** Phase 12: Use Snapshot for Generation (Non-Breaking) - Modify _generate_markdown() to use snapshot and implement mtime validation  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.47** Phase 11: Create Structure Snapshot (Non-Breaking) - Create FileStructureSnapshot dataclass and capture structure from pristine file  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.46** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section  (2026-01-25) `#code` (2026-01-26)
+  - [x] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release` (2026-01-26)
   - [x] **#163.44** Phase 9: Testing and Validation - Re-test all commands and verify feature parity with shell script  (2026-01-25) `#test` (2026-01-26)
   - [x] **#163.43** Phase 8: MCP Server Completion - Add all missing MCP tools for implemented CLI commands  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.42** Phase 7: Utility Commands - Implement report-bug, uninstall, version commands  (2026-01-25) `#code` (2026-01-26)
@@ -173,6 +203,8 @@
   - [x] **#163.38** Phase 3: Task Display and Relationships - Implement show and relate commands  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.37** Phase 2: Note Management - Implement note, delete-note, update-note commands  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.36** Phase 1: Core Task Management Operations - Implement modify, delete, archive, restore, undo commands  (2026-01-25) `#code` (2026-01-26)
+  - [x] **#163.35** Release phase: Final release of Python version with migration support `#release` (2026-01-26)
+  - [x] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (2026-01-26)
   - [x] **#163.33** Maintenance phase: Track progress using existing todo.ai script (this task list)  (2026-01-25) `#code` (2026-01-26)
     > Use existing todo.ai script to track this refactor project. All subtasks should be managed via the shell version. This validates the tool works while we build the replacement.
   - [x] **#163.32** Maintenance phase: Ensure existing shell script continues working during development  (2026-01-25) `#code` (2026-01-26)
@@ -214,32 +246,22 @@
   - [x] **#163.2** Design phase: Define core logic API and interface contracts  (2026-01-25) `#design` (2026-01-26)
   - [x] **#163.1** Design phase: Create architecture design document for Python refactor  (2026-01-25) `#design` (2026-01-26)
     > Architecture design document created at docs/design/PYTHON_REFACTOR_ARCHITECTURE.md. Document validated (v1.1) and covers: current architecture analysis, proposed Python architecture with dual interfaces (MCP + CLI), core module design, installation via pipx, migration strategy, testing strategy with isolated test data, and implementation phases.
-
-- [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
-  - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
-  - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
-  - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
-
+- [x] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature` (2026-01-26)
+  > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
+  > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
 - [x] **#128** Create git commit hook for todo list linting and validation `#feature` (2026-01-26)
-
 - [x] **#127** Enhance --lint command with additional detection features `#feature` (2026-01-26)
-
-- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
-
-- [ ] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security`
-  - [ ] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security`
-  - [ ] **#49.9** Implement high-priority security improvements identified in audit `#code`
-  - [ ] **#49.8** Create security improvement recommendations document based on findings `#docs`
-  - [ ] **#49.7** Evaluate supply chain security: repository compromise, MITM attacks, and code signing `#security`
-  - [ ] **#49.6** Review file system access: what files can be read/written and potential data exfiltration risks `#security`
-  - [ ] **#49.5** Analyze prompt injection risks: malicious content in TODO.md affecting AI agent behavior `#security`
-  - [ ] **#49.4** Examine Cursor rules injection vectors: preventing malicious rules from being installed or modified `#security`
-  - [ ] **#49.3** Assess code execution risks: migration system, script execution, and dynamic code loading `#security`
-  - [ ] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security`
-  - [ ] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security`
-
-- [x] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature` `#wontfix` (2026-01-26)
-  > Decided not to implement. The bug reporting feature was removed in the v3.0 MCP/CLI audit, and feature requests would follow the same pattern. Users can create GitHub issues directly for feature requests.
+  - [x] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security` (2026-01-26)
+  - [x] **#49.9** Implement high-priority security improvements identified in audit `#code` (2026-01-26)
+  - [x] **#49.8** Create security improvement recommendations document based on findings `#docs` (2026-01-26)
+  - [x] **#49.7** Evaluate supply chain security: repository compromise, MITM attacks, and code signing `#security` (2026-01-26)
+  - [x] **#49.6** Review file system access: what files can be read/written and potential data exfiltration risks `#security` (2026-01-26)
+  - [x] **#49.5** Analyze prompt injection risks: malicious content in TODO.md affecting AI agent behavior `#security` (2026-01-26)
+  - [x] **#49.4** Examine Cursor rules injection vectors: preventing malicious rules from being installed or modified `#security` (2026-01-26)
+  - [x] **#49.3** Assess code execution risks: migration system, script execution, and dynamic code loading `#security` (2026-01-26)
+  - [x] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security` (2026-01-26)
+  - [x] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security` (2026-01-26)
+- [x] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security` (2026-01-26)
   - [x] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test` (2026-01-26)
   - [x] **#47.7** Update help screen and documentation with feature request command `#docs` (2026-01-26)
   - [x] **#47.6** Integrate feature request rules into cursor rules (similar to bug reporting rules) `#code` (2026-01-26)
@@ -248,8 +270,8 @@
   - [x] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code` (2026-01-26)
   - [x] **#47.2** Implement feature request command handler and template generation `#code` (2026-01-26)
   - [x] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs` (2026-01-26)
-
-- [x] **#45** Enhance release process with pre-release support for beta/testing versions `#release` (2026-01-26)
+- [x] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature` `#wontfix` (2026-01-26)
+  > Decided not to implement. The bug reporting feature was removed in the v3.0 MCP/CLI audit, and feature requests would follow the same pattern. Users can create GitHub issues directly for feature requests.
   - [x] **#45.8** Test pre-release creation and promotion workflow `#test` (2026-01-26)
   - [x] **#45.7** Update release process documentation with pre-release workflow `#docs` (2026-01-26)
   - [x] **#45.6** Add command to promote pre-release to official release (remove --prerelease flag) `#code` (2026-01-26)
@@ -258,56 +280,19 @@
   - [x] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code` (2026-01-26)
   - [x] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs` (2026-01-26)
   - [x] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research` (2026-01-26)
-
-- [x] **#42** Implement self-reporting bug feature for GitHub Issues `#feature` (2026-01-26)
-  > Feature removed as part of v3.0.0 MCP/CLI audit. The bug reporting tools (report_bug, backups, rollback) were eliminated to streamline the tool set. Users can report issues directly on GitHub.
+- [x] **#45** Enhance release process with pre-release support for beta/testing versions `#release` (2026-01-26)
   - [x] **#42.6** Test duplicate detection and 'me too' reply flow (2026-01-25) (2026-01-26)
   - [x] **#42.5** Test bug reporting with GitHub CLI integration (2026-01-25) (2026-01-26)
   - [x] **#42.4** Create bug report template with logs and data attachment (2026-01-25) (2026-01-26)
   - [x] **#42.3** Implement duplicate issue detection and 'me too' reply functionality (2026-01-25) (2026-01-26)
   - [x] **#42.2** Implement bug detection and reporting logic (2026-01-25) (2026-01-26)
   - [x] **#42.1** Create design document for bug reporting feature (2026-01-25) (2026-01-26)
-
-- [x] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai` (2026-01-26)
+- [x] **#42** Implement self-reporting bug feature for GitHub Issues `#feature` (2026-01-26)
+  > Feature removed as part of v3.0.0 MCP/CLI audit. The bug reporting tools (report_bug, backups, rollback) were eliminated to streamline the tool set. Users can report issues directly on GitHub.
   - [x] **#35.3** Create tests directory and draft detailed test plan document   (2026-01-25) `#docs` `#tests` (2026-01-26)
   - [x] **#35.2** Define test framework architecture and tooling   (2026-01-25) `#planning` `#tests` (2026-01-26)
   - [x] **#35.1** Research todo.ai testing requirements and existing docs   (2026-01-25) `#docs` `#tests` (2026-01-26)
-
----
-
-## Archived Tasks
-- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
-- [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
-  - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
-  - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
-  - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
-  - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
-- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
-  - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
-  - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
-  - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
-  - [x] **#212.2** Consolidate overlapping rules and simplify `#refactor` (2026-01-26)
-  - [x] **#212.1** Audit existing rules for legacy shell/CLI references `#audit` (2026-01-26)
-    > Create initial audit document for review
-- [x] **#212** Clean up .cursor rules for MCP-first workflow `#maintenance` `#rules` (2026-01-26)
-  > Requirement: Remove all references to shell tool (./todo.ai) and CLI (todo-ai) in the rules. Focus exclusively on MCP tools.
-  - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
-  - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
-  - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
-  - [x] **#210.3** Design tamper detection solution (detection mechanism, warning system, recovery options) `#architecture` `#design` (2026-01-26)
-  - [x] **#210.2** Research best practices for file integrity detection (checksums, signatures, metadata) `#research` `#security` (2026-01-26)
-  - [x] **#210.1** Analyze current TODO.md integrity checks and vulnerability to manual edits `#analysis` `#investigation` (2026-01-26)
-    > Analysis complete. Key findings:
-    > ✅ EXISTS: mtime tracking, passive warning header, pre-commit lint
-    > ❌ MISSING: Content verification (checksums/hashes), active warnings, runtime detection
-    > 🔴 CRITICAL: No detection of content tampering, status changes, or ID manipulation
-    > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
-    > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
-    > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
-- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
-  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
-  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
-  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
+- [x] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai` (2026-01-26)
   - [x] **#211.4** Verify fix with task #125 (has subtasks 125.1-125.13) `#verification` (2026-01-25)
     > Verified with task #125 (has 13 subtasks).
     > After running `todo-ai reorder`, subtasks now appear in correct numerical order:
@@ -1268,8 +1253,6 @@
   - [D] **#220.2** Update config.py to use .ai-todo/ paths `#code` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
-  - [D] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (deleted 2026-01-26, expires 2026-02-25)
-    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
   - [D] **#215.10** !false (It's funny because it's true). (deleted 2026-01-26, expires 2026-02-25)
     > Explanation: The exclamation mark '!' is the logical NOT operator in many programming languages. Therefore, '!false' reads as 'NOT false', which evaluates to 'true'.
   - [D] **#215.9** 0 is false and 1 is true, right? 1. (deleted 2026-01-26, expires 2026-02-25)
@@ -1292,7 +1275,6 @@
     > Explanation: In programming, software errors are called 'bugs'. Real bugs (insects) are attracted to light sources. Dark mode is a screen setting that emits less light, thus 'avoiding bugs'.
 - [D] **#215** Collection of 10 Funny Jokes `#fun` `#jokes` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#214** Test task for whitespace verification `#test` (deleted 2026-01-26, expires 2026-02-25)
-  - [D] **#203.5** Final review and publish README.md changes `#release` `#review` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
@@ -1311,9 +1293,6 @@
   - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
 - [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
-  - [D] **#163.45** Phase 10: Release Phase - Beta/pre-release and final release with migration support `#release` (deleted 2025-12-15, expires 2026-01-14)
-  - [D] **#163.35** Release phase: Final release of Python version with migration support `#release` (deleted 2025-12-14, expires 2026-01-13)
-  - [D] **#163.34** Release phase: Create beta/pre-release for testing with real users `#release` (deleted 2025-12-14, expires 2026-01-13)
 - [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
   - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
@@ -1324,9 +1303,6 @@
   - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
   - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
   - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
@@ -1376,14 +1352,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 23:45:10
+**ai-todo** | Last Updated: 2026-01-27 00:00:44

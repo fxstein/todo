@@ -76,9 +76,9 @@ EOF
     mv "$temp_log" "$RELEASE_LOG"
 }
 
-# Get version from todo.ai file (secondary source - for validation only)
+# Get version from legacy/todo.ai file (secondary source - for validation only)
 get_file_version() {
-    grep '^VERSION=' todo.ai | sed 's/VERSION="\([^"]*\)"/\1/'
+    grep '^VERSION=' legacy/todo.ai 2>/dev/null | sed 's/VERSION="\([^"]*\)"/\1/' || echo ""
 }
 
 # Get latest release version from GitHub (PRIMARY source of truth)
@@ -132,8 +132,8 @@ validate_version_consistency() {
         echo -e "${YELLOW}⚠️  VERSION MISMATCH DETECTED${NC}"
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "${YELLOW}The VERSION variable in todo.ai does not match the latest GitHub release:${NC}"
-        echo -e "  ${RED}File version (todo.ai):    ${file_version}${NC}"
+        echo -e "${YELLOW}The VERSION variable in legacy/todo.ai does not match the latest GitHub release:${NC}"
+        echo -e "  ${RED}File version (legacy/todo.ai): ${file_version}${NC}"
         echo -e "  ${GREEN}GitHub version (releases): ${github_version}${NC}"
         echo ""
         echo -e "${YELLOW}GitHub releases are the source of truth for versioning.${NC}"
@@ -202,8 +202,8 @@ is_backend_only_release() {
         [[ -z "$file" ]] && continue
 
         # Skip version bump commits
-        if [[ "$file" == "todo.ai" ]]; then
-            # Check if todo.ai changes are functional or just version bumps
+        if [[ "$file" == "legacy/todo.ai" ]]; then
+            # Check if legacy/todo.ai changes are functional or just version bumps
             # This is handled by commit message analysis below
             continue
         fi
@@ -289,8 +289,8 @@ analyze_commits() {
             if echo "$commit" | grep -qiE "(backend|infra|release|internal|refactor|developer)"; then
                 # Explicitly backend - stays PATCH (default)
                 commit_level="patch"
-            elif echo "$commit_files" | grep -q "^todo\.ai$"; then
-                # todo.ai changed - assume user-facing unless explicitly backend
+            elif echo "$commit_files" | grep -q "^legacy/todo\.ai$"; then
+                # legacy/todo.ai changed - assume user-facing unless explicitly backend
                 commit_level="minor"
             elif echo "$commit_files" | grep -q "^\.cursor/rules/"; then
                 # .cursor/rules/ changed - assume user-facing unless explicitly backend
@@ -312,8 +312,8 @@ analyze_commits() {
             while IFS= read -r file || [[ -n "$file" ]]; do
                 [[ -z "$file" ]] && continue
 
-                # Check if frontend (user-facing docs or todo.ai)
-                if [[ "$file" == "README.md" ]] || [[ "$file" == "todo.ai" ]] ||
+                # Check if frontend (user-facing docs or legacy/todo.ai)
+                if [[ "$file" == "README.md" ]] || [[ "$file" == "legacy/todo.ai" ]] ||
                    [[ "$file" =~ ^docs/[^/]+\.md$ ]]; then
                     if [[ "$file" != "docs/TEST_PLAN.md" ]]; then
                         has_frontend=true
@@ -914,34 +914,34 @@ commit_prepare_artifacts() {
     echo -e "${GREEN}✓ Release notes preview pushed${NC}"
 }
 
-# Update version in todo.ai, pyproject.toml, and todo_ai/__init__.py
+# Update version in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py
 update_version() {
     local new_version="$1"
 
     # Use sed_inplace function if available, otherwise use direct sed
     if command -v sed_inplace &> /dev/null; then
-        sed_inplace "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
-        sed_inplace "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+        sed_inplace "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" legacy/todo.ai
+        sed_inplace "s/^# Version: .*/# Version: ${new_version}/" legacy/todo.ai
         # Update version in pyproject.toml
         sed_inplace "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
-        # Update version in todo_ai/__init__.py
-        sed_inplace "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" todo_ai/__init__.py
+        # Update version in ai_todo/__init__.py
+        sed_inplace "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" ai_todo/__init__.py
     else
         # macOS or Linux compatible
         if [[ "$(uname)" == "Darwin" ]]; then
-            sed -i '' "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
-            sed -i '' "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+            sed -i '' "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" legacy/todo.ai
+            sed -i '' "s/^# Version: .*/# Version: ${new_version}/" legacy/todo.ai
             # Update version in pyproject.toml
             sed -i '' "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
-            # Update version in todo_ai/__init__.py
-            sed -i '' "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" todo_ai/__init__.py
+            # Update version in ai_todo/__init__.py
+            sed -i '' "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" ai_todo/__init__.py
         else
-            sed -i "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" todo.ai
-            sed -i "s/^# Version: .*/# Version: ${new_version}/" todo.ai
+            sed -i "s/^VERSION=\".*\"/VERSION=\"${new_version}\"/" legacy/todo.ai
+            sed -i "s/^# Version: .*/# Version: ${new_version}/" legacy/todo.ai
             # Update version in pyproject.toml
             sed -i "s/^version = \".*\"/version = \"${new_version}\"/" pyproject.toml
-            # Update version in todo_ai/__init__.py
-            sed -i "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" todo_ai/__init__.py
+            # Update version in ai_todo/__init__.py
+            sed -i "s/^__version__ = \".*\"/__version__ = \"${new_version}\"/" ai_todo/__init__.py
         fi
     fi
 }
@@ -1225,15 +1225,15 @@ main() {
 
     # Filter out files that should be ignored during release
     while IFS= read -r line; do
-        # Skip weird backup files like "todo.ai ''"
-        if [[ "$line" =~ ^[?]{2}[[:space:]]+\"todo\.ai ]]; then
+        # Skip weird backup files like "legacy/todo.ai ''"
+        if [[ "$line" =~ ^[?]{2}[[:space:]]+\"(legacy/)?todo\.ai ]]; then
             continue
         fi
         # Skip RELEASE_LOG.log - it will be committed at the end after all release operations
         if echo "$line" | grep -qE "release/RELEASE_LOG\.log|^RELEASE_LOG\.log"; then
             continue
         fi
-        # Skip .todo.ai/.todo.ai.serial and .todo.ai/.todo.ai.log - these are normal operational files
+        # Skip .ai-todo/.ai-todo.serial and .ai-todo/.ai-todo.log - these are normal operational files
         # They change whenever tasks are added/completed, which is expected behavior
         # Excluding them prevents blocking releases due to normal task management activity
         if echo "$line" | grep -qE "\.todo\.ai/\.todo\.ai\.(serial|log)"; then
@@ -1319,7 +1319,7 @@ main() {
     echo -e "${GREEN}📌 Version Information${NC}"
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     echo -e "${GREEN}Current version (GitHub):  ${CURRENT_VERSION} ✓${NC}"
-    echo -e "${BLUE}File version (todo.ai):     ${file_version}${NC}"
+    echo -e "${BLUE}File version (legacy/todo.ai): ${file_version}${NC}"
     echo ""
 
     # Get last tag
@@ -1462,7 +1462,7 @@ main() {
     # Log release start with all details
     log_release_step "RELEASE START" "Starting release process:
 - Current version (GitHub): ${CURRENT_VERSION}
-- File version (todo.ai): ${file_version}
+- File version (legacy/todo.ai): ${file_version}
 - Proposed version: ${NEW_VERSION}
 - Release type: ${RELEASE_TYPE}
 - Bump type: ${BUMP_TYPE}
@@ -1676,18 +1676,18 @@ abort_release() {
         echo -e "${GREEN}   ✓ pyproject.toml${NC}"
     fi
 
-    # Update todo.ai
-    if [[ -f "todo.ai" ]]; then
-        sed -i.bak "s/^VERSION=\".*\"/VERSION=\"${previous_version}\"/" todo.ai
-        rm todo.ai.bak
-        echo -e "${GREEN}   ✓ todo.ai${NC}"
+    # Update legacy/todo.ai
+    if [[ -f "legacy/todo.ai" ]]; then
+        sed -i.bak "s/^VERSION=\".*\"/VERSION=\"${previous_version}\"/" legacy/todo.ai
+        rm legacy/todo.ai.bak
+        echo -e "${GREEN}   ✓ legacy/todo.ai${NC}"
     fi
 
-    # Update todo_ai/__init__.py
-    if [[ -f "todo_ai/__init__.py" ]]; then
-        sed -i.bak "s/^__version__ = \".*\"/__version__ = \"${previous_version}\"/" todo_ai/__init__.py
-        rm todo_ai/__init__.py.bak
-        echo -e "${GREEN}   ✓ todo_ai/__init__.py${NC}"
+    # Update ai_todo/__init__.py
+    if [[ -f "ai_todo/__init__.py" ]]; then
+        sed -i.bak "s/^__version__ = \".*\"/__version__ = \"${previous_version}\"/" ai_todo/__init__.py
+        rm ai_todo/__init__.py.bak
+        echo -e "${GREEN}   ✓ ai_todo/__init__.py${NC}"
     fi
 
     log_release_step "ABORT REVERT" "Reverted version files to ${previous_version}"
@@ -1702,7 +1702,7 @@ abort_release() {
 
     # Step 7: Stage changes
     echo -e "${BLUE}📝 Staging changes...${NC}"
-    git add pyproject.toml todo.ai todo_ai/__init__.py release/RELEASE_LOG.log
+    git add pyproject.toml legacy/todo.ai ai_todo/__init__.py release/RELEASE_LOG.log
 
     # Add uv.lock if it changed (pytest may have updated it)
     if [[ -f "uv.lock" ]] && git diff --quiet uv.lock 2>/dev/null; then
@@ -1887,16 +1887,16 @@ execute_release() {
     echo ""
 
     # Update version
-    echo -e "${BLUE}📝 Updating version in todo.ai, pyproject.toml, and todo_ai/__init__.py...${NC}"
-    log_release_step "UPDATE VERSION" "Updating version in todo.ai, pyproject.toml, and todo_ai/__init__.py from ${CURRENT_VERSION} to ${NEW_VERSION}"
+    echo -e "${BLUE}📝 Updating version in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py...${NC}"
+    log_release_step "UPDATE VERSION" "Updating version in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py from ${CURRENT_VERSION} to ${NEW_VERSION}"
     update_version "$NEW_VERSION"
 
     # Verify all files were updated correctly
-    if ! grep -q "^VERSION=\"${NEW_VERSION}\"" todo.ai 2>/dev/null; then
-        echo -e "${RED}❌ Error: Version update failed in todo.ai${NC}"
+    if ! grep -q "^VERSION=\"${NEW_VERSION}\"" legacy/todo.ai 2>/dev/null; then
+        echo -e "${RED}❌ Error: Version update failed in legacy/todo.ai${NC}"
         echo -e "${RED}   → The VERSION variable was not updated correctly${NC}"
-        echo -e "${RED}   → Check todo.ai file for sed errors or file permissions${NC}"
-        log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo.ai to ${NEW_VERSION}"
+        echo -e "${RED}   → Check legacy/todo.ai file for sed errors or file permissions${NC}"
+        log_release_step "VERSION UPDATE ERROR" "Failed to update version in legacy/todo.ai to ${NEW_VERSION}"
         exit 1
     fi
     if ! grep -q "^version = \"${NEW_VERSION}\"" pyproject.toml 2>/dev/null; then
@@ -1906,15 +1906,15 @@ execute_release() {
         log_release_step "VERSION UPDATE ERROR" "Failed to update version in pyproject.toml to ${NEW_VERSION}"
         exit 1
     fi
-    if ! grep -q "^__version__ = \"${NEW_VERSION}\"" todo_ai/__init__.py 2>/dev/null; then
-        echo -e "${RED}❌ Error: Version update failed in todo_ai/__init__.py${NC}"
+    if ! grep -q "^__version__ = \"${NEW_VERSION}\"" ai_todo/__init__.py 2>/dev/null; then
+        echo -e "${RED}❌ Error: Version update failed in ai_todo/__init__.py${NC}"
         echo -e "${RED}   → The __version__ variable was not updated correctly${NC}"
-        echo -e "${RED}   → Check todo_ai/__init__.py file for sed errors or file permissions${NC}"
-        log_release_step "VERSION UPDATE ERROR" "Failed to update version in todo_ai/__init__.py to ${NEW_VERSION}"
+        echo -e "${RED}   → Check ai_todo/__init__.py file for sed errors or file permissions${NC}"
+        log_release_step "VERSION UPDATE ERROR" "Failed to update version in ai_todo/__init__.py to ${NEW_VERSION}"
         exit 1
     fi
-    echo -e "${GREEN}✓ Verified version updated in todo.ai, pyproject.toml, and todo_ai/__init__.py${NC}"
-    log_release_step "VERSION UPDATED" "Version updated successfully in todo.ai, pyproject.toml, and todo_ai/__init__.py"
+    echo -e "${GREEN}✓ Verified version updated in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py${NC}"
+    log_release_step "VERSION UPDATED" "Version updated successfully in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py"
 
     # Convert to bash version (now that version is updated)
     echo -e "${BLUE}🔄 Converting to bash version...${NC}"
@@ -1925,7 +1925,7 @@ execute_release() {
         log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
         exit 1
     fi
-    log_release_step "BASH CONVERSION" "Successfully converted todo.ai to todo.bash with version ${NEW_VERSION}"
+    log_release_step "BASH CONVERSION" "Successfully converted legacy/todo.ai to todo.bash with version ${NEW_VERSION}"
     echo -e "${GREEN}✓ Bash version created${NC}"
 
     # Run pre-commit hooks on generated files to fix formatting before staging
@@ -1944,7 +1944,7 @@ execute_release() {
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
-    git add todo.ai pyproject.toml todo_ai/__init__.py
+    git add legacy/todo.ai pyproject.toml ai_todo/__init__.py
 
     # Commit summary file if it exists and is uncommitted
     if [[ "$summary_needs_commit" == true ]] && [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
@@ -1959,16 +1959,16 @@ execute_release() {
         git add release/RELEASE_NOTES.md
     fi
 
-    # Commit TODO.md and .todo.ai files if they're uncommitted (they should always be committed together)
-    local todo_status=$(git status -s | grep -E "(TODO\.md|\.todo\.ai/)" || echo "")
+    # Commit TODO.md and .ai-todo files if they're uncommitted (they should always be committed together)
+    local todo_status=$(git status -s | grep -E "(TODO\.md|\.ai-todo/)" || echo "")
     if [[ -n "$todo_status" ]]; then
         if echo "$todo_status" | grep -q "TODO.md"; then
             log_release_step "COMMIT TODO" "Adding TODO.md to commit"
             git add TODO.md
         fi
-        if echo "$todo_status" | grep -qE "\.todo\.ai/"; then
-            log_release_step "COMMIT TODO_DATA" "Adding .todo.ai/ files to commit"
-            git add .todo.ai/.todo.ai.serial .todo.ai/.todo.ai.log 2>/dev/null || true
+        if echo "$todo_status" | grep -qE "\.ai-todo/"; then
+            log_release_step "COMMIT TODO_DATA" "Adding .ai-todo/ files to commit"
+            git add .ai-todo/.ai-todo.serial .ai-todo/.ai-todo.log 2>/dev/null || true
         fi
     fi
 
@@ -2092,10 +2092,10 @@ Includes release summary from ${SUMMARY_FILE}"
     local verification_failed=false
     local verification_errors=""
 
-    # Check todo.ai
-    if ! git show "$TAG":todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
+    # Check legacy/todo.ai
+    if ! git show "$TAG":legacy/todo.ai 2>/dev/null | grep -q "^VERSION=\"${NEW_VERSION}\""; then
         verification_failed=true
-        verification_errors="${verification_errors}\n   ❌ todo.ai: VERSION not found or incorrect"
+        verification_errors="${verification_errors}\n   ❌ legacy/todo.ai: VERSION not found or incorrect"
     fi
 
     # Check pyproject.toml
@@ -2104,10 +2104,10 @@ Includes release summary from ${SUMMARY_FILE}"
         verification_errors="${verification_errors}\n   ❌ pyproject.toml: version not found or incorrect"
     fi
 
-    # Check todo_ai/__init__.py
-    if ! git show "$TAG":todo_ai/__init__.py 2>/dev/null | grep -q "^__version__ = \"${NEW_VERSION}\""; then
+    # Check ai_todo/__init__.py
+    if ! git show "$TAG":ai_todo/__init__.py 2>/dev/null | grep -q "^__version__ = \"${NEW_VERSION}\""; then
         verification_failed=true
-        verification_errors="${verification_errors}\n   ❌ todo_ai/__init__.py: __version__ not found or incorrect"
+        verification_errors="${verification_errors}\n   ❌ ai_todo/__init__.py: __version__ not found or incorrect"
     fi
 
     if [[ "$verification_failed" == true ]]; then

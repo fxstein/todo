@@ -1000,4 +1000,5 @@ class FileOps:
             ]
         )
 
-        return "\n".join(line.rstrip() for line in lines) + "\n"
+        full_content = "\n".join(lines)
+        return "\n".join(line.rstrip() for line in full_content.splitlines()) + "\n"

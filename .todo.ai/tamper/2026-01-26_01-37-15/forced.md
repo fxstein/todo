@@ -4,10 +4,10 @@
 
 ## Tasks
 
-- [ ] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance`
-  - [ ] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification`
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
+  - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
   - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
-  - [ ] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code`
+  - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
   - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
@@ -1222,4 +1222,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:37:43
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:35:22

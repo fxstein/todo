@@ -4,10 +4,10 @@
 
 ## Tasks
 
-- [ ] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance`
-  - [ ] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification`
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
+  - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
   - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
-  - [ ] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code`
+  - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
   - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
@@ -696,7 +696,7 @@
   - [x] **#153.7** Add commands to help text and usage documentation `#feature` (2025-11-16)
   - [x] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature` (2025-11-16)
     > Test scenarios:
-    >
+    > 
     > 1. delete-note on task with single-line note
     > 2. delete-note on task with multi-line note
     > 3. delete-note on task with no notes (should error)
@@ -710,28 +710,28 @@
   - [x] **#153.5** Handle multi-line notes correctly in both commands `#feature` (2025-11-16)
   - [x] **#153.4** Implement update-note command to replace existing notes `#feature` (2025-11-16)
     > Implementation approach for update-note:
-    >
+    > 
     > 1. Call delete-note logic to remove existing notes
     > 2. Call add_note() logic to add new notes
     > 3. Essentially: delete + add in one operation
     > 4. Ensures proper formatting via existing add_note()
-    >
+    > 
     > Could be wrapper function:
     > update_note() {
     > delete_note_internal $task_id  # No prompt version
     > add_note $task_id $new_text
     > }
-    >
+    > 
     > Reuse existing add_note() multi-line formatting logic from fix #149.
   - [x] **#153.3** Implement delete-note command to remove all notes from a task `#feature` (2025-11-16)
     > Implementation approach for delete-note:
-    >
+    > 
     > 1. Find task line number (reuse logic from show_task)
     > 2. Find all consecutive blockquote lines after task
     > 3. Use sed or temp file to delete those lines
     > 4. Update footer timestamp
     > 5. Log the action
-    >
+    > 
     > Reference collect_task_notes() function if it exists - may already have note detection logic. Similar pattern to delete_task() but only removes note lines, not the task itself.
   - [x] **#153.2** Analyze current note storage format in TODO.md `#feature` (2025-11-16)
     > Notes in TODO.md format:
@@ -740,34 +740,34 @@
     > - Each line starts with '  >' (indent + > + space)
     > - Can span multiple lines
     > - Ends when next non-blockquote line encountered
-    >
+    > 
     > Example level-1 subtask:
     > - [ ] **#42.1** Task description
     > > Note line 1
     > > Note line 2
     > > Note line 3
-    >
+    > 
     > Need to identify all note lines for delete/update operations.
   - [x] **#153.1** Design command syntax for update-note and delete-note `#feature` (2025-11-16)
     > Proposed command syntax:
-    >
+    > 
     > ./todo.ai delete-note <task-id>
     > - Removes ALL notes from specified task
     > - Confirmation prompt: 'Delete all notes from task #X? (y/N)'
     > - Returns error if task has no notes
-    >
+    > 
     > ./todo.ai update-note <task-id> "new note text"
     > - Replaces ALL existing notes with new text
     > - Supports multi-line notes (like add note)
     > - Shows preview: 'Replace N lines with M lines?'
     > - Returns error if task has no notes to update
-    >
+    > 
     > Alternative: Could add --force to skip confirmations for both commands.
 - [x] **#153** Add note management: update and delete note commands `#feature` (2025-11-16)
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
   > - update-note: Replace existing notes with new text
-  >
+  > 
   > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
   - [x] **#152.7** Verify GitHub issue template structure `#testing` (2025-11-16)
   - [x] **#152.6** Test label categorization for different error types `#testing` (2025-11-16)
@@ -779,7 +779,7 @@
     > - User must explicitly confirm with 'y'
     > - Cancelled if user says 'N' or presses Enter
     > - Maintains full user control as designed
-    >
+    > 
     > Test: Ran './todo.ai report-bug "test" "test" "test"' without env vars
     > Result: Prompted for confirmation as expected ✓
   - [x] **#152.3** Test AI agent detection and auto-submission (with CURSOR_AI set) `#testing` (2025-11-16)
@@ -789,18 +789,18 @@
   - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug` (2025-11-16)
   - [x] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug` (2025-11-16)
     > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
-    >
+    > 
     > **Original broken notes (from bug #36 work):**
     > - Task 147.3: Lines 36-45 need '  > ' prefix
     > - Task 147.4: Lines 27-32 need '  > ' prefix
     > - Task 147.5: Lines 21-23 need '  > ' prefix
     > - Task 147.6: Lines 14-18 need '  > ' prefix
-    >
+    > 
     > **Newly broken notes (from creating task #149):**
     > - Task 149: Main task note (multi-line, needs '  > ' prefix)
     > - Task 149.1: Multi-line note about expected vs current behavior
     > - Task 149.6: This very note! (multi-line, needs '  > ' prefix)
-    >
+    > 
     > After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
     > Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
     > - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
@@ -810,44 +810,44 @@
     > After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
   - [x] **#149.5** Test fix with multi-line notes at different nesting levels `#bug` (2025-11-16)
     > Tested multi-line notes at all 3 nesting levels:
-    >
+    > 
     > Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
     > Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
     > Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
-    >
+    > 
     > All lines properly formatted with indent + '  > ' prefix. Fix verified!
   - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug` (2025-11-16)
     > Fixed add_note() function with 3 key changes:
-    >
+    > 
     > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
     > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces
     > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
-    >
+    > 
     > This note itself tests the fix - all lines should have proper blockquote markers!
   - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug` (2025-11-16)
     > Bug located at line 4355 in add_note() function:
-    >
+    > 
     > local note_line="${indent}  > ${note_text}"
-    >
+    > 
     > This creates a single line by concatenating indent + '  > ' + entire note_text.
     > When note_text contains newlines, they're inserted as raw text without formatting.
-    >
+    > 
     > Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
   - [x] **#149.2** Find and analyze the add_note() function `#bug` (2025-11-16)
     > Search for 'add_note()' or '^add_note\(' function in todo.ai. Check how it processes note text, especially when note contains newlines. Look for where indentation prefix is calculated and where blockquote marker (>) is added. Likely splits note on newlines but only formats first line correctly.
   - [x] **#149.1** Document the multi-line note formatting bug with examples `#bug` (2025-11-16)
     > Current behavior vs expected:
-    >
+    > 
     > CURRENT (broken):
     > > First line of note
     > Line 2 without marker
     > Line 3 without marker
-    >
+    > 
     > EXPECTED (correct):
     > > First line of note
     > > Line 2 with marker
     > > Line 3 with marker
-    >
+    > 
     > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
 - [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug` (2025-11-16)
   > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
@@ -869,25 +869,25 @@
     > - Level 2: Task #148.1.1 ✓ (was failing, now fixed)
   - [x] **#147.4** Fix task ID resolution to support arbitrary nesting depth `#bug` (2025-11-16)
     > Fixed show_task() function in todo.ai:
-    >
+    > 
     > Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
     > Line 4150: Same fix for fallback search
     > Line 4168: Same fix for note line number search
     > Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
-    >
+    > 
     > All changes support arbitrary nesting depth and handle malformed checkboxes.
   - [x] **#147.3** Identify where show/modify/note commands fail for deep nesting `#bug` (2025-11-16)
     > Affected locations in show_task() function:
-    >
+    > 
     > Line 4143: Main task search - missing 4+ space patterns
     > Line 4148: Fallback search - missing 4+ space patterns
     > Line 4164: Note line number search - missing 4+ space patterns
-    >
+    > 
     > For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
     > - Lines 2559, 2664, 2693: Task operations
     > - Lines 3035, 3040, 3061: More operations
     > - Line 4331: Another operation
-    >
+    > 
     > Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation depth
   - [x] **#147.2** Reproduce the bug with 3-level nested subtasks (1.2.1 pattern) `#bug` (2025-11-16)
     > Bug confirmed: Task #148.1.1 exists in TODO.md with 4-space indentation but 'show 148.1.1' returns 'Task not found'. Tasks #148 (0 spaces) and #148.1 (2 spaces) work correctly.
@@ -1222,4 +1222,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:37:43
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:35:22

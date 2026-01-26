@@ -377,8 +377,8 @@ def stop_command(task_id: str, todo_path: str = "TODO.md"):
         print(f"Error: {e}")
 
 
-def delete_command(task_ids: list[str], with_subtasks: bool = False, todo_path: str = "TODO.md"):
-    """Soft delete task(s) to Deleted section."""
+def delete_command(task_ids: list[str], with_subtasks: bool = True, todo_path: str = "TODO.md"):
+    """Soft delete task(s) to Deleted section (includes subtasks by default)."""
     manager = get_manager(todo_path)
 
     # Expand task IDs

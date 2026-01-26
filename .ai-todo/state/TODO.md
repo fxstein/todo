@@ -16,7 +16,7 @@
   - [ ] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4`
   - [ ] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3`
   - [ ] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2`
-  - [ ] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1`
+  - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-26)
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
   - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
@@ -51,7 +51,7 @@
 - [ ] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix`
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
 
-- [ ] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix`
+- [x] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix` (2026-01-26)
   > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
 
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
@@ -1373,9 +1373,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 20:58:35
+**ai-todo** | Last Updated: 2026-01-26 21:01:18

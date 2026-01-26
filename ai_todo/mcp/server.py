@@ -119,8 +119,8 @@ def modify_task(task_id: str, description: str, tags: list[str] | None = None) -
 
 
 @mcp.tool()
-def delete_task(task_id: str, with_subtasks: bool = False) -> str:
-    """Delete a task (move to Deleted section)."""
+def delete_task(task_id: str, with_subtasks: bool = True) -> str:
+    """Delete a task and its subtasks (move to Deleted section)."""
     return _capture_output(delete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH)
 
 

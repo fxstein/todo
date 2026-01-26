@@ -4,6 +4,13 @@
 
 ## Tasks
 
+- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
+  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
+  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
+  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
+  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
+  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
+
 - [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
 
 - [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
@@ -1246,4 +1253,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 02:02:13
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 02:31:58

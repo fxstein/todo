@@ -12,6 +12,7 @@
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
 
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
+  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
   - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
   - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
   - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
@@ -1251,4 +1252,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:42:16
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:42:47

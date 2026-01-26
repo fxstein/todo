@@ -45,7 +45,7 @@ def test_todo_file(tmp_path):
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
         encoding="utf-8",
     )
@@ -132,7 +132,7 @@ class TestMCPCLIParity:
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
             encoding="utf-8",
         )
@@ -180,7 +180,7 @@ class TestMCPCLIParity:
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
             encoding="utf-8",
         )
@@ -216,7 +216,7 @@ class TestMCPCLIParity:
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
             encoding="utf-8",
         )
@@ -254,7 +254,7 @@ class TestMCPCLIParity:
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
             encoding="utf-8",
         )
@@ -291,7 +291,7 @@ class TestMCPCLIParity:
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
             encoding="utf-8",
         )
@@ -326,7 +326,7 @@ class TestMCPCLIParity:
 
 ## Deleted Tasks
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo
 """,
             encoding="utf-8",
         )

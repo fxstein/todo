@@ -19,8 +19,8 @@ def test_preserve_file_structure(tmp_path):
 
 ------------------
 **Last Updated:** Thu Oct 30 21:17:25 CET 2025
-**Repository:** https://github.com/fxstein/todo.ai
-**Maintenance:** Use `todo.ai` script only
+**Repository:** https://github.com/fxstein/ai-todo
+**Maintenance:** Use `ai-todo` CLI/MCP
 """
     todo_path.write_text(original_content, encoding="utf-8")
 
@@ -52,5 +52,5 @@ def test_preserve_file_structure(tmp_path):
 
     # Check that footer is preserved
     assert "------------------" in new_content
-    assert "**Repository:** https://github.com/fxstein/todo.ai" in new_content
-    assert "**Maintenance:** Use `todo.ai` script only" in new_content
+    assert "**Repository:** https://github.com/fxstein/ai-todo" in new_content
+    assert "**Maintenance:** Use `ai-todo` CLI/MCP" in new_content

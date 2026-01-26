@@ -1,5 +1,5 @@
 ---
-description: "Commit message standards for todo.ai"
+description: "Commit message standards for ai-todo"
 alwaysApply: true
 ---
 # Commit Standards
@@ -23,7 +23,7 @@ Use these prefixes to help the release script determine version bumps:
 
 **CRITICAL REQUIREMENT:**
 
--   **MUST use `task#nn` format** (e.g., `task#210`, `task#212`) when referencing todo.ai tasks.
+-   **MUST use `task#nn` format** (e.g., `task#210`, `task#212`) when referencing ai-todo tasks.
 -   **NEVER use `#nn` format** (e.g., `#210`) - this links to GitHub Issues/PRs, not tasks.
 
 **Examples:**

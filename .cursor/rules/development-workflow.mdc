@@ -1,5 +1,5 @@
 ---
-description: "Development workflow for todo.ai (Python/MCP)"
+description: "Development workflow for ai-todo (Python/MCP)"
 alwaysApply: true
 ---
 # Development Workflow
@@ -9,27 +9,27 @@ alwaysApply: true
 
 ## Repository Context
 
--   **Root:** `todo_ai/` (Python package source)
--   **CLI Entry:** `todo_ai/cli/main.py`
--   **MCP Entry:** `todo_ai/mcp/server.py`
--   **Core Logic:** `todo_ai/core/` (Shared logic for CLI and MCP)
+-   **Root:** `ai_todo/` (Python package source)
+-   **CLI Entry:** `ai_todo/cli/main.py`
+-   **MCP Entry:** `ai_todo/mcp/server.py`
+-   **Core Logic:** `ai_todo/core/` (Shared logic for CLI and MCP)
 
 ## Development Rules
 
-1.  **Python First:** All new features must be implemented in the Python package (`todo_ai/`).
-2.  **File Operations:** ALWAYS use `todo_ai.core.file_ops.FileOps` for reading/writing `TODO.md`.
+1.  **Python First:** All new features must be implemented in the Python package (`ai_todo/`).
+2.  **File Operations:** ALWAYS use `ai_todo.core.file_ops.FileOps` for reading/writing `TODO.md`.
     -   This class handles checksums, shadow copies, and atomic updates.
     -   **NEVER** use `open()` or `write()` on `TODO.md` directly.
 3.  **Testing:**
     -   Run unit tests: `uv run pytest`
     -   Test MCP tools via the MCP Inspector or Cursor.
 4.  **Installation/Migration:**
-    -   Installation logic resides in `todo_ai/cli/system_ops.py` (or dedicated modules).
-    -   Migrations are handled by `todo_ai.core.migrations`.
+    -   Installation logic resides in `ai_todo/cli/system_ops.py` (or dedicated modules).
+    -   Migrations are handled by `ai_todo.core.migrations`.
 
 ## File Integrity & Tamper Detection
 
-todo.ai uses a simple tamper detection system to protect `TODO.md` integrity.
+ai-todo uses a simple tamper detection system to protect `TODO.md` integrity.
 
 -   **State Directory:** `.todo.ai/state/` contains critical integrity files (checksums, shadow copies).
 -   **RESTRICTION:** This directory is **OFF LIMITS** to agents. Never read, write, or modify files in this directory directly.

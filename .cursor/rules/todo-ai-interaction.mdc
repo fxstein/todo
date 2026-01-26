@@ -1,8 +1,8 @@
 ---
-description: "Rules for interacting with todo.ai via MCP"
+description: "Rules for interacting with ai-todo via MCP"
 alwaysApply: true
 ---
-# todo.ai Interaction Rules
+# ai-todo Interaction Rules
 
 ## Critical Requirements
 

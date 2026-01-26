@@ -1,5 +1,5 @@
 ---
-description: "Release workflow for todo.ai"
+description: "Release workflow for ai-todo"
 alwaysApply: true
 ---
 # Release Workflow

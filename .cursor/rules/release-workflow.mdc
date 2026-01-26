@@ -10,6 +10,8 @@ When user asks to "prepare release" or "prepare beta release":
 
 1. Wait for CI: `./scripts/wait-for-ci.sh`
 2. Generate 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
+   - **For beta-to-beta releases**: Analyze commits since the last beta tag.
+   - **For stable releases (graduating from beta)**: Analyze ALL commits since the last **stable** release (not the last beta). This ensures the summary covers the entire beta cycle.
 3. Run: `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
 4. **STOP.** Show preview and let user review before proceeding.
 

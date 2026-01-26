@@ -154,6 +154,19 @@ get_last_tag() {
     fi
 }
 
+# Get last STABLE tag (excludes beta/pre-release versions)
+# Used when graduating from beta cycle to stable release
+get_last_stable_tag() {
+    # Find all version tags, sorted descending, filter out betas
+    local stable_tags=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+    if [[ -z "$stable_tags" ]]; then
+        # No stable tags exist, return empty
+        echo ""
+    else
+        echo "$stable_tags"
+    fi
+}
+
 # Check if release is backend-only (infrastructure only, no user-facing changes)
 is_backend_only_release() {
     local commit_range="$1"
@@ -1324,16 +1337,48 @@ main() {
 
     # Get last tag
     LAST_TAG=$(get_last_tag)
+
+    # Detect if we're graduating from beta to stable
+    # This happens when: current version is beta AND we're NOT creating a beta release
+    local GRADUATING_FROM_BETA=false
+    local LAST_STABLE_TAG=""
+    if [[ "$IN_BETA_CYCLE" == true ]] && [[ "$BETA_RELEASE" == false ]]; then
+        GRADUATING_FROM_BETA=true
+        LAST_STABLE_TAG=$(get_last_stable_tag)
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${YELLOW}📦 GRADUATING FROM BETA TO STABLE${NC}"
+        echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        echo -e "${YELLOW}   Current beta: ${CURRENT_VERSION}${NC}"
+        echo -e "${YELLOW}   Target stable: ${BETA_BASE_VERSION}${NC}"
+        if [[ -n "$LAST_STABLE_TAG" ]]; then
+            echo -e "${YELLOW}   Last stable release: ${LAST_STABLE_TAG}${NC}"
+            echo -e "${YELLOW}   Analyzing ALL commits since ${LAST_STABLE_TAG}${NC}"
+        else
+            echo -e "${YELLOW}   No previous stable release found${NC}"
+            echo -e "${YELLOW}   Analyzing ALL commits${NC}"
+        fi
+        echo ""
+        log_release_step "BETA GRADUATION" "Graduating from beta ${CURRENT_VERSION} to stable ${BETA_BASE_VERSION}, analyzing commits since ${LAST_STABLE_TAG:-initial}"
+    fi
+
     if [[ "$LAST_TAG" =~ ^v ]]; then
         echo -e "${GREEN}📌 Last release: ${LAST_TAG}${NC}"
     else
         echo -e "${YELLOW}📌 No previous release found (using initial commit)${NC}"
     fi
 
+    # For beta graduation, use last STABLE tag for commit analysis
+    # This ensures release notes cover the entire beta cycle
+    local COMMIT_ANALYSIS_TAG="$LAST_TAG"
+    if [[ "$GRADUATING_FROM_BETA" == true ]] && [[ -n "$LAST_STABLE_TAG" ]]; then
+        COMMIT_ANALYSIS_TAG="$LAST_STABLE_TAG"
+        echo -e "${BLUE}📌 Using ${LAST_STABLE_TAG} for commit analysis (beta graduation)${NC}"
+    fi
+
     # Analyze commits to determine bump type
     echo ""
     echo -e "${BLUE}📊 Analyzing commits since last release...${NC}"
-    BUMP_TYPE=$(analyze_commits "$LAST_TAG")
+    BUMP_TYPE=$(analyze_commits "$COMMIT_ANALYSIS_TAG")
 
     # Check if current version is a beta (e.g., 3.0.0b1)
     # If so, we're in a beta cycle and must stay at the same base version
@@ -1474,7 +1519,9 @@ main() {
     if [[ -n "$SUMMARY_FILE" ]] && [[ -f "$SUMMARY_FILE" ]]; then
         echo -e "${GREEN}📄 Including AI-generated summary from: $SUMMARY_FILE${NC}"
     fi
-    local preview_notes_file=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
+    # Use COMMIT_ANALYSIS_TAG (last stable for beta graduation, or last tag otherwise)
+    local NOTES_TAG="${COMMIT_ANALYSIS_TAG:-$LAST_TAG}"
+    local preview_notes_file=$(generate_release_notes "$NOTES_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
 
     # Show release notes preview
     echo ""
@@ -1529,11 +1576,13 @@ NEW_VERSION=$NEW_VERSION
 BUMP_TYPE=$BUMP_TYPE
 CURRENT_VERSION=$CURRENT_VERSION
 LAST_TAG=$LAST_TAG
+NOTES_TAG=$NOTES_TAG
 SUMMARY_FILE=$SUMMARY_FILE
 summary_needs_commit=$summary_needs_commit
 RELEASE_TYPE=$RELEASE_TYPE
 BASE_VERSION=$BASE_VERSION
 IS_MAJOR=$IS_MAJOR
+GRADUATING_FROM_BETA=$GRADUATING_FROM_BETA
 PREPARED_AT=$PREPARED_AT
 PREPARED_BY=$PREPARED_BY
 GIT_TAG=v${NEW_VERSION}
@@ -1881,8 +1930,10 @@ execute_release() {
 
     # Regenerate release notes from RELEASE_SUMMARY.md (single source of truth)
     # This ensures any updates to the summary after prepare are included
+    # Use NOTES_TAG (which is last stable tag for beta graduation, or last tag otherwise)
     echo -e "${BLUE}📝 Generating release notes from ${SUMMARY_FILE:-commits}...${NC}"
-    RELEASE_NOTES_FILE=$(generate_release_notes "$LAST_TAG" "$NEW_VERSION" "$SUMMARY_FILE")
+    local release_tag="${NOTES_TAG:-$LAST_TAG}"
+    RELEASE_NOTES_FILE=$(generate_release_notes "$release_tag" "$NEW_VERSION" "$SUMMARY_FILE")
     echo -e "${GREEN}✓ Release notes generated${NC}"
     echo ""
 

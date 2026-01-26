@@ -1139,6 +1139,27 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#215.1** Why do programmers prefer dark mode? Because light attracts bugs. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: In programming, software errors are called 'bugs'. Real bugs (insects) are attracted to light sources. Dark mode is a screen setting that emits less light, thus 'avoiding bugs'.
+  - [D] **#215.2** How many programmers does it take to change a light bulb? None, that's a hardware problem. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: Programmers write software (code) and often distinguish it from hardware (physical devices like light bulbs). If a physical device fails, they jokingly claim it's not their department.
+  - [D] **#215.3** A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?' (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: SQL is a language for databases. Data is stored in 'tables'. A 'JOIN' is a specific command used to combine data from two different tables.
+  - [D] **#215.4** There are 10 types of people in the world: those who understand binary, and those who don't. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: Binary is a number system used by computers consisting only of 0s and 1s. In binary, '10' represents the number 2. So the joke actually says 'There are two types of people'.
+  - [D] **#215.5** Why did the programmer quit his job? He didn't get arrays. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: An 'array' is a fundamental data structure in programming (a list of items). The joke relies on the pun that 'arrays' sounds exactly like 'a raise' (an increase in salary).
+  - [D] **#215.6** What is a programmer's favorite hangout place? Foo Bar. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: 'Foo' and 'Bar' are the standard placeholder names used in programming tutorials and examples (like 'John Doe'). 'Foo Bar' sounds like the name of a drinking establishment.
+  - [D] **#215.7** Why do Java programmers wear glasses? Because they don't C#. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: C# (pronounced 'C-Sharp') is a popular programming language. The joke is a pun on 'see sharp' (to see clearly). Java is a different language, implying they can't 'see sharp'.
+  - [D] **#215.8** A programmer's wife tells him, 'While you're at the store, get some milk.' He never comes back. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: This refers to a 'while loop' in code. The instruction 'While you are at the store' is interpreted as a condition: as long as he is at the store, he must keep getting milk. Since he never leaves the store (the condition remains true), he is stuck in an infinite loop.
+  - [D] **#215.9** 0 is false and 1 is true, right? 1. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: In computer logic, the number 0 represents 'False' and 1 represents 'True'. When asked 'right?', instead of saying 'Yes' or 'True', the programmer answers '1'.
+  - [D] **#215.10** !false (It's funny because it's true). (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: The exclamation mark '!' is the logical NOT operator in many programming languages. Therefore, '!false' reads as 'NOT false', which evaluates to 'true'.
+- [D] **#215** Collection of 10 Funny Jokes `#fun` `#jokes` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#214** Test task for whitespace verification `#test` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
@@ -1222,4 +1243,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:38:07
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:44:40

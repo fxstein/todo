@@ -40,7 +40,7 @@ from ai_todo.cli.commands import (
 from ai_todo.core.exceptions import TamperError
 
 # Initialize FastMCP
-mcp = FastMCP("todo-ai")
+mcp = FastMCP("ai-todo")
 
 # Global state for todo path (set by run_server)
 CURRENT_TODO_PATH: str = "TODO.md"

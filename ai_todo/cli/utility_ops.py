@@ -12,7 +12,7 @@ def version_command() -> None:
     """Show version information."""
     print(f"ai-todo version {__version__}")
     print("Repository: https://github.com/fxstein/ai-todo")
-    print("Update: pip install --upgrade todo-ai")
+    print("Update: pip install --upgrade ai-todo")
 
 
 def uninstall_command(
@@ -27,9 +27,9 @@ def uninstall_command(
     print("🗑️  Uninstalling todo.ai")
     print("")
     print("For Python package installations, use:")
-    print("  pip uninstall todo-ai")
+    print("  pip uninstall ai-todo")
     print("  # or")
-    print("  uv pip uninstall todo-ai")
+    print("  uv pip uninstall ai-todo")
     print("")
     print("For shell script installations:")
     print("  - Script location: Check your PATH or installation directory")

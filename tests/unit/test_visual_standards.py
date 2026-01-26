@@ -69,13 +69,12 @@ class TestHeaderFormat:
         assert "Do not edit manually" in content
 
     def test_header_references_tool_variants(self, file_ops):
-        """Verify header references both CLI/MCP and shell script variants."""
+        """Verify header references ai-todo CLI/MCP."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
         content = file_ops.todo_path.read_text(encoding="utf-8")
 
-        assert "`todo-ai`" in content  # CLI/MCP variant
-        assert "`todo.ai`" in content  # Shell script variant
+        assert "`ai-todo`" in content  # CLI/MCP variant
 
 
 class TestFooterFormat:
@@ -87,15 +86,15 @@ class TestFooterFormat:
         file_ops.write_tasks([t1])
         content = file_ops.todo_path.read_text(encoding="utf-8")
 
-        assert "**todo-ai (mcp)**" in content
+        assert "**ai-todo**" in content
 
-    def test_footer_contains_version(self, file_ops):
-        """Verify footer contains version number."""
+    def test_footer_contains_timestamp_label(self, file_ops):
+        """Verify footer contains Last Updated label."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
         content = file_ops.todo_path.read_text(encoding="utf-8")
 
-        assert "v3.0.0" in content
+        assert "Last Updated:" in content
 
     def test_footer_contains_timestamp(self, file_ops):
         """Verify footer contains properly formatted timestamp."""

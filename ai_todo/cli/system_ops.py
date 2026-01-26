@@ -49,9 +49,9 @@ def update_command() -> None:
     print("🔄 Updating todo.ai...")
     print("")
     print("Note: For Python package installations, use:")
-    print("  pip install --upgrade todo-ai")
+    print("  pip install --upgrade ai-todo")
     print("  # or")
-    print("  uv pip install --upgrade todo-ai")
+    print("  uv pip install --upgrade ai-todo")
     print("")
     print("For shell script installations, visit:")
     print("  https://github.com/fxstein/ai-todo")
@@ -197,9 +197,9 @@ def rollback_command(target: str | None = None, todo_path: str = "TODO.md") -> N
     # Note: For Python package, rollback doesn't make sense in the same way
     # This is mainly for shell script installations
     print("Note: For Python package installations, rollback should be done via:")
-    print("  pip install todo-ai==<version>")
+    print("  pip install ai-todo==<version>")
     print("  # or")
-    print("  uv pip install todo-ai==<version>")
+    print("  uv pip install ai-todo==<version>")
 
 
 def create_backup(todo_path: str = "TODO.md") -> str | None:

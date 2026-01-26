@@ -896,7 +896,7 @@ class FileOps:
                 [
                     "# todo.ai ToDo List",
                     "",
-                    "> ⚠️ **MANAGED FILE**: Do not edit manually. Use `todo-ai` (CLI/MCP) or `todo.ai` to manage tasks.",
+                    "> ⚠️ **MANAGED FILE**: Do not edit manually. Use `ai-todo` (CLI/MCP) to manage tasks.",
                     "",
                 ]
             )
@@ -1060,7 +1060,7 @@ class FileOps:
                 [
                     "",
                     "---",
-                    f"**todo-ai (mcp)** v3.0.0 | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                    f"**ai-todo** | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
                 ]
             )
 

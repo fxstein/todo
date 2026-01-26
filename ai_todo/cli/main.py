@@ -66,8 +66,8 @@ def main():
         print(f"Expected hash: {e.expected_hash[:8]}...")
         print(f"Actual hash:   {e.actual_hash[:8]}...")
         print("")
-        print("Use 'todo-ai tamper diff' to see changes.")
-        print("Use 'todo-ai tamper accept \"reason\"' to accept external changes.")
+        print("Use 'ai-todo tamper diff' to see changes.")
+        print("Use 'ai-todo tamper accept \"reason\"' to accept external changes.")
         print("")
         import sys
 

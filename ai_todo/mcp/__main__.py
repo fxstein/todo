@@ -4,7 +4,7 @@ from ai_todo.mcp.server import main as async_main
 
 
 def main():
-    """Entry point for todo-ai-mcp."""
+    """Entry point for ai-todo MCP server."""
     try:
         asyncio.run(async_main())
     except KeyboardInterrupt:

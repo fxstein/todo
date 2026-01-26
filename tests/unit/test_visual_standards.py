@@ -29,7 +29,7 @@ class TestSpacingRules:
         t2 = Task(id="2", description="Second task", status=TaskStatus.PENDING)
 
         file_ops.write_tasks([t1, t2])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         task1_idx = next(i for i, line in enumerate(lines) if "**#1**" in line)
@@ -46,7 +46,7 @@ class TestSpacingRules:
         t1_2 = Task(id="1.2", description="Second subtask", status=TaskStatus.PENDING)
 
         file_ops.write_tasks([t1, t1_1, t1_2])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         subtask1_idx = next(i for i, line in enumerate(lines) if "**#1.1**" in line)
@@ -63,7 +63,7 @@ class TestHeaderFormat:
         """Verify header contains the MANAGED FILE warning."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         assert "⚠️ **MANAGED FILE**" in content
         assert "Do not edit manually" in content
@@ -72,7 +72,7 @@ class TestHeaderFormat:
         """Verify header references both CLI/MCP and shell script variants."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         assert "`todo-ai`" in content  # CLI/MCP variant
         assert "`todo.ai`" in content  # Shell script variant
@@ -85,7 +85,7 @@ class TestFooterFormat:
         """Verify footer contains tool variant identifier."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         assert "**todo-ai (mcp)**" in content
 
@@ -93,7 +93,7 @@ class TestFooterFormat:
         """Verify footer contains version number."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         assert "v3.0.0" in content
 
@@ -101,7 +101,7 @@ class TestFooterFormat:
         """Verify footer contains properly formatted timestamp."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         assert "Last Updated:" in content
         # Verify timestamp format (YYYY-MM-DD HH:MM:SS)
@@ -122,7 +122,7 @@ class TestSectionSeparators:
         t2 = Task(id="2", description="Archived task", status=TaskStatus.ARCHIVED)
 
         file_ops.write_tasks([t1, t2])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         # Find section headers and check for separator
         assert "## Tasks" in content
@@ -140,7 +140,7 @@ class TestSectionSeparators:
         t2 = Task(id="2", description="Deleted task", status=TaskStatus.DELETED)
 
         file_ops.write_tasks([t1, t2])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         archived_idx = content.find("## Archived Tasks")
         deleted_idx = content.find("## Deleted Tasks")
@@ -152,7 +152,7 @@ class TestSectionSeparators:
         """Verify separator exists before footer."""
         t1 = Task(id="1", description="Test task", status=TaskStatus.PENDING)
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         # Footer is last line, separator should be nearby
@@ -169,7 +169,7 @@ class TestTagFormatting:
         t1.add_tag("important")
 
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         assert "`#test`" in content
         assert "`#important`" in content
@@ -187,7 +187,7 @@ class TestIndentation:
         t1_1 = Task(id="1.1", description="Subtask", status=TaskStatus.PENDING)
 
         file_ops.write_tasks([t1, t1_1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         subtask_line = next(line for line in lines if "**#1.1**" in line)
@@ -203,7 +203,7 @@ class TestIndentation:
         t1.add_note("This is a note")
 
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         note_line = next(line for line in lines if "This is a note" in line)
@@ -218,7 +218,7 @@ class TestIndentation:
         t1_1.add_note("Subtask note")
 
         file_ops.write_tasks([t1, t1_1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         note_line = next(line for line in lines if "Subtask note" in line)
@@ -238,7 +238,7 @@ class TestOrdering:
 
         # Pass tasks in newest-first order (as commands do)
         file_ops.write_tasks([t3, t2, t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         task1_idx = next(i for i, line in enumerate(lines) if "**#1**" in line)
@@ -257,7 +257,7 @@ class TestOrdering:
 
         # Pass tasks with parent first, then subtasks in newest-first order
         file_ops.write_tasks([t1, t1_3, t1_2, t1_1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         subtask1_idx = next(i for i, line in enumerate(lines) if "**#1.1**" in line)
@@ -278,7 +278,7 @@ class TestCompletion:
         t3 = Task(id="3", description="Pending", status=TaskStatus.PENDING)
 
         file_ops.write_tasks([t1, t2, t3])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         # Find Tasks section and Archived section
         tasks_section_start = content.find("## Tasks")
@@ -299,7 +299,7 @@ class TestArchive:
         t2 = Task(id="2", description="Archived", status=TaskStatus.ARCHIVED)
 
         file_ops.write_tasks([t1, t2])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         # Find section boundaries
         archived_section_start = content.find("## Archived Tasks")
@@ -315,7 +315,7 @@ class TestArchive:
         t2 = Task(id="2", description="New archived", status=TaskStatus.ARCHIVED)
 
         file_ops.write_tasks([t2, t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         # Find section boundaries
         archived_section_start = content.find("## Archived Tasks")
@@ -337,7 +337,7 @@ class TestDelete:
         t2 = Task(id="2", description="Deleted", status=TaskStatus.DELETED)
 
         file_ops.write_tasks([t1, t2])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         # Find Deleted section
         deleted_section_start = content.find("## Deleted Tasks")
@@ -357,7 +357,7 @@ class TestNoteFormatting:
         t1.add_note("Single line note")
 
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         note_line = next(line for line in lines if "Single line note" in line)
@@ -373,7 +373,7 @@ class TestNoteFormatting:
         t1.add_note("Line 3")
 
         file_ops.write_tasks([t1])
-        content = file_ops.todo_path.read_text()
+        content = file_ops.todo_path.read_text(encoding="utf-8")
 
         lines = content.split("\n")
         note_lines = [line for line in lines if "Line" in line]
@@ -408,7 +408,7 @@ class TestLintCommand:
         tasks = ops.read_tasks()
         ops.write_tasks(tasks)
 
-        fixed_content = todo_path.read_text()
+        fixed_content = todo_path.read_text(encoding="utf-8")
         lines = fixed_content.split("\n")
 
         task1_idx = next(i for i, line in enumerate(lines) if "**#1**" in line)

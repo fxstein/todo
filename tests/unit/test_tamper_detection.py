@@ -50,7 +50,7 @@ def test_initialization_creates_checksum(temp_todo_dir):
     FileOps(str(todo_file))
 
     assert checksum_file.exists()
-    assert len(checksum_file.read_text().strip()) == 64
+    assert len(checksum_file.read_text(encoding="utf-8").strip()) == 64
 
 
 def test_tamper_detection_passive_mode(temp_todo_dir):
@@ -68,7 +68,7 @@ def test_tamper_detection_passive_mode(temp_todo_dir):
     # Checksum should be updated to match new content
     checksum_file = temp_todo_dir / ".todo.ai" / "state" / "checksum"
     new_checksum = file_ops_new.calculate_checksum(todo_file.read_text(encoding="utf-8"))
-    assert checksum_file.read_text().strip() == new_checksum
+    assert checksum_file.read_text(encoding="utf-8").strip() == new_checksum
 
     # Log should contain TAMPER_DETECTED
     log_file = temp_todo_dir / ".todo.ai" / ".todo.ai.log"

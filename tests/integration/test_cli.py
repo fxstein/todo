@@ -76,7 +76,7 @@ def test_add_subtasks_multiple_parents(isolated_cli):
     isolated_cli.invoke(cli, ["add-subtask", "3", "Subtask C.1"])
     isolated_cli.invoke(cli, ["add-subtask", "3", "Subtask C.2"])
 
-    content = Path("TODO.md").read_text()
+    content = Path("TODO.md").read_text(encoding="utf-8")
     lines = content.splitlines()
 
     def line_index(fragment: str) -> int:

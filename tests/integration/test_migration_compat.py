@@ -55,7 +55,7 @@ def test_start_from_shell_repo():
         assert "Added: #3 New Python Task" in result.output
 
         # C. Verify Serial Update
-        assert (config_dir / ".todo.ai.serial").read_text() == "3"
+        assert (config_dir / ".todo.ai.serial").read_text(encoding="utf-8") == "3"
 
         # D. Verify File Structure Preservation
         content = todo_path.read_text(encoding="utf-8")

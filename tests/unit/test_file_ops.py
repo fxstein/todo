@@ -97,12 +97,12 @@ def test_serial_ops(file_ops):
     # Set serial
     file_ops.set_serial(5)
     assert file_ops.get_serial() == 5
-    assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "5"
+    assert (file_ops.config_dir / ".todo.ai.serial").read_text(encoding="utf-8") == "5"
 
     # Set again
     file_ops.set_serial(10)
     assert file_ops.get_serial() == 10
-    assert (file_ops.config_dir / ".todo.ai.serial").read_text() == "10"
+    assert (file_ops.config_dir / ".todo.ai.serial").read_text(encoding="utf-8") == "10"
 
 
 def test_relationships(tmp_path):

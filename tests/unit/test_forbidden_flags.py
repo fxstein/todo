@@ -36,7 +36,7 @@ def test_no_forbidden_flags():
     found_in = []
     for file_path in files_to_check:
         try:
-            content = file_path.read_text()
+            content = file_path.read_text(encoding="utf-8")
             if forbidden in content:
                 found_in.append(str(file_path.relative_to(project_root)))
         except Exception:

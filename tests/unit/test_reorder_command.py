@@ -100,7 +100,7 @@ def test_reorder_preserves_notes(test_todo_file):
 
     reorder_command(todo_path=test_todo_file)
 
-    content = Path(test_todo_file).read_text()
+    content = Path(test_todo_file).read_text(encoding="utf-8")
 
     # Check order
     lines = content.splitlines()

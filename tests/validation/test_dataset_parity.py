@@ -125,8 +125,8 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
     """
     import re
 
-    shell_content = shell_path.read_text() if shell_path.exists() else ""
-    python_content = python_path.read_text() if python_path.exists() else ""
+    shell_content = shell_path.read_text(encoding="utf-8") if shell_path.exists() else ""
+    python_content = python_path.read_text(encoding="utf-8") if python_path.exists() else ""
 
     if shell_content == python_content:
         return True, "Files are identical"

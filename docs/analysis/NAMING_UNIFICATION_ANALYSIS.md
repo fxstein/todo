@@ -276,3 +276,36 @@ Rationale:
 - Keep original filenames for users who still need them
 - Mark as deprecated in documentation
 - Remove from repository root to reduce confusion
+
+### Decision 3: CLI Command Alias
+
+**Chosen: No alias (clean break)**
+
+- Remove `todo-ai` entry point immediately
+- Only `ai-todo` command available
+- With 7 GitHub stars, clean break is simpler than maintaining dual entry points
+
+### Decision 4: Install Script
+
+**Chosen: Remove entirely**
+
+- Delete `install.sh` from repository
+- Users install via `uv tool install ai-todo` or `pipx install ai-todo`
+- Simplifies repository, no legacy install path to maintain
+
+### Decision 5: Sequencing
+
+**Chosen: Parallel (update docs + rename together)**
+
+- Update all documentation locally to use `ai-todo` names
+- Execute GitHub repo rename and code changes
+- Push everything together as single coherent release
+- Task #203 (README redesign) merges into this release
+
+### Decision 6: Legacy MCP Alias
+
+**Chosen: Remove entirely**
+
+- Delete `todo-ai-mcp` entry point
+- Only `ai-todo serve` available for MCP server
+- No legacy aliases to maintain

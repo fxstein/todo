@@ -265,12 +265,3 @@ Rationale:
 4. Simplifies uvx usage significantly
 5. Reduces documentation complexity
 6. Now is the best time (before more adoption)
-
----
-
-## Next Steps
-
-1. [ ] Complete impact analysis (task #219.2)
-2. [ ] Create implementation plan (task #219.3)
-3. [ ] Make decision (task #219.4)
-4. [ ] If approved, execute rename

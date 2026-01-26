@@ -4,11 +4,33 @@
 
 ## Tasks
 
-- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
-  - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
-  - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
-  - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
-  - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
+- [ ] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix`
+  > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
+
+- [ ] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix`
+  > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
+  - [ ] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code`
+  - [ ] **#220.2** Update config.py to use .ai-todo/ paths `#code`
+  - [ ] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code`
+
+- [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
+  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
+  - [ ] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` `#inprogress`
+    > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
+  - [x] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration` (2026-01-26)
+    - [x] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing` (2026-01-26)
+    - [x] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code` (2026-01-26)
+    - [x] **#219.6.5** Add migration logging and user notification `#code` `#ux` (2026-01-26)
+    - [x] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration` (2026-01-26)
+    - [x] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code` (2026-01-26)
+    - [x] **#219.6.2** Update config.py to use .ai-todo/ paths `#code` (2026-01-26)
+    - [x] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code` (2026-01-26)
+  - [x] **#219.4** Decision: Proceed with rename or keep current naming `#decision` (2026-01-26)
+  - [x] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` (2026-01-26)
+    > Implementation plan: docs/design/NAMING_IMPLEMENTATION_PLAN.md
+  - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-26)
+  - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-26)
+    > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
@@ -17,12 +39,20 @@
   - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
 
-- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
-  - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
-  - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
-  - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
-  - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
-  - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
+- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
+  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
+  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
+  - [ ] **#203.9** Final review and publish README.md changes `#release` `#review`
+  - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
+  - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
+  - [x] **#203.6** Update docs/guides/GETTING_STARTED.md for MCP-first approach `#documentation` (2026-01-26)
+  - [x] **#203.4** Test all installation paths (uvx MCP, uv CLI, shell script) `#testing` (2026-01-26)
+    > Test in isolated environment (temp directory outside repo) to avoid polluting files, content, or cursor rules.
+  - [x] **#203.3** Implement new README.md with MCP-first structure `#implementation` (2026-01-26)
+    > IMPORTANT: Do not push README.md changes until finalized or explicitly testing live. Keep changes local during development.
+  - [x] **#203.2** Create docs/FAQ.md with 'Why not GitHub Issues?' content `#documentation` `#faq` (2026-01-26)
+  - [x] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` (2026-01-26)
+    > Design document: docs/design/README_REDESIGN_V3.md
 
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
@@ -191,6 +221,19 @@
 ---
 
 ## Archived Tasks
+  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
+  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
+  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
+  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
+  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
+- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
+- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
+- [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
+  - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
+  - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
+  - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
+  - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
   - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
   - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
   - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
@@ -696,7 +739,7 @@
   - [x] **#153.7** Add commands to help text and usage documentation `#feature` (2025-11-16)
   - [x] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature` (2025-11-16)
     > Test scenarios:
-    > 
+    >
     > 1. delete-note on task with single-line note
     > 2. delete-note on task with multi-line note
     > 3. delete-note on task with no notes (should error)
@@ -710,28 +753,28 @@
   - [x] **#153.5** Handle multi-line notes correctly in both commands `#feature` (2025-11-16)
   - [x] **#153.4** Implement update-note command to replace existing notes `#feature` (2025-11-16)
     > Implementation approach for update-note:
-    > 
+    >
     > 1. Call delete-note logic to remove existing notes
     > 2. Call add_note() logic to add new notes
     > 3. Essentially: delete + add in one operation
     > 4. Ensures proper formatting via existing add_note()
-    > 
+    >
     > Could be wrapper function:
     > update_note() {
     > delete_note_internal $task_id  # No prompt version
     > add_note $task_id $new_text
     > }
-    > 
+    >
     > Reuse existing add_note() multi-line formatting logic from fix #149.
   - [x] **#153.3** Implement delete-note command to remove all notes from a task `#feature` (2025-11-16)
     > Implementation approach for delete-note:
-    > 
+    >
     > 1. Find task line number (reuse logic from show_task)
     > 2. Find all consecutive blockquote lines after task
     > 3. Use sed or temp file to delete those lines
     > 4. Update footer timestamp
     > 5. Log the action
-    > 
+    >
     > Reference collect_task_notes() function if it exists - may already have note detection logic. Similar pattern to delete_task() but only removes note lines, not the task itself.
   - [x] **#153.2** Analyze current note storage format in TODO.md `#feature` (2025-11-16)
     > Notes in TODO.md format:
@@ -740,34 +783,34 @@
     > - Each line starts with '  >' (indent + > + space)
     > - Can span multiple lines
     > - Ends when next non-blockquote line encountered
-    > 
+    >
     > Example level-1 subtask:
     > - [ ] **#42.1** Task description
     > > Note line 1
     > > Note line 2
     > > Note line 3
-    > 
+    >
     > Need to identify all note lines for delete/update operations.
   - [x] **#153.1** Design command syntax for update-note and delete-note `#feature` (2025-11-16)
     > Proposed command syntax:
-    > 
+    >
     > ./todo.ai delete-note <task-id>
     > - Removes ALL notes from specified task
     > - Confirmation prompt: 'Delete all notes from task #X? (y/N)'
     > - Returns error if task has no notes
-    > 
+    >
     > ./todo.ai update-note <task-id> "new note text"
     > - Replaces ALL existing notes with new text
     > - Supports multi-line notes (like add note)
     > - Shows preview: 'Replace N lines with M lines?'
     > - Returns error if task has no notes to update
-    > 
+    >
     > Alternative: Could add --force to skip confirmations for both commands.
 - [x] **#153** Add note management: update and delete note commands `#feature` (2025-11-16)
   > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
   > - delete-note: Remove all notes from a task
   > - update-note: Replace existing notes with new text
-  > 
+  >
   > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
   - [x] **#152.7** Verify GitHub issue template structure `#testing` (2025-11-16)
   - [x] **#152.6** Test label categorization for different error types `#testing` (2025-11-16)
@@ -779,7 +822,7 @@
     > - User must explicitly confirm with 'y'
     > - Cancelled if user says 'N' or presses Enter
     > - Maintains full user control as designed
-    > 
+    >
     > Test: Ran './todo.ai report-bug "test" "test" "test"' without env vars
     > Result: Prompted for confirmation as expected ✓
   - [x] **#152.3** Test AI agent detection and auto-submission (with CURSOR_AI set) `#testing` (2025-11-16)
@@ -789,18 +832,18 @@
   - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug` (2025-11-16)
   - [x] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug` (2025-11-16)
     > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
-    > 
+    >
     > **Original broken notes (from bug #36 work):**
     > - Task 147.3: Lines 36-45 need '  > ' prefix
     > - Task 147.4: Lines 27-32 need '  > ' prefix
     > - Task 147.5: Lines 21-23 need '  > ' prefix
     > - Task 147.6: Lines 14-18 need '  > ' prefix
-    > 
+    >
     > **Newly broken notes (from creating task #149):**
     > - Task 149: Main task note (multi-line, needs '  > ' prefix)
     > - Task 149.1: Multi-line note about expected vs current behavior
     > - Task 149.6: This very note! (multi-line, needs '  > ' prefix)
-    > 
+    >
     > After fix, verify with './todo.ai show 147.3', './todo.ai show 149', etc. to ensure all notes display correctly.
     > Manually fix 4 broken notes in TODO.md by adding proper indentation and blockquote markers:
     > - Task 147.3: Lines 36-45 need '  > ' prefix (2 spaces + > + space)
@@ -810,44 +853,44 @@
     > After fix, verify with './todo.ai show 147.3' etc. to ensure notes display correctly.
   - [x] **#149.5** Test fix with multi-line notes at different nesting levels `#bug` (2025-11-16)
     > Tested multi-line notes at all 3 nesting levels:
-    > 
+    >
     > Level 0 (main task): 0 spaces + 2 space blockquote = '  >' ✓
     > Level 1 (subtask): 2 spaces + 2 space blockquote = '    >' ✓
     > Level 2 (sub-subtask): 4 spaces + 2 space blockquote = '      >' ✓
-    > 
+    >
     > All lines properly formatted with indent + '  > ' prefix. Fix verified!
   - [x] **#149.4** Fix add_note() to properly indent all lines with blockquote markers `#bug` (2025-11-16)
     > Fixed add_note() function with 3 key changes:
-    > 
+    >
     > Line 4336: Updated grep to '^[ ]*- \[.*\]' for arbitrary nesting depth
     > Lines 4343-4350: Dynamic indent detection using regex to extract leading spaces
     > Lines 4354-4362: Multi-line processing loop that adds indent + '  > ' to EACH line
-    > 
+    >
     > This note itself tests the fix - all lines should have proper blockquote markers!
   - [x] **#149.3** Identify how note lines are processed and where indentation fails `#bug` (2025-11-16)
     > Bug located at line 4355 in add_note() function:
-    > 
+    >
     > local note_line="${indent}  > ${note_text}"
-    > 
+    >
     > This creates a single line by concatenating indent + '  > ' + entire note_text.
     > When note_text contains newlines, they're inserted as raw text without formatting.
-    > 
+    >
     > Fix needed: Split note_text by newlines, prepend '${indent}  > ' to EACH line.
   - [x] **#149.2** Find and analyze the add_note() function `#bug` (2025-11-16)
     > Search for 'add_note()' or '^add_note\(' function in todo.ai. Check how it processes note text, especially when note contains newlines. Look for where indentation prefix is calculated and where blockquote marker (>) is added. Likely splits note on newlines but only formats first line correctly.
   - [x] **#149.1** Document the multi-line note formatting bug with examples `#bug` (2025-11-16)
     > Current behavior vs expected:
-    > 
+    >
     > CURRENT (broken):
     > > First line of note
     > Line 2 without marker
     > Line 3 without marker
-    > 
+    >
     > EXPECTED (correct):
     > > First line of note
     > > Line 2 with marker
     > > Line 3 with marker
-    > 
+    >
     > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
 - [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug` (2025-11-16)
   > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
@@ -869,25 +912,25 @@
     > - Level 2: Task #148.1.1 ✓ (was failing, now fixed)
   - [x] **#147.4** Fix task ID resolution to support arbitrary nesting depth `#bug` (2025-11-16)
     > Fixed show_task() function in todo.ai:
-    > 
+    >
     > Line 4145: Changed from '^- \[.\] ... \|^  - \[.\]' to '^[ ]*- \[.*\]' (arbitrary nesting)
     > Line 4150: Same fix for fallback search
     > Line 4168: Same fix for note line number search
     > Line 4173: Fixed note display regex from '^"  > " \| ^"    > "' to '^[[:space:]]*\> '
-    > 
+    >
     > All changes support arbitrary nesting depth and handle malformed checkboxes.
   - [x] **#147.3** Identify where show/modify/note commands fail for deep nesting `#bug` (2025-11-16)
     > Affected locations in show_task() function:
-    > 
+    >
     > Line 4143: Main task search - missing 4+ space patterns
     > Line 4148: Fallback search - missing 4+ space patterns
     > Line 4164: Note line number search - missing 4+ space patterns
-    > 
+    >
     > For comparison, these functions ALREADY support 3 levels (0,2,4 spaces):
     > - Lines 2559, 2664, 2693: Task operations
     > - Lines 3035, 3040, 3061: More operations
     > - Line 4331: Another operation
-    > 
+    >
     > Solution: Use flexible pattern '^[ ]*- \[.\] \*\*#' to match ANY indentation depth
   - [x] **#147.2** Reproduce the bug with 3-level nested subtasks (1.2.1 pattern) `#bug` (2025-11-16)
     > Bug confirmed: Task #148.1.1 exists in TODO.md with 4-space indentation but 'show 148.1.1' returns 'Task not found'. Tasks #148 (0 spaces) and #148.1 (2 spaces) work correctly.
@@ -1139,7 +1182,32 @@
 ---
 
 ## Deleted Tasks
+- [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (deleted 2026-01-26, expires 2026-02-25)
+    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
+  - [D] **#215.10** !false (It's funny because it's true). (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: The exclamation mark '!' is the logical NOT operator in many programming languages. Therefore, '!false' reads as 'NOT false', which evaluates to 'true'.
+  - [D] **#215.9** 0 is false and 1 is true, right? 1. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: In computer logic, the number 0 represents 'False' and 1 represents 'True'. When asked 'right?', instead of saying 'Yes' or 'True', the programmer answers '1'.
+  - [D] **#215.8** A programmer's wife tells him, 'While you're at the store, get some milk.' He never comes back. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: This refers to a 'while loop' in code. The instruction 'While you are at the store' is interpreted as a condition: as long as he is at the store, he must keep getting milk. Since he never leaves the store (the condition remains true), he is stuck in an infinite loop.
+  - [D] **#215.7** Why do Java programmers wear glasses? Because they don't C#. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: C# (pronounced 'C-Sharp') is a popular programming language. The joke is a pun on 'see sharp' (to see clearly). Java is a different language, implying they can't 'see sharp'.
+  - [D] **#215.6** What is a programmer's favorite hangout place? Foo Bar. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: 'Foo' and 'Bar' are the standard placeholder names used in programming tutorials and examples (like 'John Doe'). 'Foo Bar' sounds like the name of a drinking establishment.
+  - [D] **#215.5** Why did the programmer quit his job? He didn't get arrays. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: An 'array' is a fundamental data structure in programming (a list of items). The joke relies on the pun that 'arrays' sounds exactly like 'a raise' (an increase in salary).
+  - [D] **#215.4** There are 10 types of people in the world: those who understand binary, and those who don't. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: Binary is a number system used by computers consisting only of 0s and 1s. In binary, '10' represents the number 2. So the joke actually says 'There are two types of people'.
+  - [D] **#215.3** A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?' (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: SQL is a language for databases. Data is stored in 'tables'. A 'JOIN' is a specific command used to combine data from two different tables.
+  - [D] **#215.2** How many programmers does it take to change a light bulb? None, that's a hardware problem. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: Programmers write software (code) and often distinguish it from hardware (physical devices like light bulbs). If a physical device fails, they jokingly claim it's not their department.
+  - [D] **#215.1** Why do programmers prefer dark mode? Because light attracts bugs. (deleted 2026-01-26, expires 2026-02-25)
+    > Explanation: In programming, software errors are called 'bugs'. Real bugs (insects) are attracted to light sources. Dark mode is a screen setting that emits less light, thus 'avoiding bugs'.
+- [D] **#215** Collection of 10 Funny Jokes `#fun` `#jokes` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#214** Test task for whitespace verification `#test` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#203.5** Final review and publish README.md changes `#release` `#review` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
@@ -1222,4 +1290,15 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:35:22
+
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
+<!-- TASK RELATIONSHIPS
+203:depends-on:219
+-->
+
+---
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 16:03:41

@@ -6,7 +6,7 @@ AI agents need a **fast, local, Markdown-native** way to manage tasks. GitHub Is
 
 **Key differences:**
 
-| Feature | todo.ai | GitHub Issues |
+| Feature | ai-todo | GitHub Issues |
 |---------|---------|---------------|
 | **Speed** | Instant, local operations | API calls, network latency |
 | **Authentication** | None required | OAuth/PAT tokens needed |
@@ -17,35 +17,39 @@ AI agents need a **fast, local, Markdown-native** way to manage tasks. GitHub Is
 
 **When to use each:**
 
-- **todo.ai**: Day-to-day task tracking during development, AI agent workflows, quick task management
+- **ai-todo**: Day-to-day task tracking during development, AI agent workflows, quick task management
 - **GitHub Issues**: Bug reports from users, feature requests, cross-repository coordination, public discussion
 
-**Integration**: You can reference GitHub Issues in todo.ai tasks:
+**Integration**: You can reference GitHub Issues in ai-todo tasks:
 
-```
+```markdown
 Create a task for fixing #123
 Add subtask: Address PR #456 feedback
 ```
 
-This keeps todo.ai fast and simple while maintaining links to your GitHub workflow.
+This keeps ai-todo fast and simple while maintaining links to your GitHub workflow.
 
 ## How do I migrate from the shell script to Python?
 
 See the [Python Migration Guide](user/PYTHON_MIGRATION_GUIDE.md) for step-by-step instructions. The short version:
 
 1. Install: `uv tool install ai-todo`
-2. Replace `./todo.ai` with `todo-ai` in your workflow
+2. Replace `./todo.ai` with `ai-todo` in your workflow
 3. No data migration needed - same file formats
 
-## Can I use todo.ai without Python?
+## Can I use ai-todo without an MCP-enabled IDE?
 
-Yes. The legacy shell script (v2.x) is still available:
+Yes. The CLI works standalone:
 
 ```bash
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
-```
+# Install
+uv tool install ai-todo
 
-Note: The shell script lacks MCP integration for AI agents. We recommend Python v3.0+ when possible.
+# Use directly
+ai-todo add "My task"
+ai-todo list
+ai-todo complete 1
+```
 
 ## How do I set up Cursor integration?
 
@@ -54,9 +58,9 @@ Add this to your project's `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "todo-ai": {
+    "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "todo-ai", "serve", "--root", "${workspaceFolder}"]
+      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }
@@ -67,8 +71,8 @@ See the [MCP Setup Guide](user/MCP_SETUP.md) for detailed instructions.
 ## Where is my data stored?
 
 - **Tasks**: `TODO.md` in your project root
-- **Configuration**: `.todo.ai/config.yaml`
-- **State**: `.todo.ai/` directory (serial numbers, checksums, logs)
+- **Configuration**: `.ai-todo/config.yaml`
+- **State**: `.ai-todo/` directory (serial numbers, checksums, logs)
 
 All files are plain text and safe to commit to Git.
 
@@ -80,4 +84,4 @@ Yes. Since TODO.md is a plain text file tracked in Git, standard Git workflows a
 - Merge conflicts are resolved like any other file
 - Task IDs are unique within the file
 
-For real-time collaboration, consider using GitHub Issues for shared tasks and todo.ai for personal/branch-specific work.
+For real-time collaboration, consider using GitHub Issues for shared tasks and ai-todo for personal/branch-specific work.

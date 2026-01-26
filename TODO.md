@@ -15,18 +15,18 @@
 
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
-  - [ ] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation`
+  - [ ] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` `#inprogress`
     > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
-  - [ ] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration`
-    - [ ] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing`
-    - [ ] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code`
-    - [ ] **#219.6.5** Add migration logging and user notification `#code` `#ux`
-    - [ ] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration`
-    - [ ] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code`
-    - [ ] **#219.6.2** Update config.py to use .ai-todo/ paths `#code`
-    - [ ] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code`
+  - [x] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration` (2026-01-26)
+    - [x] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing` (2026-01-26)
+    - [x] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code` (2026-01-26)
+    - [x] **#219.6.5** Add migration logging and user notification `#code` `#ux` (2026-01-26)
+    - [x] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration` (2026-01-26)
+    - [x] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code` (2026-01-26)
+    - [x] **#219.6.2** Update config.py to use .ai-todo/ paths `#code` (2026-01-26)
+    - [x] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code` (2026-01-26)
   - [x] **#219.4** Decision: Proceed with rename or keep current naming `#decision` (2026-01-26)
-  - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` `#inprogress`
+  - [x] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` (2026-01-26)
     > Implementation plan: docs/design/NAMING_IMPLEMENTATION_PLAN.md
   - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-26)
   - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-26)
@@ -1301,4 +1301,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 14:37:36
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 16:03:41

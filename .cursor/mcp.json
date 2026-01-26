@@ -4,7 +4,8 @@
       "command": "uv",
       "args": [
         "run",
-        "todo-ai",
+        "--directory", "/Users/oratzes/cursor/todo.ai",
+        "ai-todo",
         "serve",
         "--root",
         "${workspaceFolder}"

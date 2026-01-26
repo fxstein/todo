@@ -1,6 +1,6 @@
-# Getting Started with todo.ai
+# Getting Started with ai-todo
 
-This guide will help you set up `todo.ai` for your development workflow. Choose the setup that matches your needs.
+This guide will help you set up ai-todo for your development workflow. Choose the setup that matches your needs.
 
 > **Related Documentation:**
 > - [FAQ](../FAQ.md) - Common questions answered
@@ -16,9 +16,9 @@ For AI agent integration with Cursor or similar IDEs, add this to your project's
 ```json
 {
   "mcpServers": {
-    "todo-ai": {
+    "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "todo-ai", "serve", "--root", "${workspaceFolder}"]
+      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }
@@ -47,28 +47,10 @@ pipx install ai-todo
 **Usage:**
 
 ```bash
-todo-ai add "Implement feature X" "#feature"
-todo-ai list
-todo-ai complete 1
+ai-todo add "Implement feature X" "#feature"
+ai-todo list
+ai-todo complete 1
 ```
-
----
-
-## Legacy: Shell Script
-
-For environments without Python 3.10+:
-
-```bash
-# Smart installer (auto-detects your shell)
-curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
-
-# Initialize
-./todo.ai init
-```
-
-**Usage:** `./todo.ai [command]`
-
-> **Note:** The shell script lacks MCP integration. We recommend Python v3.0+ when possible.
 
 ---
 
@@ -81,9 +63,9 @@ curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | s
 
 # CLI alternative:
 uv tool install ai-todo
-todo-ai add "Fix authentication bug" "#bug"
-todo-ai complete 1
-todo-ai list
+ai-todo add "Fix authentication bug" "#bug"
+ai-todo complete 1
+ai-todo list
 ```
 
 ### Team Collaboration
@@ -92,7 +74,7 @@ For teams, configure multi-user mode to prevent ID conflicts:
 
 ```bash
 # Using CLI
-todo-ai switch-mode multi-user
+ai-todo switch-mode multi-user
 
 # Each team member gets their own prefix:
 # Creates: #alice-50, #bob-51, etc.
@@ -103,10 +85,10 @@ todo-ai switch-mode multi-user
 Track tasks per branch:
 
 ```bash
-todo-ai switch-mode branch
+ai-todo switch-mode branch
 
 # On branch: feature/auth
-todo-ai add "Add login page" "#frontend"
+ai-todo add "Add login page" "#frontend"
 # Creates: #feature-50
 ```
 
@@ -114,7 +96,7 @@ todo-ai add "Add login page" "#frontend"
 
 ## Numbering Modes
 
-todo.ai supports four numbering modes:
+ai-todo supports four numbering modes:
 
 | Mode | Format | Best For |
 |------|--------|----------|
@@ -126,7 +108,7 @@ todo.ai supports four numbering modes:
 Switch modes:
 
 ```bash
-todo-ai switch-mode <mode>
+ai-todo switch-mode <mode>
 ```
 
 See [Numbering Modes Guide](NUMBERING_MODES_GUIDE.md) for details.
@@ -135,18 +117,18 @@ See [Numbering Modes Guide](NUMBERING_MODES_GUIDE.md) for details.
 
 ## TODO.md Format
 
-The `TODO.md` file is a **managed file** — don't edit it manually. Use todo-ai commands to ensure consistent formatting.
+The `TODO.md` file is a **managed file** — don't edit it manually. Use ai-todo commands to ensure consistent formatting.
 
 **Check formatting:**
 
 ```bash
-todo-ai lint
+ai-todo lint
 ```
 
 **Fix formatting:**
 
 ```bash
-todo-ai reformat
+ai-todo reformat
 ```
 
 ---
@@ -156,29 +138,29 @@ todo-ai reformat
 ### Task Management
 
 ```bash
-todo-ai add "Task description" "#tags"
-todo-ai add-subtask 1 "Subtask description"
-todo-ai start 1
-todo-ai complete 1
-todo-ai list
-todo-ai show 1
-todo-ai archive 1
+ai-todo add "Task description" "#tags"
+ai-todo add-subtask 1 "Subtask description"
+ai-todo start 1
+ai-todo complete 1
+ai-todo list
+ai-todo show 1
+ai-todo archive 1
 ```
 
 ### Configuration
 
 ```bash
-todo-ai config                    # View configuration
-todo-ai switch-mode <mode>        # Change numbering mode
-todo-ai setup-coordination <type> # Configure coordination
+ai-todo config                    # View configuration
+ai-todo switch-mode <mode>        # Change numbering mode
+ai-todo setup-coordination <type> # Configure coordination
 ```
 
 ### Information
 
 ```bash
-todo-ai version
-todo-ai --help
-todo-ai log
+ai-todo version
+ai-todo --help
+ai-todo log
 ```
 
 ---
@@ -199,5 +181,5 @@ todo-ai log
 
 - **Documentation:** See the [docs index](../README.md)
 - **FAQ:** [Common questions](../FAQ.md)
-- **GitHub:** https://github.com/fxstein/todo.ai
-- **Issues:** https://github.com/fxstein/todo.ai/issues
+- **GitHub:** https://github.com/fxstein/ai-todo
+- **Issues:** https://github.com/fxstein/ai-todo/issues

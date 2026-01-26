@@ -1,33 +1,26 @@
-# Setting Up todo.ai with Cursor (MCP)
+# Setting Up ai-todo with Cursor (MCP)
 
-`todo.ai` v3.0+ includes a built-in **Model Context Protocol (MCP)** server. This allows Cursor's AI agent to directly interact with your task list—reading tasks, adding items, and marking them complete—without you needing to type CLI commands or paste file contents.
+ai-todo v3.0+ includes a built-in **Model Context Protocol (MCP)** server. This allows Cursor's AI agent to directly interact with your task list—reading tasks, adding items, and marking them complete—without you needing to type CLI commands or paste file contents.
 
 ## Prerequisites
 
-- `todo-ai` installed via `uv` (recommended) or `pipx` (v3.0+).
-    ```bash
-    # Using uv (recommended - faster, more reliable)
-    uv tool install ai-todo
-
-    # Alternative: pipx
-    pipx install ai-todo
-    ```
-- Cursor IDE (latest version).
+- [uv](https://docs.astral.sh/uv/) installed (`curl -LsSf https://astral.sh/uv/install.sh | sh`)
+- Cursor IDE (latest version)
 
 ## Configuration
 
 ### Project-Specific Configuration (Recommended)
 
-To ensure `todo-ai` uses the correct `TODO.md` file for your project, create a `.cursor/mcp.json` file in your project root:
+Create a `.cursor/mcp.json` file in your project root:
 
 ```json
 {
   "mcpServers": {
-    "todo-ai": {
+    "ai-todo": {
       "command": "uvx",
       "args": [
         "--from", "ai-todo",
-        "todo-ai",
+        "ai-todo",
         "serve",
         "--root",
         "${workspaceFolder}"
@@ -38,7 +31,8 @@ To ensure `todo-ai` uses the correct `TODO.md` file for your project, create a `
 ```
 
 This configuration:
-1. Uses `uvx` to run `todo-ai` from the `ai-todo` package without permanent installation.
+
+1. Uses `uvx` to run `ai-todo` on-demand without permanent installation.
 2. Runs the `serve` command to start the MCP server.
 3. Sets the `--root` to the current workspace folder, ensuring the correct `TODO.md` is used.
 
@@ -46,18 +40,25 @@ This configuration:
 
 If you prefer a global setup (not recommended for multiple projects), you can configure it in Cursor Settings:
 
-1. **Locate the Command:** `which todo-ai`
-2. **Configure Cursor:**
-   - **Name:** `todo-ai`
+1. **Install ai-todo:**
+
+    ```bash
+    uv tool install ai-todo
+    ```
+
+2. **Locate the Command:** `which ai-todo`
+
+3. **Configure Cursor:**
+   - **Name:** `ai-todo`
    - **Type:** `stdio`
-   - **Command:** `todo-ai` (or full path)
+   - **Command:** `ai-todo` (or full path)
    - **Arguments:** `serve`
 
    *Note: Without the `--root` argument, the global server will look for `TODO.md` in the directory where Cursor was launched.*
 
-3. **Verify Connection:**
+4. **Verify Connection:**
 
-    Once added, the status indicator next to `todo-ai` should turn green.
+    Once added, the status indicator next to `ai-todo` should turn green.
 
 ## Usage in Cursor
 
@@ -70,10 +71,10 @@ Once connected, you can ask Cursor's AI (Composer or Chat) to manage your tasks 
 - "Mark task #15 as complete."
 - "Create a subtask under #10 for writing tests."
 
-Cursor will automatically call the appropriate `todo-ai` tools (`add_task`, `list_tasks`, `complete_task`) to perform the action.
+Cursor will automatically call the appropriate ai-todo tools (`add_task`, `list_tasks`, `complete_task`) to perform the action.
 
 ## Security & Privacy
 
 - The MCP server runs locally on your machine.
-- It only accesses the `TODO.md` file in the directory where the MCP server was started.
-    *Note: Currently, the global `todo-ai-mcp` command typically targets the `TODO.md` in the directory where Cursor launched the server process, or defaults to the current working directory.*
+- It only accesses the `TODO.md` file in the specified root directory.
+- No data is sent to external servers.

@@ -4,34 +4,6 @@
 
 ## Tasks
 
-- [ ] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix`
-  > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
-
-- [ ] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix`
-  > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
-  - [ ] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code`
-  - [ ] **#220.2** Update config.py to use .ai-todo/ paths `#code`
-  - [ ] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code`
-
-- [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
-  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
-  - [ ] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation`
-    > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
-  - [ ] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration`
-    - [ ] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing`
-    - [ ] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code`
-    - [ ] **#219.6.5** Add migration logging and user notification `#code` `#ux`
-    - [ ] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration`
-    - [ ] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code`
-    - [ ] **#219.6.2** Update config.py to use .ai-todo/ paths `#code`
-    - [ ] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code`
-  - [x] **#219.4** Decision: Proceed with rename or keep current naming `#decision` (2026-01-26)
-  - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` `#inprogress`
-    > Implementation plan: docs/design/NAMING_IMPLEMENTATION_PLAN.md
-  - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-26)
-  - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-26)
-    > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
-
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
@@ -39,20 +11,12 @@
   - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
 
-- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
-  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
-  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
-  - [ ] **#203.9** Final review and publish README.md changes `#release` `#review`
-  - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
-  - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
-  - [x] **#203.6** Update docs/guides/GETTING_STARTED.md for MCP-first approach `#documentation` (2026-01-26)
-  - [x] **#203.4** Test all installation paths (uvx MCP, uv CLI, shell script) `#testing` (2026-01-26)
-    > Test in isolated environment (temp directory outside repo) to avoid polluting files, content, or cursor rules.
-  - [x] **#203.3** Implement new README.md with MCP-first structure `#implementation` (2026-01-26)
-    > IMPORTANT: Do not push README.md changes until finalized or explicitly testing live. Keep changes local during development.
-  - [x] **#203.2** Create docs/FAQ.md with 'Why not GitHub Issues?' content `#documentation` `#faq` (2026-01-26)
-  - [x] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` (2026-01-26)
-    > Design document: docs/design/README_REDESIGN_V3.md
+- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
+  - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
+  - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
+  - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
+  - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
+  - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
 
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
@@ -221,19 +185,11 @@
 ---
 
 ## Archived Tasks
-  - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
-  - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
-  - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
-  - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
-  - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
-- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
-- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
-- [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
   - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
   - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
   - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
   - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
-- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
   - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
   - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
   - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
@@ -1182,32 +1138,7 @@
 ---
 
 ## Deleted Tasks
-- [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
-  - [D] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (deleted 2026-01-26, expires 2026-02-25)
-    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
-  - [D] **#215.10** !false (It's funny because it's true). (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: The exclamation mark '!' is the logical NOT operator in many programming languages. Therefore, '!false' reads as 'NOT false', which evaluates to 'true'.
-  - [D] **#215.9** 0 is false and 1 is true, right? 1. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: In computer logic, the number 0 represents 'False' and 1 represents 'True'. When asked 'right?', instead of saying 'Yes' or 'True', the programmer answers '1'.
-  - [D] **#215.8** A programmer's wife tells him, 'While you're at the store, get some milk.' He never comes back. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: This refers to a 'while loop' in code. The instruction 'While you are at the store' is interpreted as a condition: as long as he is at the store, he must keep getting milk. Since he never leaves the store (the condition remains true), he is stuck in an infinite loop.
-  - [D] **#215.7** Why do Java programmers wear glasses? Because they don't C#. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: C# (pronounced 'C-Sharp') is a popular programming language. The joke is a pun on 'see sharp' (to see clearly). Java is a different language, implying they can't 'see sharp'.
-  - [D] **#215.6** What is a programmer's favorite hangout place? Foo Bar. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: 'Foo' and 'Bar' are the standard placeholder names used in programming tutorials and examples (like 'John Doe'). 'Foo Bar' sounds like the name of a drinking establishment.
-  - [D] **#215.5** Why did the programmer quit his job? He didn't get arrays. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: An 'array' is a fundamental data structure in programming (a list of items). The joke relies on the pun that 'arrays' sounds exactly like 'a raise' (an increase in salary).
-  - [D] **#215.4** There are 10 types of people in the world: those who understand binary, and those who don't. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: Binary is a number system used by computers consisting only of 0s and 1s. In binary, '10' represents the number 2. So the joke actually says 'There are two types of people'.
-  - [D] **#215.3** A SQL query walks into a bar, walks up to two tables and asks, 'Can I join you?' (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: SQL is a language for databases. Data is stored in 'tables'. A 'JOIN' is a specific command used to combine data from two different tables.
-  - [D] **#215.2** How many programmers does it take to change a light bulb? None, that's a hardware problem. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: Programmers write software (code) and often distinguish it from hardware (physical devices like light bulbs). If a physical device fails, they jokingly claim it's not their department.
-  - [D] **#215.1** Why do programmers prefer dark mode? Because light attracts bugs. (deleted 2026-01-26, expires 2026-02-25)
-    > Explanation: In programming, software errors are called 'bugs'. Real bugs (insects) are attracted to light sources. Dark mode is a screen setting that emits less light, thus 'avoiding bugs'.
-- [D] **#215** Collection of 10 Funny Jokes `#fun` `#jokes` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#214** Test task for whitespace verification `#test` (deleted 2026-01-26, expires 2026-02-25)
-  - [D] **#203.5** Final review and publish README.md changes `#release` `#review` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
@@ -1290,15 +1221,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
-<!-- TASK RELATIONSHIPS
-203:depends-on:219
--->
-
----
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 14:37:36
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:32:33

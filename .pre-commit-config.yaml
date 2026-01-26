@@ -3,9 +3,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^\.todo\.ai/
+        exclude: ^(\.todo\.ai/|\.ai-todo/)
       - id: end-of-file-fixer
-        exclude: ^\.todo\.ai/
+        exclude: ^(\.todo\.ai/|\.ai-todo/)
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
@@ -70,10 +70,10 @@ repos:
       #   files: \.(md|mdc)$
 
       - id: todo-ai-lint
-        name: todo.ai lint
-        # EXCEPTION: We are developing todo.ai, so we must run the local source code directly.
-        # For normal projects using todo.ai, use: entry: uv run todo-ai lint
-        entry: uv run python -m todo_ai.cli.main lint
+        name: ai-todo lint
+        # EXCEPTION: We are developing ai-todo, so we must run the local source code directly.
+        # For normal projects using ai-todo, use: entry: uv run ai-todo lint
+        entry: uv run python -m ai_todo.cli.main lint
         language: system
         types: [markdown]
         files: ^TODO\.md$
@@ -88,4 +88,4 @@ repos:
         always_run: false
         # Only run pytest when Python code or test files change
         # This prevents pytest from blocking formatting-only commits
-        files: ^(todo_ai/|tests/|pyproject\.toml|setup\.py)
+        files: ^(ai_todo/|tests/|pyproject\.toml|setup\.py)

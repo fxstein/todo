@@ -1,10 +1,10 @@
 # Documentation Index
 
-Welcome to the todo.ai documentation! This page provides a complete overview of all available documentation organized by category.
+Welcome to the ai-todo documentation! This page provides a complete overview of all available documentation organized by category.
 
 ## Quick Links
 
-**New to todo.ai?** Start here:
+**New to ai-todo?** Start here:
 
 - [Getting Started](guides/GETTING_STARTED.md) - Quick start with MCP and CLI setup
 - [FAQ](FAQ.md) - Common questions answered
@@ -23,7 +23,7 @@ Welcome to the todo.ai documentation! This page provides a complete overview of 
 
 ### 📘 user/ - User Guides
 
-Essential guides for setting up and using todo.ai.
+Essential guides for setting up and using ai-todo.
 
 | Document | Description |
 |----------|-------------|
@@ -68,7 +68,7 @@ Technical design specifications explaining system architecture and feature desig
 
 ### 👨‍💻 development/ - Contributor Documentation
 
-Documentation for contributors and developers working on todo.ai.
+Documentation for contributors and developers working on ai-todo.
 
 | Document | Description |
 |----------|-------------|
@@ -124,10 +124,10 @@ See [STRUCTURE.md](STRUCTURE.md) for complete documentation structure guidelines
 
 ## Need Help?
 
-- **Issues or bugs:** [Report on GitHub](https://github.com/fxstein/todo.ai/issues)
+- **Issues or bugs:** [Report on GitHub](https://github.com/fxstein/ai-todo/issues)
 - **Questions:** Check [FAQ](FAQ.md) for common answers
 - **Contributing:** See [Development Guidelines](development/DEVELOPMENT_GUIDELINES.md)
 
 ---
 
-**Repository:** https://github.com/fxstein/todo.ai
+**Repository:** https://github.com/fxstein/ai-todo

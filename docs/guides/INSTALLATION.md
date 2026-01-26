@@ -1,81 +1,139 @@
 # Installation
 
-## Smart Installer (Recommended)
+## Quick Install (Recommended)
 
-One-liner that auto-detects your system and installs the optimal version:
+For most users, install via `uv`:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
+# Install uv first (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install ai-todo
+uv tool install ai-todo
 ```
 
-**What it does:**
-1. Detects your OS (macOS, Linux, Windows/WSL)
-2. Checks shell availability (zsh, bash 4+)
-3. Fetches latest release from GitHub
-4. Installs the optimal version for your system
-5. Zero interaction required
+**Verify installation:**
 
-**Example output:**
-```
-todo.ai Smart Installer
-========================
-
-🔍 Detected: macOS
-📦 Installing: zsh version (todo.ai)
-   Reason: zsh is default on modern macOS
-
-🔍 Checking for latest release...
-✓ Latest release: v2.3.1
-📥 Downloading from release...
-✓ Downloaded successfully
-✓ Made executable
-
-✅ Installation complete!
-```
-
-## Manual Installation
-
-If you prefer to choose the version manually:
-
-**Zsh version** (recommended for macOS):
 ```bash
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai && chmod +x todo.ai
+ai-todo version
 ```
 
-**Bash version** (recommended for Linux, requires bash 4+):
+## Installation Methods
+
+### Method 1: Zero-Install MCP (Best for Cursor users)
+
+No permanent installation needed. Add this to your project's `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "ai-todo": {
+      "command": "uvx",
+      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
+    }
+  }
+}
+```
+
+Your AI agent can now manage tasks directly.
+
+**Requirement:** [uv](https://docs.astral.sh/uv/) must be installed.
+
+### Method 2: Global CLI Installation
+
+For command-line usage:
+
 ```bash
-curl -o todo.ai https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.bash && chmod +x todo.ai
+# Using uv (recommended - faster, more reliable)
+uv tool install ai-todo
+
+# Or with pipx
+pipx install ai-todo
+```
+
+**Requirement:** Python 3.10+
+
+### Method 3: pipx
+
+```bash
+# Install pipx first
+brew install pipx  # macOS
+# or: python -m pip install --user pipx
+
+pipx ensurepath
+pipx install ai-todo
 ```
 
 ## Requirements
 
-| Version | Shell | Availability |
-|---------|-------|--------------|
-| Zsh     | zsh (any version) | Default on macOS 10.15+ |
-| Bash    | bash 4.0+ | Default on most Linux |
-
-**Note:** macOS ships with bash 3.2 which doesn't support the bash version. Use zsh or upgrade bash via homebrew: `brew install bash`
+| Method | Requirements |
+|--------|--------------|
+| **Zero-Install MCP** | uv, Cursor IDE |
+| **uv tool install** | uv, Python 3.10+ |
+| **pipx install** | pipx, Python 3.10+ |
 
 ## Troubleshooting
 
-**Error: No compatible shell found**
-- macOS: zsh is pre-installed on 10.15+ (`/bin/zsh`)
-- Linux: `sudo apt install zsh` or `sudo yum install zsh`
-- Or upgrade bash: requires 4.0+ for associative arrays
+### "Command not found: ai-todo"
 
-**Error: Download failed**
-- Check internet connection
-- Verify GitHub is accessible
-- Try wget instead: `wget -O todo.ai <url> && chmod +x todo.ai`
+Ensure your tool directory is in PATH:
 
-**Error: Permission denied**
-- Add executable permission: `chmod +x todo.ai`
-- Or run via shell: `zsh todo.ai list` or `bash todo.bash list`
+```bash
+# For uv
+echo $PATH | grep -q ".local/bin" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
 
-## Technical Details
+# For pipx
+pipx ensurepath
+```
 
-See [BASH_VS_ZSH_ANALYSIS.md](../analysis/BASH_VS_ZSH_ANALYSIS.md) for:
-- Performance comparison (bash 8-21% faster)
-- Compatibility analysis
-- Conversion details (only 7 changes needed)
-- Detailed recommendations
+Restart your terminal after updating PATH.
+
+### "Python version too old"
+
+ai-todo requires Python 3.10+. Check your version:
+
+```bash
+python --version
+```
+
+Install a newer version via:
+
+- **macOS:** `brew install python@3.12`
+- **Linux:** Use pyenv or your package manager
+- **Windows:** Download from python.org
+
+### "uv not found"
+
+Install uv:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### MCP Server Not Connecting
+
+1. Verify uv is installed: `which uv`
+2. Check Cursor settings for MCP server status
+3. Restart Cursor after adding mcp.json
+
+## Upgrading
+
+```bash
+# uv
+uv tool upgrade ai-todo
+
+# pipx
+pipx upgrade ai-todo
+```
+
+## Uninstalling
+
+```bash
+# uv
+uv tool uninstall ai-todo
+
+# pipx
+pipx uninstall ai-todo
+```
+
+Your `TODO.md` and `.ai-todo/` data are preserved.

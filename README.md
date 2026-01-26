@@ -1,4 +1,4 @@
-# todo.ai
+# ai-todo
 
 **AI-native task management for coding agents**
 
@@ -13,9 +13,9 @@ Add this to your project's `.cursor/mcp.json`:
 ```json
 {
   "mcpServers": {
-    "todo-ai": {
+    "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "todo-ai", "serve", "--root", "${workspaceFolder}"]
+      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }
@@ -27,9 +27,9 @@ That's it! Your AI agent can now manage tasks directly. No installation required
 
 ---
 
-## Why todo.ai?
+## Why ai-todo?
 
-AI agents track tasks internally, but this creates a closed system that gets lost after sessions end. todo.ai provides a **permanent, version-controlled record** in your Git repository.
+AI agents track tasks internally, but this creates a closed system that gets lost after sessions end. ai-todo provides a **permanent, version-controlled record** in your Git repository.
 
 - **Persistent** — Tasks survive across sessions, restarts, and time
 - **Version Controlled** — Tracked in Git alongside your code
@@ -51,9 +51,9 @@ For AI agent integration via Cursor or similar IDEs. Uses `uvx` to run on-demand
 ```json
 {
   "mcpServers": {
-    "todo-ai": {
+    "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "todo-ai", "serve", "--root", "${workspaceFolder}"]
+      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }
@@ -73,28 +73,15 @@ uv tool install ai-todo
 pipx install ai-todo
 ```
 
-**CLI Usage:** `todo-ai [command]` (e.g., `todo-ai add "My task"`, `todo-ai list`)
+**CLI Usage:** `ai-todo [command]` (e.g., `ai-todo add "My task"`, `ai-todo list`)
 
-**MCP Server:** `todo-ai serve` (for Cursor integration)
-
-### Option C: Legacy Shell Script
-
-For environments without Python 3.10+:
-
-```bash
-# Smart installer (detects your shell)
-curl -fsSL https://raw.githubusercontent.com/fxstein/todo.ai/main/install.sh | sh
-```
-
-**Usage:** `./todo.ai [command]`
-
-> **Note:** The shell script provides core functionality but lacks MCP integration. We recommend upgrading to Python v3.0+ when possible.
+**MCP Server:** `ai-todo serve` (for Cursor integration)
 
 ---
 
 ## For Humans
 
-With todo.ai, you simply tell your AI agent what you want in plain English:
+With ai-todo, you simply tell your AI agent what you want in plain English:
 
 - *"Create a task for implementing user authentication"*
 - *"Break down the auth feature into subtasks"*
@@ -109,7 +96,7 @@ Your agent handles the technical details. All tasks are stored in `TODO.md` in y
 
 ## See It In Action
 
-This repository uses todo.ai for its own development! Check [`TODO.md`](./TODO.md) to see:
+This repository uses ai-todo for its own development! Check [`TODO.md`](./TODO.md) to see:
 
 - Task hierarchies with subtasks
 - Tag-based organization (`#feature`, `#bug`, `#documentation`)

@@ -150,7 +150,10 @@ def add_command(description: str, tags: list[str], todo_path: str = "TODO.md"):
     manager = TaskManager(tasks)
 
     # ID Generation
-    config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
+    config_dir = Path(todo_path).parent / ".ai-todo"
+    if not config_dir.exists():
+        config_dir = Path(todo_path).parent / ".todo.ai"
+    config_path = config_dir / "config.yaml"
     config = Config(str(config_path))
     coord_manager = CoordinationManager(config)
     new_id = coord_manager.get_next_task_id(manager, file_ops)
@@ -227,7 +230,10 @@ def add_subtask_command(
         if parent.id.count(".") >= 2:
             raise ValueError("Maximum nesting depth is 3 levels (task.subtask.sub-subtask)")
 
-        config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
+        config_dir = Path(todo_path).parent / ".ai-todo"
+        if not config_dir.exists():
+            config_dir = Path(todo_path).parent / ".todo.ai"
+        config_path = config_dir / "config.yaml"
         config = Config(str(config_path))
         coord_manager = CoordinationManager(config)
         subtask_id = coord_manager.get_next_subtask_id(parent_id, manager)

@@ -5,9 +5,13 @@ import yaml
 
 
 class Config:
-    """Manages todo.ai configuration."""
+    """Manages ai-todo configuration."""
 
-    def __init__(self, config_path: str = ".todo.ai/config.yaml"):
+    # Data directory names
+    NEW_DATA_DIR = ".ai-todo"
+    OLD_DATA_DIR = ".todo.ai"
+
+    def __init__(self, config_path: str = ".ai-todo/config.yaml"):
         self.config_path = Path(config_path)
         self._data: dict[str, Any] = {}
         self._load()

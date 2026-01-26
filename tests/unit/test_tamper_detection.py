@@ -14,8 +14,8 @@ def temp_todo_dir(tmp_path):
     todo_file = todo_dir / "TODO.md"
     todo_file.write_text("# Tasks\n\n- [ ] **#1** Task 1\n", encoding="utf-8")
 
-    # Initialize .todo.ai
-    config_dir = todo_dir / ".todo.ai"
+    # Initialize .ai-todo (new naming)
+    config_dir = todo_dir / ".ai-todo"
     config_dir.mkdir()
 
     # Initialize config.yaml
@@ -43,7 +43,7 @@ def test_checksum_calculation(temp_todo_dir):
 def test_initialization_creates_checksum(temp_todo_dir):
     """Test that initializing FileOps creates a checksum file."""
     todo_file = temp_todo_dir / "TODO.md"
-    checksum_file = temp_todo_dir / ".todo.ai" / "state" / "checksum"
+    checksum_file = temp_todo_dir / ".ai-todo" / "state" / "checksum"
 
     assert not checksum_file.exists()
 
@@ -66,19 +66,19 @@ def test_tamper_detection_passive_mode(temp_todo_dir):
     file_ops_new = FileOps(str(todo_file))
 
     # Checksum should be updated to match new content
-    checksum_file = temp_todo_dir / ".todo.ai" / "state" / "checksum"
+    checksum_file = temp_todo_dir / ".ai-todo" / "state" / "checksum"
     new_checksum = file_ops_new.calculate_checksum(todo_file.read_text(encoding="utf-8"))
     assert checksum_file.read_text(encoding="utf-8").strip() == new_checksum
 
     # Log should contain TAMPER_DETECTED
-    log_file = temp_todo_dir / ".todo.ai" / ".todo.ai.log"
+    log_file = temp_todo_dir / ".ai-todo" / ".ai-todo.log"
     assert "TAMPER_DETECTED" in log_file.read_text(encoding="utf-8")
 
 
 def test_tamper_detection_active_mode(temp_todo_dir):
     """Test that active mode raises TamperError."""
     todo_file = temp_todo_dir / "TODO.md"
-    config_file = temp_todo_dir / ".todo.ai" / "config.yaml"
+    config_file = temp_todo_dir / ".ai-todo" / "config.yaml"
 
     # Enable active mode
     config_file.write_text("security:\n  tamper_proof: true\n", encoding="utf-8")
@@ -97,7 +97,7 @@ def test_tamper_detection_active_mode(temp_todo_dir):
 def test_accept_tamper(temp_todo_dir):
     """Test accepting tamper updates checksum and archives event."""
     todo_file = temp_todo_dir / "TODO.md"
-    config_file = temp_todo_dir / ".todo.ai" / "config.yaml"
+    config_file = temp_todo_dir / ".ai-todo" / "config.yaml"
 
     # Enable active mode
     config_file.write_text("security:\n  tamper_proof: true\n", encoding="utf-8")
@@ -122,7 +122,7 @@ def test_accept_tamper(temp_todo_dir):
     FileOps(str(todo_file))
 
     # Check archive
-    tamper_dir = temp_todo_dir / ".todo.ai" / "tamper"
+    tamper_dir = temp_todo_dir / ".ai-todo" / "tamper"
     assert tamper_dir.exists()
     # Should have one timestamped directory
     event_dirs = list(tamper_dir.glob("*"))
@@ -150,6 +150,6 @@ def test_shadow_copy_update(temp_todo_dir):
     content = "New content"
     file_ops.update_integrity(content)
 
-    shadow_file = temp_todo_dir / ".todo.ai" / "state" / "TODO.md"
+    shadow_file = temp_todo_dir / ".ai-todo" / "state" / "TODO.md"
     assert shadow_file.exists()
     assert shadow_file.read_text(encoding="utf-8") == content

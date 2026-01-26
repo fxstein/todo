@@ -47,21 +47,30 @@ class FileStructureSnapshot:
 
 
 class FileOps:
-    """Handles file operations for TODO.md and .todo.ai directory."""
+    """Handles file operations for TODO.md and .ai-todo directory."""
+
+    # Data directory names
+    NEW_DATA_DIR = ".ai-todo"
+    OLD_DATA_DIR = ".todo.ai"
 
     def __init__(
         self, todo_path: str = "TODO.md", interface: str = "CLI", skip_verify: bool = False
     ):
         self.todo_path = Path(todo_path)
-        self.config_dir = self.todo_path.parent / ".todo.ai"
+        self.interface = interface
+
+        # Check for migration from old data directory
+        self._migrate_data_directory()
+
+        # Use new data directory name
+        self.config_dir = self.todo_path.parent / self.NEW_DATA_DIR
         self.state_dir = self.config_dir / "state"
-        self.serial_path = self.config_dir / ".todo.ai.serial"
+        self.serial_path = self.config_dir / ".ai-todo.serial"
         self.checksum_path = self.state_dir / "checksum"
         self.shadow_path = self.state_dir / "TODO.md"
-        self.log_path = self.config_dir / ".todo.ai.log"
+        self.log_path = self.config_dir / ".ai-todo.log"
         self.audit_log_path = self.state_dir / "audit.log"
         self.tamper_mode_path = self.state_dir / "tamper_mode"
-        self.interface = interface
 
         # State to preserve file structure
         self.header_lines: list[str] = []
@@ -97,6 +106,53 @@ class FileOps:
         # Verify integrity on init (Gatekeeper)
         if not skip_verify:
             self.verify_integrity()
+
+    def _migrate_data_directory(self) -> None:
+        """Migrate from .todo.ai/ to .ai-todo/ if needed."""
+        old_dir = self.todo_path.parent / self.OLD_DATA_DIR
+        new_dir = self.todo_path.parent / self.NEW_DATA_DIR
+
+        # Skip if old directory doesn't exist or new directory already exists
+        if not old_dir.exists():
+            return
+        if new_dir.exists():
+            # Both exist - log warning but don't overwrite
+            print(
+                f"Warning: Both {self.OLD_DATA_DIR}/ and {self.NEW_DATA_DIR}/ exist. Using {self.NEW_DATA_DIR}/."
+            )
+            return
+
+        # Migrate: rename directory
+        try:
+            print(f"Migrating data directory: {self.OLD_DATA_DIR}/ → {self.NEW_DATA_DIR}/")
+            shutil.move(str(old_dir), str(new_dir))
+
+            # Rename internal files
+            self._migrate_internal_files(new_dir)
+
+            print(f"✅ Migration complete: {self.NEW_DATA_DIR}/")
+        except Exception as e:
+            print(f"Warning: Migration failed: {e}")
+            print(f"Falling back to {self.OLD_DATA_DIR}/")
+            # If migration failed, use old directory
+            self.config_dir = old_dir
+
+    def _migrate_internal_files(self, data_dir: Path) -> None:
+        """Rename internal state files from old naming to new naming."""
+        # Map of old file names to new file names
+        file_renames = {
+            ".todo.ai.serial": ".ai-todo.serial",
+            ".todo.ai.log": ".ai-todo.log",
+        }
+
+        for old_name, new_name in file_renames.items():
+            old_path = data_dir / old_name
+            new_path = data_dir / new_name
+            if old_path.exists() and not new_path.exists():
+                try:
+                    old_path.rename(new_path)
+                except Exception as e:
+                    print(f"Warning: Could not rename {old_name} to {new_name}: {e}")
 
     def calculate_checksum(self, content: str) -> str:
         """Calculate SHA-256 hash of normalized content."""
@@ -182,7 +238,7 @@ class FileOps:
         return new_hash
 
     def _log_action(self, action: str, task_id: str, checksum: str, description: str = "") -> None:
-        """Log action to .todo.ai.log and local audit.log."""
+        """Log action to .ai-todo.log and local audit.log."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         user = os.environ.get("USER") or os.environ.get("USERNAME") or "unknown"
 

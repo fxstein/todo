@@ -20,9 +20,11 @@ RELEASE_SUMMARY.md
 
 # Auto-generated end-user cursor rules (created by init_cursor_rules())
 # These are generated on install/update and don't need to be committed
+.cursor/rules/ai-todo-*.mdc
 .cursor/rules/todo.ai-*.mdc
 
 # Backup files created by mode switching and rollback operations
+.ai-todo/backups/
 .todo.ai/backups/
 
 
@@ -54,4 +56,5 @@ wheels/
 *.egg
 
 # Local audit log (persists across checkouts)
+.ai-todo/state/audit.log
 .todo.ai/state/audit.log

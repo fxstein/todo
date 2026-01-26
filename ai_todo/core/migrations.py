@@ -6,7 +6,7 @@ from pathlib import Path
 class MigrationRegistry:
     """Manages migration execution."""
 
-    def __init__(self, config_dir: str = ".todo.ai"):
+    def __init__(self, config_dir: str = ".ai-todo"):
         self.config_dir = Path(config_dir)
         self.migrations_dir = self.config_dir / "migrations"
         self.state_file = self.migrations_dir / "state.yaml"

@@ -1,4 +1,4 @@
-"""Configuration and setup commands for todo.ai."""
+"""Configuration and setup commands for ai-todo."""
 
 import shutil
 import subprocess
@@ -8,15 +8,23 @@ from pathlib import Path
 from ai_todo.core.config import Config
 
 
+def _get_config_dir(todo_path: str) -> Path:
+    """Get the config directory, preferring new name but falling back to legacy."""
+    new_dir = Path(todo_path).parent / ".ai-todo"
+    old_dir = Path(todo_path).parent / ".todo.ai"
+    return new_dir if new_dir.exists() else (old_dir if old_dir.exists() else new_dir)
+
+
 def show_config_command(todo_path: str = "TODO.md") -> None:
     """Show current configuration."""
-    config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
+    config_dir = _get_config_dir(todo_path)
+    config_path = config_dir / "config.yaml"
 
     if not config_path.exists():
         print("No configuration file found.")
         print("Using default mode: single-user")
         print("")
-        print("To create a config file, use: ./todo.ai switch-mode <mode>")
+        print("To create a config file, use: ai-todo switch-mode <mode>")
         return
 
     print("Current Configuration:")
@@ -135,7 +143,8 @@ def setup_coordination_command(
         print("Types: github-issues, counterapi")
         return
 
-    config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
+    config_dir = _get_config_dir(todo_path)
+    config_path = config_dir / "config.yaml"
     config = Config(str(config_path))
 
     # Ensure config file exists
@@ -321,7 +330,8 @@ def switch_mode_command(
         print(f"Valid modes: {', '.join(valid_modes)}")
         return
 
-    config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
+    config_dir = _get_config_dir(todo_path)
+    config_path = config_dir / "config.yaml"
     config = Config(str(config_path))
 
     current_mode = config.get_numbering_mode()
@@ -350,7 +360,7 @@ def switch_mode_command(
 
 def list_mode_backups_command(todo_path: str = "TODO.md") -> None:
     """List mode switch backups."""
-    config_dir = Path(todo_path).parent / ".todo.ai"
+    config_dir = _get_config_dir(todo_path)
     backups_dir = config_dir / "backups"
 
     if not backups_dir.exists():
@@ -385,11 +395,11 @@ def rollback_mode_command(backup_name: str, todo_path: str = "TODO.md") -> None:
     """Rollback from mode switch backup."""
     if not backup_name:
         print("Error: Please provide backup name")
-        print("Usage: ./todo.ai rollback-mode <backup-name>")
-        print("List backups: ./todo.ai list-mode-backups")
+        print("Usage: ai-todo rollback-mode <backup-name>")
+        print("List backups: ai-todo list-mode-backups")
         return
 
-    config_dir = Path(todo_path).parent / ".todo.ai"
+    config_dir = _get_config_dir(todo_path)
     backups_dir = config_dir / "backups"
 
     backup_todo = backups_dir / f"{backup_name}.TODO.md"
@@ -412,7 +422,9 @@ def rollback_mode_command(backup_name: str, todo_path: str = "TODO.md") -> None:
         # If backup has no config but current has one, remove it
         config_path.unlink()
 
-    serial_path = config_dir / ".todo.ai.serial"
+    serial_path = config_dir / ".ai-todo.serial"
+    if not serial_path.exists():
+        serial_path = config_dir / ".todo.ai.serial"
     if backup_serial.exists():
         shutil.copy2(backup_serial, serial_path)
 
@@ -423,7 +435,7 @@ def create_mode_backup(todo_path: str = "TODO.md") -> str | None:
     """Create backup before mode switches."""
     from datetime import datetime
 
-    config_dir = Path(todo_path).parent / ".todo.ai"
+    config_dir = _get_config_dir(todo_path)
     backups_dir = config_dir / "backups"
     backups_dir.mkdir(parents=True, exist_ok=True)
 
@@ -443,7 +455,9 @@ def create_mode_backup(todo_path: str = "TODO.md") -> str | None:
         shutil.copy2(config_path, backup_config)
 
     # Backup serial file
-    serial_path = config_dir / ".todo.ai.serial"
+    serial_path = config_dir / ".ai-todo.serial"
+    if not serial_path.exists():
+        serial_path = config_dir / ".todo.ai.serial"
     if serial_path.exists():
         backup_serial = backups_dir / f"{backup_name}.serial"
         shutil.copy2(serial_path, backup_serial)

@@ -33,12 +33,15 @@ def uninstall_command(
     print("")
     print("For shell script installations:")
     print("  - Script location: Check your PATH or installation directory")
-    print("  - Data directory: .todo.ai/ (in current working directory)")
-    print("  - Cursor rules: .cursor/rules/todo.ai-*.mdc")
+    print("  - Data directory: .ai-todo/ (in current working directory)")
+    print("  - Cursor rules: .cursor/rules/ai-todo-*.mdc")
     print("")
 
-    # Check for .todo.ai directory in current working directory
-    todo_ai_dir = Path.cwd() / ".todo.ai"
+    # Check for .ai-todo directory in current working directory
+    # Also check legacy .todo.ai for backward compatibility
+    ai_todo_dir = Path.cwd() / ".ai-todo"
+    legacy_dir = Path.cwd() / ".todo.ai"
+    todo_ai_dir = ai_todo_dir if ai_todo_dir.exists() else legacy_dir
     has_data_dir = todo_ai_dir.exists()
 
     # Check for Cursor rules
@@ -56,7 +59,7 @@ def uninstall_command(
     if remove_data and has_data_dir:
         print(f"  ✗ Data directory: {todo_ai_dir}")
         will_remove_data = True
-        print("     ⚠️  Warning: This will remove your TODO data (.todo.ai/ directory)")
+        print("     ⚠️  Warning: This will remove your TODO data (.ai-todo/ directory)")
         print("     ⚠️  Your TODO.md file will remain untouched")
     elif has_data_dir:
         print(f"  ✓ Data directory: {todo_ai_dir} (preserved - use --remove-data to remove)")
@@ -75,7 +78,7 @@ def uninstall_command(
     if not will_remove_data and not will_remove_rules:
         print("")
         print("✅ Nothing to remove in current directory.")
-        print("   Use --remove-data to remove .todo.ai/ directory")
+        print("   Use --remove-data to remove .ai-todo/ directory")
         print("   Use --remove-rules to remove Cursor rules")
         return
 
@@ -323,7 +326,10 @@ def _generate_bug_report(error_message: str, error_context: str | None, command:
 
     # Collect recent logs
     log_info = ""
-    log_path = Path(".todo.ai") / ".todo.ai.log"
+    # Check new location first, then legacy
+    log_path = Path(".ai-todo") / ".ai-todo.log"
+    if not log_path.exists():
+        log_path = Path(".todo.ai") / ".todo.ai.log"
     if log_path.exists():
         try:
             content = log_path.read_text(encoding="utf-8")

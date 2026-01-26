@@ -19,8 +19,8 @@ def file_ops(temp_todo_file):
 def test_init_creates_config_dir(tmp_path):
     todo_path = tmp_path / "TODO.md"
     _ = FileOps(str(todo_path))
-    assert (tmp_path / ".todo.ai").exists()
-    assert (tmp_path / ".todo.ai").is_dir()
+    assert (tmp_path / ".ai-todo").exists()
+    assert (tmp_path / ".ai-todo").is_dir()
 
 
 def test_read_tasks_empty(file_ops):
@@ -97,12 +97,12 @@ def test_serial_ops(file_ops):
     # Set serial
     file_ops.set_serial(5)
     assert file_ops.get_serial() == 5
-    assert (file_ops.config_dir / ".todo.ai.serial").read_text(encoding="utf-8") == "5"
+    assert (file_ops.config_dir / ".ai-todo.serial").read_text(encoding="utf-8") == "5"
 
     # Set again
     file_ops.set_serial(10)
     assert file_ops.get_serial() == 10
-    assert (file_ops.config_dir / ".todo.ai.serial").read_text(encoding="utf-8") == "10"
+    assert (file_ops.config_dir / ".ai-todo.serial").read_text(encoding="utf-8") == "10"
 
 
 def test_relationships(tmp_path):

@@ -427,7 +427,7 @@ def report_bug(error_description, error_context, command):
 
 
 @cli.command()
-@click.option("--remove-data", "--data", is_flag=True, help="Remove .todo.ai/ data directory")
+@click.option("--remove-data", "--data", is_flag=True, help="Remove .ai-todo/ data directory")
 @click.option("--remove-rules", "--rules", is_flag=True, help="Remove Cursor rules")
 @click.option("--all", is_flag=True, help="Remove script, data, and rules")
 @click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")

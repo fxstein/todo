@@ -10,8 +10,13 @@ def view_log_command(
     filter_text: str | None = None, lines: int | None = None, todo_path: str = "TODO.md"
 ) -> None:
     """View TODO operation log (with --filter and --lines options)."""
-    config_dir = Path(todo_path).parent / ".todo.ai"
-    log_file = config_dir / ".todo.ai.log"
+    # Check new location first, then legacy
+    config_dir = Path(todo_path).parent / ".ai-todo"
+    if not config_dir.exists():
+        config_dir = Path(todo_path).parent / ".todo.ai"
+    log_file = config_dir / ".ai-todo.log"
+    if not log_file.exists():
+        log_file = config_dir / ".todo.ai.log"
 
     if not log_file.exists():
         print("No log file found")
@@ -54,7 +59,9 @@ def update_command() -> None:
 
 def list_backups_command(todo_path: str = "TODO.md") -> None:
     """List available backup versions."""
-    config_dir = Path(todo_path).parent / ".todo.ai"
+    config_dir = Path(todo_path).parent / ".ai-todo"
+    if not config_dir.exists():
+        config_dir = Path(todo_path).parent / ".todo.ai"
     backups_dir = config_dir / "backups"
 
     if not backups_dir.exists():
@@ -99,7 +106,9 @@ def list_backups_command(todo_path: str = "TODO.md") -> None:
 
 def rollback_command(target: str | None = None, todo_path: str = "TODO.md") -> None:
     """Rollback to previous version (by index or timestamp)."""
-    config_dir = Path(todo_path).parent / ".todo.ai"
+    config_dir = Path(todo_path).parent / ".ai-todo"
+    if not config_dir.exists():
+        config_dir = Path(todo_path).parent / ".todo.ai"
     backups_dir = config_dir / "backups"
 
     if not backups_dir.exists():
@@ -199,7 +208,9 @@ def create_backup(todo_path: str = "TODO.md") -> str | None:
     if not todo_file.exists():
         return None
 
-    config_dir = todo_file.parent / ".todo.ai"
+    config_dir = todo_file.parent / ".ai-todo"
+    if not config_dir.exists():
+        config_dir = todo_file.parent / ".todo.ai"
     backups_dir = config_dir / "backups"
     backups_dir.mkdir(parents=True, exist_ok=True)
 

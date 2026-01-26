@@ -62,3 +62,4 @@ wheels/
 # Local audit log (persists across checkouts)
 .ai-todo/state/audit.log
 .todo.ai/state/audit.log
+scripts/.run-full-tests-periodic

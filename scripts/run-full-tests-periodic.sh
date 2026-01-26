@@ -2,7 +2,7 @@
 # Run full test suite every 10th commit
 # Used by pre-commit hook to periodically catch integration test failures
 
-COUNTER_FILE=".ai-todo/.commit-count"
+COUNTER_FILE="scripts/.run-full-tests-periodic"
 INTERVAL=10
 
 # Ensure directory exists

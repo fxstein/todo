@@ -31,7 +31,7 @@ alwaysApply: true
 
 ai-todo uses a simple tamper detection system to protect `TODO.md` integrity.
 
--   **State Directory:** `.todo.ai/state/` contains critical integrity files (checksums, shadow copies).
+-   **State Directory:** `.ai-todo/state/` contains critical integrity files (checksums, shadow copies).
 -   **RESTRICTION:** This directory is **OFF LIMITS** to agents. Never read, write, or modify files in this directory directly.
 -   **Tamper Mode:** Configured in `config.yaml` (`security.tamper_proof`).
 

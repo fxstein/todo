@@ -11,9 +11,9 @@
   - [ ] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9`
   - [ ] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8`
   - [ ] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7`
-  - [ ] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6`
-  - [ ] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5`
-  - [ ] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#inprogress` `#polish` `#step-4`
+  - [x] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6` (2026-01-26)
+  - [x] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5` (2026-01-26)
+  - [x] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4` (2026-01-26)
   - [x] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3` (2026-01-26)
   - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-26)
   - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-26)
@@ -54,7 +54,7 @@
 - [x] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix` (2026-01-26)
   > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
 
-- [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
+- [x] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming` (2026-01-26)
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
   - [x] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification` (2026-01-26)
   - [x] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation` (2026-01-26)
@@ -112,12 +112,12 @@
 - [ ] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp`
   > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
 
-- [ ] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature`
+- [x] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature` (2026-01-26)
   > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
-  - [ ] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules`
-  - [ ] **#187.9** Document version detection: MCP server (todo-ai-mcp) > Python CLI (todo-ai) > Shell script (./todo.ai) - all v3.0+ except shell script also supports v2.x `#documentation`
-  - [ ] **#187.8** Test updated rules: verify AI agents prefer MCP when available, fallback to CLI when not `#test`
-  - [ ] **#187.7** Update init_cursor_rules() function to include MCP preference in generated rules `#code`
+  - [x] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules` (2026-01-26)
+  - [x] **#187.9** Document version detection: MCP server (todo-ai-mcp) > Python CLI (todo-ai) > Shell script (./todo.ai) - all v3.0+ except shell script also supports v2.x `#documentation` (2026-01-26)
+  - [x] **#187.8** Test updated rules: verify AI agents prefer MCP when available, fallback to CLI when not `#test` (2026-01-26)
+  - [x] **#187.7** Update init_cursor_rules() function to include MCP preference in generated rules `#code` (2026-01-26)
   - [x] **#187.6** Add detection logic: prefer MCP (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai) as fallback   (2026-01-25) `#cursor-rules` `#documentation` (2026-01-26)
   - [x] **#187.5** Update .cursorrules file to mention MCP preference in Task Management section  (2026-01-25) `#cursor-rules` (2026-01-26)
   - [x] **#187.4** Update todo.ai-task-notes.mdc to use MCP note tool instead of CLI command  (2026-01-25) `#cursor-rules` (2026-01-26)
@@ -1373,9 +1373,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 21:22:14
+**ai-todo** | Last Updated: 2026-01-26 22:03:10

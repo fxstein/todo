@@ -1,3 +1,76 @@
+## Release 3.0.0b18
+
+# Release Summary: v3.0.0b18
+
+## Major Naming Unification
+
+This release completes a comprehensive rename from `todo.ai` to `ai-todo` across the entire project. The unified naming eliminates confusion between the various component names (repository, PyPI package, CLI command) by standardizing on `ai-todo` everywhere.
+
+**Key changes:**
+- **CLI command:** `todo-ai` → `ai-todo`
+- **Data directory:** `.todo.ai/` → `.ai-todo/` (automatic migration on startup)
+- **Python package:** `todo_ai/` → `ai_todo/`
+- **GitHub repository:** Renamed to `ai-todo`
+- **Shell scripts:** Moved to `legacy/` directory (deprecated)
+
+The migration is transparent for existing users - the tool automatically detects and migrates old `.todo.ai/` directories to the new `.ai-todo/` format on first run.
+
+## Additional Improvements
+
+- **3-level task nesting:** Tasks can now have sub-subtasks (e.g., #1.2.3)
+- **Cursor rules enhancement:** Added guidance for "task list" (hierarchical) vs "tasks" (flat) terminology
+- **Documentation overhaul:** All user-facing docs updated with MCP-first approach and new naming
+
+---
+
+### ✨ Features
+
+- Implement data directory migration .todo.ai/ → .ai-todo/ (task#219.6) ([718d3f3](https://github.com/fxstein/ai-todo/commit/718d3f3d0797c62dd670f73bd9ed9ec00eca2d99))
+
+### 🐛 Bug Fixes
+
+- Update tests for ai-todo naming and legacy shell path (task#219) ([b72cab3](https://github.com/fxstein/ai-todo/commit/b72cab328d4007340ce31d38cf3e94d002e79652))
+- Allow 3-level task nesting (task.subtask.sub-subtask) ([70ea225](https://github.com/fxstein/ai-todo/commit/70ea22542ddeaf68279ff84883fe637beb713654))
+
+### 🔧 Other Changes
+
+- docs: Add AI release summary for v3.0.0b18 ([02989af](https://github.com/fxstein/ai-todo/commit/02989afcd1f18c41e905eb277334dc6167f0d9e6))
+- chore: Clean up deleted tasks and orphaned subtasks ([eab3b9c](https://github.com/fxstein/ai-todo/commit/eab3b9c55ed81d93ab516ca78bae4f93fd217c1c))
+- docs: Remove redundant example from task structure rule ([80fdcdd](https://github.com/fxstein/ai-todo/commit/80fdcdd79c655617888996c9f08d7a198e161a9b))
+- docs: Add task list vs tasks guidance to cursor rules ([2d7cad5](https://github.com/fxstein/ai-todo/commit/2d7cad5adf4072c9a3ffaad618382df6aac14229))
+- internal: Update GitHub URLs to ai-todo (task#219) ([992024c](https://github.com/fxstein/ai-todo/commit/992024cbe5983cf8fb2f0ed4281fa3246ceb5cd9))
+- docs: Update user-facing documentation for ai-todo naming (task#219.8) ([562add0](https://github.com/fxstein/ai-todo/commit/562add06160b285cf1c143cc58d8654ddad8b599))
+- internal: Update Cursor rules for ai-todo naming (task#219) ([aadc42c](https://github.com/fxstein/ai-todo/commit/aadc42c79bc48377bba1caf66c5715a3ab750ab9))
+- internal: Deprecate shell scripts (task#219) ([589a4d2](https://github.com/fxstein/ai-todo/commit/589a4d20654427596786ed3e7759106f4609cfed))
+- internal: Update tests and CI for ai_todo (task#219) ([73ab83b](https://github.com/fxstein/ai-todo/commit/73ab83b33fee74a764eaa840d6c17aa41fb1bac5))
+- internal: Rename todo_ai/ to ai_todo/ (task#219.1.1) ([45f0916](https://github.com/fxstein/ai-todo/commit/45f09160e4f14a989ae72796099ae6aae0126424))
+- docs: Create naming implementation plan (task#219.3) ([3093eb9](https://github.com/fxstein/ai-todo/commit/3093eb926b5f26d481730b57a474db0a1c6b2329))
+- docs: Add task#219.8 for documentation updates and bug task#222 ([2a040c7](https://github.com/fxstein/ai-todo/commit/2a040c7486b0fb5facddc20b10c2703c83666576))
+- docs: Add bug task#221 - delete task leaves orphaned subtasks ([ad98920](https://github.com/fxstein/ai-todo/commit/ad98920a7e98f8dda5171b1db8485c78f388a099))
+- docs: Add Decision 9 - rename data directory .todo.ai/ to .ai-todo/ (task#219.1) ([fdf0064](https://github.com/fxstein/ai-todo/commit/fdf006468c917e27d4f0e267340c3dfefb827a53))
+- docs: Add Decision 8 - update all Cursor rules to ai-todo (task#219.1) ([d1728eb](https://github.com/fxstein/ai-todo/commit/d1728ebbdb3449ee8f5d54ba437cad2061b98d74))
+- docs: Add Decision 7 - rename todo_ai/ to ai_todo/ (task#219.1) ([9ad200f](https://github.com/fxstein/ai-todo/commit/9ad200f41d2e7c7a2873ccc43646bddd5086a0af))
+- docs: Record all naming decisions (task#219.1) ([eff261c](https://github.com/fxstein/ai-todo/commit/eff261c24c4c1819f1e7486fde0c1a02e20d9ffd))
+- docs: Record naming decisions in analysis (task#219.1) ([f321b94](https://github.com/fxstein/ai-todo/commit/f321b94475ba4b68ccb83a377d3f65da87d2f2b0))
+- docs: Remove Next Steps from naming analysis (task#219.1) ([107df89](https://github.com/fxstein/ai-todo/commit/107df897e0fa988bd3da0ba7d1607e84c2ca64e2))
+- docs: Create naming unification analysis (task#219.1) ([f271499](https://github.com/fxstein/ai-todo/commit/f2714995ad3e9622a9a81abf2919472e3b385abe))
+- chore: Start task#219.1 (naming analysis) ([787b057](https://github.com/fxstein/ai-todo/commit/787b0572e0c274fdb80ff4298ec8f0f1e5839c71))
+- docs: Add task#219 for unified naming decision (ai-todo) ([6b221a4](https://github.com/fxstein/ai-todo/commit/6b221a444264e83e8053356a53f7a897c33407da))
+- docs: Update referenced documentation for MCP-first approach (task#203) ([1d785c9](https://github.com/fxstein/ai-todo/commit/1d785c960040f130a9d8980eab562ec5ba7db3f2))
+- docs: Add subtasks for referenced documentation updates (task#203) ([8072a8d](https://github.com/fxstein/ai-todo/commit/8072a8d5abe05a66947309330271f8848488ed55))
+- docs: Implement README redesign with MCP-first approach (task#203) ([e2bba2f](https://github.com/fxstein/ai-todo/commit/e2bba2f0e9c4a6a829f9e4c6378279f3893f0cf2))
+- docs: Add isolation requirement note to task#203.4 ([591ee1e](https://github.com/fxstein/ai-todo/commit/591ee1e1edeb1344136fa0dda25b0f33321b20a5))
+- docs: Update task#203 subtasks for implementation workflow ([10f7298](https://github.com/fxstein/ai-todo/commit/10f7298fe5aa745d95359845f20c538098cacc1b))
+- docs: Remove Next Steps section from README redesign doc (task#203.1) ([9e1db38](https://github.com/fxstein/ai-todo/commit/9e1db386f73a8714d27620b6bc29c71254b55c59))
+- docs: Update README redesign with design decisions (task#203.1) ([372bb32](https://github.com/fxstein/ai-todo/commit/372bb326365b29e3ce712a653f9d2994ed04e731))
+- chore: Add summary note to task#203 ([8baed6a](https://github.com/fxstein/ai-todo/commit/8baed6ae46b8b7566e43c2354ef90de7f7bf8e57))
+- chore: Start task#203.1 and add design document note ([fec6fca](https://github.com/fxstein/ai-todo/commit/fec6fca73db055b406c645f506e2d756fe25c054))
+- docs: Create README redesign design document (task#203.1) ([27cc167](https://github.com/fxstein/ai-todo/commit/27cc1677d61088f4a208a1d4b8a706d2b8af3d09))
+- chore: Archive completed tasks #216, #217 ([981365d](https://github.com/fxstein/ai-todo/commit/981365d8d45da149395de59fc0a57b8ddf27e4c2))
+- chore: Archive completed task#218 (Simplify Cursor rules) ([efaa729](https://github.com/fxstein/ai-todo/commit/efaa729d4a8b765ee7f4f7cdc140f0387ecc6bbd))
+
+## Previous Beta Release Notes
+
 ## Release 3.0.0b17
 
 ## Summary

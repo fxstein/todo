@@ -130,7 +130,7 @@ jobs:
           echo "✅ No forbidden flags found"
 
       - name: Validate documentation
-        uses: DavidAnson/markdownlint-cli2-action@v20
+        uses: DavidAnson/markdownlint-cli2-action@v22
         with:
           globs: |
             **/*.md

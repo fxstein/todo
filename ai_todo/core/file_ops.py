@@ -6,9 +6,9 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from todo_ai.core.config import Config
-from todo_ai.core.exceptions import TamperError
-from todo_ai.core.task import Task, TaskStatus
+from ai_todo.core.config import Config
+from ai_todo.core.exceptions import TamperError
+from ai_todo.core.task import Task, TaskStatus
 
 
 @dataclass(frozen=True)

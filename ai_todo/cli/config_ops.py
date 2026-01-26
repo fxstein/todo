@@ -5,7 +5,7 @@ import subprocess
 import urllib.request
 from pathlib import Path
 
-from todo_ai.core.config import Config
+from ai_todo.core.config import Config
 
 
 def show_config_command(todo_path: str = "TODO.md") -> None:
@@ -175,7 +175,7 @@ def _setup_github_issues_coordination(config: Config, interactive: bool, todo_pa
 
     # Get repository info
     try:
-        from todo_ai.core.github_client import GitHubClient
+        from ai_todo.core.github_client import GitHubClient
 
         github_client = GitHubClient()
         owner, repo = github_client._get_repo_info()

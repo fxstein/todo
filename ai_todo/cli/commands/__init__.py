@@ -3,7 +3,7 @@ import re
 import subprocess
 from pathlib import Path
 
-from todo_ai.cli.config_ops import (
+from ai_todo.cli.config_ops import (
     detect_coordination_command,
     list_mode_backups_command,
     rollback_mode_command,
@@ -12,22 +12,22 @@ from todo_ai.cli.config_ops import (
     show_config_command,
     switch_mode_command,
 )
-from todo_ai.cli.system_ops import (
+from ai_todo.cli.system_ops import (
     create_backup,
     list_backups_command,
     rollback_command,
     update_command,
     view_log_command,
 )
-from todo_ai.cli.utility_ops import (
+from ai_todo.cli.utility_ops import (
     report_bug_command,
     uninstall_command,
     version_command,
 )
-from todo_ai.core.config import Config
-from todo_ai.core.coordination import CoordinationManager
-from todo_ai.core.file_ops import FileOps
-from todo_ai.core.task import Task, TaskManager, TaskStatus
+from ai_todo.core.config import Config
+from ai_todo.core.coordination import CoordinationManager
+from ai_todo.core.file_ops import FileOps
+from ai_todo.core.task import Task, TaskManager, TaskStatus
 
 # Global file_ops cache to preserve relationships across operations
 _file_ops_cache: dict[str, FileOps] = {}

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from fastmcp import FastMCP
 
-from todo_ai.cli.commands import (
+from ai_todo.cli.commands import (
     add_command,
     add_subtask_command,
     archive_command,
@@ -37,7 +37,7 @@ from todo_ai.cli.commands import (
     update_note_command,
     update_tool_command,
 )
-from todo_ai.core.exceptions import TamperError
+from ai_todo.core.exceptions import TamperError
 
 # Initialize FastMCP
 mcp = FastMCP("todo-ai")
@@ -146,7 +146,7 @@ def undo_task(task_id: str) -> str:
 @mcp.tool()
 def start_task(task_id: str) -> str:
     """Mark a task as in progress."""
-    from todo_ai.cli.commands import start_command
+    from ai_todo.cli.commands import start_command
 
     return _capture_output(start_command, task_id, todo_path=CURRENT_TODO_PATH)
 
@@ -154,7 +154,7 @@ def start_task(task_id: str) -> str:
 @mcp.tool()
 def stop_task(task_id: str) -> str:
     """Stop progress on a task."""
-    from todo_ai.cli.commands import stop_command
+    from ai_todo.cli.commands import stop_command
 
     return _capture_output(stop_command, task_id, todo_path=CURRENT_TODO_PATH)
 
@@ -328,7 +328,7 @@ def uninstall_tool(
 @mcp.tool()
 def accept_tamper(reason: str) -> str:
     """Accept external changes to TODO.md."""
-    from todo_ai.cli.tamper_ops import tamper_accept_command
+    from ai_todo.cli.tamper_ops import tamper_accept_command
 
     return _capture_output(tamper_accept_command, reason, todo_path=CURRENT_TODO_PATH)
 

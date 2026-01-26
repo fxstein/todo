@@ -40,15 +40,14 @@ Repository = "https://github.com/fxstein/todo.ai.git"
 Issues = "https://github.com/fxstein/todo.ai/issues"
 
 [project.scripts]
-todo-ai = "todo_ai.cli.main:cli"
-todo-ai-mcp = "todo_ai.mcp.__main__:main"
+ai-todo = "ai_todo.cli.main:cli"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["todo_ai*"]
+include = ["ai_todo*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

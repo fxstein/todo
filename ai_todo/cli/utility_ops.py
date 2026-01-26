@@ -5,7 +5,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from todo_ai import __version__
+from ai_todo import __version__
 
 
 def version_command() -> None:
@@ -147,7 +147,7 @@ def report_bug_command(
 
     # Get repository info
     try:
-        from todo_ai.core.github_client import GitHubClient
+        from ai_todo.core.github_client import GitHubClient
 
         github_client = GitHubClient()
         owner, repo = github_client._get_repo_info()
@@ -610,7 +610,7 @@ def _calculate_similarity(text1: str, text2: str) -> float:
 def _create_new_issue(title: str, body: str, repo_url: str, labels: str) -> None:
     """Create new GitHub issue."""
     try:
-        from todo_ai.core.github_client import GitHubClient
+        from ai_todo.core.github_client import GitHubClient
 
         github_client = GitHubClient()
         label_list = [label.strip() for label in labels.split(",") if label.strip()]

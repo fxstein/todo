@@ -165,7 +165,7 @@ def rollback_command(target: str | None = None, todo_path: str = "TODO.md") -> N
 
     # Get current version
     try:
-        from todo_ai import __version__
+        from ai_todo import __version__
 
         current_version = __version__
     except Exception:

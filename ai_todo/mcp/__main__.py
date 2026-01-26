@@ -1,6 +1,6 @@
 import asyncio
 
-from todo_ai.mcp.server import main as async_main
+from ai_todo.mcp.server import main as async_main
 
 
 def main():

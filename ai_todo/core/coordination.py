@@ -1,7 +1,7 @@
 import subprocess
 
-from todo_ai.core.config import Config
-from todo_ai.core.github_client import GitHubClient
+from ai_todo.core.config import Config
+from ai_todo.core.github_client import GitHubClient
 
 
 class CoordinationManager:

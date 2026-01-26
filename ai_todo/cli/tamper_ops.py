@@ -1,7 +1,7 @@
 import difflib
 import sys
 
-from todo_ai.core.file_ops import FileOps
+from ai_todo.core.file_ops import FileOps
 
 
 def tamper_diff_command(todo_path: str = "TODO.md") -> None:

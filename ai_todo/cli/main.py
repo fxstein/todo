@@ -1,6 +1,6 @@
 import click
 
-from todo_ai.cli.commands import (
+from ai_todo.cli.commands import (
     add_command,
     add_subtask_command,
     archive_command,
@@ -36,7 +36,7 @@ from todo_ai.cli.commands import (
     update_tool_command,
     version_tool_command,
 )
-from todo_ai.core.exceptions import TamperError
+from ai_todo.core.exceptions import TamperError
 
 
 @click.group()
@@ -129,7 +129,7 @@ def modify(ctx, task_id, description, tags):
 @click.pass_context
 def start(ctx, task_id):
     """Mark a task as in progress."""
-    from todo_ai.cli.commands import start_command
+    from ai_todo.cli.commands import start_command
 
     start_command(task_id, todo_path=ctx.obj["todo_file"])
 
@@ -139,7 +139,7 @@ def start(ctx, task_id):
 @click.pass_context
 def stop(ctx, task_id):
     """Stop progress on a task."""
-    from todo_ai.cli.commands import stop_command
+    from ai_todo.cli.commands import stop_command
 
     stop_command(task_id, todo_path=ctx.obj["todo_file"])
 
@@ -462,7 +462,7 @@ def version_long():
 @click.pass_context
 def serve(ctx, root):
     """Start the MCP server over stdio."""
-    from todo_ai.mcp.server import run_server
+    from ai_todo.mcp.server import run_server
 
     # Use the root from command option, global option, or default to current directory
     root_path = root or ctx.obj.get("root") or "."
@@ -482,7 +482,7 @@ def tamper():
 @click.pass_context
 def tamper_diff(ctx):
     """Show diff between current file and last valid state."""
-    from todo_ai.cli.tamper_ops import tamper_diff_command
+    from ai_todo.cli.tamper_ops import tamper_diff_command
 
     tamper_diff_command(todo_path=ctx.obj["todo_file"])
 
@@ -492,7 +492,7 @@ def tamper_diff(ctx):
 @click.pass_context
 def tamper_accept(ctx, reason):
     """Accept external changes."""
-    from todo_ai.cli.tamper_ops import tamper_accept_command
+    from ai_todo.cli.tamper_ops import tamper_accept_command
 
     tamper_accept_command(reason, todo_path=ctx.obj["todo_file"])
 

@@ -23,6 +23,11 @@ RELEASE_SUMMARY.md
 .cursor/rules/ai-todo-*.mdc
 .cursor/rules/todo.ai-*.mdc
 
+# Data directories (for development repo - don't commit local state)
+# In user projects, these would NOT be ignored
+/.ai-todo/
+/.todo.ai/
+
 # Backup files created by mode switching and rollback operations
 .ai-todo/backups/
 .todo.ai/backups/

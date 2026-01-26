@@ -30,6 +30,8 @@ def run_shell_command(cmd: list[str], cwd: Path) -> tuple[str, int]:
     try:
         env = os.environ.copy()
         env["TODO_AI_TESTING"] = "1"
+        # Force shell to use test directory instead of auto-detecting git root
+        env["TODO_AI_ROOT"] = str(cwd)
         # Clear TODO_FILE to prevent pollution from other tests
         env.pop("TODO_FILE", None)
 

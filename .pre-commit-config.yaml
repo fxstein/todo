@@ -3,7 +3,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
+        exclude: ^\.todo\.ai/
       - id: end-of-file-fixer
+        exclude: ^\.todo\.ai/
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files

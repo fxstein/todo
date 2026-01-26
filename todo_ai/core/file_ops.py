@@ -1000,4 +1000,4 @@ class FileOps:
             ]
         )
 
-        return "\n".join(lines) + "\n"
+        return "\n".join(line.rstrip() for line in lines) + "\n"

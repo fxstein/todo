@@ -89,3 +89,12 @@ repos:
         # Only run pytest when Python code or test files change
         # This prevents pytest from blocking formatting-only commits
         files: ^(ai_todo/|tests/|pyproject\.toml|setup\.py)
+
+      - id: pytest-full
+        name: pytest (full suite - every 10th commit)
+        entry: ./scripts/run-full-tests-periodic.sh
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: false
+        files: ^(ai_todo/|tests/|pyproject\.toml|setup\.py)

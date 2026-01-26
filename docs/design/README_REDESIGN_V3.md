@@ -266,8 +266,10 @@ For existing users:
 4. [ ] Remove/relocate deprecated sections
 5. [ ] Test all installation paths work as documented
 
-## Open Questions
+## Design Decisions
 
-1. Should we keep any reference to GitHub Issues integration?
-2. Should "Why not GitHub Issues?" become a FAQ entry?
-3. Do we need a separate "Comparison" page for alternatives?
+| Question | Decision |
+|----------|----------|
+| GitHub Issues reference | Keep brief mention in "For Humans" section (e.g., "Reference GitHub issues: 'Fix bug from #123'") |
+| "Why not GitHub Issues?" section | Move to new `docs/FAQ.md` page |
+| Comparison page for alternatives | Skip for now, can add later if needed |

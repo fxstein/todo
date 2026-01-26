@@ -21,6 +21,8 @@ Add this to your project's `.cursor/mcp.json`:
 }
 ```
 
+Then enable the server in Cursor Settings → MCP Servers → toggle **ai-todo** on.
+
 That's it! Your AI agent can now manage tasks directly. No installation required.
 
 **Try it:** Ask your agent to *"create a task for implementing user authentication"*

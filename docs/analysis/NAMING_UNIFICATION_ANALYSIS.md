@@ -318,3 +318,11 @@ Rationale:
 - Update all internal imports
 - Full consistency: PyPI=ai-todo, import=ai_todo, command=ai-todo
 - Now is the time with low adoption
+
+### Decision 8: Cursor Rules
+
+**Chosen: Update all to `ai-todo`**
+
+- User-installed rules: Update generated rules to use `ai-todo` naming
+- Development rules: Update `.cursorrules` and `.cursor/rules/*.mdc`
+- Full consistency across all Cursor rule files

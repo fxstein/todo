@@ -309,3 +309,12 @@ Rationale:
 - Delete `todo-ai-mcp` entry point
 - Only `ai-todo serve` available for MCP server
 - No legacy aliases to maintain
+
+### Decision 7: Python Package Directory
+
+**Chosen: Rename to `ai_todo/`**
+
+- Rename `todo_ai/` directory to `ai_todo/`
+- Update all internal imports
+- Full consistency: PyPI=ai-todo, import=ai_todo, command=ai-todo
+- Now is the time with low adoption

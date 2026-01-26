@@ -1475,9 +1475,9 @@ init_cursor_rules() {
         return 0
     fi
 
-    # Skip in development repository (has todo_ai/ Python package and pyproject.toml)
+    # Skip in development repository (has ai_todo/ Python package and pyproject.toml)
     # Development repo has manually maintained rules that shouldn't be overwritten
-    if [[ -d "${ROOT_DIR}/todo_ai" ]] && [[ -f "${ROOT_DIR}/pyproject.toml" ]]; then
+    if [[ -d "${ROOT_DIR}/ai_todo" ]] && [[ -f "${ROOT_DIR}/pyproject.toml" ]]; then
         return 0
     fi
 

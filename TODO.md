@@ -25,10 +25,11 @@
     - [ ] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code`
     - [ ] **#219.6.2** Update config.py to use .ai-todo/ paths `#code`
     - [ ] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code`
-  - [ ] **#219.4** Decision: Proceed with rename or keep current naming `#decision`
-  - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation`
-  - [ ] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis`
-  - [ ] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` `#inprogress`
+  - [x] **#219.4** Decision: Proceed with rename or keep current naming `#decision` (2026-01-26)
+  - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation` `#inprogress`
+    > Implementation plan: docs/design/NAMING_IMPLEMENTATION_PLAN.md
+  - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-26)
+  - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-26)
     > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
@@ -1290,9 +1291,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 14:32:40
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 14:37:36

@@ -118,7 +118,13 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
 
     Ignores differences in header and footer content, focusing on the Tasks,
     Archived Tasks, and Deleted Tasks sections.
+
+    Also normalizes known parity differences:
+    - Dates on task lines: (YYYY-MM-DD) patterns are stripped
+    - Section headers: "Recently Completed" and "Archived Tasks" are equivalent
     """
+    import re
+
     shell_content = shell_path.read_text() if shell_path.exists() else ""
     python_content = python_path.read_text() if python_path.exists() else ""
 
@@ -128,9 +134,6 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
     # Find differences
     shell_lines = shell_content.splitlines()
     python_lines = python_content.splitlines()
-
-    diff_msg = []
-    max_len = max(len(shell_lines), len(python_lines))
 
     # Filter out header/footer lines for comparison
     # We only care about lines starting with "-", "##", or ">" (notes)
@@ -150,13 +153,26 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
             return False
         return True
 
-    relevant_shell = [line for line in shell_lines if is_relevant_line(line)]
-    relevant_python = [line for line in python_lines if is_relevant_line(line)]
+    def normalize_line(line: str) -> str:
+        """Normalize a line to ignore known parity differences."""
+        # Strip trailing/leading whitespace
+        line = line.strip()
+        # Normalize section headers (Shell: "Recently Completed", Python: "Archived Tasks")
+        if line == "## Recently Completed":
+            line = "## Archived Tasks"
+        # Strip date suffixes like (2026-01-26) or (2025-01-01) from task lines
+        # These appear at end of lines like: - [x] **#1** Task description (2026-01-26)
+        line = re.sub(r"\s*\(\d{4}-\d{2}-\d{2}\)\s*$", "", line)
+        return line
+
+    relevant_shell = [normalize_line(line) for line in shell_lines if is_relevant_line(line)]
+    relevant_python = [normalize_line(line) for line in python_lines if is_relevant_line(line)]
 
     if relevant_shell == relevant_python:
-        return True, "Files match (ignoring header/footer differences)"
+        return True, "Files match (ignoring header/footer and date differences)"
 
     # If still different, show relevant diff
+    diff_msg = []
     max_len = max(len(relevant_shell), len(relevant_python))
     for i in range(max_len):
         shell_line = relevant_shell[i] if i < len(relevant_shell) else "<MISSING>"

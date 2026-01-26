@@ -26,6 +26,7 @@ To ensure `todo-ai` uses the correct `TODO.md` file for your project, create a `
     "todo-ai": {
       "command": "uvx",
       "args": [
+        "--from", "ai-todo",
         "todo-ai",
         "serve",
         "--root",
@@ -37,7 +38,7 @@ To ensure `todo-ai` uses the correct `TODO.md` file for your project, create a `
 ```
 
 This configuration:
-1. Uses `uvx` to run `todo-ai` without permanent installation (or uses installed version if available).
+1. Uses `uvx` to run `todo-ai` from the `ai-todo` package without permanent installation.
 2. Runs the `serve` command to start the MCP server.
 3. Sets the `--root` to the current workspace folder, ensuring the correct `TODO.md` is used.
 

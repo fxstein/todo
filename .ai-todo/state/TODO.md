@@ -4,26 +4,11 @@
 
 ## Tasks
 
-- [ ] **#233** Programmer jokes collection `#fun` `#joke`
-  - [ ] **#233.10** ['hip', 'hip'] — Sorry, I was just making a hip hop array.
-  - [ ] **#233.9** I would tell you a UDP joke, but you might not get it.
-  - [ ] **#233.8** Why was the JavaScript developer sad? Because he didn't Node how to Express himself.
-  - [ ] **#233.7** How many programmers does it take to change a light bulb? None, that's a hardware problem.
-  - [ ] **#233.6** Why do Java developers wear glasses? Because they don't C#.
-  - [ ] **#233.5** A programmer's wife tells him: 'Buy bread. If they have eggs, buy a dozen.' He comes home with 12 loaves.
-  - [ ] **#233.4** Why did the developer go broke? Because he used up all his cache.
-  - [ ] **#233.3** There are only 10 types of people in the world: those who understand binary and those who don't.
-  - [ ] **#233.2** A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?'
-  - [ ] **#233.1** Why do programmers prefer dark mode? Because light attracts bugs.
-
 - [ ] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix`
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
 
 - [ ] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix`
   > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
-  - [ ] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code`
-  - [ ] **#220.2** Update config.py to use .ai-todo/ paths `#code`
-  - [ ] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code`
 
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
@@ -1194,6 +1179,18 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.10** ['hip', 'hip'] — Sorry, I was just making a hip hop array. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.9** I would tell you a UDP joke, but you might not get it. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.8** Why was the JavaScript developer sad? Because he didn't Node how to Express himself. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.7** How many programmers does it take to change a light bulb? None, that's a hardware problem. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.6** Why do Java developers wear glasses? Because they don't C#. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.5** A programmer's wife tells him: 'Buy bread. If they have eggs, buy a dozen.' He comes home with 12 loaves. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.4** Why did the developer go broke? Because he used up all his cache. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.3** There are only 10 types of people in the world: those who understand binary and those who don't. (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.2** A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?' (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#233.1** Why do programmers prefer dark mode? Because light attracts bugs. (deleted 2026-01-26, expires 2026-02-25)
+- [D] **#233** Programmer jokes collection `#fun` `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#232** ['hip', 'hip'] — Sorry, I was just making a hip hop array. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#231** I would tell you a UDP joke, but you might not get it. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#230** Why was the JavaScript developer sad? Because he didn't Node how to Express himself. `#joke` (deleted 2026-01-26, expires 2026-02-25)
@@ -1204,6 +1201,8 @@
 - [D] **#225** There are only 10 types of people in the world: those who understand binary and those who don't. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#224** A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?' `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#223** Why do programmers prefer dark mode? Because light attracts bugs. `#joke` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#220.2** Update config.py to use .ai-todo/ paths `#code` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (deleted 2026-01-26, expires 2026-02-25)
     > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
@@ -1323,4 +1322,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 16:13:29
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 16:20:32

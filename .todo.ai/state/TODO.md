@@ -11,12 +11,12 @@
   - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
   - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
 
-- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation`
+- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
   - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
   - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
   - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
   - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
-  - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation`
+  - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` `#inprogress`
 
 - [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
@@ -185,13 +185,13 @@
 ---
 
 ## Archived Tasks
-- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
   - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-26)
   - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-26)
   - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-26)
   - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-26)
   - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-26)
 - [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-26)
+- [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
 - [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
   - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
   - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
@@ -1250,4 +1250,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 03:13:42
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:31:26

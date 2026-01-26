@@ -29,7 +29,7 @@ No permanent installation needed. Add this to your project's `.cursor/mcp.json`:
   "mcpServers": {
     "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
+      "args": ["ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }

@@ -15,7 +15,7 @@ Add this to your project's `.cursor/mcp.json`:
   "mcpServers": {
     "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
+      "args": ["ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }
@@ -53,7 +53,7 @@ For AI agent integration via Cursor or similar IDEs. Uses `uvx` to run on-demand
   "mcpServers": {
     "ai-todo": {
       "command": "uvx",
-      "args": ["--from", "ai-todo", "ai-todo", "serve", "--root", "${workspaceFolder}"]
+      "args": ["ai-todo", "serve", "--root", "${workspaceFolder}"]
     }
   }
 }

@@ -15,7 +15,7 @@
   - [ ] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5`
   - [ ] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4`
   - [ ] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3`
-  - [ ] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2`
+  - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-26)
   - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-26)
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
@@ -48,7 +48,7 @@
   - [ ] **#234.2** Inventory current CLI commands (list all available commands)
   - [ ] **#234.1** Inventory current MCP tools (list all available tools)
 
-- [ ] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix`
+- [x] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix` (2026-01-26)
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
 
 - [x] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix` (2026-01-26)
@@ -1373,14 +1373,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 21:01:18
+**ai-todo** | Last Updated: 2026-01-26 21:05:26

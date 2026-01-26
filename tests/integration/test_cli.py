@@ -232,6 +232,22 @@ def test_show_command(isolated_cli):
     assert "Task to show" in result.output
 
 
+def test_show_command_deleted_task_displays_d(isolated_cli):
+    """Test show command displays [D] for deleted tasks (task#222 fix)."""
+    # Create parent with subtasks
+    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Child task"])
+
+    # Delete the subtask only
+    isolated_cli.invoke(cli, ["delete", "1.1", "--no-subtasks"])
+
+    # Show the parent - should display subtask with [D] not [x]
+    result = isolated_cli.invoke(cli, ["show", "1"])
+    assert result.exit_code == 0
+    assert "[D]" in result.output  # Deleted subtask should show [D]
+    assert "[ ]" in result.output  # Parent should still be pending [ ]
+
+
 def test_relate_command(isolated_cli):
     """Test relate command."""
     isolated_cli.invoke(cli, ["add", "Task 1"])

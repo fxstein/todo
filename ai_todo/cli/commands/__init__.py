@@ -589,6 +589,16 @@ def update_note_command(task_id: str, new_note_text: str, todo_path: str = "TODO
         print(f"Error: {e}")
 
 
+def _get_checkbox(status_value: str) -> str:
+    """Get the appropriate checkbox for a task status."""
+    if status_value == "pending":
+        return "[ ]"
+    elif status_value == "deleted":
+        return "[D]"
+    else:  # completed, archived
+        return "[x]"
+
+
 def show_command(task_id: str, todo_path: str = "TODO.md"):
     """Display task with subtasks, relationships, and notes."""
     file_ops = FileOps(todo_path)
@@ -601,7 +611,7 @@ def show_command(task_id: str, todo_path: str = "TODO.md"):
         return
 
     # Display task line
-    checkbox = "[x]" if task.status.value != "pending" else "[ ]"
+    checkbox = _get_checkbox(task.status.value)
     indent = "  " * (task.id.count("."))
     tag_str = " ".join([f"`#{tag}`" for tag in sorted(task.tags)]) if task.tags else ""
     description = task.description
@@ -617,7 +627,7 @@ def show_command(task_id: str, todo_path: str = "TODO.md"):
     subtasks = manager.get_subtasks(task_id)
     if subtasks:
         for subtask in sorted(subtasks, key=lambda t: t.id):
-            sub_checkbox = "[x]" if subtask.status.value != "pending" else "[ ]"
+            sub_checkbox = _get_checkbox(subtask.status.value)
             sub_indent = "  " * (subtask.id.count("."))
             sub_tag_str = (
                 " ".join([f"`#{tag}`" for tag in sorted(subtask.tags)]) if subtask.tags else ""

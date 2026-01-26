@@ -189,9 +189,9 @@ def test_archive_cooldown_blocks_immediate_archive(isolated_cli):
 
     # Try to archive immediately - should be blocked by cooldown
     result = isolated_cli.invoke(cli, ["archive", "1"])
-    assert "cooldown protection" in result.output or "Wait" in result.output
-    # Should NOT have archived the task
-    assert "Archived 1 task(s)" not in result.output
+    assert "requires human review" in result.output
+    # Should NOT have archived any tasks
+    assert "Archived" not in result.output
 
 
 def test_archive_cooldown_allows_single_task(isolated_cli):

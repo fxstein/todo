@@ -417,32 +417,30 @@ def archive_command(
     config = Config(str(config_path))
     cooldown_seconds = config.get("safety.archive_cooldown_seconds", 60)
 
+    # Check cooldown for root tasks with subtasks BEFORE any archiving
+    for task_id in task_ids:
+        if "." in task_id:
+            continue  # Skip subtasks in cooldown check
+        task = manager.get_task(task_id)
+        if not task or not task.completed_at or cooldown_seconds <= 0:
+            continue
+        # Check if task has subtasks
+        subtask_ids = [t.id for t in manager.list_tasks() if t.id.startswith(f"{task_id}.")]
+        if not subtask_ids:
+            continue
+        # This is a root task with subtasks - check cooldown
+        elapsed = (datetime.now() - task.completed_at).total_seconds()
+        if elapsed < cooldown_seconds:
+            print(f"Task #{task_id} requires human review before archiving.")
+            return
+
     # Expand task IDs (with subtasks by default)
     expanded_ids = expand_task_ids(task_ids, with_subtasks, todo_path)
 
     archived_count = 0
-    skipped_cooldown = []
-
     # Process in reverse order so parent ends up on top (newest) in Archived Tasks
     for task_id in reversed(expanded_ids):
         try:
-            task = manager.get_task(task_id)
-            if not task:
-                print(f"Error: Task {task_id} not found")
-                continue
-
-            # Check cooldown for root tasks (tasks with subtasks)
-            if "." not in task_id and task.completed_at and cooldown_seconds > 0:
-                # Check if task has subtasks
-                subtask_ids = [t.id for t in manager.list_tasks() if t.id.startswith(f"{task_id}.")]
-                if subtask_ids:
-                    # This is a root task with subtasks - check cooldown
-                    elapsed = (datetime.now() - task.completed_at).total_seconds()
-                    if elapsed < cooldown_seconds:
-                        remaining = int(cooldown_seconds - elapsed)
-                        skipped_cooldown.append((task_id, remaining))
-                        continue
-
             task = manager.archive_task(task_id)
             if task and reason:
                 # Add reason as note
@@ -451,13 +449,6 @@ def archive_command(
                 archived_count += 1
         except ValueError as e:
             print(f"Error: {e}")
-
-    if skipped_cooldown:
-        for task_id, remaining in skipped_cooldown:
-            print(
-                f"⏳ Task #{task_id} completed less than {cooldown_seconds}s ago. "
-                f"Wait {remaining}s before archiving (cooldown protection)."
-            )
 
     if archived_count > 0:
         save_changes(manager, todo_path)

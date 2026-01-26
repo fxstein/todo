@@ -1,0 +1,45 @@
+---
+description: "Rules for interacting with todo.ai via MCP"
+alwaysApply: true
+---
+# todo.ai Interaction Rules
+
+**CRITICAL: MCP-FIRST WORKFLOW**
+
+1.  **ALWAYS** use the **MCP Server** (`project-0-todo.ai-todo-ai`) for all todo.ai operations.
+2.  **NEVER** use the shell script (`./todo.ai`) or Python CLI (`todo-ai`) unless explicitly instructed to test the CLI itself.
+3.  **NEVER** edit `TODO.md` manually. The file is protected by a tamper detection system.
+
+## Task Management
+
+Use these MCP tools for all task operations:
+
+-   **Add Task:** `add_task(description, tags)`
+-   **Add Subtask:** `add_subtask(parent_id, description, tags)`
+-   **List Tasks:** `list_tasks(status, tag)`
+-   **Complete:** `complete_task(task_id)`
+-   **Update:** `modify_task(task_id, description, tags)`
+-   **Delete:** `delete_task(task_id)` (Soft delete)
+-   **Archive:** `archive_task(task_id)` (Move to Archived)
+-   **Restore:** `restore_task(task_id)` (From Deleted/Archived)
+
+## Notes
+
+-   **Add Note:** `add_note(task_id, note_text)`
+-   **Update Note:** `update_note(task_id, new_note_text)`
+-   **Delete Note:** `delete_note(task_id)`
+
+**Note Guidelines:**
+-   Use notes for implementation details, dependencies, or technical decisions.
+-   ❌ Do NOT use notes for status updates (e.g., "Done"). Use `complete_task` instead.
+-   ❌ Do NOT duplicate subtask info in notes.
+
+
+## Tamper Detection
+
+If you trigger a `TamperError` (e.g., "TAMPER DETECTED: TODO.md has been modified externally"):
+
+1.  **STOP IMMEDIATELY.** Do NOT try to force the command or bypass the error.
+2.  **INFORM THE USER.** Explain that `TODO.md` has been modified externally and ask for instructions.
+3.  **WAIT FOR APPROVAL.** Only use `accept_tamper(reason)` if the user explicitly authorizes it.
+4.  **Reason:** Provide a clear, user-approved reason for accepting the external change (e.g., "User authorized sync after git pull").

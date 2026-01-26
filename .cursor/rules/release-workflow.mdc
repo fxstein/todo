@@ -1,0 +1,63 @@
+---
+description: "Release workflow and decision rules for todo.ai"
+alwaysApply: true
+---
+# Release Workflow
+
+**CRITICAL: Follow this decision tree exactly for all releases.**
+
+## When User Says "Prepare Release" or "Release todo.ai"
+
+### Step 1: Check CI/CD Status (MANDATORY)
+
+```bash
+./scripts/wait-for-ci.sh
+```
+
+-   **If fails:** STOP. Tell user to fix CI/CD first. DO NOT proceed.
+-   **If passes:** Continue to Step 2.
+
+### Step 2: Determine Version Bump Type
+
+Analyze commits since last release to determine: MAJOR, MINOR, or PATCH.
+
+### Step 3: Apply Release Rules
+
+**For MAJOR bumps (e.g., 2.0.0 → 3.0.0):**
+1.  Check if beta exists: `gh release list | grep "v3.0.0b"`
+2.  **If no beta:** STOP. Must create beta first (`--prepare --beta`).
+3.  **If beta exists:** Check age (>= 7 days recommended).
+
+**For MINOR bumps (e.g., 2.0.0 → 2.1.0):**
+-   Ask user: Beta first (safer) or Stable directly?
+
+**For PATCH bumps (e.g., 2.0.0 → 2.0.1):**
+-   Proceed directly to stable.
+
+### Step 4: Prepare & Preview
+
+```bash
+./release/release.sh --prepare [--beta] [--summary release/AI_RELEASE_SUMMARY.md]
+```
+
+1.  **AI Summary:** Generate 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
+2.  **Run Prepare:** Execute the command.
+3.  **STOP & WAIT:** Show the preview. Ask user to confirm "execute release".
+
+### Step 5: Execute
+
+```bash
+./release/release.sh --execute
+```
+
+## Error Handling
+
+**If ANY error occurs:**
+1.  **STOP IMMEDIATELY.**
+2.  **Report error.**
+3.  **WAIT FOR USER.** Do not attempt auto-recovery.
+
+## Forbidden Actions
+-   ❌ Never auto-execute after prepare.
+-   ❌ Never bypass CI/CD failures.
+-   ❌ **NEVER use `--no-verify` on git commits.**

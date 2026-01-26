@@ -334,4 +334,4 @@ Rationale:
 - Full consistency with new naming
 - Requires migration logic for existing users
 - On first run, detect `.todo.ai/` and migrate to `.ai-todo/`
-- See task#219.5 for implementation details
+- See task#219.6 for implementation details

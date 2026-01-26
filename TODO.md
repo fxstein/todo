@@ -4,10 +4,20 @@
 
 ## Tasks
 
+  - [ ] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code`
+  - [ ] **#220.2** Update config.py to use .ai-todo/ paths `#code`
+  - [ ] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code`
+
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
-  - [ ] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration`
-    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
+  - [ ] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration`
+    - [ ] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing`
+    - [ ] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code`
+    - [ ] **#219.6.5** Add migration logging and user notification `#code` `#ux`
+    - [ ] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration`
+    - [ ] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code`
+    - [ ] **#219.6.2** Update config.py to use .ai-todo/ paths `#code`
+    - [ ] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code`
   - [ ] **#219.4** Decision: Proceed with rename or keep current naming `#decision`
   - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation`
   - [ ] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis`
@@ -1164,6 +1174,9 @@
 ---
 
 ## Deleted Tasks
+- [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (deleted 2026-01-26, expires 2026-02-25)
+    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
   - [D] **#215.10** !false (It's funny because it's true). (deleted 2026-01-26, expires 2026-02-25)
     > Explanation: The exclamation mark '!' is the logical NOT operator in many programming languages. Therefore, '!false' reads as 'NOT false', which evaluates to 'true'.
   - [D] **#215.9** 0 is false and 1 is true, right? 1. (deleted 2026-01-26, expires 2026-02-25)
@@ -1275,4 +1288,4 @@
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:49:35
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:55:04

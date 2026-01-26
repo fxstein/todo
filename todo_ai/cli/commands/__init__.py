@@ -223,9 +223,9 @@ def add_subtask_command(
         if not parent:
             raise ValueError(f"Parent task {parent_id} not found")
 
-        # Check nesting depth
-        if parent.id.count(".") >= 1:
-            raise ValueError("Maximum nesting depth is 2 levels (task.subtask)")
+        # Check nesting depth (allow 3 levels: task → subtask → sub-subtask)
+        if parent.id.count(".") >= 2:
+            raise ValueError("Maximum nesting depth is 3 levels (task.subtask.sub-subtask)")
 
         config_path = Path(todo_path).parent / ".todo.ai" / "config.yaml"
         config = Config(str(config_path))

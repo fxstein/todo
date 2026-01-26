@@ -2,7 +2,7 @@
 
 ## Major Naming Unification
 
-This release completes a comprehensive rename from `todo.ai` to `ai-todo` across the entire project. The unified naming eliminates confusion between the various component names (repository, PyPI package, CLI command) by standardizing on `ai-todo` everywhere.
+This release completes a comprehensive rename from `todo.ai` to `ai-todo` across the entire project. The unified naming eliminates confusion between the various component names by standardizing on `ai-todo` everywhere: CLI command, PyPI package, GitHub repository, and data directory.
 
 **Key changes:**
 - **CLI command:** `todo-ai` → `ai-todo`
@@ -11,10 +11,11 @@ This release completes a comprehensive rename from `todo.ai` to `ai-todo` across
 - **GitHub repository:** Renamed to `ai-todo`
 - **Shell scripts:** Moved to `legacy/` directory (deprecated)
 
-The migration is transparent for existing users - the tool automatically detects and migrates old `.todo.ai/` directories to the new `.ai-todo/` format on first run.
+The migration is fully transparent - the tool automatically detects and migrates old `.todo.ai/` directories to `.ai-todo/` on first run.
 
 ## Additional Improvements
 
 - **3-level task nesting:** Tasks can now have sub-subtasks (e.g., #1.2.3)
-- **Cursor rules enhancement:** Added guidance for "task list" (hierarchical) vs "tasks" (flat) terminology
-- **Documentation overhaul:** All user-facing docs updated with MCP-first approach and new naming
+- **Simplified MCP configuration:** `uvx` config no longer requires redundant `--from` flag
+- **Test isolation:** Shell tests now properly isolated to prevent pollution of project root
+- **Documentation overhaul:** All docs updated with MCP-first approach and simplified examples

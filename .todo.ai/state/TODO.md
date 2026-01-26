@@ -13,10 +13,11 @@
 
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
   > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
-  - [ ] **#203.5** Review and refine additional documentation requirements `#documentation` `#review`
-  - [ ] **#203.4** Document Next-Gen System Installation (uv/pipx/pip) and matching MCP config `#documentation` `#mcp` `#python`
-  - [ ] **#203.3** Document Next-Gen Zero-Install MCP setup (uvx) `#documentation` `#mcp` `#uvx`
-  - [ ] **#203.2** Document Legacy installation (Shell script) `#documentation` `#legacy`
+  - [ ] **#203.5** Final review and publish README.md changes `#release` `#review`
+  - [ ] **#203.4** Test all installation paths (uvx MCP, uv CLI, shell script) `#testing`
+  - [ ] **#203.3** Implement new README.md with MCP-first structure `#implementation`
+    > IMPORTANT: Do not push README.md changes until finalized or explicitly testing live. Keep changes local during development.
+  - [ ] **#203.2** Create docs/FAQ.md with 'Why not GitHub Issues?' content `#documentation` `#faq`
   - [ ] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` `#inprogress`
     > Design document: docs/design/README_REDESIGN_V3.md
 
@@ -1252,4 +1253,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:42:47
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 10:53:41

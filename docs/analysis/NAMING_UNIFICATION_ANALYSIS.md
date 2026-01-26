@@ -326,3 +326,12 @@ Rationale:
 - User-installed rules: Update generated rules to use `ai-todo` naming
 - Development rules: Update `.cursorrules` and `.cursor/rules/*.mdc`
 - Full consistency across all Cursor rule files
+
+### Decision 9: Data Directory
+
+**Chosen: Rename `.todo.ai/` to `.ai-todo/`**
+
+- Full consistency with new naming
+- Requires migration logic for existing users
+- On first run, detect `.todo.ai/` and migrate to `.ai-todo/`
+- See task#219.5 for implementation details

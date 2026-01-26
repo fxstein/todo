@@ -6,6 +6,8 @@
 
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
+  - [ ] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration`
+    > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
   - [ ] **#219.4** Decision: Proceed with rename or keep current naming `#decision`
   - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation`
   - [ ] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis`
@@ -1273,4 +1275,4 @@
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:33:36
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:49:35

@@ -54,7 +54,7 @@ def update_command() -> None:
     print("  uv pip install --upgrade todo-ai")
     print("")
     print("For shell script installations, visit:")
-    print("  https://github.com/fxstein/todo.ai")
+    print("  https://github.com/fxstein/ai-todo")
 
 
 def list_backups_command(todo_path: str = "TODO.md") -> None:

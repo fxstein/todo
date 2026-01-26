@@ -34,10 +34,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/fxstein/todo.ai"
-Documentation = "https://github.com/fxstein/todo.ai/tree/main/docs"
-Repository = "https://github.com/fxstein/todo.ai.git"
-Issues = "https://github.com/fxstein/todo.ai/issues"
+Homepage = "https://github.com/fxstein/ai-todo"
+Documentation = "https://github.com/fxstein/ai-todo/tree/main/docs"
+Repository = "https://github.com/fxstein/ai-todo.git"
+Issues = "https://github.com/fxstein/ai-todo/issues"
 
 [project.scripts]
 ai-todo = "ai_todo.cli.main:cli"

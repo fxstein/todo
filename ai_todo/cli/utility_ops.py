@@ -10,8 +10,8 @@ from ai_todo import __version__
 
 def version_command() -> None:
     """Show version information."""
-    print(f"todo.ai version {__version__}")
-    print("Repository: https://github.com/fxstein/todo.ai")
+    print(f"ai-todo version {__version__}")
+    print("Repository: https://github.com/fxstein/ai-todo")
     print("Update: pip install --upgrade todo-ai")
 
 

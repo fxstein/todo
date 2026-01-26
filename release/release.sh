@@ -821,6 +821,11 @@ generate_release_notes() {
             continue
         fi
 
+        # Escape file paths containing underscores by wrapping in backticks
+        # This prevents markdown lint from interpreting __init__.py as bold text
+        # Pattern: word/word.ext or word/__word__.ext -> `word/word.ext` or `word/__word__.ext`
+        message=$(echo "$message" | sed -E 's|([a-zA-Z0-9_-]+/[a-zA-Z0-9_.-]+)|`\1`|g')
+
         # Create commit link
         local commit_link="([${hash:0:7}](${repo_url}/commit/${hash}))"
 

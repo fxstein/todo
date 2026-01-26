@@ -106,3 +106,8 @@ strict_optional = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = false
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.5.0",
+]

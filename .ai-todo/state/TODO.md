@@ -4,7 +4,30 @@
 
 ## Tasks
 
-- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md) `#enhancement` `#v3.1`
+- [ ] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release`
+  - [ ] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12`
+  - [ ] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11`
+  - [ ] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10`
+  - [ ] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9`
+  - [ ] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8`
+  - [ ] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7`
+  - [ ] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6`
+  - [ ] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5`
+  - [ ] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4`
+  - [ ] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3`
+  - [ ] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2`
+  - [ ] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1`
+
+- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
+  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
+  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
+  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
+  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
+  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
+  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
+  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
+
+- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
 
 - [ ] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor`
   - [ ] **#235.8** Test updated rules with fresh install
@@ -1205,6 +1228,18 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#237.12** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#design` `#safety` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.11** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#mcp` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.10** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#mcp` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.9** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#cursor-rules` `#polish` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.8** POLISH: Complete unified naming migration (task#219) `#naming` `#polish` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.7** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234)  `#v3.0` `#polish` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.6** POLISH: Review and optimize embedded Cursor rules (task#235)  `#v3.0` `#polish` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.5** BUG: Fix show_task displaying deleted tasks incorrectly (task#222) `#bug` `#high` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.4** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#high` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.3** CRITICAL: Final review and publish README.md (task#203.9) `#critical` `#documentation` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.2** CRITICAL: Complete release phase for Python refactor (task#163.52) `#critical` `#release` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#237.1** CRITICAL: Complete stable release phase (task#172.5) `#critical` `#release` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.10** ['hip', 'hip'] — Sorry, I was just making a hip hop array. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.9** I would tell you a UDP joke, but you might not get it. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.8** Why was the JavaScript developer sad? Because he didn't Node how to Express himself. (deleted 2026-01-26, expires 2026-02-25)
@@ -1343,4 +1378,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 20:30:04
+**ai-todo** | Last Updated: 2026-01-26 20:58:35

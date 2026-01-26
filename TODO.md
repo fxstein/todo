@@ -4,6 +4,13 @@
 
 ## Tasks
 
+- [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming`
+  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
+  - [ ] **#219.4** Decision: Proceed with rename or keep current naming `#decision`
+  - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation`
+  - [ ] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis`
+  - [ ] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation`
+
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
@@ -13,6 +20,7 @@
 
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
   > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
+  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
   - [ ] **#203.9** Final review and publish README.md changes `#release` `#review`
   - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
   - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
@@ -1258,4 +1266,15 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 12:16:05
+
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
+<!-- TASK RELATIONSHIPS
+203:depends-on:219
+-->
+
+---
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:28:57

@@ -8,7 +8,7 @@
 
 The todo.ai project suffers from naming fragmentation across platforms, creating confusion for users and documentation complexity. This analysis evaluates the current state, identifies pain points, and proposes options for unification.
 
-**Recommendation:** Unify to `ai-todo` across all platforms to match PyPI and eliminate confusion.
+**Decision:** Unify to `ai-todo` across all platforms. Deprecate shell script (move to `legacy/`, do not rename).
 
 ---
 
@@ -254,9 +254,11 @@ Would be simpler as:
 
 ---
 
-## Recommendation
+## Decisions
 
-**Proceed with Option A: Unify to `ai-todo`**
+### Decision 1: Unified Name
+
+**Chosen: Option A — `ai-todo`**
 
 Rationale:
 1. PyPI name is immutable — we must align to it
@@ -265,3 +267,12 @@ Rationale:
 4. Simplifies uvx usage significantly
 5. Reduces documentation complexity
 6. Now is the best time (before more adoption)
+
+### Decision 2: Shell Script Handling
+
+**Chosen: Deprecate and relocate (do not rename)**
+
+- Move `todo.ai` and `todo.bash` to `legacy/` directory
+- Keep original filenames for users who still need them
+- Mark as deprecated in documentation
+- Remove from repository root to reduce confusion

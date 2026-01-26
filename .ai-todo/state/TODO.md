@@ -4,6 +4,25 @@
 
 ## Tasks
 
+- [ ] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor`
+  - [ ] **#235.8** Test updated rules with fresh install
+  - [ ] **#235.7** Simplify/consolidate rules (remove redundancy)
+  - [ ] **#235.6** Update rules for ai-todo naming conventions
+  - [ ] **#235.5** Update rules to prioritize MCP tools over CLI commands
+  - [ ] **#235.4** Identify rules that are obsolete (shell-specific, pre-MCP)
+  - [ ] **#235.3** Compare embedded rules vs .cursor/rules in this repo
+  - [ ] **#235.2** Inventory legacy shell script rules (todo.ai-*.mdc templates)
+  - [ ] **#235.1** Inventory embedded rules in Python code (init_cursor_rules)
+
+- [ ] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor`
+  - [ ] **#234.7** Document recommendations for removals/additions
+  - [ ] **#234.6** Review tool naming consistency (ai-todo conventions)
+  - [ ] **#234.5** Identify missing MCP tools that should exist
+  - [ ] **#234.4** Identify deprecated/obsolete tools (shell-specific, legacy)
+  - [ ] **#234.3** Compare MCP tools vs CLI commands for parity
+  - [ ] **#234.2** Inventory current CLI commands (list all available commands)
+  - [ ] **#234.1** Inventory current MCP tools (list all available tools)
+
 - [ ] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix`
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
 
@@ -12,6 +31,11 @@
 
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
+  - [ ] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification`
+  - [ ] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation`
+  - [ ] **#219.11** Cleanup: Update test fixtures (GitHub URLs fxstein/todo.ai → ai-todo) `#cleanup` `#testing`
+  - [ ] **#219.10** Cleanup: Update ai_todo/ source code (pip commands, FastMCP name, tamper hints) `#cleanup` `#code`
+  - [x] **#219.9** Post-migration audit: Document remaining old naming references `#audit` `#documentation` (2026-01-26)
   - [x] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` (2026-01-26)
     > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
   - [x] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration` (2026-01-26)
@@ -1179,7 +1203,6 @@
 ---
 
 ## Deleted Tasks
-  - [D] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.10** ['hip', 'hip'] — Sorry, I was just making a hip hop array. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.9** I would tell you a UDP joke, but you might not get it. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.8** Why was the JavaScript developer sad? Because he didn't Node how to Express himself. (deleted 2026-01-26, expires 2026-02-25)
@@ -1201,6 +1224,7 @@
 - [D] **#225** There are only 10 types of people in the world: those who understand binary and those who don't. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#224** A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?' `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#223** Why do programmers prefer dark mode? Because light attracts bugs. `#joke` (deleted 2026-01-26, expires 2026-02-25)
+  - [D] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#220.2** Update config.py to use .ai-todo/ paths `#code` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
@@ -1312,14 +1336,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 16:20:32
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 19:46:42

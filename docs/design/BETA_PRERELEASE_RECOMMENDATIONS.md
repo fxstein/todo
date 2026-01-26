@@ -269,8 +269,8 @@ pipx install --pre todo-ai        # Beta
 
 **Using pip:**
 ```bash
-pip install todo-ai               # Stable
-pip install --pre todo-ai         # Beta
+pip install ai-todo               # Stable
+pip install --pre ai-todo         # Beta
 ```
 </details>
 

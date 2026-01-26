@@ -13,11 +13,11 @@ MCP servers communicate via a transport layer. The most common for local tools i
 - **stdio (Standard Input/Output):**
   - Default for local integration (Cursor, Claude Desktop).
   - No specific arguments needed usually, but some servers allow explicit selection.
-  - **Recommendation:** Default to `stdio` when running `todo-ai serve`.
+  - **Recommendation:** Default to `stdio` when running `ai-todo serve`.
 
 - **SSE (Server-Sent Events):**
   - Used for remote or HTTP-based servers.
-  - **Decision:** We will **NOT** support SSE for the foreseeable future. `todo-ai` is a local developer tool that requires direct access to the local filesystem (`TODO.md`). A remote server implementation would complicate file access and is out of scope.
+  - **Decision:** We will **NOT** support SSE for the foreseeable future. `ai-todo` is a local developer tool that requires direct access to the local filesystem (`TODO.md`). A remote server implementation would complicate file access and is out of scope.
   - **Recommendation:** Stick strictly to `stdio` transport.
 
 ### 2. Logging and Debugging
@@ -30,15 +30,15 @@ Debugging MCP servers can be difficult since stdout is used for protocol communi
   - **Critical:** Ensure logs do NOT pollute stdout, as that breaks the JSON-RPC protocol.
 
 ### 3. Root/Context Configuration
-This is the primary requirement for `todo-ai`.
+This is the primary requirement for `ai-todo`.
 
 - **Root Directory:** `--root <path>`
   - Specifies the workspace or repository root.
-  - For `todo-ai`, this determines where `TODO.md` is located.
+  - For `ai-todo`, this determines where `TODO.md` is located.
   - Should default to current working directory (`CWD`) if not specified.
 
 ### 4. File Path Overrides
-Specific to `todo-ai`, we might want to override the filename itself.
+Specific to `ai-todo`, we might want to override the filename itself.
 
 - **Todo File:** `--todo-file <filename>`
   - Defaults to `TODO.md`.
@@ -46,10 +46,10 @@ Specific to `todo-ai`, we might want to override the filename itself.
 
 ## Proposed `serve` Command Interface
 
-Based on the investigation, the `todo-ai serve` command should support the following signature:
+Based on the investigation, the `ai-todo serve` command should support the following signature:
 
 ```bash
-todo-ai serve [OPTIONS]
+ai-todo serve [OPTIONS]
 ```
 
 ### Options:
@@ -76,4 +76,4 @@ todo-ai serve [OPTIONS]
 The current `todo-ai-mcp` entry point (`todo_ai/mcp/__main__.py`) takes no arguments and hardcodes the path. The new `serve` command will replace this with a flexible, configurable entry point.
 
 ## Conclusion
-We should implement `todo-ai serve` with support for `--root`, `--todo-file`, and logging options. This aligns with MCP best practices and solves the portability issues identified in Task #191.
+We should implement `ai-todo serve` with support for `--root`, `--todo-file`, and logging options. This aligns with MCP best practices and solves the portability issues identified in Task #191.

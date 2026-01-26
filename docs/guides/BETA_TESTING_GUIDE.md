@@ -57,14 +57,14 @@ Test the basic commands you use most:
 
 ```bash
 # Task management
-todo-ai add "Test task" "#test"
-todo-ai list
-todo-ai complete 1
+ai-todo add "Test task" "#test"
+ai-todo list
+ai-todo complete 1
 todo-ai archive 1
 
 # Subtasks
-todo-ai add-subtask 1 "Test subtask" "#test"
-todo-ai complete 1.1
+ai-todo add-subtask 1 "Test subtask" "#test"
+ai-todo complete 1.1
 ```
 
 ### 2. Your Platform
@@ -147,8 +147,8 @@ If you prefer, create a GitHub Issue manually:
 **Python:** 3.12.0
 
 **Steps to reproduce:**
-1. Run: todo-ai add "Test task"
-2. Run: todo-ai complete 1
+1. Run: ai-todo add "Test task"
+2. Run: ai-todo complete 1
 3. Error occurs
 
 **Expected:** Task marked as completed

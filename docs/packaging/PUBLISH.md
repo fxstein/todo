@@ -35,7 +35,7 @@ python3 -m twine upload --repository testpypi dist/*
 
 You can then test installation:
 ```bash
-pip install --index-url https://test.pypi.org/simple/ --no-deps todo-ai
+pip install --index-url https://test.pypi.org/simple/ --no-deps ai-todo
 ```
 
 ### Production PyPI

@@ -492,13 +492,13 @@ if __name__ == '__main__':
 ### CLI Compatibility
 
 **Maintain Existing Syntax:**
-- `todo.ai add "description"` → `todo-ai add "description"`
-- `todo.ai complete 42` → `todo-ai complete 42`
-- `todo.ai list` → `todo-ai list`
+- `todo.ai add "description"` → `ai-todo add "description"`
+- `todo.ai complete 42` → `ai-todo complete 42`
+- `todo.ai list` → `ai-todo list`
 - All existing commands work identically
 
 **Entry Point:**
-- After pipx installation: `todo-ai` command available system-wide
+- After pipx installation: `ai-todo` command available system-wide
 - Maintains backward compatibility with existing workflows
 
 ---
@@ -555,7 +555,7 @@ pipx install todo-ai
 ```
 
 **After Installation:**
-- `todo-ai` command available system-wide (CLI)
+- `ai-todo` command available system-wide (CLI)
 - `todo-ai-mcp` command available (MCP server)
 - Both use same core logic
 
@@ -647,7 +647,7 @@ def migrate_from_shell():
 
 **User Instructions:**
 1. Install Python version: `pipx install todo-ai`
-2. Test with existing data: `todo-ai list`
+2. Test with existing data: `ai-todo list`
 3. Verify all commands work
 4. Optionally remove shell version
 

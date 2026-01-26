@@ -156,8 +156,8 @@ uv tool install ai-todo
 pipx install ai-todo
 \`\`\`
 
-**CLI Usage:** `todo-ai [command]` (e.g., `todo-ai add "My task"`)
-**MCP Server:** `todo-ai serve` (for Cursor integration)
+**CLI Usage:** `ai-todo [command]` (e.g., `ai-todo add "My task"`)
+**MCP Server:** `ai-todo serve` (for Cursor integration)
 
 ### Option C: Legacy Shell Script
 
@@ -254,7 +254,7 @@ Apache License 2.0 - See [LICENSE](LICENSE)
 
 For existing users:
 
-1. **Shell → CLI**: `uv tool install ai-todo`, replace `./todo.ai` with `todo-ai`
+1. **Shell → CLI**: `uv tool install ai-todo`, replace `./todo.ai` with `ai-todo`
 2. **CLI → MCP**: Add `.cursor/mcp.json` config, agents use MCP automatically
 3. **Shell → MCP**: Install uv, add `.cursor/mcp.json` config
 

@@ -8,7 +8,7 @@ todo.ai includes a simple **Tamper Detection System** to ensure the integrity of
 
 ## How It Works
 
-The system maintains a cryptographic checksum (SHA-256) of your `TODO.md` file. Every time you use a valid `todo-ai` command (CLI or MCP), this checksum is updated.
+The system maintains a cryptographic checksum (SHA-256) of your `TODO.md` file. Every time you use a valid `ai-todo` command (CLI or MCP), this checksum is updated.
 
 If you (or an external tool) edit `TODO.md` manually:
 1. The system detects that the file content does not match the stored checksum.
@@ -30,7 +30,7 @@ security:
 - **Log Entry:** `TAMPER_DETECTED` (with auto-accept).
 
 ### Active Mode (`true`) - Strict
-- **Behavior:** Detects tampering and **blocks** all `todo-ai` commands until resolved.
+- **Behavior:** Detects tampering and **blocks** all `ai-todo` commands until resolved.
 - **Use Case:** Essential for multi-user environments, automated pipelines, or when using AI agents to prevent them from hallucinating edits.
 - **Error Message:**
   ```text
@@ -47,7 +47,7 @@ If you are in **Active Mode** and trigger a tamper alert, you must explicitly re
 See exactly what changed between the last valid state and the current file:
 
 ```bash
-todo-ai tamper diff
+ai-todo tamper diff
 ```
 
 This shows a color-coded diff comparing the **Shadow Copy** (last known valid state) vs. the **Current File** (tampered).
@@ -56,7 +56,7 @@ This shows a color-coded diff comparing the **Shadow Copy** (last known valid st
 If the manual edits were intentional, you can accept them. This updates the checksum to match the current file and logs the event.
 
 ```bash
-todo-ai tamper accept "Fixed typo manually"
+ai-todo tamper accept "Fixed typo manually"
 ```
 
 **Note:** Accepting changes creates a forensic backup in `.todo.ai/tamper/<timestamp>/` containing both the original and forced versions.

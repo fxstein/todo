@@ -1,10 +1,10 @@
 # Unified Executable Architecture Design
 
 ## Overview
-This document outlines the architecture for combining the `todo-ai` CLI and `todo-ai-mcp` server into a single executable. This unification simplifies distribution, installation, and usage while providing a cleaner developer experience. This design supports Task #192.2.
+This document outlines the architecture for combining the `ai-todo` CLI and `todo-ai-mcp` server into a single executable. This unification simplifies distribution, installation, and usage while providing a cleaner developer experience. This design supports Task #192.2.
 
 ## Goals
-1. **Single Entry Point:** Users install and run one command (`todo-ai`).
+1. **Single Entry Point:** Users install and run one command (`ai-todo`).
 2. **Unified Codebase:** Shared logic for argument parsing and configuration.
 3. **Backward Compatibility:** Maintain existing CLI commands (`add`, `list`, etc.).
 4. **MCP Integration:** Expose the MCP server via a `serve` subcommand.
@@ -13,7 +13,7 @@ This document outlines the architecture for combining the `todo-ai` CLI and `tod
 ## Architecture
 
 ### 1. Command Structure
-The `todo-ai` command will serve as the unified entry point.
+The `ai-todo` command will serve as the unified entry point.
 
 ```
 todo-ai [GLOBAL_OPTIONS] [COMMAND] [ARGS]
@@ -124,8 +124,8 @@ todo-ai = "todo_ai.cli.main:cli"
 2. **Rewrite `server.py`:** Re-implement the server using FastMCP decorators.
 3. **Refactor `main.py`:** Add `--root` global option handling.
 4. **Implement `serve` command:** Add the command to `main.py` to run the FastMCP server.
-5. **Update `mcp.json`:** Update documentation and examples to use `todo-ai serve`.
-6. **Tests:** Add integration tests for `todo-ai serve` and `--root` behavior.
+5. **Update `mcp.json`:** Update documentation and examples to use `ai-todo serve`.
+6. **Tests:** Add integration tests for `ai-todo serve` and `--root` behavior.
 
 ## Migration for Users
 No user migration required as there are no active users of the MCP server yet.

@@ -222,6 +222,23 @@ def test_update_note_command(isolated_cli):
     assert "Updated notes" in result.output and "#1" in result.output
 
 
+# Progress Commands
+def test_get_active_tasks_command(isolated_cli):
+    """Test get-active-tasks command."""
+    # Add tasks
+    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add", "Task 2"])
+
+    # Start a task
+    isolated_cli.invoke(cli, ["start", "1"])
+
+    # Get active tasks
+    result = isolated_cli.invoke(cli, ["get-active-tasks"])
+    assert result.exit_code == 0
+    assert "#1" in result.output
+    assert "#inprogress" in result.output
+
+
 # Phase 3: Task Display and Relationships
 def test_show_command(isolated_cli):
     """Test show command."""
@@ -298,48 +315,7 @@ def test_resolve_conflicts_dry_run(isolated_cli):
     # Should show what would be changed without making changes
 
 
-# Phase 5: System Operations
-def test_log_command(isolated_cli):
-    """Test log command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    result = isolated_cli.invoke(cli, ["log"])
-    assert result.exit_code == 0
-    # Should show log entries
-
-
-def test_log_command_with_filter(isolated_cli):
-    """Test log command with filter."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    result = isolated_cli.invoke(cli, ["log", "--filter", "add"])
-    assert result.exit_code == 0
-
-
-def test_log_command_with_lines(isolated_cli):
-    """Test log command with lines limit."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    result = isolated_cli.invoke(cli, ["log", "--lines", "5"])
-    assert result.exit_code == 0
-
-
-def test_backups_command(isolated_cli):
-    """Test backups command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    result = isolated_cli.invoke(cli, ["backups"])
-    assert result.exit_code == 0
-    # Should list available backups
-
-
-def test_rollback_command(isolated_cli):
-    """Test rollback command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    # Create a backup first
-    isolated_cli.invoke(cli, ["add", "Task 2"])
-    result = isolated_cli.invoke(cli, ["rollback", "0"])
-    assert result.exit_code == 0
-    # Should rollback to previous version
-
-
-# Phase 6: Configuration and Setup
+# Phase 5: Configuration and Setup
 def test_config_command(isolated_cli):
     """Test config command."""
     result = isolated_cli.invoke(cli, ["config"])

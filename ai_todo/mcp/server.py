@@ -11,7 +11,6 @@ from ai_todo.cli.commands import (
     add_command,
     add_subtask_command,
     archive_command,
-    backups_command,
     complete_command,
     config_command,
     delete_command,
@@ -19,23 +18,18 @@ from ai_todo.cli.commands import (
     detect_coordination_tool_command,
     lint_command,
     list_command,
-    log_command,
     modify_command,
     note_command,
     reformat_command,
     relate_command,
     reorder_command,
-    report_bug_tool_command,
     resolve_conflicts_command,
     restore_command,
-    rollback_tool_command,
     setup_coordination_tool_command,
     show_command,
     switch_mode_tool_command,
     undo_command,
-    uninstall_tool_command,
     update_note_command,
-    update_tool_command,
 )
 from ai_todo.core.exceptions import TamperError
 
@@ -217,19 +211,19 @@ def relate_task(task_id: str, rel_type: str, target_ids: list[str]) -> str:
 
 
 @mcp.tool()
-def lint_todo() -> str:
+def lint() -> str:
     """Identify formatting issues (indentation, checkboxes)."""
     return _capture_output(lint_command, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()
-def reformat_todo(dry_run: bool = False) -> str:
+def reformat(dry_run: bool = False) -> str:
     """Apply formatting fixes."""
     return _capture_output(reformat_command, dry_run, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()
-def reorder_todo() -> str:
+def reorder() -> str:
     """Reorder subtasks to match reverse-chronological order (newest on top)."""
     return _capture_output(reorder_command, todo_path=CURRENT_TODO_PATH)
 
@@ -240,36 +234,7 @@ def resolve_conflicts(dry_run: bool = False) -> str:
     return _capture_output(resolve_conflicts_command, dry_run, todo_path=CURRENT_TODO_PATH)
 
 
-# Phase 5: System Operations
-
-
-@mcp.tool()
-def view_log(filter: str | None = None, lines: int | None = None) -> str:
-    """View TODO operation log."""
-    return _capture_output(
-        log_command, filter_text=filter, lines=lines, todo_path=CURRENT_TODO_PATH
-    )
-
-
-@mcp.tool()
-def update_tool() -> str:
-    """Update todo.ai to latest version."""
-    return _capture_output(update_tool_command)
-
-
-@mcp.tool()
-def list_backups() -> str:
-    """List available backup versions."""
-    return _capture_output(backups_command, todo_path=CURRENT_TODO_PATH)
-
-
-@mcp.tool()
-def rollback(target: str | None = None) -> str:
-    """Rollback to previous version (by index or timestamp)."""
-    return _capture_output(rollback_tool_command, target=target, todo_path=CURRENT_TODO_PATH)
-
-
-# Phase 6: Configuration and Setup
+# Phase 5: Configuration and Setup
 
 
 @mcp.tool()
@@ -303,26 +268,18 @@ def switch_mode(mode: str, force: bool = False, renumber: bool = False) -> str:
     )
 
 
-# Phase 7: Utility Commands
+# Phase 6: Info
 
 
 @mcp.tool()
-def report_bug(
-    error_description: str, error_context: str | None = None, command: str | None = None
-) -> str:
-    """Report bugs to GitHub Issues (with duplicate detection)."""
-    return _capture_output(report_bug_tool_command, error_description, error_context, command)
+def version() -> str:
+    """Return the current ai-todo version."""
+    from ai_todo import __version__
+
+    return f"ai-todo version {__version__}"
 
 
-@mcp.tool()
-def uninstall_tool(
-    remove_data: bool = False, remove_rules: bool = False, force: bool = False
-) -> str:
-    """Uninstall todo.ai."""
-    return _capture_output(uninstall_tool_command, remove_data, remove_rules, force)
-
-
-# Phase 8: Tamper Detection
+# Phase 7: Tamper Detection
 
 
 @mcp.tool()

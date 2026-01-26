@@ -349,12 +349,12 @@ class TestMCPCLIParity:
         assert cli_output.strip() == mcp_output.strip()
 
     async def test_lint_parity(self, test_todo_file):
-        """Test lint_todo MCP tool matches lint CLI command."""
+        """Test lint MCP tool matches lint CLI command."""
         # CLI output
         cli_output = capture_cli_output(lint_command, todo_path=test_todo_file)
 
         # MCP output
-        mcp_output = await capture_mcp_output("lint_todo", {}, test_todo_file)
+        mcp_output = await capture_mcp_output("lint", {}, test_todo_file)
 
         # Compare (lint output should be identical)
         assert cli_output.strip() == mcp_output.strip()
@@ -385,41 +385,41 @@ async def test_all_mcp_tools_exist():
 
     # Expected tools (all phases)
     expected_tools = {
-        # Basic
+        # Core Tasks
         "add_task",
         "add_subtask",
         "complete_task",
         "list_tasks",
-        # Phase 1
         "modify_task",
         "delete_task",
         "archive_task",
         "restore_task",
         "undo_task",
-        # Phase 2
+        # Progress
+        "start_task",
+        "stop_task",
+        "get_active_tasks",
+        # Notes
         "add_note",
         "delete_note",
         "update_note",
-        # Phase 3
+        # Display & Relationships
         "show_task",
         "relate_task",
-        # Phase 4
-        "lint_todo",
-        "reformat_todo",
+        # File Operations
+        "lint",
+        "reformat",
+        "reorder",
         "resolve_conflicts",
-        # Phase 5
-        "view_log",
-        "update_tool",
-        "list_backups",
-        "rollback",
-        # Phase 6
+        # Configuration
         "show_config",
         "detect_coordination",
         "setup_coordination",
         "switch_mode",
-        # Phase 7
-        "report_bug",
-        "uninstall_tool",
+        # Tamper Detection
+        "accept_tamper",
+        # Info
+        "version",
     }
 
     # Verify all tools exist

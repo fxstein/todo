@@ -4,36 +4,27 @@ from ai_todo.cli.commands import (
     add_command,
     add_subtask_command,
     archive_command,
-    backups_command,
     complete_command,
     config_command,
     delete_command,
     delete_note_command,
     detect_coordination_tool_command,
-    edit_command,
     lint_command,
     list_command,
-    list_mode_backups_tool_command,
-    log_command,
     modify_command,
     note_command,
     reformat_command,
     relate_command,
     reorder_command,
-    report_bug_tool_command,
     resolve_conflicts_command,
     restore_command,
-    rollback_mode_tool_command,
-    rollback_tool_command,
     setup_coordination_tool_command,
     setup_wizard_tool_command,
     show_command,
     show_root_command,
     switch_mode_tool_command,
     undo_command,
-    uninstall_tool_command,
     update_note_command,
-    update_tool_command,
     version_tool_command,
 )
 from ai_todo.core.exceptions import TamperError
@@ -142,6 +133,13 @@ def stop(ctx, task_id):
     from ai_todo.cli.commands import stop_command
 
     stop_command(task_id, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command("get-active-tasks")
+@click.pass_context
+def get_active_tasks(ctx):
+    """Get a list of all currently active tasks (marked #inprogress)."""
+    list_command(tag="inprogress", incomplete_only=True, todo_path=ctx.obj["todo_file"])
 
 
 @cli.command()
@@ -297,52 +295,7 @@ def resolve_conflicts(ctx, dry_run):
     resolve_conflicts_command(dry_run, todo_path=ctx.obj["todo_file"])
 
 
-@cli.command()
-@click.pass_context
-def edit(ctx):
-    """Open TODO.md in editor."""
-    edit_command(todo_path=ctx.obj["todo_file"])
-
-
-# Phase 5: System Operations
-@cli.command()
-@click.option("--filter", help="Filter log entries by text")
-@click.option("--lines", type=int, help="Number of lines to show")
-@click.pass_context
-def log(ctx, filter, lines):
-    """View TODO operation log."""
-    log_command(filter_text=filter, lines=lines, todo_path=ctx.obj["todo_file"])
-
-
-@cli.command()
-def update():
-    """Update todo.ai to latest version."""
-    update_tool_command()
-
-
-@cli.command("backups")
-@click.pass_context
-def backups(ctx):
-    """List available backup versions."""
-    backups_command(todo_path=ctx.obj["todo_file"])
-
-
-@cli.command("list-backups")
-@click.pass_context
-def list_backups(ctx):
-    """List available backup versions (alias for backups)."""
-    backups_command(todo_path=ctx.obj["todo_file"])
-
-
-@cli.command()
-@click.argument("target", required=False)
-@click.pass_context
-def rollback(ctx, target):
-    """Rollback to previous version (by index or timestamp)."""
-    rollback_tool_command(target=target, todo_path=ctx.obj["todo_file"])
-
-
-# Phase 6: Configuration and Setup
+# Phase 5: Configuration and Setup
 @cli.command("config")
 @click.pass_context
 def config(ctx):
@@ -364,13 +317,6 @@ def detect_coordination(ctx):
     detect_coordination_tool_command(todo_path=ctx.obj["todo_file"])
 
 
-@cli.command("detect-options")
-@click.pass_context
-def detect_options(ctx):
-    """Detect available coordination options (alias for detect-coordination)."""
-    detect_coordination_tool_command(todo_path=ctx.obj["todo_file"])
-
-
 @cli.command("setup-coordination")
 @click.argument("coord_type")
 @click.pass_context
@@ -386,13 +332,6 @@ def setup(ctx):
     setup_wizard_tool_command(todo_path=ctx.obj["todo_file"])
 
 
-@cli.command("setup-wizard")
-@click.pass_context
-def setup_wizard(ctx):
-    """Interactive setup wizard (alias for setup)."""
-    setup_wizard_tool_command(todo_path=ctx.obj["todo_file"])
-
-
 @cli.command("switch-mode")
 @click.argument("mode")
 @click.option("--force", "-f", is_flag=True, help="Force mode switch (skip validation)")
@@ -403,44 +342,7 @@ def switch_mode(ctx, mode, force, renumber):
     switch_mode_tool_command(mode, force=force, renumber=renumber, todo_path=ctx.obj["todo_file"])
 
 
-@cli.command("list-mode-backups")
-@click.pass_context
-def list_mode_backups(ctx):
-    """List mode switch backups."""
-    list_mode_backups_tool_command(todo_path=ctx.obj["todo_file"])
-
-
-@cli.command("rollback-mode")
-@click.argument("backup_name")
-@click.pass_context
-def rollback_mode(ctx, backup_name):
-    """Rollback from mode switch backup."""
-    rollback_mode_tool_command(backup_name, todo_path=ctx.obj["todo_file"])
-
-
-# Phase 7: Utility Commands
-@cli.command("report-bug")
-@click.argument("error_description")
-@click.argument("error_context", required=False)
-@click.argument("command", required=False)
-def report_bug(error_description, error_context, command):
-    """Report bugs to GitHub Issues (with duplicate detection)."""
-    report_bug_tool_command(error_description, error_context, command)
-
-
-@cli.command()
-@click.option("--remove-data", "--data", is_flag=True, help="Remove .ai-todo/ data directory")
-@click.option("--remove-rules", "--rules", is_flag=True, help="Remove Cursor rules")
-@click.option("--all", is_flag=True, help="Remove script, data, and rules")
-@click.option("--force", "-f", is_flag=True, help="Skip confirmation prompt")
-def uninstall(remove_data, remove_rules, all, force):
-    """Uninstall todo.ai."""
-    if all:
-        remove_data = True
-        remove_rules = True
-    uninstall_tool_command(remove_data=remove_data, remove_rules=remove_rules, force=force)
-
-
+# Phase 6: Info
 @cli.command("version")
 def version():
     """Show version information."""

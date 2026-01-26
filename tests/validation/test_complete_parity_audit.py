@@ -153,41 +153,41 @@ def get_mcp_tools() -> set[str]:
     # The MCP tools are statically defined in server.py
     # We know what they are from the implementation
     return {
-        # Basic
+        # Core Tasks
         "add_task",
         "add_subtask",
         "complete_task",
         "list_tasks",
-        # Phase 1
         "modify_task",
         "delete_task",
         "archive_task",
         "restore_task",
         "undo_task",
-        # Phase 2
+        # Progress
+        "start_task",
+        "stop_task",
+        "get_active_tasks",
+        # Notes
         "add_note",
         "delete_note",
         "update_note",
-        # Phase 3
+        # Display & Relationships
         "show_task",
         "relate_task",
-        # Phase 4
-        "lint_todo",
-        "reformat_todo",
+        # File Operations
+        "lint",
+        "reformat",
+        "reorder",
         "resolve_conflicts",
-        # Phase 5
-        "view_log",
-        "update_tool",
-        "list_backups",
-        "rollback",
-        # Phase 6
+        # Configuration
         "show_config",
         "detect_coordination",
         "setup_coordination",
         "switch_mode",
-        # Phase 7
-        "report_bug",
-        "uninstall_tool",
+        # Tamper Detection
+        "accept_tamper",
+        # Info
+        "version",
     }
 
 
@@ -206,7 +206,26 @@ class TestCompleteParity:
 
         # Filter out parsing artifacts (words from "todo.ai" usage text)
         parsing_artifacts = {"to", "for", "ai", "the", "a", "an", "and", "or", "of"}
-        missing_in_python = normalized_shell - normalized_python - parsing_artifacts
+
+        # Commands removed in v3.0 cleanup (legacy shell script still has them)
+        removed_commands = {
+            "backups",
+            "list-backups",
+            "list-mode-backups",
+            "log",
+            "report-bug",
+            "rollback",
+            "rollback-mode",
+            "uninstall",
+            "update",
+            "edit",
+            "setup-wizard",
+            "detect-options",
+        }
+
+        missing_in_python = (
+            normalized_shell - normalized_python - parsing_artifacts - removed_commands
+        )
 
         if missing_in_python:
             # Provide detailed report
@@ -223,12 +242,10 @@ class TestCompleteParity:
         mcp_tools = get_mcp_tools()
 
         # Some CLI commands intentionally don't have MCP tools:
-        # - edit: requires terminal interaction
-        # - version/-v/--version: informational flags
-        # - detect-options: CLI helper
-        # - setup-wizard: interactive CLI
-        # - list-mode-backups: mode-specific
-        # - rollback-mode: mode-specific
+        # - setup: interactive wizard (CLI-only)
+        # - serve: starts the MCP server (CLI-only)
+        # - show-root: debug command (CLI-only)
+        # - version/-v/--version: has MCP equivalent now
 
         # Commands that map to different MCP names
         expected_core_tools = {
@@ -241,24 +258,24 @@ class TestCompleteParity:
             "archive_task",  # archive
             "restore_task",  # restore
             "undo_task",  # undo
+            "start_task",  # start
+            "stop_task",  # stop
+            "get_active_tasks",  # get-active-tasks
             "add_note",  # note
             "delete_note",  # delete-note
             "update_note",  # update-note
             "show_task",  # show
             "relate_task",  # relate
-            "lint_todo",  # lint
-            "reformat_todo",  # reformat
+            "lint",  # lint
+            "reformat",  # reformat
+            "reorder",  # reorder
             "resolve_conflicts",  # resolve-conflicts
-            "view_log",  # log
-            "update_tool",  # update
-            "list_backups",  # backups
-            "rollback",  # rollback
             "show_config",  # config
             "detect_coordination",  # detect-coordination
             "setup_coordination",  # setup-coordination
             "switch_mode",  # switch-mode
-            "report_bug",  # report-bug
-            "uninstall_tool",  # uninstall
+            "accept_tamper",  # tamper accept
+            "version",  # version
         }
 
         # Check that all expected core tools exist
@@ -277,21 +294,16 @@ class TestCompleteParity:
         """Verify we have the expected number of MCP tools."""
         mcp_tools = get_mcp_tools()
 
-        # Expected: 32 tools (as per implementation)
-        # - 4 basic (add_task, add_subtask, complete_task, list_tasks)
-        # - 5 Phase 1 (modify, delete, archive, restore, undo)
-        # - 3 Phase 2 (add_note, delete_note, update_note)
-        # - 2 Phase 3 (show_task, relate_task)
-        # - 3 Phase 4 (lint_todo, reformat_todo, resolve_conflicts)
-        # - 4 Phase 5 (view_log, update_tool, list_backups, rollback)
-        # - 4 Phase 6 (show_config, detect_coordination, setup_coordination, switch_mode)
-        # - 2 Phase 7 (report_bug, uninstall_tool)
+        # Expected: 27 tools (as per v3.0 audit)
+        # - 9 Core Tasks (add, add_subtask, complete, list, modify, delete, archive, restore, undo)
+        # - 3 Progress (start, stop, get_active_tasks)
+        # - 3 Notes (add_note, delete_note, update_note)
+        # - 2 Display & Relationships (show_task, relate_task)
+        # - 4 File Operations (lint, reformat, reorder, resolve_conflicts)
+        # - 4 Configuration (show_config, detect_coordination, setup_coordination, switch_mode)
+        # - 1 Tamper Detection (accept_tamper)
+        # - 1 Info (version)
         # Total: 27 core tools
-
-        # Additional tools for variations
-        # - list_mode_backups might not be exposed as MCP tool
-        # - rollback_mode might not be exposed
-        # - setup wizard might not be exposed
         # - detect_coordination might not be exposed
         # - edit is CLI-only (requires terminal)
         # - version might be CLI-only
@@ -318,12 +330,29 @@ class TestCompleteParity:
         parsing_artifacts = {"to", "for", "ai", "the", "a", "an", "and", "or", "of"}
         normalized_shell = normalized_shell - parsing_artifacts
 
+        # Commands removed in v3.0 cleanup (legacy shell script still has them)
+        removed_commands = {
+            "backups",
+            "list-backups",
+            "list-mode-backups",
+            "log",
+            "report-bug",
+            "rollback",
+            "rollback-mode",
+            "uninstall",
+            "update",
+            "edit",
+            "setup-wizard",
+            "detect-options",
+        }
+        normalized_shell = normalized_shell - removed_commands
+
         coverage = len(normalized_python & normalized_shell) / len(normalized_shell) * 100
 
         report = f"""
 📊 Command Parity Report:
 
-Shell commands:  {len(shell_commands)} (filtered)
+Shell commands:  {len(shell_commands)} (filtered, excluding removed)
 Python commands: {len(python_commands)}
 Coverage:        {coverage:.1f}%
 
@@ -355,6 +384,23 @@ Only in Python:   {len(normalized_python - normalized_shell)}
         # Filter out parsing artifacts
         parsing_artifacts = {"to", "for", "ai", "the", "a", "an", "and", "or", "of"}
         normalized_shell = normalized_shell - parsing_artifacts
+
+        # Commands removed in v3.0 cleanup (legacy shell script still has them)
+        removed_commands = {
+            "backups",
+            "list-backups",
+            "list-mode-backups",
+            "log",
+            "report-bug",
+            "rollback",
+            "rollback-mode",
+            "uninstall",
+            "update",
+            "edit",
+            "setup-wizard",
+            "detect-options",
+        }
+        normalized_shell = normalized_shell - removed_commands
 
         cli_parity = len(normalized_python & normalized_shell) / len(normalized_shell) * 100
 

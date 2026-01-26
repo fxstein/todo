@@ -4,7 +4,7 @@
 
 ## Major Naming Unification
 
-This release completes a comprehensive rename from `todo.ai` to `ai-todo` across the entire project. The unified naming eliminates confusion between the various component names (repository, PyPI package, CLI command) by standardizing on `ai-todo` everywhere.
+This release completes a comprehensive rename from `todo.ai` to `ai-todo` across the entire project. The unified naming eliminates confusion between the various component names by standardizing on `ai-todo` everywhere: CLI command, PyPI package, GitHub repository, and data directory.
 
 **Key changes:**
 - **CLI command:** `todo-ai` → `ai-todo`
@@ -13,13 +13,14 @@ This release completes a comprehensive rename from `todo.ai` to `ai-todo` across
 - **GitHub repository:** Renamed to `ai-todo`
 - **Shell scripts:** Moved to `legacy/` directory (deprecated)
 
-The migration is transparent for existing users - the tool automatically detects and migrates old `.todo.ai/` directories to the new `.ai-todo/` format on first run.
+The migration is fully transparent - the tool automatically detects and migrates old `.todo.ai/` directories to `.ai-todo/` on first run.
 
 ## Additional Improvements
 
 - **3-level task nesting:** Tasks can now have sub-subtasks (e.g., #1.2.3)
-- **Cursor rules enhancement:** Added guidance for "task list" (hierarchical) vs "tasks" (flat) terminology
-- **Documentation overhaul:** All user-facing docs updated with MCP-first approach and new naming
+- **Simplified MCP configuration:** `uvx` config no longer requires redundant `--from` flag
+- **Test isolation:** Shell tests now properly isolated to prevent pollution of project root
+- **Documentation overhaul:** All docs updated with MCP-first approach and simplified examples
 
 ---
 
@@ -29,11 +30,16 @@ The migration is transparent for existing users - the tool automatically detects
 
 ### 🐛 Bug Fixes
 
+- Only ignore legacy .todo.ai/ directory, keep .ai-todo/ tracked ([86884ea](https://github.com/fxstein/ai-todo/commit/86884eaec9c1a358576760fe3fb71cda6b483216))
+- Isolate shell tests to prevent .todo.ai pollution ([3686545](https://github.com/fxstein/ai-todo/commit/3686545004fcbbc653739b310238bfb00a2e8c88))
 - Update tests for ai-todo naming and legacy shell path (task#219) ([b72cab3](https://github.com/fxstein/ai-todo/commit/b72cab328d4007340ce31d38cf3e94d002e79652))
 - Allow 3-level task nesting (task.subtask.sub-subtask) ([70ea225](https://github.com/fxstein/ai-todo/commit/70ea22542ddeaf68279ff84883fe637beb713654))
 
 ### 🔧 Other Changes
 
+- docs: Add AI release summary for v3.0.0b18 ([33d750d](https://github.com/fxstein/ai-todo/commit/33d750dca5cd8c4ec7e5b11e8525d9c9f0581261))
+- docs: Simplify uvx MCP configuration (remove redundant --from) ([5008698](https://github.com/fxstein/ai-todo/commit/500869840c623b0addeb2dd771e7135259637493))
+- chore: Remove accidentally re-added .todo.ai directory ([ed1b2e0](https://github.com/fxstein/ai-todo/commit/ed1b2e0051a36a8cc54f143574c84745ba3fe1ef))
 - docs: Add AI release summary for v3.0.0b18 ([02989af](https://github.com/fxstein/ai-todo/commit/02989afcd1f18c41e905eb277334dc6167f0d9e6))
 - chore: Clean up deleted tasks and orphaned subtasks ([eab3b9c](https://github.com/fxstein/ai-todo/commit/eab3b9c55ed81d93ab516ca78bae4f93fd217c1c))
 - docs: Remove redundant example from task structure rule ([80fdcdd](https://github.com/fxstein/ai-todo/commit/80fdcdd79c655617888996c9f08d7a198e161a9b))

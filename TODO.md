@@ -4,6 +4,8 @@
 
 ## Tasks
 
+- [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
+
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
   - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
@@ -185,11 +187,11 @@
 ---
 
 ## Archived Tasks
-- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
   - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
   - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
   - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
   - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
   - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
   - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
   - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
@@ -1242,4 +1244,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:45:49
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 01:55:59

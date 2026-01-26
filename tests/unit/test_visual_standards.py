@@ -10,7 +10,7 @@ from todo_ai.core.task import Task, TaskStatus
 def temp_todo_file(tmp_path):
     """Create a temporary TODO.md file for testing."""
     todo_path = tmp_path / "TODO.md"
-    todo_path.write_text("# Tasks\n", encoding="utf-8")
+    todo_path.write_text("## Tasks\n", encoding="utf-8")
     return todo_path
 
 

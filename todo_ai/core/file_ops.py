@@ -831,18 +831,22 @@ class FileOps:
         if snapshot is None:
             raise ValueError("Structure snapshot must be available for generation")
 
-        # 1. Header (Enforced Standard)
-        lines.extend(
-            [
-                "# todo.ai ToDo List",
-                "",
-                "> ⚠️ **MANAGED FILE**: Do not edit manually. Use `todo-ai` (CLI/MCP) or `todo.ai` to manage tasks.",
-                "",
-            ]
-        )
+        # 1. Header
+        if snapshot.has_original_header and snapshot.header_lines:
+            lines.extend(snapshot.header_lines)
+        else:
+            # Default Header (Enforced Standard for new files or files without header)
+            lines.extend(
+                [
+                    "# todo.ai ToDo List",
+                    "",
+                    "> ⚠️ **MANAGED FILE**: Do not edit manually. Use `todo-ai` (CLI/MCP) or `todo.ai` to manage tasks.",
+                    "",
+                ]
+            )
 
         # 2. Tasks Section
-        lines.append("## Tasks")
+        lines.append(snapshot.tasks_header_format)
         # Enforce blank line after header if there are tasks
         if active_tasks:
             lines.append("")
@@ -991,14 +995,18 @@ class FileOps:
                 if metadata_lines_to_use:
                     lines.extend(metadata_lines_to_use)
 
-        # 6. Footer (Enforced Standard)
-        lines.extend(
-            [
-                "",
-                "---",
-                f"**todo-ai (mcp)** v3.0.0 | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            ]
-        )
+        # 6. Footer
+        if snapshot.footer_lines:
+            lines.extend(snapshot.footer_lines)
+        else:
+            # Default Footer
+            lines.extend(
+                [
+                    "",
+                    "---",
+                    f"**todo-ai (mcp)** v3.0.0 | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+                ]
+            )
 
         full_content = "\n".join(lines)
         return "\n".join(line.rstrip() for line in full_content.splitlines()) + "\n"

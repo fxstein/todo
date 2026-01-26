@@ -177,6 +177,37 @@ def test_archive_command(isolated_cli):
     assert "Archived" in result.output
 
 
+def test_archive_cooldown_blocks_immediate_archive(isolated_cli):
+    """Test archive cooldown prevents immediate archiving of completed root tasks with subtasks."""
+    # Create parent task with subtasks
+    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
+    isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 2"])
+
+    # Complete the parent (and subtasks)
+    isolated_cli.invoke(cli, ["complete", "1", "--with-subtasks"])
+
+    # Try to archive immediately - should be blocked by cooldown
+    result = isolated_cli.invoke(cli, ["archive", "1"])
+    assert "cooldown protection" in result.output or "Wait" in result.output
+    # Should NOT have archived the task
+    assert "Archived 1 task(s)" not in result.output
+
+
+def test_archive_cooldown_allows_single_task(isolated_cli):
+    """Test archive cooldown does NOT block single tasks without subtasks."""
+    # Create single task (no subtasks)
+    isolated_cli.invoke(cli, ["add", "Single task"])
+
+    # Complete it
+    isolated_cli.invoke(cli, ["complete", "1"])
+
+    # Try to archive immediately - should work (no subtasks = no cooldown)
+    result = isolated_cli.invoke(cli, ["archive", "1"])
+    assert result.exit_code == 0
+    assert "Archived 1 task(s)" in result.output
+
+
 def test_restore_command(isolated_cli):
     """Test restore command."""
     isolated_cli.invoke(cli, ["add", "Task to restore"])

@@ -8,9 +8,9 @@
   - [ ] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12`
   - [ ] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11`
   - [ ] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10`
-  - [ ] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9`
-  - [ ] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8`
-  - [ ] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7`
+  - [x] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9` (2026-01-26)
+  - [x] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8` (2026-01-26)
+  - [x] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7` (2026-01-26)
   - [x] **#238.6** POLISH: Update cursor rules to prefer MCP over CLI (task#187) `#polish` `#step-6` (2026-01-26)
   - [x] **#238.5** POLISH: Complete unified naming migration (task#219) `#polish` `#step-5` (2026-01-26)
   - [x] **#238.4** POLISH: Audit MCP/CLI tools for post-migration cleanup (task#234) `#polish` `#step-4` (2026-01-26)
@@ -78,12 +78,12 @@
   - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-26)
     > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
 
-- [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
-  - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
-  - [ ] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp`
-  - [ ] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design`
-  - [ ] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research`
-  - [ ] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis`
+- [x] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety` (2026-01-26)
+  - [x] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation` (2026-01-26)
+  - [x] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp` (2026-01-26)
+  - [x] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design` (2026-01-26)
+  - [x] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research` (2026-01-26)
+  - [x] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis` (2026-01-26)
 
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
   > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
@@ -100,16 +100,16 @@
   - [x] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` (2026-01-26)
     > Design document: docs/design/README_REDESIGN_V3.md
 
-- [ ] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp`
+- [x] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp` (2026-01-26)
   > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
-  - [ ] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp`
-  - [ ] **#191.5** Implement and test the portable setup solution `#implementation` `#mcp`
-  - [ ] **#191.4** Design a clean installation process that sets up portable MCP config `#design` `#mcp`
-  - [ ] **#191.3** Compare with MCP best practices for project-local configuration `#investigation` `#mcp`
-  - [ ] **#191.2** Investigate options for dynamic workspace root detection in MCP server `#investigation` `#mcp`
-  - [ ] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp`
+  - [x] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp` (2026-01-26)
+  - [x] **#191.5** Implement and test the portable setup solution `#implementation` `#mcp` (2026-01-26)
+  - [x] **#191.4** Design a clean installation process that sets up portable MCP config `#design` `#mcp` (2026-01-26)
+  - [x] **#191.3** Compare with MCP best practices for project-local configuration `#investigation` `#mcp` (2026-01-26)
+  - [x] **#191.2** Investigate options for dynamic workspace root detection in MCP server `#investigation` `#mcp` (2026-01-26)
+  - [x] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp` (2026-01-26)
 
-- [ ] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp`
+- [x] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp` (2026-01-26)
   > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
 
 - [x] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature` (2026-01-26)
@@ -1383,4 +1383,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 22:03:10
+**ai-todo** | Last Updated: 2026-01-26 22:24:43

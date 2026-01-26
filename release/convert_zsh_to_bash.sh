@@ -10,7 +10,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-SOURCE_FILE="${1:-todo.ai}"
+SOURCE_FILE="${1:-legacy/todo.ai}"
 TARGET_FILE="${2:-todo.bash}"
 
 if [[ ! -f "$SOURCE_FILE" ]]; then

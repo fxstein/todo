@@ -5,96 +5,122 @@ This guide explains how to upgrade from the legacy `todo.ai` shell script (v2.x)
 ## Overview
 
 Version 3.0 is a complete rewrite in Python, offering:
-- **Dual Interfaces:** Standard CLI + AI-native MCP (Model Context Protocol) Server.
-- **Improved Performance:** Faster parsing and task management.
-- **Cross-Platform Support:** Native support for macOS, Linux, and Windows.
-- **Zero-Data Migration:** Fully compatible with your existing `TODO.md` and `.todo.ai/` configuration.
 
-## Prerequisites
+- **MCP Integration:** AI agents interact directly with your task list
+- **Dual Interfaces:** MCP Server + Standard CLI
+- **Cross-Platform:** Native support for macOS, Linux, and Windows
+- **Zero-Data Migration:** Fully compatible with existing `TODO.md` and `.todo.ai/`
 
-- **Python 3.10+** installed on your system.
-- **uv** (recommended): A fast Python tool installer for isolated CLI tools.
-- **pipx** (alternative): A tool for installing and running Python applications in isolated environments.
+## Recommended: Zero-Install MCP Setup
 
-### Installing pipx (if not installed)
+The easiest migration path is to skip CLI installation entirely and use MCP with `uvx`:
 
-**macOS:**
-```bash
-brew install pipx
-pipx ensurepath
+Add this to your project's `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "todo-ai": {
+      "command": "uvx",
+      "args": ["--from", "ai-todo", "todo-ai", "serve", "--root", "${workspaceFolder}"]
+    }
+  }
+}
 ```
 
-**Linux/Windows:**
-Follow the official [pipx installation guide](https://pypa.github.io/pipx/).
+**Prerequisite:** Install [uv](https://docs.astral.sh/uv/) first:
 
-## Installation
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-We recommend installing `ai-todo` globally using `uv tool`. This ensures it doesn't conflict with other Python packages.
+**That's it!** Your AI agent can now manage tasks. The shell script can remain as a fallback.
+
+## Alternative: CLI Installation
+
+If you prefer command-line access, install the CLI globally:
 
 ```bash
 # Using uv (recommended)
 uv tool install ai-todo
 
-# Alternative: pipx
+# Or with pipx
 pipx install ai-todo
 ```
 
-This will expose two commands globally:
-1. `todo-ai`: The CLI tool (replaces `./todo.ai`).
-2. `todo-ai-mcp`: The MCP server for AI agents.
+**Prerequisite:** Python 3.10+
 
-## Migrating from Shell Script
+### Installing uv
 
-Since v3.0 uses the exact same file formats (`TODO.md`, `.todo.ai/config.yaml`, `.todo.ai/.todo.ai.serial`), **no data migration is required**. You can simply start using the new command in your existing repositories.
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Installing pipx (alternative)
+
+**macOS:**
+
+```bash
+brew install pipx
+pipx ensurepath
+```
+
+**Linux/Windows:** Follow the [pipx installation guide](https://pypa.github.io/pipx/).
+
+## Migration Steps
+
+Since v3.0 uses the exact same file formats (`TODO.md`, `.todo.ai/config.yaml`), **no data migration is required**.
 
 ### 1. Verify Installation
 
-Check the version:
 ```bash
-todo-ai --version
+todo-ai version
 ```
 
-### 2. Replace Local Script (Optional but Recommended)
+### 2. Replace Shell Script (Optional)
 
-If you have the `todo.ai` shell script committed in your repository root:
+If you want to remove the legacy script:
 
-1. **Remove the shell script:**
-    ```bash
-    git rm todo.ai
-    ```
+```bash
+git rm todo.ai
+```
 
-2. **Update your workflow:**
-    Instead of running `./todo.ai [command]`, now run `todo-ai [command]`.
+### 3. Update Your Workflow
 
-    *Example:*
-    ```bash
-    # Old
-    ./todo.ai list
+| Old (Shell) | New (CLI) |
+|-------------|-----------|
+| `./todo.ai list` | `todo-ai list` |
+| `./todo.ai add "Task"` | `todo-ai add "Task"` |
+| `./todo.ai complete 1` | `todo-ai complete 1` |
 
-    # New
-    todo-ai list
-    ```
+Core command syntax is preserved.
 
-### 3. Usage
+## Setting Up MCP (Cursor Integration)
 
-The command syntax is preserved for core operations:
-
-- `todo-ai list`
-- `todo-ai add "My task" "#tag"`
-- `todo-ai complete <id>`
-
-## Setting up AI Agent Integration (MCP)
-
-The major new feature in v3.0 is the MCP Server, which allows AI agents (like Cursor) to directly read and manipulate your task list safely and structuredly.
-
-See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup instructions for Cursor.
+See [MCP_SETUP.md](MCP_SETUP.md) for detailed Cursor integration instructions.
 
 ## Troubleshooting
 
 **"Command not found: todo-ai"**
-Ensure your `pipx` binary directory is in your PATH. Run `pipx ensurepath` and restart your terminal.
 
-**Config/Data Issues**
-If you encounter issues reading your existing `TODO.md`:
-1. Run `todo-ai list` to see if it parses correctly.
-2. The tool automatically attempts to preserve custom headers/footers in `TODO.md`.
+Ensure your tool directory is in PATH:
+
+```bash
+# For uv
+echo $PATH | grep -q ".local/bin" || echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+
+# For pipx
+pipx ensurepath
+```
+
+Restart your terminal after updating PATH.
+
+**"Config/Data Issues"**
+
+Run `todo-ai list` to verify your existing `TODO.md` parses correctly. The tool preserves all existing data.
+
+## Need Help?
+
+- **FAQ:** [Common questions](../FAQ.md)
+- **MCP Setup:** [Cursor integration](MCP_SETUP.md)
+- **Issues:** https://github.com/fxstein/todo.ai/issues

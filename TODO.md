@@ -14,9 +14,9 @@
 - [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
   > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
   - [ ] **#203.9** Final review and publish README.md changes `#release` `#review`
-  - [ ] **#203.8** Update docs/README.md index to reflect new structure `#documentation`
-  - [ ] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation`
-  - [ ] **#203.6** Update docs/guides/GETTING_STARTED.md for MCP-first approach `#documentation`
+  - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
+  - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
+  - [x] **#203.6** Update docs/guides/GETTING_STARTED.md for MCP-first approach `#documentation` (2026-01-26)
   - [x] **#203.4** Test all installation paths (uvx MCP, uv CLI, shell script) `#testing` (2026-01-26)
     > Test in isolated environment (temp directory outside repo) to avoid polluting files, content, or cursor rules.
   - [x] **#203.3** Implement new README.md with MCP-first structure `#implementation` (2026-01-26)
@@ -1258,4 +1258,4 @@
   - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 12:13:59
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 12:16:05

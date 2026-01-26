@@ -784,7 +784,7 @@ generate_release_notes() {
 
     # Reset the notes file to ensure we start clean
     # This prevents pollution from previous failed attempts or uncommitted changes
-    echo "## Release ${new_version}" > "$notes_file"
+    echo "# Release ${new_version}" > "$notes_file"
     echo "" >> "$notes_file"
 
     # Add AI-generated summary if provided
@@ -1335,6 +1335,19 @@ main() {
     echo -e "${BLUE}File version (legacy/todo.ai): ${file_version}${NC}"
     echo ""
 
+    # Check if current version is a beta (e.g., 3.0.0b1)
+    # If so, we're in a beta cycle and must stay at the same base version
+    # NOTE: This must be checked BEFORE graduation detection
+    local IN_BETA_CYCLE=false
+    local BETA_BASE_VERSION=""
+    if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+b[0-9]+$ ]]; then
+        IN_BETA_CYCLE=true
+        # Extract base version using sed (works in both bash and zsh)
+        BETA_BASE_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$/\1/')
+        echo -e "${BLUE}🔄 In beta cycle for version ${BETA_BASE_VERSION}${NC}"
+        echo -e "${BLUE}   Next beta will use base version ${BETA_BASE_VERSION} (ignoring commit-based bump)${NC}"
+    fi
+
     # Get last tag
     LAST_TAG=$(get_last_tag)
 
@@ -1379,18 +1392,6 @@ main() {
     echo ""
     echo -e "${BLUE}📊 Analyzing commits since last release...${NC}"
     BUMP_TYPE=$(analyze_commits "$COMMIT_ANALYSIS_TAG")
-
-    # Check if current version is a beta (e.g., 3.0.0b1)
-    # If so, we're in a beta cycle and must stay at the same base version
-    local IN_BETA_CYCLE=false
-    local BETA_BASE_VERSION=""
-    if [[ "$CURRENT_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+b[0-9]+$ ]]; then
-        IN_BETA_CYCLE=true
-        # Extract base version using sed (works in both bash and zsh)
-        BETA_BASE_VERSION=$(echo "$CURRENT_VERSION" | sed -E 's/^([0-9]+\.[0-9]+\.[0-9]+)b[0-9]+$/\1/')
-        echo -e "${BLUE}🔄 In beta cycle for version ${BETA_BASE_VERSION}${NC}"
-        echo -e "${BLUE}   Next beta will use base version ${BETA_BASE_VERSION} (ignoring commit-based bump)${NC}"
-    fi
 
     case "$BUMP_TYPE" in
         major)

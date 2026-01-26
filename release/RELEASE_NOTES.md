@@ -2,16 +2,17 @@
 
 ## ai-todo v3.0.0 Release Summary
 
-**ai-todo v3.0.0** marks the completion of a comprehensive Python rewrite, transforming the project from a shell-based tool into a modern, production-ready Python package. The MCP server and CLI are now unified into a single executable (`ai-todo`), providing seamless integration with AI assistants like Cursor while maintaining a powerful command-line interface. Installation is as simple as `pip install ai-todo` or `uv tool install ai-todo`.
+**ai-todo v3.0.0** represents a complete rewrite of the project, evolving from a shell-based task management tool into a modern, production-ready Python package. The MCP server and CLI are now unified into a single executable (`ai-todo`), providing seamless integration with AI assistants like Cursor while maintaining a powerful command-line interface. Installation is as simple as `pip install ai-todo` or `uv tool install ai-todo`, and the package is published via PyPI with secure OIDC-based trusted publishing.
 
-This release introduces several key features for data integrity and workflow safety. A **tamper detection system** now protects TODO.md from unintended external modifications, with configurable security modes and automatic recovery options. An **archive cooldown** (60-second default) prevents AI agents from prematurely archiving completed tasks, requiring human review for root tasks. The **delete command** now removes subtasks by default, fixing orphaned subtask issues that plagued earlier versions.
+This major release introduces several key features for data integrity and workflow safety. A **tamper detection system** protects TODO.md from unintended external modifications, with configurable security modes and automatic recovery options. An **archive cooldown** (60-second default) prevents AI agents from prematurely archiving completed tasks, requiring human review for root tasks. The new **start/stop commands** allow marking tasks as in-progress with `#inprogress` tags. The **delete command** now removes subtasks by default, and deleted tasks display with `[D]` markers instead of confusing checkmarks.
 
-The internal architecture has been significantly streamlined. The MCP/CLI tool set was audited and reduced from 37 to 27 tools, removing redundant operations (update, uninstall, rollback, report_bug) and standardizing naming conventions. The data directory migrated from `.todo.ai/` to `.ai-todo/` for better discoverability, with automatic migration for existing users. The Cursor rules system was consolidated from a monolithic `.cursorrules` file to modular `.cursor/rules/*.mdc` documents, and legacy shell scripts are now deprecated in favor of the Python implementation.
+The architecture has been significantly modernized. The Python implementation uses **FastMCP** for the MCP server with full async support. The CLI uses **Click** with rich help text. A comprehensive **CI/CD pipeline** on GitHub Actions handles testing across Python 3.13+ on Ubuntu, macOS, and Windows, with automated PyPI publishing on tagged releases. The data directory migrated from `.todo.ai/` to `.ai-todo/` with automatic migration for existing users. Legacy shell scripts remain available but are deprecated. The MCP/CLI tool set was audited and streamlined from 37 to 27 tools, removing redundant operations and standardizing naming conventions.
 
 ---
 
 ### ✨ Features
 
+- Add beta-to-stable graduation logic for releases (task#238.11) ([a8fcd6e](https://github.com/fxstein/ai-todo/commit/a8fcd6e18937b8660155c9ba7014eb748bd0224f))
 - Add archive cooldown protection for root tasks (task#205) ([aa54253](https://github.com/fxstein/ai-todo/commit/aa542531eb8e06d3f905371cb6a8938c9621d709))
 - Implement MCP/CLI tools audit cleanup (task#238.4) ([d4b1969](https://github.com/fxstein/ai-todo/commit/d4b1969b40941cacc06e207248677e569de83b4a))
 
@@ -27,6 +28,7 @@ The internal architecture has been significantly streamlined. The MCP/CLI tool s
 
 ### 🔧 Other Changes
 
+- docs: Update AI release summary for v3.0.0 stable (full beta cycle) ([ebc884e](https://github.com/fxstein/ai-todo/commit/ebc884e762b350304007f64f70368579a5416d5d))
 - docs: Add AI release summary for v3.0.0 ([459af0a](https://github.com/fxstein/ai-todo/commit/459af0a4c769935b008ff339ddac69737a1fa45b))
 - infra: Move commit counter to scripts/.run-full-tests-periodic ([ac21eae](https://github.com/fxstein/ai-todo/commit/ac21eae4091afa223213ffd1c74cf7a4fd71ff81))
 - infra: Add periodic full test suite in pre-commit (every 10th commit) ([401ff77](https://github.com/fxstein/ai-todo/commit/401ff772c6c158a71c39867418004ba59d78e3c5))

@@ -309,14 +309,14 @@ The MCP server name is typically `ai-todo` or similar in your `.cursor/mcp.json`
 
 def _init_cursor_rules(root: Path) -> None:
     """Initialize Cursor rules if they don't exist."""
-    rules_dir = root / ".cursor" / "rules"
-    rule_file = rules_dir / "ai-todo-task-management.mdc"
-
-    # Only create if the file doesn't exist
-    if rule_file.exists():
-        return
-
     try:
+        rules_dir = root / ".cursor" / "rules"
+        rule_file = rules_dir / "ai-todo-task-management.mdc"
+
+        # Only create if the file doesn't exist
+        if rule_file.exists():
+            return
+
         rules_dir.mkdir(parents=True, exist_ok=True)
         rule_file.write_text(AI_TODO_CURSOR_RULE.strip() + "\n")
     except (OSError, PermissionError):

@@ -7,7 +7,7 @@
 - [ ] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release`
   - [ ] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12`
   - [ ] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11`
-  - [ ] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10`
+  - [x] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10` (2026-01-26)
   - [x] **#238.9** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#safety` `#step-9` (2026-01-26)
   - [x] **#238.8** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#step-8` (2026-01-26)
   - [x] **#238.7** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#step-7` (2026-01-26)
@@ -85,10 +85,10 @@
   - [x] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research` (2026-01-26)
   - [x] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis` (2026-01-26)
 
-- [ ] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` `#inprogress`
+- [x] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` (2026-01-26)
   > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
   > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
-  - [ ] **#203.9** Final review and publish README.md changes `#release` `#review`
+  - [x] **#203.9** Final review and publish README.md changes `#release` `#review` (2026-01-26)
   - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
   - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
   - [x] **#203.6** Update docs/guides/GETTING_STARTED.md for MCP-first approach `#documentation` (2026-01-26)
@@ -1373,14 +1373,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-26 22:24:43
+**ai-todo** | Last Updated: 2026-01-26 22:31:36

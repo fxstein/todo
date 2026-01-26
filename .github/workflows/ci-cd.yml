@@ -325,7 +325,7 @@ jobs:
 
   test-pr:
     name: PR Tests
-    needs: quality
+    needs: [changes, quality]
     if: github.event_name == 'pull_request' && needs.changes.outputs.code == 'true'
     strategy:
       fail-fast: false

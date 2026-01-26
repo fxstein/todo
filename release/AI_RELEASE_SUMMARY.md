@@ -1,24 +1,7 @@
-# Release Summary: v3.0.0b17
+# Release Summary
 
-This beta release focuses on **Windows compatibility**, **parity test improvements**, and **stability fixes** following the major Tamper Detection feature introduced in b16.
+This release introduces the **Tamper Detection System**, a significant new feature that protects TODO.md integrity by detecting external modifications. When enabled, todo.ai maintains a shadow copy and checksum of TODO.md, alerting users if the file is modified outside of todo.ai tools. This is an opt-in feature that helps maintain task consistency in collaborative or automated environments.
 
-## Key Improvements
+Several important bug fixes improve the overall experience. Subtask sorting now uses numerical comparison instead of alphabetical, ensuring task#10 appears after task#9 rather than after task#1. The restore command has been fixed to correctly position both root tasks and subtasks. A whitespace conflict between todo.ai and pre-commit hooks has been resolved, and UTF-8 encoding is now explicitly specified for Windows compatibility.
 
-### Windows Compatibility Fix
-All test files now explicitly specify UTF-8 encoding when reading files, resolving failures on Windows where the system default encoding (cp1252) couldn't decode emoji characters in TODO.md headers. This ensures consistent cross-platform behavior.
-
-### Parity Test Robustness
-The Python vs Shell parity tests have been significantly improved to focus on **functional equivalence** rather than cosmetic differences:
-- Dates on completed tasks are now normalized (Python adds completion dates, Shell doesn't)
-- Section header naming differences are ignored ("Archived Tasks" vs "Recently Completed")
-- Header and footer content differences are filtered out
-
-### File Structure Preservation
-Fixed a regression where custom headers and footers in TODO.md files were being overwritten with standard templates. The system now correctly preserves existing file structure during read/write cycles.
-
-## Summary of Changes
-- **3 bug fixes** for test infrastructure and file operations
-- **1 test improvement** for cross-platform compatibility
-- Multiple housekeeping commits for task management
-
-This release completes the stabilization work for the v3.0.0 release candidate.
+Documentation and developer experience have been enhanced with simplified Cursor rules that are more concise and actionable. The TODO.md visual standards have been implemented to ensure consistent formatting, and the tamper detection documentation clearly explains the feature as an optional integrity tool rather than a security mechanism.

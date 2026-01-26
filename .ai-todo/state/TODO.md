@@ -31,10 +31,10 @@
 
 - [ ] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#inprogress` `#naming`
   > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
-  - [ ] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification`
-  - [ ] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation`
+  - [x] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification` (2026-01-26)
+  - [x] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation` (2026-01-26)
   - [ ] **#219.11** Cleanup: Update test fixtures (GitHub URLs fxstein/todo.ai → ai-todo) `#cleanup` `#testing`
-  - [ ] **#219.10** Cleanup: Update ai_todo/ source code (pip commands, FastMCP name, tamper hints) `#cleanup` `#code`
+  - [ ] **#219.10** Cleanup: Update ai_todo/ source code (pip commands, FastMCP name, tamper hints) `#cleanup` `#code` `#inprogress`
   - [x] **#219.9** Post-migration audit: Document remaining old naming references `#audit` `#documentation` (2026-01-26)
   - [x] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` (2026-01-26)
     > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
@@ -1336,9 +1336,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 19:46:42
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 19:52:07

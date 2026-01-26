@@ -30,6 +30,7 @@ The migration is fully transparent - the tool automatically detects and migrates
 
 ### 🐛 Bug Fixes
 
+- Update convert script for legacy/todo.ai path ([9e4d96e](https://github.com/fxstein/ai-todo/commit/9e4d96efce02c8d45b5c2ff9d64aee7fb714a3ff))
 - Update release script for ai-todo naming (legacy/todo.ai, ai_todo/) ([910ba94](https://github.com/fxstein/ai-todo/commit/910ba94ae08835e578f801178aae5d57949b7f0e))
 - Only ignore legacy .todo.ai/ directory, keep .ai-todo/ tracked ([86884ea](https://github.com/fxstein/ai-todo/commit/86884eaec9c1a358576760fe3fb71cda6b483216))
 - Isolate shell tests to prevent .todo.ai pollution ([3686545](https://github.com/fxstein/ai-todo/commit/3686545004fcbbc653739b310238bfb00a2e8c88))

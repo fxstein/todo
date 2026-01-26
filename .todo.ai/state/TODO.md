@@ -10,6 +10,7 @@
   - [ ] **#219.3** Create implementation plan with rollout phases `#design` `#implementation`
   - [ ] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis`
   - [ ] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` `#inprogress`
+    > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
 
 - [ ] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety`
   - [ ] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation`
@@ -1267,14 +1268,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:29:54
+**todo-ai (mcp)** v3.0.0 | Last Updated: 2026-01-26 13:33:36

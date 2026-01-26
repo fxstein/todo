@@ -1,4 +1,4 @@
-# ai-todo v3.0.0 Release Summary
+## ai-todo v3.0.0 Release Summary
 
 **ai-todo v3.0.0** represents a complete rewrite of the project, evolving from a shell-based task management tool into a modern, production-ready Python package. The MCP server and CLI are now unified into a single executable (`ai-todo`), providing seamless integration with AI assistants like Cursor while maintaining a powerful command-line interface. Installation is as simple as `pip install ai-todo` or `uv tool install ai-todo`, and the package is published via PyPI with secure OIDC-based trusted publishing.
 

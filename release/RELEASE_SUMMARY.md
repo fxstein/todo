@@ -1,7 +1,5 @@
-## ai-todo v3.0.1 Release Summary
+This release fixes a critical bug where TODO.md files became malformed when adding multiple subtasks via MCP on fresh repositories. The issue caused orphaned timestamp lines to accumulate in the file, breaking the expected format. The fix ensures footer timestamps are properly handled and always regenerated cleanly, while also updating the branding from legacy "todo.ai" to "ai-todo" in default headers.
 
-This patch release fixes a bug in the archive cooldown feature and updates CI/CD dependencies.
+Additionally, this release adds proactive compatibility testing for fastmcp 3.x in the CI pipeline. This experimental job monitors compatibility with the upcoming fastmcp 3.0 release, helping catch breaking changes early. The job is informational only and does not block releases.
 
-**Bug Fix:** The archive cooldown (which prevents AI agents from immediately archiving completed tasks) was incorrectly triggering for all tasks because `completed_at` timestamps were reset to `datetime.now()` when parsing TODO.md. The cooldown is now session-based in the MCP server, only blocking archival of tasks completed within the current session. This allows archiving of previously completed tasks while still protecting against overeager agents archiving tasks immediately after completion.
-
-**Infrastructure:** Updated GitHub Actions dependencies via Dependabot: `actions/checkout` v6, `actions/setup-python` v6, `actions/cache` v5, `astral-sh/setup-uv` v7, and `markdownlint-cli2-action` v22.
+The cursor rule generator that installs rules in new projects now documents that tasks are displayed in reverse chronological order (newest on top), helping prevent confusion about the intentional task ordering behavior.

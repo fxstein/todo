@@ -3,7 +3,11 @@ from ai_todo.core.task import Task
 
 
 def test_preserve_file_structure(tmp_path):
-    """Test that FileOps preserves header and footer content."""
+    """Test that FileOps preserves header content and regenerates standard footer.
+
+    Note: Custom footer content is NOT preserved (GitHub Issue #47 fix).
+    Footer is always regenerated with standard ai-todo timestamp format.
+    """
     todo_path = tmp_path / "TODO.md"
 
     original_content = """# Custom Header
@@ -50,7 +54,7 @@ def test_preserve_file_structure(tmp_path):
     assert "**#1** Task 1" in new_content
     assert "**#3** Task 3" in new_content
 
-    # Check that footer is preserved
-    assert "------------------" in new_content
-    assert "**Repository:** https://github.com/fxstein/ai-todo" in new_content
-    assert "**Maintenance:** Use `ai-todo` CLI/MCP" in new_content
+    # Check that footer is regenerated with standard format
+    # (Custom footer content is NOT preserved - GitHub Issue #47 fix)
+    assert "---" in new_content
+    assert "Last Updated:" in new_content

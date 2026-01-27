@@ -409,8 +409,10 @@ class FileOps:
         for line in lines:
             line_stripped = line.strip()
 
-            # Ignore separator lines
+            # Check for separator lines - may indicate footer start
             if line_stripped == "---":
+                # Mark that we've seen a separator - next timestamp might be footer
+                # We don't transition yet, continue parsing
                 continue
 
             # Check for single # Tasks section (common format)
@@ -629,6 +631,11 @@ class FileOps:
             # Note: Blank lines are handled by existing blank line logic, not captured here
             # (They will be handled properly in Phase 12 with the snapshot system)
             if current_section in TASK_SECTIONS and current_task and line_stripped:
+                # Skip orphaned ai-todo timestamp lines (GitHub Issue #47)
+                # These are malformed footer lines that should be ignored, not captured
+                if line_stripped.startswith("**ai-todo**") and "Last Updated:" in line_stripped:
+                    continue
+
                 # We're in a task section and have a current task
                 # This line is not a task, not a note, not a section header, not metadata, and not blank
                 # Capture it as interleaved content keyed by the preceding task ID
@@ -698,7 +705,7 @@ class FileOps:
         for line_idx, line in enumerate(lines):
             line_stripped = line.strip()
 
-            # Ignore separator lines
+            # Check for separator lines - may indicate footer start
             if line_stripped == "---":
                 continue
 
@@ -817,6 +824,11 @@ class FileOps:
 
             # Phase 10: Capture interleaved content (non-task, non-note, non-blank lines)
             if current_section == "Tasks" and current_task_id and line_stripped:
+                # Skip orphaned ai-todo timestamp lines (GitHub Issue #47)
+                # These are malformed footer lines that should be ignored, not captured
+                if line_stripped.startswith("**ai-todo**") and "Last Updated:" in line_stripped:
+                    continue
+
                 if current_task_id not in interleaved_content:
                     interleaved_content[current_task_id] = []
                 interleaved_content[current_task_id].append(line)
@@ -894,7 +906,7 @@ class FileOps:
             # Default Header (Enforced Standard for new files or files without header)
             lines.extend(
                 [
-                    "# todo.ai ToDo List",
+                    "# ai-todo Task List",
                     "",
                     "> ⚠️ **MANAGED FILE**: Do not edit manually. Use `ai-todo` (CLI/MCP) to manage tasks.",
                     "",
@@ -1051,18 +1063,15 @@ class FileOps:
                 if metadata_lines_to_use:
                     lines.extend(metadata_lines_to_use)
 
-        # 6. Footer
-        if snapshot.footer_lines:
-            lines.extend(snapshot.footer_lines)
-        else:
-            # Default Footer
-            lines.extend(
-                [
-                    "",
-                    "---",
-                    f"**ai-todo** | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                ]
-            )
+        # 6. Footer - Always regenerate with current timestamp
+        # (snapshot.footer_lines captured for parsing but we always generate fresh footer)
+        lines.extend(
+            [
+                "",
+                "---",
+                f"**ai-todo** | Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            ]
+        )
 
         full_content = "\n".join(lines)
         return "\n".join(line.rstrip() for line in full_content.splitlines()) + "\n"

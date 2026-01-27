@@ -6,7 +6,11 @@ from ai_todo.cli.main import cli
 
 
 def test_start_from_shell_repo():
-    """Test compatibility with an existing shell-script created repository."""
+    """Test compatibility with an existing shell-script created repository.
+
+    Note: Custom footer content (e.g., **Repository:**) is NOT preserved.
+    Footer is always regenerated with standard ai-todo timestamp format (GitHub Issue #47 fix).
+    """
     runner = CliRunner()
 
     with runner.isolated_filesystem():
@@ -59,6 +63,10 @@ def test_start_from_shell_repo():
 
         # D. Verify File Structure Preservation
         content = todo_path.read_text(encoding="utf-8")
-        assert "**Repository:** https://github.com/example/repo" in content
+        # Header preserved
+        assert "# Project Tasks" in content
+        # Tasks preserved
         assert "**#1** Legacy Task 1" in content
         assert "**#3** New Python Task" in content
+        # Footer regenerated with standard format (custom footer NOT preserved)
+        assert "Last Updated:" in content

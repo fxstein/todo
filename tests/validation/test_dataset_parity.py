@@ -145,7 +145,12 @@ def compare_todo_files(shell_path: Path, python_path: Path) -> tuple[bool, str]:
         if not line:
             return False
         # Ignore header/footer lines (metadata, separators, titles)
-        if line.startswith("# todo.ai") or line.startswith("# Project"):
+        # Include both legacy "todo.ai" and current "ai-todo" branding
+        if (
+            line.startswith("# todo.ai")
+            or line.startswith("# ai-todo")
+            or line.startswith("# Project")
+        ):
             return False
         if line.startswith("> ⚠️"):
             return False

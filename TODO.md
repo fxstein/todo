@@ -4,15 +4,24 @@
 
 ## Tasks
 
-- [ ] **#240** Fix malformed TODO.md when adding subtasks via MCP on fresh repository (GitHub Issue #47: https://github.com/fxstein/ai-todo/issues/47) `#bug` `#file-ops` `#mcp`
-  - [ ] **#240.8** Test: Run full test suite and verify no regressions `#testing`
-  - [ ] **#240.7** Test: Verify lint and reformat commands can detect and fix malformed TODO.md files `#linter` `#testing`
-  - [ ] **#240.6** Test: Create unit tests for fresh TODO.md creation with multiple subtasks `#testing`
-  - [ ] **#240.5** Assess: Verify subtask ordering is correct (newest on top: 1.n → 1.1) - may not be a bug `#assessment`
-  - [ ] **#240.4** Implement: Fix footer/timestamp duplication in file_ops.py write operations `#implementation`
-  - [ ] **#240.3** Design: Document fix approach for footer handling and subtask ordering `#design`
-  - [ ] **#240.2** Assess: Identify root cause - trace file_ops.py footer/timestamp handling during rapid sequential writes `#assessment`
-  - [ ] **#240.1** Assess: Reproduce the bug in a test environment with fresh TODO.md creation `#assessment`
+- [x] **#240** Fix malformed TODO.md when adding subtasks via MCP on fresh repository (GitHub Issue #47: https://github.com/fxstein/ai-todo/issues/47) `#bug` `#file-ops` `#mcp` (2026-01-27)
+  - [x] **#240.12** Test: Run full test suite to verify no regressions from branding/rule changes `#testing` (2026-01-27)
+  - [x] **#240.11** Test: Add unit test for ai-todo branding in default header `#testing` (2026-01-27)
+  - [x] **#240.10** Fix: Update cursor rule to document reverse chronological ordering (newest tasks on top) `#cursor-rules` `#documentation` (2026-01-27)
+    > Updated AI_TODO_CURSOR_RULE in ai_todo/mcp/server.py (the rule generator for new installations). Added single line: 'Tasks are displayed in **reverse chronological order** (newest on top)'
+  - [x] **#240.9** Fix: Update default TODO.md header from 'todo.ai' to 'ai-todo' (retired branding) `#branding` `#implementation` (2026-01-27)
+  - [x] **#240.8** Test: Run full test suite and verify no regressions `#testing` (2026-01-27)
+  - [x] **#240.7** Test: Verify lint and reformat commands can detect and fix malformed TODO.md files `#linter` `#testing` (2026-01-27)
+    > VERIFIED: `ai-todo reformat` successfully fixes malformed TODO.md files by: 1) Skipping orphaned timestamp lines during parsing, 2) Preserving all tasks and subtasks, 3) Regenerating a single correct footer.
+  - [x] **#240.6** Test: Create unit tests for fresh TODO.md creation with multiple subtasks `#testing` (2026-01-27)
+  - [x] **#240.5** Assess: Verify subtask ordering is correct (newest on top: 1.n → 1.1) - may not be a bug `#assessment` (2026-01-27)
+    > VERIFIED: Subtask ordering is correct - newest on top (1.3 → 1.2 → 1.1). This was not a bug, just the reporter's misunderstanding of ai-todo's reverse chronological ordering.
+  - [x] **#240.4** Implement: Fix footer/timestamp duplication in file_ops.py write operations `#implementation` (2026-01-27)
+  - [x] **#240.3** Design: Document fix approach for footer handling and subtask ordering `#design` (2026-01-27)
+    > FIX APPROACH: Change footer detection from `------------------` (18 dashes) to `---` (3 dashes) in both _parse_markdown() line 467 and _capture_structure_snapshot() line 762. This aligns detection with the default footer format and prevents timestamp lines from being captured as interleaved content.
+  - [x] **#240.2** Assess: Identify root cause - trace file_ops.py footer/timestamp handling during rapid sequential writes `#assessment` (2026-01-27)
+    > ROOT CAUSE: Default footer uses `---` (3 dashes) but footer detection in _parse_markdown() and _capture_structure_snapshot() expects `------------------` (18 dashes). Since `---` is ignored as separator, the timestamp line gets captured as interleaved content for the last task. On each write, old timestamps are written with interleaved content, then new footer added.
+  - [x] **#240.1** Assess: Reproduce the bug in a test environment with fresh TODO.md creation `#assessment` (2026-01-27)
 
 - [x] **#239** Test compatibility with fastmcp 3.x beta `#compatibility` `#fastmcp` (2026-01-27)
   > All 200 tests pass with fastmcp 3.0.0b1. ai-todo is already compatible with the 3.x beta. Added CI job to continuously monitor compatibility.
@@ -1370,4 +1379,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 01:53:05
+**ai-todo** | Last Updated: 2026-01-27 02:08:42

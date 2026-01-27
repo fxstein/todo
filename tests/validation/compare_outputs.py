@@ -44,7 +44,7 @@ def main():
 
     # Create empty TODO.md with correct structure manually to avoid init prompts
     (test_dir / "TODO.md").write_text(
-        "# todo.ai ToDo List\n\n## Tasks\n\n------------------\n**Maintenance:** Use `todo.ai` script only\n",
+        "# ai-todo Task List\n\n## Tasks\n\n------------------\n**Maintenance:** Use `ai-todo` CLI/MCP only\n",
         encoding="utf-8",
     )
     (test_dir / ".ai-todo").mkdir()

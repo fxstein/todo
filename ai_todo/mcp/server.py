@@ -319,6 +319,7 @@ alwaysApply: true
 - **NEVER** use Cursor's built-in TODO tools
 - **NEVER** edit TODO.md directly (protected by tamper detection)
 - **ASK** before completing root tasks or archiving
+- Tasks are displayed in **reverse chronological order** (newest on top)
 
 The MCP server name is typically `ai-todo` or similar in your `.cursor/mcp.json`.
 """

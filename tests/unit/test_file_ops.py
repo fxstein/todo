@@ -50,7 +50,7 @@ def test_write_and_read_tasks(file_ops):
 
 
 def test_parse_complex_todo(tmp_path):
-    content = """# todo.ai ToDo List
+    content = """# ai-todo Task List
 
 > Warning
 
@@ -106,7 +106,7 @@ def test_serial_ops(file_ops):
 
 
 def test_relationships(tmp_path):
-    content = """# todo.ai ToDo List
+    content = """# ai-todo Task List
 
 ## Tasks
 - [ ] **#1** Task 1
@@ -362,8 +362,11 @@ def test_generate_markdown_uses_snapshot(tmp_path):
     # Verify tasks section
     assert "## Tasks" in generated
 
-    # Verify custom footer is preserved
-    assert "**Footer**" in generated
+    # Footer is always regenerated with current timestamp (GitHub Issue #47 fix)
+    # Custom footer content is NOT preserved - only the standard ai-todo footer is used
+    assert "Last Updated:" in generated
+    assert "---" in generated
+
     # Verify interleaved content is inserted
     assert "# Comment between tasks" in generated
     # Verify it appears between tasks
@@ -602,3 +605,164 @@ def test_file_structure_snapshot_interleaved_content():
     assert len(snapshot.interleaved_content["2"]) == 1
     assert "# Comment for task 1" in snapshot.interleaved_content["1"][0]
     assert "# Comment for task 2" in snapshot.interleaved_content["2"][0]
+
+
+def test_fresh_file_no_duplicate_timestamps(tmp_path):
+    """GitHub Issue #47: Test that fresh TODO.md creation doesn't produce duplicate timestamps.
+
+    When creating a fresh TODO.md and adding multiple subtasks, the footer timestamp
+    should only appear once at the end, not after each task.
+    """
+    todo_path = tmp_path / "TODO.md"
+
+    # Create fresh FileOps (no existing TODO.md)
+    ops = FileOps(str(todo_path))
+
+    # Add a root task
+    task1 = Task(id="1", description="Root task", status=TaskStatus.PENDING, tags={"setup"})
+    ops.write_tasks([task1])
+
+    # Read back and add a subtask
+    tasks = ops.read_tasks()
+    task1_1 = Task(
+        id="1.1", description="First subtask", status=TaskStatus.PENDING, tags={"config"}
+    )
+    tasks.append(task1_1)
+    ops.write_tasks(tasks)
+
+    # Read content and verify only ONE footer timestamp
+    content = todo_path.read_text(encoding="utf-8")
+
+    # Count occurrences of "Last Updated:"
+    timestamp_count = content.count("Last Updated:")
+    assert timestamp_count == 1, (
+        f"Expected 1 timestamp, found {timestamp_count}. Content:\n{content}"
+    )
+
+    # Verify the timestamp is at the end (after ---)
+    lines = content.strip().splitlines()
+    last_line = lines[-1]
+    assert "Last Updated:" in last_line, f"Timestamp should be at end. Last line: {last_line}"
+
+    # Verify separator is present
+    assert "---" in content
+
+
+def test_multiple_subtasks_single_footer(tmp_path):
+    """GitHub Issue #47: Test that adding multiple subtasks maintains single footer.
+
+    Simulates the bug scenario: add root task, then add multiple subtasks sequentially.
+    Each write should not accumulate footer timestamps.
+    """
+    todo_path = tmp_path / "TODO.md"
+
+    # Create fresh FileOps (no existing TODO.md)
+    ops = FileOps(str(todo_path))
+
+    # Add a root task
+    task1 = Task(id="1", description="Root task", status=TaskStatus.PENDING)
+    ops.write_tasks([task1])
+
+    # Add subtasks one by one (simulating MCP sequential calls)
+    for i in range(1, 4):
+        # Re-read to get fresh snapshot (simulates new MCP call)
+        ops2 = FileOps(str(todo_path))
+        tasks = ops2.read_tasks()
+
+        # Add new subtask
+        subtask = Task(
+            id=f"1.{i}",
+            description=f"Subtask {i}",
+            status=TaskStatus.PENDING,
+        )
+        # Insert at beginning for reverse-chronological order
+        tasks.insert(1, subtask)  # After root task
+        ops2.write_tasks(tasks)
+
+    # Final verification
+    content = todo_path.read_text(encoding="utf-8")
+
+    # Should have exactly ONE timestamp
+    timestamp_count = content.count("Last Updated:")
+    assert timestamp_count == 1, f"Expected 1 timestamp after 3 subtasks, found {timestamp_count}"
+
+    # Verify structure: root task, then subtasks, then footer
+    assert "**#1**" in content
+    assert "**#1.1**" in content
+    assert "**#1.2**" in content
+    assert "**#1.3**" in content
+
+    # Verify no orphaned timestamps between tasks
+    lines = content.splitlines()
+    tasks_section_ended = False
+    for line in lines:
+        if "---" in line and not line.startswith("#"):
+            tasks_section_ended = True
+        if "Last Updated:" in line:
+            # Timestamp should only appear after tasks section ends
+            assert tasks_section_ended, f"Timestamp found before footer section: {line}"
+
+
+def test_default_header_uses_ai_todo_branding(tmp_path):
+    """Test that default header uses 'ai-todo' branding, not legacy 'todo.ai'.
+
+    The 'todo.ai' branding was retired as part of v3.x migration.
+    """
+    todo_path = tmp_path / "TODO.md"
+
+    # Create fresh FileOps (no existing TODO.md)
+    ops = FileOps(str(todo_path))
+
+    # Add a task to trigger file creation
+    from ai_todo.core.task import Task, TaskStatus
+
+    task = Task(id="1", description="Test task", status=TaskStatus.PENDING)
+    ops.write_tasks([task])
+
+    # Read content and verify branding
+    content = todo_path.read_text(encoding="utf-8")
+
+    # Should use new branding
+    assert "# ai-todo Task List" in content, "Default header should use 'ai-todo' branding"
+
+    # Should NOT use legacy branding
+    assert "todo.ai" not in content, "Legacy 'todo.ai' branding should not appear"
+
+
+def test_footer_timestamp_not_captured_as_interleaved(tmp_path):
+    """GitHub Issue #47: Test that footer timestamp is NOT captured as interleaved content.
+
+    The fix ensures that ai-todo timestamp lines (even orphaned ones) are skipped during
+    parsing and not captured as interleaved content. The footer is always regenerated fresh.
+    """
+    # Create content with footer (simulates file after first write)
+    content = """# ai-todo Task List
+
+> ⚠️ **MANAGED FILE**: Do not edit manually. Use `ai-todo` (CLI/MCP) to manage tasks.
+
+## Tasks
+
+- [ ] **#1** Test task `#setup`
+
+---
+**ai-todo** | Last Updated: 2026-01-27 00:00:00
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    ops.read_tasks()
+
+    # Verify timestamp was NOT captured as interleaved content
+    assert ops._structure_snapshot is not None
+
+    # The timestamp line should NOT be in interleaved content
+    for task_id, interleaved in ops._structure_snapshot.interleaved_content.items():
+        for line in interleaved:
+            assert "Last Updated:" not in line, (
+                f"Footer timestamp captured as interleaved content for task {task_id}"
+            )
+
+    # Note: Footer timestamp is intentionally NOT captured in footer_lines
+    # because we always regenerate the footer with current timestamp on write.
+    # This prevents timestamp duplication (GitHub Issue #47)

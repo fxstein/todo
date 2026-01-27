@@ -387,7 +387,7 @@ class TestLintCommand:
 
     def test_lint_detects_missing_blank_line(self, tmp_path):
         """Verify lint detects missing blank lines between root tasks."""
-        content = """# todo.ai ToDo List
+        content = """# ai-todo Task List
 
 > Warning
 

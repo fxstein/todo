@@ -4,6 +4,19 @@
 
 ## Tasks
 
+- [ ] **#242** Investigate archive/delete task ordering bug - root task appears below subtasks `#bug` `#file-ops`
+  - [ ] **#242.11** Docs: Document fix if behavior change affects user expectations
+  - [ ] **#242.10** Test: Run full test suite to verify no regressions
+  - [ ] **#242.9** Test: Add unit tests for delete ordering with parent and subtasks
+  - [ ] **#242.8** Test: Add unit tests for archive ordering with parent and subtasks
+  - [ ] **#242.7** Implement: Fix task ordering in delete operation (if affected)
+  - [ ] **#242.6** Implement: Fix task ordering in archive operation
+  - [ ] **#242.5** Design: Define correct archive/delete ordering (root task first, then subtasks)
+  - [ ] **#242.4** Analyze: Check if legacy shell script has same behavior or handles ordering differently
+  - [ ] **#242.3** Analyze: Trace archive/delete code path in file_ops.py to identify root cause
+  - [ ] **#242.2** Analyze: Verify if delete operation has the same ordering issue
+  - [ ] **#242.1** Analyze: Reproduce archive ordering issue with root task and subtasks
+
 - [ ] **#241** Implement self-update feature via uv with MCP server graceful shutdown `#feature` `#mcp`
   - [ ] **#241.12** Docs: Add troubleshooting section for update failures and rollback
   - [ ] **#241.11** Docs: Document self-update feature in README and user guide
@@ -1398,4 +1411,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 10:29:36
+**ai-todo** | Last Updated: 2026-01-27 11:28:21

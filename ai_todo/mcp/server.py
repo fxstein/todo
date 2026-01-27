@@ -298,10 +298,14 @@ def version() -> str:
 
 @mcp.tool()
 def check_update() -> str:
-    """Check if an ai-todo update is available."""
+    """Check if an ai-todo update is available, respecting version constraints."""
+    from pathlib import Path
+
     from ai_todo.core.updater import check_for_updates
 
-    info = check_for_updates()
+    # Get project root from TODO path
+    project_root = Path(CURRENT_TODO_PATH).parent
+    info = check_for_updates(project_root)
     return info.message
 
 
@@ -309,14 +313,21 @@ def check_update() -> str:
 def update(restart: bool = True) -> str:
     """Update ai-todo to the latest version and optionally restart.
 
+    Respects version constraints from pyproject.toml or global config.
+
     Args:
         restart: If True, restart the MCP server after update to apply changes.
                  The host (e.g., Cursor) will automatically reconnect.
     """
+    from pathlib import Path
+
     from ai_todo.core.updater import perform_update, restart_server
 
+    # Get project root from TODO path
+    project_root = Path(CURRENT_TODO_PATH).parent
+
     # Perform the update
-    success, message = perform_update(restart=restart)
+    success, message = perform_update(restart=restart, project_root=project_root)
 
     if success and restart:
         # Schedule restart after returning the message
@@ -380,6 +391,19 @@ def _init_cursor_rules(root: Path) -> None:
         pass
 
 
+def _check_version_mismatch(root: Path) -> None:
+    """Check for version mismatch and emit warning to stderr (MCP-safe)."""
+    try:
+        from ai_todo.core.version_constraints import check_version_mismatch
+
+        warning = check_version_mismatch(root)
+        if warning:
+            print(f"⚠️  {warning}", file=sys.stderr)
+    except Exception:
+        # Don't let version check errors break server startup
+        pass
+
+
 def run_server(root_path: str = "."):
     """Run the MCP server."""
     global CURRENT_TODO_PATH
@@ -388,6 +412,9 @@ def run_server(root_path: str = "."):
 
     # Initialize Cursor rules if needed
     _init_cursor_rules(root)
+
+    # Check for version mismatch (warning to stderr, MCP-safe)
+    _check_version_mismatch(root)
 
     # Run the server using stdio transport
     mcp.run(transport="stdio")

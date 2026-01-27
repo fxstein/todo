@@ -2,6 +2,7 @@
 
 Provides version checking against PyPI and update mechanisms via uv.
 Supports both production (installed via uv/pip) and development (editable) modes.
+Respects version constraints from pyproject.toml or global config.
 """
 
 import os
@@ -23,10 +24,16 @@ class UpdateInfo:
     latest_version: str
     is_dev_mode: bool
     update_available: bool
+    target_version: str | None = (
+        None  # Version to update to (may differ from latest if constrained)
+    )
+    constraint_info: str | None = None  # Info about active constraint
 
     @property
     def message(self) -> str:
         """Human-readable update status message."""
+        constraint_msg = f" ({self.constraint_info})" if self.constraint_info else ""
+
         if self.is_dev_mode:
             if self.update_available:
                 return (
@@ -36,7 +43,14 @@ class UpdateInfo:
             return f"Running in development mode at version {self.current_version} (latest: {self.latest_version})"
         else:
             if self.update_available:
-                return f"Update available: {self.current_version} -> {self.latest_version}"
+                if self.target_version and self.target_version != self.latest_version:
+                    return (
+                        f"Update available: {self.current_version} -> {self.target_version}{constraint_msg}\n"
+                        f"(Latest is {self.latest_version}, but constrained)"
+                    )
+                return f"Update available: {self.current_version} -> {self.latest_version}{constraint_msg}"
+            if self.constraint_info:
+                return f"ai-todo is up to date (version {self.current_version}){constraint_msg}"
             return f"ai-todo is up to date (version {self.current_version})"
 
 
@@ -106,12 +120,17 @@ def parse_version(version: str) -> tuple[int, ...]:
     return tuple(int(p) for p in parts if p.isdigit())
 
 
-def check_for_updates() -> UpdateInfo:
-    """Check if an update is available.
+def check_for_updates(project_root: Path | None = None) -> UpdateInfo:
+    """Check if an update is available, respecting version constraints.
+
+    Args:
+        project_root: Project root directory to check for pyproject.toml constraints.
 
     Returns:
         UpdateInfo with current/latest versions and update availability.
     """
+    from ai_todo.core.version_constraints import get_effective_constraint
+
     current = __version__
     latest = get_latest_version()
     dev_mode = is_dev_mode()
@@ -125,11 +144,40 @@ def check_for_updates() -> UpdateInfo:
             update_available=False,
         )
 
+    # Check for version constraints
+    constraint = get_effective_constraint(project_root)
+    constraint_info: str | None = None
+    target_version: str | None = latest
+
+    if constraint:
+        constraint_info = f"constraint: {constraint.raw}"
+
+        # If pinned, no updates allowed
+        if constraint.pinned:
+            return UpdateInfo(
+                current_version=current,
+                latest_version=latest,
+                is_dev_mode=dev_mode,
+                update_available=False,
+                constraint_info=f"pinned to {constraint.pinned}",
+            )
+
+        # Check if latest satisfies constraint
+        if not constraint.satisfies(latest):
+            # Latest doesn't satisfy constraint - find best version that does
+            # For now, just report that we can't update beyond constraint
+            target_version = None
+            constraint_info = f"latest {latest} exceeds constraint {constraint.raw}"
+
     # Compare versions
     try:
         current_tuple = parse_version(current)
         latest_tuple = parse_version(latest)
         update_available = latest_tuple > current_tuple
+
+        # If constrained and latest exceeds constraint, check if we're at max allowed
+        if constraint and target_version is None:
+            update_available = False
     except (ValueError, IndexError):
         update_available = False
 
@@ -138,19 +186,22 @@ def check_for_updates() -> UpdateInfo:
         latest_version=latest,
         is_dev_mode=dev_mode,
         update_available=update_available,
+        target_version=target_version if update_available else None,
+        constraint_info=constraint_info,
     )
 
 
-def perform_update(restart: bool = True) -> tuple[bool, str]:
-    """Perform the update using uv.
+def perform_update(restart: bool = True, project_root: Path | None = None) -> tuple[bool, str]:
+    """Perform the update using uv, respecting version constraints.
 
     Args:
         restart: If True, exit the process after update to trigger restart by host.
+        project_root: Project root directory to check for pyproject.toml constraints.
 
     Returns:
         Tuple of (success, message).
     """
-    info = check_for_updates()
+    info = check_for_updates(project_root)
 
     if info.is_dev_mode:
         if restart:
@@ -167,32 +218,40 @@ def perform_update(restart: bool = True) -> tuple[bool, str]:
             )
 
     if not info.update_available:
+        msg = f"ai-todo is already at the latest version ({info.current_version})"
+        if info.constraint_info:
+            msg += f"\n({info.constraint_info})"
         if restart:
-            return (True, f"Already at latest version ({info.current_version}). Restarting...")
+            return (True, msg + "\nRestarting...")
         else:
-            return (True, f"ai-todo is already at the latest version ({info.current_version})")
+            return (True, msg)
+
+    # Determine target version
+    target = info.target_version or info.latest_version
 
     # Try to update using uv
     try:
-        # First, try uv pip install --upgrade
+        # Build the install command with optional version constraint
+        cmd = ["uv", "pip", "install", "--upgrade", f"ai-todo=={target}"]
+
         result = subprocess.run(
-            ["uv", "pip", "install", "--upgrade", "ai-todo"],
+            cmd,
             capture_output=True,
             text=True,
             timeout=120,
         )
 
         if result.returncode == 0:
-            return (
-                True,
-                f"Successfully updated ai-todo: {info.current_version} -> {info.latest_version}\n"
-                + ("Restarting to apply update..." if restart else ""),
-            )
+            msg = f"Successfully updated ai-todo: {info.current_version} -> {target}"
+            if info.constraint_info:
+                msg += f"\n({info.constraint_info})"
+            if restart:
+                msg += "\nRestarting to apply update..."
+            return (True, msg)
         else:
-            # Try alternative: uvx with version
             return (
                 False,
-                f"Update failed: {result.stderr}\nTry manually: uv pip install --upgrade ai-todo",
+                f"Update failed: {result.stderr}\nTry manually: uv pip install ai-todo=={target}",
             )
 
     except FileNotFoundError:

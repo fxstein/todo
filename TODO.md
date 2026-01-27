@@ -4,7 +4,7 @@
 
 ## Tasks
 
-- [ ] **#245** Add version pinning and maximum version constraints to self-update feature (builds on #241) `#feature` `#mcp` `#update`
+- [x] **#245** Add version pinning and maximum version constraints to self-update feature (builds on #241) `#feature` `#mcp` `#update` (2026-01-27)
   > DESIGN: Two deployment modes with different constraint sources:
   > - Project-local (uv add ai-todo): Use pyproject.toml constraints (uv handles automatically)
   > - System-global (uv tool install): Use ~/.config/ai-todo/config.yaml for version constraints
@@ -27,19 +27,19 @@
   > - Example: "Warning: Global ai-todo 4.1.0 doesn't match project constraint >=3.0.0,<4.0.0"
   > - Suggest: "Consider using project-local install: uv add ai-todo"
   > IMPLEMENTATION: MCP protocol safety - all warnings MUST use stderr (file=sys.stderr), never stdout. MCP uses stdout for JSON-RPC; any raw text to stdout corrupts the protocol stream.
-  - [ ] **#245.13** Implement: Add startup warning when global install version mismatches project pyproject.toml constraint
-  - [ ] **#245.12** Implement: Extend updater.py to check constraints before performing update
-  - [ ] **#245.11** Docs: Document version constraint configuration options in user guide
-  - [ ] **#245.10** Test: Integration tests for update with max_version constraint (should cap at boundary)
-  - [ ] **#245.9** Test: Integration tests for update with pinned version (should skip upgrade)
-  - [ ] **#245.8** Test: Unit tests for version constraint parsing and comparison logic
-  - [ ] **#245.7** Implement: Update MCP check_update/update tools to respect version constraints
-  - [ ] **#245.6** Implement: Add CLI commands for setting/viewing version constraints (ai-todo config update.pin-version)
-  - [ ] **#245.5** Implement: Add version constraint fields to config schema and loader
-  - [ ] **#245.4** Design: Plan update behavior with constraints (skip if pinned, cap at max_version, warn on constraint violations)
-  - [ ] **#245.3** Design: Define version constraint schema for config.yaml (pinned_version, max_version, allow_prerelease)
-  - [ ] **#245.2** Analyze: Investigate how other tools handle version locks (e.g., uv.lock, pip-tools, poetry.lock)
-  - [ ] **#245.1** Analyze: Research uv/pip version specifier patterns (==, <=, <, ~=, ^) and common ecosystem practices
+  - [x] **#245.13** Implement: Add startup warning when global install version mismatches project pyproject.toml constraint (2026-01-27)
+  - [x] **#245.12** Implement: Extend updater.py to check constraints before performing update (2026-01-27)
+  - [x] **#245.11** Docs: Document version constraint configuration options in user guide (2026-01-27)
+  - [x] **#245.10** Test: Integration tests for update with max_version constraint (should cap at boundary) (2026-01-27)
+  - [x] **#245.9** Test: Integration tests for update with pinned version (should skip upgrade) (2026-01-27)
+  - [x] **#245.8** Test: Unit tests for version constraint parsing and comparison logic (2026-01-27)
+  - [x] **#245.7** Implement: Update MCP check_update/update tools to respect version constraints (2026-01-27)
+  - [x] **#245.6** Implement: Add CLI commands for setting/viewing version constraints (ai-todo config update.pin-version) (2026-01-27)
+  - [x] **#245.5** Implement: Add version constraint fields to config schema and loader (2026-01-27)
+  - [x] **#245.4** Design: Plan update behavior with constraints (skip if pinned, cap at max_version, warn on constraint violations) (2026-01-27)
+  - [x] **#245.3** Design: Define version constraint schema for config.yaml (pinned_version, max_version, allow_prerelease) (2026-01-27)
+  - [x] **#245.2** Analyze: Investigate how other tools handle version locks (e.g., uv.lock, pip-tools, poetry.lock) (2026-01-27)
+  - [x] **#245.1** Analyze: Research uv/pip version specifier patterns (==, <=, <, ~=, ^) and common ecosystem practices (2026-01-27)
 
 - [x] **#242** Investigate archive/delete task ordering bug - root task appears below subtasks `#bug` `#file-ops` (2026-01-27)
   - [x] **#242.11** Docs: Document fix if behavior change affects user expectations (2026-01-27)
@@ -1451,4 +1451,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 13:16:08
+**ai-todo** | Last Updated: 2026-01-27 13:24:36

@@ -364,9 +364,11 @@ def version_long():
 @cli.command("check-update")
 def check_update_cmd():
     """Check if an ai-todo update is available."""
+    from pathlib import Path
+
     from ai_todo.core.updater import check_for_updates
 
-    info = check_for_updates()
+    info = check_for_updates(Path.cwd())
     print(info.message)
 
 
@@ -374,17 +376,74 @@ def check_update_cmd():
 @click.option("--check-only", is_flag=True, help="Only check for updates, don't install")
 def update_cmd(check_only):
     """Update ai-todo to the latest version."""
+    from pathlib import Path
+
     from ai_todo.core.updater import check_for_updates, perform_update
 
+    project_root = Path.cwd()
+
     if check_only:
-        info = check_for_updates()
+        info = check_for_updates(project_root)
         print(info.message)
         return
 
-    success, message = perform_update(restart=False)
+    success, message = perform_update(restart=False, project_root=project_root)
     print(message)
     if not success:
         raise SystemExit(1)
+
+
+# Update configuration commands
+@cli.group("update-config")
+def update_config():
+    """Manage global update version constraints."""
+    pass
+
+
+@update_config.command("show")
+def update_config_show():
+    """Show current update version constraint."""
+    from ai_todo.core.version_constraints import GlobalConfig, get_global_config_path
+
+    config = GlobalConfig()
+    constraint = config.get("update.version_constraint")
+    allow_prerelease = config.get("update.allow_prerelease", False)
+
+    print(f"Global config: {get_global_config_path()}")
+    if constraint:
+        print(f"Version constraint: {constraint}")
+    else:
+        print("Version constraint: (none - will update to latest)")
+    print(f"Allow prerelease: {allow_prerelease}")
+
+
+@update_config.command("set")
+@click.argument("constraint")
+def update_config_set(constraint):
+    """Set update version constraint (e.g., '>=3.0.0,<4.0.0' or '==3.0.2')."""
+    from ai_todo.core.version_constraints import GlobalConfig, parse_constraint
+
+    # Validate the constraint
+    try:
+        parsed = parse_constraint(constraint)
+        print(f"Parsed constraint: {parsed.raw}")
+    except Exception as e:
+        print(f"Error: Invalid version constraint: {e}")
+        raise SystemExit(1) from None
+
+    config = GlobalConfig()
+    config.set("update.version_constraint", constraint)
+    print(f"Set version constraint: {constraint}")
+
+
+@update_config.command("clear")
+def update_config_clear():
+    """Clear update version constraint (allow updates to latest)."""
+    from ai_todo.core.version_constraints import GlobalConfig
+
+    config = GlobalConfig()
+    config.set("update.version_constraint", None)
+    print("Cleared version constraint - updates will go to latest version")
 
 
 @cli.command("serve")

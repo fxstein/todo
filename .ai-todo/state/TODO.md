@@ -4,45 +4,7 @@
 
 ## Tasks
 
-- [x] **#261** Implement batch operations for task state commands `#api` `#batch-operations` `#enhancement` (2026-01-27)
-  > Add batch support (one or list of task IDs) to complete, archive, delete, and restore commands. Ensure consistent API across CLI and MCP.
-  - [x] **#261.7** Document: Update API docs and CLI help for batch operations (2026-01-27)
-    > CLI help updated (shows TASK_IDS...). Design doc at docs/batch-operations-design.md
-  - [x] **#261.6** Verify: End-to-end validation of batch operations (2026-01-27)
-    > Full test suite: 241 passed. CLI and MCP batch operations verified.
-  - [x] **#261.5** Test: Create unit and integration tests for batch operations (2026-01-27)
-    > Updated test_mcp_cli_parity.py to use task_ids: list[str]. All 241 tests pass.
-  - [x] **#261.4** Implement: Add batch support to restore CLI command (2026-01-27)
-    > Updated restore CLI command to accept multiple task IDs via nargs=-1, refactored restore_command to accept list[str]
-  - [x] **#261.3** Implement: Add batch support to MCP tools (2026-01-27)
-    > Updated complete_task, delete_task, archive_task, restore_task MCP tools to accept task_ids: list[str]
-  - [x] **#261.2** Design: Create design document for batch operations API (2026-01-27)
-    > APPROVED: Option A - task_ids: list[str] (1 to n items). See docs/batch-operations-design.md
-  - [x] **#261.1** Investigate: Audit current batch support in CLI, MCP, and core (2026-01-27)
-
-- [x] **#260** GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security` (2026-01-27)
-  > GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security`
-  > > COMPLETE: Implemented Option A (Minimal Security Focus). Updated .cursorignore to protect tamper detection state. Added security best practices docs. GitHub issue #29 closed.
-  - [x] **#260.7** Document: Add security best practices docs and close GitHub issue #29 (2026-01-27)
-    > Document: Add security best practices docs and close GitHub issue #29
-    > > DONE: Created docs/guides/SECURITY_BEST_PRACTICES.md, updated docs/README.md index, closed GitHub issue #29.
-  - [x] **#260.6** Verify: Confirm sensitive content is not exposed to AI agents (2026-01-27)
-    > Verify: Confirm sensitive content is not exposed to AI agents
-    > > VERIFIED: .cursorignore blocks Cursor AI features (Tab, inline edit, @ refs) from state/. Note: MCP tools bypass .cursorignore by design - this is expected and necessary for ai-todo to function.
-  - [x] **#260.5** Test: Verify ignore patterns work correctly in Cursor (2026-01-27)
-    > Test: Verify ignore patterns work correctly in Cursor
-    > > VERIFIED: .cursorignore patterns use valid gitignore syntax. Protected directories exist and contain sensitive files (checksum, tamper_mode, shadow TODO.md).
-  - [x] **#260.4** Implement: Add .cursorignore file with recommended patterns (2026-01-27)
-  - [x] **#260.3** Decide: Define default ignore patterns and user customization options (2026-01-27)
-    > AWAITING APPROVAL: Select Option A, B, or C from docs/cursorignore-design.md
-  - [x] **#260.2** Analyze: Identify sensitive files/patterns that should be ignored (2026-01-27)
-    > See docs/cursorignore-design.md for analysis
-  - [x] **#260.1** Investigate: Research .cursorignore format and best practices for secrets (2026-01-27)
-
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
-  - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
-  - [x] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2026-01-27)
-  - [x] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2026-01-27)
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
   - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
@@ -63,6 +25,39 @@
 ---
 
 ## Archived Tasks
+- [x] **#261** Implement batch operations for task state commands `#api` `#batch-operations` `#enhancement` (2026-01-27)
+  > Add batch support (one or list of task IDs) to complete, archive, delete, and restore commands. Ensure consistent API across CLI and MCP.
+  - [x] **#261.7** Document: Update API docs and CLI help for batch operations (2026-01-27)
+    > CLI help updated (shows TASK_IDS...). Design doc at docs/batch-operations-design.md
+  - [x] **#261.6** Verify: End-to-end validation of batch operations (2026-01-27)
+    > Full test suite: 241 passed. CLI and MCP batch operations verified.
+  - [x] **#261.5** Test: Create unit and integration tests for batch operations (2026-01-27)
+    > Updated test_mcp_cli_parity.py to use task_ids: list[str]. All 241 tests pass.
+  - [x] **#261.4** Implement: Add batch support to restore CLI command (2026-01-27)
+    > Updated restore CLI command to accept multiple task IDs via nargs=-1, refactored restore_command to accept list[str]
+  - [x] **#261.3** Implement: Add batch support to MCP tools (2026-01-27)
+    > Updated complete_task, delete_task, archive_task, restore_task MCP tools to accept task_ids: list[str]
+  - [x] **#261.2** Design: Create design document for batch operations API (2026-01-27)
+    > APPROVED: Option A - task_ids: list[str] (1 to n items). See docs/batch-operations-design.md
+  - [x] **#261.1** Investigate: Audit current batch support in CLI, MCP, and core (2026-01-27)
+- [x] **#260** GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security` (2026-01-27)
+  > GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security`
+  > > COMPLETE: Implemented Option A (Minimal Security Focus). Updated .cursorignore to protect tamper detection state. Added security best practices docs. GitHub issue #29 closed.
+  - [x] **#260.7** Document: Add security best practices docs and close GitHub issue #29 (2026-01-27)
+    > Document: Add security best practices docs and close GitHub issue #29
+    > > DONE: Created docs/guides/SECURITY_BEST_PRACTICES.md, updated docs/README.md index, closed GitHub issue #29.
+  - [x] **#260.6** Verify: Confirm sensitive content is not exposed to AI agents (2026-01-27)
+    > Verify: Confirm sensitive content is not exposed to AI agents
+    > > VERIFIED: .cursorignore blocks Cursor AI features (Tab, inline edit, @ refs) from state/. Note: MCP tools bypass .cursorignore by design - this is expected and necessary for ai-todo to function.
+  - [x] **#260.5** Test: Verify ignore patterns work correctly in Cursor (2026-01-27)
+    > Test: Verify ignore patterns work correctly in Cursor
+    > > VERIFIED: .cursorignore patterns use valid gitignore syntax. Protected directories exist and contain sensitive files (checksum, tamper_mode, shadow TODO.md).
+  - [x] **#260.4** Implement: Add .cursorignore file with recommended patterns (2026-01-27)
+  - [x] **#260.3** Decide: Define default ignore patterns and user customization options (2026-01-27)
+    > AWAITING APPROVAL: Select Option A, B, or C from docs/cursorignore-design.md
+  - [x] **#260.2** Analyze: Identify sensitive files/patterns that should be ignored (2026-01-27)
+    > See docs/cursorignore-design.md for analysis
+  - [x] **#260.1** Investigate: Research .cursorignore format and best practices for secrets (2026-01-27)
 - [x] **#259** GitHub Issue #30: Evaluate MCP server benefits over CLI `#github-issue` `#investigation` `#mcp` (2026-01-27)
   > IMPLEMENTED in v3.0.0: MCP server fully implemented with CLI parity. Close GitHub issue #30.
   - [x] **#259.8** Close GitHub issue #30 as implemented in v3.0.0 (2026-01-27)
@@ -1476,6 +1471,9 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#252** Test task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#248** Tell a joke `#test` (deleted 2026-01-27, expires 2026-02-26)
@@ -1622,4 +1620,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 22:57:47
+**ai-todo** | Last Updated: 2026-01-27 23:04:21

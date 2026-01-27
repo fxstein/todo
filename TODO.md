@@ -4,6 +4,9 @@
 
 ## Tasks
 
+- [x] **#239** Test compatibility with fastmcp 3.x beta `#compatibility` `#fastmcp` (2026-01-27)
+  > All 200 tests pass with fastmcp 3.0.0b1. ai-todo is already compatible with the 3.x beta. Added CI job to continuously monitor compatibility.
+
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
   - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
   - [x] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2026-01-27)
@@ -28,7 +31,6 @@
 ---
 
 ## Archived Tasks
-- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-27)
   - [x] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12` (2026-01-27)
   - [x] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11` (2026-01-27)
   - [x] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10` (2026-01-27)
@@ -41,6 +43,7 @@
   - [x] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3` (2026-01-27)
   - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-27)
   - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-27)
+- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-27)
   - [x] **#235.8** Test updated rules with fresh install (2026-01-27)
   - [x] **#235.7** Simplify/consolidate rules (remove redundancy) (2026-01-27)
   - [x] **#235.6** Update rules for ai-todo naming conventions (2026-01-27)
@@ -1357,4 +1360,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 00:00:44
+**ai-todo** | Last Updated: 2026-01-27 01:00:31

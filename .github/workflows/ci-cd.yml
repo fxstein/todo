@@ -368,6 +368,82 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
+  # Experimental: Test compatibility with fastmcp 3.x beta
+  # This job is informational only - allowed to fail
+  # Helps catch breaking changes early before fastmcp 3.0 stable release
+  test-fastmcp-3x:
+    name: 🔮 FastMCP 3.x Compatibility
+    needs: quality
+    if: |
+      github.event_name == 'push' &&
+      !startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Allowed to fail - informational only
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+          allow-prereleases: true
+
+      - name: Install Zsh
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh
+
+      - name: Install dependencies with fastmcp 3.x
+        run: |
+          # Install base dependencies
+          uv sync --all-extras
+
+          # Upgrade to fastmcp 3.x beta (overrides the pinned version)
+          uv pip install "fastmcp>=3.0.0b1"
+
+          # Show installed versions
+          echo "Installed fastmcp version:"
+          uv pip show fastmcp | grep Version
+
+      - name: Run test suite with fastmcp 3.x
+        run: |
+          echo "================================================"
+          echo "🔮 FASTMCP 3.x COMPATIBILITY TEST"
+          echo "================================================"
+          echo ""
+          echo "This is an experimental job to catch breaking changes"
+          echo "early before fastmcp 3.0 stable is released."
+          echo ""
+          echo "Failures here are expected and informational only."
+          echo "They do NOT block releases or other CI jobs."
+          echo ""
+          echo "================================================"
+          echo ""
+
+          uv run pytest --tb=short -v 2>&1 || {
+            echo ""
+            echo "================================================"
+            echo "❌ Tests failed with fastmcp 3.x"
+            echo ""
+            echo "This is expected - fastmcp 3.x may have breaking changes."
+            echo "Review the errors above to prepare for migration."
+            echo "================================================"
+            exit 1
+          }
+
+          echo ""
+          echo "================================================"
+          echo "✅ Tests passed with fastmcp 3.x!"
+          echo "   ai-todo appears compatible with the beta."
+          echo "================================================"
+
   # Summary job to gate release on all tests passing
   # This creates clear visual dependency in GitHub Actions UI
   all-tests-pass:

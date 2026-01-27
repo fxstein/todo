@@ -181,10 +181,13 @@ class TestGetGlobalConfigPath:
     """Tests for get_global_config_path function."""
 
     def test_default_path(self):
-        """Test default config path."""
-        with patch.dict("os.environ", {}, clear=True):
-            path = get_global_config_path()
-            assert path == Path.home() / ".config" / "ai-todo" / "config.yaml"
+        """Test default config path (no XDG override)."""
+        # Mock Path.home() to avoid Windows environment issues
+        # and clear XDG_CONFIG_HOME to test default behavior
+        with patch("pathlib.Path.home", return_value=Path("/home/testuser")):
+            with patch.dict("os.environ", {"XDG_CONFIG_HOME": ""}, clear=False):
+                path = get_global_config_path()
+                assert path == Path("/home/testuser/.config/ai-todo/config.yaml")
 
     def test_xdg_override(self):
         """Test XDG_CONFIG_HOME override."""

@@ -177,8 +177,8 @@ class TestGetConfigData:
 
     @patch("ai_todo.core.config.Config")
     @patch("ai_todo.core.file_ops.FileOps")
-    def test_returns_config_settings(self, mock_file_ops_class, mock_config_class):
-        """Test that config helper returns settings."""
+    def test_returns_config_settings_no_coordination(self, mock_file_ops_class, mock_config_class):
+        """Test that config helper returns settings when coordination is disabled."""
         from ai_todo.mcp.server import _get_config_data
 
         # Mock Config
@@ -186,7 +186,6 @@ class TestGetConfigData:
         mock_config.get_numbering_mode.return_value = "single-user"
         mock_config.get.side_effect = lambda key, default=None: {
             "security.tamper_proof": True,
-            "coordination.enabled": False,
         }.get(key, default)
         mock_config.get_coordination_type.return_value = "none"
         mock_config_class.return_value = mock_config
@@ -206,4 +205,39 @@ class TestGetConfigData:
         assert result["numbering"]["mode"] == "single-user"
         assert result["security"]["tamper_proof"] is True
         assert result["coordination"]["enabled"] is False
+        assert result["coordination"]["type"] == "none"
         assert "timestamp" in result
+
+    @patch("ai_todo.core.config.Config")
+    @patch("ai_todo.core.file_ops.FileOps")
+    def test_returns_config_settings_with_coordination(
+        self, mock_file_ops_class, mock_config_class
+    ):
+        """Test that config helper returns enabled=True when coordination type is set."""
+        from ai_todo.mcp.server import _get_config_data
+
+        # Mock Config with github-issues coordination
+        mock_config = MagicMock()
+        mock_config.get_numbering_mode.return_value = "single-user"
+        mock_config.get.side_effect = lambda key, default=None: {
+            "security.tamper_proof": True,
+        }.get(key, default)
+        mock_config.get_coordination_type.return_value = "github-issues"
+        mock_config_class.return_value = mock_config
+
+        # Mock FileOps
+        mock_config_dir = MagicMock()
+        serial_path = MagicMock()
+        serial_path.exists.return_value = True
+        serial_path.read_text.return_value = "42"
+        mock_config_dir.__truediv__ = MagicMock(return_value=serial_path)
+
+        mock_file_ops = MagicMock()
+        mock_file_ops.config_dir = mock_config_dir
+        mock_file_ops_class.return_value = mock_file_ops
+
+        result = _get_config_data("TODO.md")
+
+        assert result["coordination"]["enabled"] is True
+        assert result["coordination"]["type"] == "github-issues"
+        assert result["numbering"]["next_id"] == 43

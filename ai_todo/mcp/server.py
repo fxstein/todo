@@ -639,7 +639,7 @@ def _get_config_data(todo_path: str) -> dict:
             "tamper_proof": config.get("security.tamper_proof", False),
         },
         "coordination": {
-            "enabled": config.get("coordination.enabled", False),
+            "enabled": config.get_coordination_type() not in ("none", ""),
             "type": config.get_coordination_type(),
         },
         "timestamp": datetime.now().isoformat(),

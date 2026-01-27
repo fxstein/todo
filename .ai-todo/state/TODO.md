@@ -4,6 +4,20 @@
 
 ## Tasks
 
+- [ ] **#241** Implement self-update feature via uv with MCP server graceful shutdown `#feature` `#mcp`
+  - [ ] **#241.12** Docs: Add troubleshooting section for update failures and rollback
+  - [ ] **#241.11** Docs: Document self-update feature in README and user guide
+  - [ ] **#241.10** Test: Verify graceful shutdown signals pending operations to complete
+  - [ ] **#241.9** Test: Integration tests for MCP update tool with mocked uv commands
+  - [ ] **#241.8** Test: Unit tests for version comparison and update detection logic
+  - [ ] **#241.7** Implement: Add CLI `ai-todo update` command for manual updates
+  - [ ] **#241.6** Implement: Add graceful shutdown mechanism for MCP server after update completes
+  - [ ] **#241.5** Implement: Create `update` MCP tool that triggers uv upgrade subprocess
+  - [ ] **#241.4** Implement: Add version check against PyPI to detect available updates
+  - [ ] **#241.3** Design: Determine graceful shutdown strategy for MCP server (signal handling, cleanup)
+  - [ ] **#241.2** Design: Define update workflow (check version, download, shutdown, restart by host)
+  - [ ] **#241.1** Design: Research uv self-update mechanisms and MCP server shutdown patterns
+
 - [x] **#240** Fix malformed TODO.md when adding subtasks via MCP on fresh repository (GitHub Issue #47: https://github.com/fxstein/ai-todo/issues/47) `#bug` `#file-ops` `#mcp` (2026-01-27)
   - [x] **#240.12** Test: Run full test suite to verify no regressions from branding/rule changes `#testing` (2026-01-27)
   - [x] **#240.11** Test: Add unit test for ai-todo branding in default header `#testing` (2026-01-27)
@@ -1374,9 +1388,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 02:08:42
+**ai-todo** | Last Updated: 2026-01-27 10:29:36

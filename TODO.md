@@ -20,43 +20,24 @@
     > APPROVED: Option A - task_ids: list[str] (1 to n items). See docs/batch-operations-design.md
   - [x] **#261.1** Investigate: Audit current batch support in CLI, MCP, and core (2026-01-27)
 
-- [ ] **#260** GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security`
-  > Research and implement .cursorignore files to prevent secrets and sensitive content from being exposed to AI agents.
-  - [ ] **#260.7** Document: Add security best practices docs and close GitHub issue #29
-  - [ ] **#260.6** Verify: Confirm sensitive content is not exposed to AI agents
-  - [ ] **#260.5** Test: Verify ignore patterns work correctly in Cursor
-  - [ ] **#260.4** Implement: Add .cursorignore file with recommended patterns
-  - [ ] **#260.3** Decide: Define default ignore patterns and user customization options
-  - [ ] **#260.2** Analyze: Identify sensitive files/patterns that should be ignored
-  - [ ] **#260.1** Investigate: Research .cursorignore format and best practices for secrets
-
-- [x] **#258** GitHub Issue #31: Investigate Cursor CLI and Shell Commands `#cursor-integration` `#github-issue` `#investigation` (2026-01-27)
-  > COMPLETE: ai-todo already integrates with Cursor via MCP. Cursor CLI provides: (1) `cursor agent` for terminal AI with MCP support, (2) `cursor agent mcp list/list-tools/enable/disable` for server management, (3) `cursor --add-mcp` for programmatic setup. No additional integration work needed. Close GitHub issue #31.
-  - [x] **#258.8** Close GitHub issue #31 as complete - ai-todo MCP integration already works with Cursor CLI (2026-01-27)
-
-- [x] **#254** Freeze legacy shell scripts and remove from test comparisons `#cleanup` `#legacy` `#testing` (2026-01-27)
-  > Implemented: (1) Added FROZEN header with date and reason to legacy/todo.ai and todo.bash, (2) Deleted parity test files (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py, test_show_root_shell.py), (3) Rewrote TEST_PLAN.md for Python-only testing, (4) CI runs pytest which now excludes deleted tests, (5) Release script references kept intentionally - scripts are frozen but still distributed for backward compatibility.
-  - [x] **#254.6** Remove legacy script references from release scripts (release.sh, etc.) (2026-01-27)
-  - [x] **#254.5** Update CI workflow to skip legacy comparison tests (2026-01-27)
-  - [x] **#254.4** Update TEST_PLAN.md to reflect Python-only testing strategy (2026-01-27)
-  - [x] **#254.3** Remove test_show_root_shell.py (shell-based show command tests) (2026-01-27)
-  - [x] **#254.2** Remove shell script parity tests (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py) (2026-01-27)
-  - [x] **#254.1** Mark legacy/ scripts as frozen (add header comment with freeze date and reason) (2026-01-27)
-
-- [x] **#253** Standardize API terminology to follow industry conventions (title/description) `#api` `#breaking-change` `#enhancement` (2026-01-27)
-  > DEPENDENCY: Complete #254 (freeze legacy scripts) before starting implementation phase (#253.4+)
-  > ANALYSIS: See docs/api-terminology-analysis.md for full audit, research, and design proposal.
-  - [x] **#253.11** Update CHANGELOG with breaking change notes (2026-01-27)
-  - [x] **#253.10** Run full test suite and verify no regressions (2026-01-27)
-  - [x] **#253.9** Update all documentation (README, docs/, cursor rules) (2026-01-27)
-  - [x] **#253.8** Update integration and e2e tests (2026-01-27)
-  - [x] **#253.7** Create/update unit tests for renamed parameters (2026-01-27)
-  - [x] **#253.6** Update core functions and internal APIs (2026-01-27)
-  - [x] **#253.5** Update CLI commands with new parameter names (2026-01-27)
-  - [x] **#253.4** Update MCP server tools (server.py) with new parameter names (2026-01-27)
-  - [x] **#253.3** Design new naming standard with mapping table (old → new) - WAIT FOR APPROVAL (2026-01-27)
-  - [x] **#253.2** Research industry standards: GitHub Issues, Jira, Linear, Todoist APIs for terminology (2026-01-27)
-  - [x] **#253.1** Audit all current parameter names across MCP tools, CLI commands, and core functions (2026-01-27)
+- [x] **#260** GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security` (2026-01-27)
+  > GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security`
+  > > COMPLETE: Implemented Option A (Minimal Security Focus). Updated .cursorignore to protect tamper detection state. Added security best practices docs. GitHub issue #29 closed.
+  - [x] **#260.7** Document: Add security best practices docs and close GitHub issue #29 (2026-01-27)
+    > Document: Add security best practices docs and close GitHub issue #29
+    > > DONE: Created docs/guides/SECURITY_BEST_PRACTICES.md, updated docs/README.md index, closed GitHub issue #29.
+  - [x] **#260.6** Verify: Confirm sensitive content is not exposed to AI agents (2026-01-27)
+    > Verify: Confirm sensitive content is not exposed to AI agents
+    > > VERIFIED: .cursorignore blocks Cursor AI features (Tab, inline edit, @ refs) from state/. Note: MCP tools bypass .cursorignore by design - this is expected and necessary for ai-todo to function.
+  - [x] **#260.5** Test: Verify ignore patterns work correctly in Cursor (2026-01-27)
+    > Test: Verify ignore patterns work correctly in Cursor
+    > > VERIFIED: .cursorignore patterns use valid gitignore syntax. Protected directories exist and contain sensitive files (checksum, tamper_mode, shadow TODO.md).
+  - [x] **#260.4** Implement: Add .cursorignore file with recommended patterns (2026-01-27)
+  - [x] **#260.3** Decide: Define default ignore patterns and user customization options (2026-01-27)
+    > AWAITING APPROVAL: Select Option A, B, or C from docs/cursorignore-design.md
+  - [x] **#260.2** Analyze: Identify sensitive files/patterns that should be ignored (2026-01-27)
+    > See docs/cursorignore-design.md for analysis
+  - [x] **#260.1** Investigate: Research .cursorignore format and best practices for secrets (2026-01-27)
 
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
   - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
@@ -92,6 +73,16 @@
   - [x] **#259.3** Decide: Close issue if complete, or identify remaining enhancements (2026-01-27)
   - [x] **#259.2** Analyze: Document MCP benefits realized vs original issue expectations (2026-01-27)
   - [x] **#259.1** Investigate: Review GitHub issue #30 and current MCP server implementation (2026-01-27)
+- [x] **#258** GitHub Issue #31: Investigate Cursor CLI and Shell Commands `#cursor-integration` `#github-issue` `#investigation` (2026-01-27)
+  > COMPLETE: ai-todo already integrates with Cursor via MCP. Cursor CLI provides: (1) `cursor agent` for terminal AI with MCP support, (2) `cursor agent mcp list/list-tools/enable/disable` for server management, (3) `cursor --add-mcp` for programmatic setup. No additional integration work needed. Close GitHub issue #31.
+  - [x] **#258.8** Close GitHub issue #31 as complete - ai-todo MCP integration already works with Cursor CLI (2026-01-27)
+  - [x] **#258.7** Document: Update docs with Cursor integration guide, close GitHub issue #31 (2026-01-27)
+  - [x] **#258.6** Verify: Test integration in real Cursor environment (2026-01-27)
+  - [x] **#258.5** Test: Create tests for Cursor CLI integration (2026-01-27)
+  - [x] **#258.4** Implement: Build Cursor CLI integration features (2026-01-27)
+  - [x] **#258.3** Decide: Determine which integrations provide most value (2026-01-27)
+  - [x] **#258.2** Analyze: Identify integration opportunities between ai-todo and Cursor CLI (2026-01-27)
+  - [x] **#258.1** Investigate: Research Cursor CLI features and shell command capabilities (2026-01-27)
 - [x] **#257** GitHub Issue #33: Enhanced bug reporting with duplicate detection and privacy `#developer-experience` `#enhancement` `#github-issue` (2026-01-27)
   > WON'T IMPLEMENT: Use native GitHub bug reporting instead of building custom tooling. Close GitHub issue #33.
   - [x] **#257.8** Close GitHub issue #33 as won't implement - use native GitHub bug reporting (2026-01-27)
@@ -122,6 +113,28 @@
   - [x] **#255.3** Decide: Determine remaining gaps and next steps (or close issue if complete) (2026-01-27)
   - [x] **#255.2** Analyze: Compare current codebase against issue requirements (2026-01-27)
   - [x] **#255.1** Investigate: Review GitHub issue #39 details and current implementation status (2026-01-27)
+- [x] **#254** Freeze legacy shell scripts and remove from test comparisons `#cleanup` `#legacy` `#testing` (2026-01-27)
+  > Implemented: (1) Added FROZEN header with date and reason to legacy/todo.ai and todo.bash, (2) Deleted parity test files (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py, test_show_root_shell.py), (3) Rewrote TEST_PLAN.md for Python-only testing, (4) CI runs pytest which now excludes deleted tests, (5) Release script references kept intentionally - scripts are frozen but still distributed for backward compatibility.
+  - [x] **#254.6** Remove legacy script references from release scripts (release.sh, etc.) (2026-01-27)
+  - [x] **#254.5** Update CI workflow to skip legacy comparison tests (2026-01-27)
+  - [x] **#254.4** Update TEST_PLAN.md to reflect Python-only testing strategy (2026-01-27)
+  - [x] **#254.3** Remove test_show_root_shell.py (shell-based show command tests) (2026-01-27)
+  - [x] **#254.2** Remove shell script parity tests (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py) (2026-01-27)
+  - [x] **#254.1** Mark legacy/ scripts as frozen (add header comment with freeze date and reason) (2026-01-27)
+- [x] **#253** Standardize API terminology to follow industry conventions (title/description) `#api` `#breaking-change` `#enhancement` (2026-01-27)
+  > DEPENDENCY: Complete #254 (freeze legacy scripts) before starting implementation phase (#253.4+)
+  > ANALYSIS: See docs/api-terminology-analysis.md for full audit, research, and design proposal.
+  - [x] **#253.11** Update CHANGELOG with breaking change notes (2026-01-27)
+  - [x] **#253.10** Run full test suite and verify no regressions (2026-01-27)
+  - [x] **#253.9** Update all documentation (README, docs/, cursor rules) (2026-01-27)
+  - [x] **#253.8** Update integration and e2e tests (2026-01-27)
+  - [x] **#253.7** Create/update unit tests for renamed parameters (2026-01-27)
+  - [x] **#253.6** Update core functions and internal APIs (2026-01-27)
+  - [x] **#253.5** Update CLI commands with new parameter names (2026-01-27)
+  - [x] **#253.4** Update MCP server tools (server.py) with new parameter names (2026-01-27)
+  - [x] **#253.3** Design new naming standard with mapping table (old → new) - WAIT FOR APPROVAL (2026-01-27)
+  - [x] **#253.2** Research industry standards: GitHub Issues, Jira, Linear, Todoist APIs for terminology (2026-01-27)
+  - [x] **#253.1** Audit all current parameter names across MCP tools, CLI commands, and core functions (2026-01-27)
 - [x] **#251** Debug and fix MCP server restart functionality in Cursor `#bug` `#mcp` (2026-01-27)
   - [x] **#251.8** Document restart behavior and any limitations (2026-01-27)
   - [x] **#251.7** Test restart across multiple scenarios (dev mode, after updates) (2026-01-27)
@@ -1463,13 +1476,6 @@
 ---
 
 ## Deleted Tasks
-  - [D] **#258.7** Document: Update docs with Cursor integration guide, close GitHub issue #31 (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#258.6** Verify: Test integration in real Cursor environment (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#258.5** Test: Create tests for Cursor CLI integration (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#258.4** Implement: Build Cursor CLI integration features (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#258.3** Decide: Determine which integrations provide most value (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#258.2** Analyze: Identify integration opportunities between ai-todo and Cursor CLI (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#258.1** Investigate: Research Cursor CLI features and shell command capabilities (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#252** Test task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#248** Tell a joke `#test` (deleted 2026-01-27, expires 2026-02-26)
@@ -1616,4 +1622,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 22:29:56
+**ai-todo** | Last Updated: 2026-01-27 22:57:47

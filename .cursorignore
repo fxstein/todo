@@ -1,1 +1,10 @@
+# ai-todo Tamper Detection State (PROTECTED)
+# Shadow copy and integrity checksums - agents should not access directly
+.ai-todo/state/
+
+# Legacy data directory state (backward compatibility)
 .todo.ai/state/
+
+# Internal operational data
+.ai-todo/backups/
+.todo.ai/backups/

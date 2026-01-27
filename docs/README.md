@@ -43,6 +43,7 @@ Detailed guides for specific features and workflows.
 | [Coordination Setup](guides/COORDINATION_SETUP.md) | Setup guides for coordination services |
 | [Tamper Detection](guides/TAMPER_DETECTION.md) | File integrity protection |
 | [Beta Testing](guides/BETA_TESTING_GUIDE.md) | Testing pre-release versions |
+| [Security Best Practices](guides/SECURITY_BEST_PRACTICES.md) | .cursorignore and secrets protection |
 
 ### ❓ FAQ
 

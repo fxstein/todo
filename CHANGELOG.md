@@ -7,32 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Breaking Changes (API Terminology Standardization)
-
-This release standardizes API terminology to follow industry conventions (GitHub, Linear, Jira).
-
-#### MCP Tools
-- `add_task(description)` → `add_task(title, description?, tags?)`
-- `add_subtask(parent_id, description)` → `add_subtask(parent_id, title, description?, tags?)`
-- `modify_task(task_id, description)` → `modify_task(task_id, title, description?, tags?)`
-- `add_note`, `update_note`, `delete_note` → replaced by `set_description(task_id, description)` (use `""` to clear)
-- New: `set_tags(task_id, tags)` for idempotent tag management (use `[]` to clear)
-- Removed: `restart` tool (use `update` with `restart=True`)
-
-#### CLI Commands
-- `add` → `add-task`
-- `modify` → `modify-task`
-- `note`, `update-note`, `delete-note` → `set-description`
-- New: `set-tags`
-
-See `docs/api-terminology-analysis.md` for full details.
-
----
-
 ## Release Channels
 
-- **Stable:** Production-ready releases (e.g., `3.0.0`)
-- **Beta:** Pre-release testing versions (e.g., `3.0.0b1`, `3.0.0b2`)
+- **Stable:** Production-ready releases (e.g., `4.0.0`)
+- **Beta:** Pre-release testing versions (e.g., `4.0.0b1`)
 
 ### Installing Releases
 
@@ -46,28 +24,91 @@ uv tool install --prerelease=allow todo-ai
 
 ---
 
-## Version Examples
+## [4.0.0b1] - 2026-01-27 (Beta)
 
-### [3.0.1] - 2025-01-15 (Stable)
+First beta for version 4.0.0 with breaking API changes and major new features.
+
+### Breaking Changes
+
+This release standardizes API terminology to follow industry conventions (GitHub, Linear, Jira).
+
+#### MCP Tools
+
+- `add_task(description)` → `add_task(title, description?, tags?)`
+- `add_subtask(parent_id, description)` → `add_subtask(parent_id, title, description?, tags?)`
+- `modify_task(task_id, description)` → `modify_task(task_id, title, description?, tags?)`
+- `add_note`, `update_note`, `delete_note` → replaced by `set_description(task_id, description)`
+- New: `set_tags(task_id, tags)` for idempotent tag management
+
+#### CLI Commands
+
+- `add` → `add-task`
+- `modify` → `modify-task`
+- `note`, `update-note`, `delete-note` → `set-description`
+- New: `set-tags`
+
+#### Legacy Scripts
+
+- Legacy shell scripts (todo.ai, todo.bash) are now frozen and no longer maintained
+
+### Added
+
+- **MCP Resources**: `tasks://open`, `tasks://active`, `tasks://{id}`, `config://settings` for IDE integration (GitHub Issue #48)
+- **Task Metadata Persistence**: Timestamps (`created_at`, `updated_at`) persisted via hidden HTML comments
+- **Batch Operations**: `complete`, `delete`, `archive`, `restore` accept multiple task IDs (GitHub Issue #31)
+- **.cursorignore Protection**: State files protected from AI agents (GitHub Issue #29)
+- **Self-update**: `update` command with version pinning and constraints
+- **Restart MCP Tool**: Dev mode quick-reload capability
+
+### Fixed
+
+- TASK_METADATA being incorrectly captured as interleaved content
+- Archive/delete task ordering bug (parent before subtasks)
+- GitHub task number coordination posting
+- Windows CI failure in test_default_path
+
+---
+
+## [3.0.2] - 2026-01-27 (Stable)
+
+Patch release fixing malformed TODO.md files.
+
+### Fixed
+
+- Malformed TODO.md when adding subtasks via MCP on fresh repositories (GitHub Issue #47)
+- Footer timestamps properly handled and regenerated cleanly
+- Updated branding from "todo.ai" to "ai-todo" in default headers
+
+### Added
+
+- FastMCP 3.x compatibility testing in CI
+- Cursor rule documentation for reverse chronological task ordering
+
+---
+
+## [3.0.1] - 2026-01-26 (Stable)
 
 Patch release with bug fixes and improvements.
 
-#### Fixed
+### Fixed
+
 - Corrected task deletion order in archive command
 - Fixed footer placement in TODO.md formatting
 - Resolved coordinate auto-increment issues
 
-#### Changed
+### Changed
+
 - Improved error handling in MCP server
 - Enhanced logging for debugging
 
 ---
 
-### [3.0.0] - 2025-01-10 (Stable)
+## [3.0.0] - 2026-01-25 (Stable)
 
 Major release: Python-based implementation with MCP server support.
 
-#### Added
+### Added
+
 - Full Python implementation with `uv` package management
 - MCP server for AI agent integration (Cursor)
 - CLI interface with `todo-ai` command
@@ -76,63 +117,16 @@ Major release: Python-based implementation with MCP server support.
 - GitHub Issues coordination support
 - Beta/pre-release release strategy
 
-#### Changed
+### Changed
+
 - **BREAKING:** Requires Python 3.10+
 - **BREAKING:** Install via `uv tool install todo-ai` instead of curl
 - Improved performance (10x faster for large TODO files)
 - Enhanced error messages with clear remediation steps
 
-#### Deprecated
+### Deprecated
+
 - Legacy shell script (v2.x) - still available but not recommended
-
----
-
-### [3.0.0b2] - 2025-01-05 (Beta)
-
-Second beta for version 3.0.0 with bug fixes from b1 feedback.
-
-#### Fixed
-- Migration command now preserves task relationships correctly
-- MCP server connection stability improvements
-- Tag preservation in modify command
-
-#### Changed
-- Improved pre-flight validation checks
-- Enhanced beta maturity warnings
-
-#### Known Issues
-- None reported
-
-**How to install:**
-```bash
-uv tool install --prerelease=allow todo-ai
-# or: pipx install --pre todo-ai
-```
-
-**Feedback:** Report issues via `todo-ai report-bug` or GitHub Issues
-
----
-
-### [3.0.0b1] - 2024-12-20 (Beta)
-
-First beta release of Python version - help us test!
-
-#### Added
-- Python implementation with full command parity
-- MCP server for AI agent integration
-- All core commands implemented
-- Migration path from shell version
-
-#### Known Issues
-- Migration may not preserve all task relationships (fixed in b2)
-
-**How to install:**
-```bash
-uv tool install --prerelease=allow todo-ai
-# or: pipx install --pre todo-ai
-```
-
-**Feedback:** Report issues via `todo-ai report-bug` or GitHub Issues
 
 ---
 
@@ -146,21 +140,21 @@ uv tool install --prerelease=allow todo-ai
 
 ### Beta Releases
 
-- **Format:** `X.Y.ZbN` (e.g., `1.0.0b1`, `1.0.0b2`)
+- **Format:** `X.Y.ZbN` (e.g., `4.0.0b1`, `4.0.0b2`)
 - **Numbering:** Beta number increments for each iteration
 - **Duration:** 7+ days for major releases, 2-3 days for minor
 - **Required:** All major releases MUST have at least one beta first
 
 ## Links
 
-- **GitHub Repository:** https://github.com/fxstein/todo.ai
+- **GitHub Repository:** https://github.com/fxstein/ai-todo
 - **PyPI Package:** https://pypi.org/project/todo-ai/
-- **Documentation:** https://github.com/fxstein/todo.ai/tree/main/docs
-- **Issue Tracker:** https://github.com/fxstein/todo.ai/issues
-- **Discussions:** https://github.com/fxstein/todo.ai/discussions
+- **Documentation:** https://github.com/fxstein/ai-todo/tree/main/docs
+- **Issue Tracker:** https://github.com/fxstein/ai-todo/issues
+- **Discussions:** https://github.com/fxstein/ai-todo/discussions
 
-[Unreleased]: https://github.com/fxstein/todo.ai/compare/v3.0.1...HEAD
-[3.0.1]: https://github.com/fxstein/todo.ai/releases/tag/v3.0.1
-[3.0.0]: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0
-[3.0.0b2]: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0b2
-[3.0.0b1]: https://github.com/fxstein/todo.ai/releases/tag/v3.0.0b1
+[Unreleased]: https://github.com/fxstein/ai-todo/compare/v4.0.0b1...HEAD
+[4.0.0b1]: https://github.com/fxstein/ai-todo/releases/tag/v4.0.0b1
+[3.0.2]: https://github.com/fxstein/ai-todo/releases/tag/v3.0.2
+[3.0.1]: https://github.com/fxstein/ai-todo/releases/tag/v3.0.1
+[3.0.0]: https://github.com/fxstein/ai-todo/releases/tag/v3.0.0

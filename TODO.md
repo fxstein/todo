@@ -4,6 +4,16 @@
 
 ## Tasks
 
+- [ ] **#240** Fix malformed TODO.md when adding subtasks via MCP on fresh repository (GitHub Issue #47: https://github.com/fxstein/ai-todo/issues/47) `#bug` `#file-ops` `#mcp`
+  - [ ] **#240.8** Test: Run full test suite and verify no regressions `#testing`
+  - [ ] **#240.7** Test: Verify lint and reformat commands can detect and fix malformed TODO.md files `#linter` `#testing`
+  - [ ] **#240.6** Test: Create unit tests for fresh TODO.md creation with multiple subtasks `#testing`
+  - [ ] **#240.5** Assess: Verify subtask ordering is correct (newest on top: 1.n → 1.1) - may not be a bug `#assessment`
+  - [ ] **#240.4** Implement: Fix footer/timestamp duplication in file_ops.py write operations `#implementation`
+  - [ ] **#240.3** Design: Document fix approach for footer handling and subtask ordering `#design`
+  - [ ] **#240.2** Assess: Identify root cause - trace file_ops.py footer/timestamp handling during rapid sequential writes `#assessment`
+  - [ ] **#240.1** Assess: Reproduce the bug in a test environment with fresh TODO.md creation `#assessment`
+
 - [x] **#239** Test compatibility with fastmcp 3.x beta `#compatibility` `#fastmcp` (2026-01-27)
   > All 200 tests pass with fastmcp 3.0.0b1. ai-todo is already compatible with the 3.x beta. Added CI job to continuously monitor compatibility.
 
@@ -1360,4 +1370,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 01:00:31
+**ai-todo** | Last Updated: 2026-01-27 01:53:05

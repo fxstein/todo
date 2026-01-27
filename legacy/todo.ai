@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 3.0.1
+# Version: 3.0.2
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 

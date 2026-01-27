@@ -4,19 +4,46 @@
 
 ## Tasks
 
+- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
+  - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
+  - [x] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2026-01-27)
+  - [x] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2026-01-27)
+
+- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
+  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
+  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
+  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
+  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
+  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
+  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
+  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
+
+- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
+
+- [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
+  - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
+  - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
+  - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
+
+---
+
+## Archived Tasks
 - [x] **#246** Investigate reorder command not reordering archived tasks `#archive` `#bug` `#reorder` (2026-01-27)
   > CAUTION: May be false positive caused by IDE window refresh delays. Verify actual bug before implementing fixes. Start with analysis and test review.
   > VERIFIED: Not a bug. Testing confirms reorder correctly reorders archived tasks. Original observation was IDE refresh delay.
+  - [x] **#246.11** Docs: Update reorder command help text to mention all sections are processed `#documentation` (2026-01-27)
   - [x] **#246.10** Verify: Run reorder on live TODO.md and confirm archived tasks are properly ordered `#verification` (2026-01-27)
   - [x] **#246.9** Test: Integration tests verifying reorder fixes out-of-order archived tasks `#testing` (2026-01-27)
   - [x] **#246.8** Test: Unit tests for reorder affecting archived tasks `#testing` (2026-01-27)
     > REVIEW: Existing test_reorder_command.py only covers active tasks. Should add test for archived task ordering.
+  - [x] **#246.7** Implement: Ensure archived/deleted sections use order_tasks_with_hierarchy for parent-subtask grouping `#implementation` (2026-01-27)
+  - [x] **#246.6** Implement: Update reorder logic to process all sections (Tasks, Archived, Deleted) `#implementation` (2026-01-27)
+  - [x] **#246.5** Design: Plan fix to extend reorder to archived/deleted sections with proper hierarchy ordering `#design` (2026-01-27)
   - [x] **#246.4** Design: Determine expected behavior - should archived/deleted sections also be reordered? `#design` (2026-01-27)
     > Expected behavior confirmed: reorder processes all sections. _generate_markdown calls order_tasks_with_hierarchy for archived/deleted during every write.
   - [x] **#246.3** Analyze: Reproduce the bug - verify archived tasks remain out of order after reorder `#analysis` `#testing` (2026-01-27)
   - [x] **#246.2** Analyze: Identify which sections reorder currently processes (Tasks only? Archived? Deleted?) `#analysis` (2026-01-27)
   - [x] **#246.1** Analyze: Review current reorder command implementation in cli and core `#analysis` (2026-01-27)
-
 - [x] **#245** Add version pinning and maximum version constraints to self-update feature (builds on #241) `#feature` `#mcp` `#update` (2026-01-27)
   > DESIGN: Two deployment modes with different constraint sources:
   > - Project-local (uv add ai-todo): Use pyproject.toml constraints (uv handles automatically)
@@ -53,7 +80,6 @@
   - [x] **#245.3** Design: Define version constraint schema for config.yaml (pinned_version, max_version, allow_prerelease) (2026-01-27)
   - [x] **#245.2** Analyze: Investigate how other tools handle version locks (e.g., uv.lock, pip-tools, poetry.lock) (2026-01-27)
   - [x] **#245.1** Analyze: Research uv/pip version specifier patterns (==, <=, <, ~=, ^) and common ecosystem practices (2026-01-27)
-
 - [x] **#242** Investigate archive/delete task ordering bug - root task appears below subtasks `#bug` `#file-ops` (2026-01-27)
   - [x] **#242.11** Docs: Document fix if behavior change affects user expectations (2026-01-27)
   - [x] **#242.10** Test: Run full test suite to verify no regressions (2026-01-27)
@@ -66,7 +92,6 @@
   - [x] **#242.3** Analyze: Trace archive/delete code path in file_ops.py to identify root cause (2026-01-27)
   - [x] **#242.2** Analyze: Verify if delete operation has the same ordering issue (2026-01-27)
   - [x] **#242.1** Analyze: Reproduce archive ordering issue with root task and subtasks (2026-01-27)
-
 - [x] **#241** Implement self-update feature via uv with MCP server graceful shutdown `#feature` `#mcp` (2026-01-27)
   > REQUIREMENT: Must detect developer environment (running from live repo vs installed package). In dev mode, skip uv upgrade but still support restart to pick up code changes.
   - [x] **#241.12** Docs: Add troubleshooting section for update failures and rollback (2026-01-27)
@@ -81,7 +106,6 @@
   - [x] **#241.3** Design: Determine graceful shutdown strategy for MCP server (signal handling, cleanup) (2026-01-27)
   - [x] **#241.2** Design: Define update workflow (check version, download, shutdown, restart by host) (2026-01-27)
   - [x] **#241.1** Design: Research uv self-update mechanisms and MCP server shutdown patterns (2026-01-27)
-
 - [x] **#240** Fix malformed TODO.md when adding subtasks via MCP on fresh repository (GitHub Issue #47: https://github.com/fxstein/ai-todo/issues/47) `#bug` `#file-ops` `#mcp` (2026-01-27)
   - [x] **#240.12** Test: Run full test suite to verify no regressions from branding/rule changes `#testing` (2026-01-27)
   - [x] **#240.11** Test: Add unit test for ai-todo branding in default header `#testing` (2026-01-27)
@@ -100,34 +124,8 @@
   - [x] **#240.2** Assess: Identify root cause - trace file_ops.py footer/timestamp handling during rapid sequential writes `#assessment` (2026-01-27)
     > ROOT CAUSE: Default footer uses `---` (3 dashes) but footer detection in _parse_markdown() and _capture_structure_snapshot() expects `------------------` (18 dashes). Since `---` is ignored as separator, the timestamp line gets captured as interleaved content for the last task. On each write, old timestamps are written with interleaved content, then new footer added.
   - [x] **#240.1** Assess: Reproduce the bug in a test environment with fresh TODO.md creation `#assessment` (2026-01-27)
-
 - [x] **#239** Test compatibility with fastmcp 3.x beta `#compatibility` `#fastmcp` (2026-01-27)
   > All 200 tests pass with fastmcp 3.0.0b1. ai-todo is already compatible with the 3.x beta. Added CI job to continuously monitor compatibility.
-
-- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
-  - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
-  - [x] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2026-01-27)
-  - [x] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2026-01-27)
-
-- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
-  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
-  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
-  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
-  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
-  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
-  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
-  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
-
-- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
-
-- [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
-  - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
-  - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
-  - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
-
----
-
-## Archived Tasks
 - [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-27)
   - [x] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12` (2026-01-27)
   - [x] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11` (2026-01-27)
@@ -1309,10 +1307,6 @@
 ---
 
 ## Deleted Tasks
-  - [D] **#246.11** Docs: Update reorder command help text to mention all sections are processed `#documentation` (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#246.7** Implement: Ensure archived/deleted sections use order_tasks_with_hierarchy for parent-subtask grouping `#implementation` (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#246.6** Implement: Update reorder logic to process all sections (Tasks, Archived, Deleted) `#implementation` (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#246.5** Design: Plan fix to extend reorder to archived/deleted sections with proper hierarchy ordering `#design` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#244** Parent task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#243** Parent task (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#237.12** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#design` `#safety` (deleted 2026-01-26, expires 2026-02-25)
@@ -1456,4 +1450,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 14:57:02
+**ai-todo** | Last Updated: 2026-01-27 14:58:27

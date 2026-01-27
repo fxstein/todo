@@ -724,6 +724,16 @@ class FileOps:
                 if line_stripped.startswith("**ai-todo**") and "Last Updated:" in line_stripped:
                     continue
 
+                # Skip metadata HTML comments (TASK_METADATA, TASK RELATIONSHIPS)
+                # These should not be captured as interleaved content
+                if line_stripped.startswith("<!-- TASK"):
+                    in_metadata_section = True
+                    continue
+                if in_metadata_section:
+                    if line_stripped == "-->":
+                        in_metadata_section = False
+                    continue
+
                 # We're in a task section and have a current task
                 # This line is not a task, not a note, not a section header, not metadata, and not blank
                 # Capture it as interleaved content keyed by the preceding task ID
@@ -924,6 +934,16 @@ class FileOps:
                 # Skip orphaned ai-todo timestamp lines (GitHub Issue #47)
                 # These are malformed footer lines that should be ignored, not captured
                 if line_stripped.startswith("**ai-todo**") and "Last Updated:" in line_stripped:
+                    continue
+
+                # Skip metadata HTML comments (TASK_METADATA, TASK RELATIONSHIPS, etc.)
+                # These should not be captured as interleaved content
+                if line_stripped.startswith("<!-- TASK"):
+                    in_metadata_section = True
+                    continue
+                if in_metadata_section:
+                    if line_stripped == "-->":
+                        in_metadata_section = False
                     continue
 
                 if current_task_id not in interleaved_content:

@@ -50,7 +50,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="3.0.1"
+VERSION="3.0.2"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 

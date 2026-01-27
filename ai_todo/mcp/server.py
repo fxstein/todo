@@ -298,10 +298,23 @@ def version() -> str:
 
 @mcp.tool()
 def check_update() -> str:
-    """Check if an ai-todo update is available, respecting version constraints."""
+    """Check if an ai-todo update is available, respecting version constraints.
+
+    In development mode, suggests using 'restart' tool instead of version checking.
+    """
     from pathlib import Path
 
-    from ai_todo.core.updater import check_for_updates
+    from ai_todo.core.updater import check_for_updates, is_dev_mode
+
+    # In dev mode, version checks are irrelevant
+    if is_dev_mode():
+        from ai_todo import __version__
+
+        return (
+            f"Development mode (version {__version__})\n"
+            "Version checks are not meaningful in dev mode.\n"
+            "Use the 'restart' tool to reload code changes."
+        )
 
     # Get project root from TODO path
     project_root = Path(CURRENT_TODO_PATH).parent
@@ -313,7 +326,8 @@ def check_update() -> str:
 def update(restart: bool = True) -> str:
     """Update ai-todo to the latest version and optionally restart.
 
-    Respects version constraints from pyproject.toml or global config.
+    In development mode, this just restarts the server to pick up code changes.
+    In production mode, updates via uv and optionally restarts.
 
     Args:
         restart: If True, restart the MCP server after update to apply changes.
@@ -321,28 +335,63 @@ def update(restart: bool = True) -> str:
     """
     from pathlib import Path
 
-    from ai_todo.core.updater import perform_update, restart_server
+    from ai_todo.core.updater import is_dev_mode, perform_update, restart_server
 
-    # Get project root from TODO path
+    # In dev mode, skip version checks entirely - just restart if requested
+    if is_dev_mode():
+        if restart:
+            import threading
+
+            def delayed_restart():
+                import time
+
+                time.sleep(0.5)
+                restart_server()
+
+            threading.Thread(target=delayed_restart, daemon=True).start()
+            return "Development mode: Restarting MCP server to pick up code changes..."
+        else:
+            return "Development mode: Use restart=True to reload code changes."
+
+    # Production mode: perform actual update
     project_root = Path(CURRENT_TODO_PATH).parent
-
-    # Perform the update
     success, message = perform_update(restart=restart, project_root=project_root)
 
     if success and restart:
-        # Schedule restart after returning the message
-        # We use a small delay to ensure the response is sent
         import threading
 
         def delayed_restart():
             import time
 
-            time.sleep(0.5)  # Allow response to be sent
+            time.sleep(0.5)
             restart_server()
 
         threading.Thread(target=delayed_restart, daemon=True).start()
 
     return message
+
+
+@mcp.tool()
+def restart() -> str:
+    """Restart the MCP server to pick up code changes.
+
+    This is the preferred tool for development workflows where you're
+    iterating on code and need to reload without version checks.
+
+    The host (e.g., Cursor) will automatically reconnect after restart.
+    """
+    import threading
+
+    from ai_todo.core.updater import restart_server
+
+    def delayed_restart():
+        import time
+
+        time.sleep(0.5)
+        restart_server()
+
+    threading.Thread(target=delayed_restart, daemon=True).start()
+    return "Restarting MCP server..."
 
 
 # Phase 7: Tamper Detection

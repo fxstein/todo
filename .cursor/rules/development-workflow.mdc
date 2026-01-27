@@ -20,10 +20,12 @@ alwaysApply: true
 2.  **File Operations:** ALWAYS use `ai_todo.core.file_ops.FileOps` for reading/writing `TODO.md`.
     -   This class handles checksums, shadow copies, and atomic updates.
     -   **NEVER** use `open()` or `write()` on `TODO.md` directly.
-3.  **Testing:**
+3.  **Linting:**
+    -   After editing Python files, run `uv run ruff check <file>` explicitly.
+4.  **Testing:**
     -   Run unit tests: `uv run pytest`
     -   Test MCP tools via the MCP Inspector or Cursor.
-4.  **Installation/Migration:**
+5.  **Installation/Migration:**
     -   Installation logic resides in `ai_todo/cli/system_ops.py` (or dedicated modules).
     -   Migrations are handled by `ai_todo.core.migrations`.
 

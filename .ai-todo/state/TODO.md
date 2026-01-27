@@ -4,20 +4,24 @@
 
 ## Tasks
 
-- [ ] **#250** Improve update command for development mode - skip version checks and provide direct restart capability `#dev-experience` `#enhancement` `#mcp`
+- [x] **#250** Improve update command for development mode - skip version checks and provide direct restart capability `#dev-experience` `#enhancement` `#mcp` (2026-01-27)
   > CONTEXT: In dev mode, version numbers are irrelevant - developers iterate on the same version many times. The update command should recognize this and provide a streamlined restart experience without unnecessary version checks or 'already up to date' messages.
-  - [ ] **#250.12** Docs: Update development workflow documentation with restart usage `#documentation`
-  - [ ] **#250.11** Verify: Test restart functionality in live dev environment `#verification`
-  - [ ] **#250.10** Test: Unit tests for dev mode detection and restart behavior `#testing`
-  - [ ] **#250.9** Implement: Add CLI restart command for development workflow `#implementation`
-  - [ ] **#250.8** Implement: Modify check_update to show dev-appropriate messaging `#implementation`
-  - [ ] **#250.7** Implement: Add restart MCP tool for dev mode quick reload `#implementation`
-  - [ ] **#250.6** Design: Consider CLI flags for dev workflow (--restart-only, --force) `#design`
-  - [ ] **#250.5** Design: Plan MCP tool API - add restart tool or modify update tool for dev mode `#design`
-  - [ ] **#250.4** Design: Define dev mode update behavior - skip version check, offer restart-only option `#design`
-  - [ ] **#250.3** Analyze: Review how other dev tools handle hot-reload/restart patterns `#analysis`
-  - [ ] **#250.2** Analyze: Identify use cases - version check vs simple restart vs git pull + restart `#analysis`
-  - [ ] **#250.1** Analyze: Review current update command behavior in dev mode `#analysis`
+  > CLARIFICATION: CLI is one-shot (no restart concept). Only MCP server needs restart capability. Focus on: (1) dedicated `restart` MCP tool for dev quick-reload, (2) improve `update` tool messaging in dev mode.
+  - [x] **#250.12** Docs: Update development workflow documentation with restart usage `#documentation` (2026-01-27)
+  - [x] **#250.11** Verify: Test restart functionality in live dev environment `#verification` (2026-01-27)
+    > Live test: Use 'restart' tool in Cursor to verify MCP server restarts and picks up code changes.
+  - [x] **#250.10** Test: Unit tests for dev mode detection and restart behavior `#testing` (2026-01-27)
+  - [x] **#250.8** Implement: Modify check_update to show dev-appropriate messaging `#implementation` (2026-01-27)
+  - [x] **#250.7** Implement: Add restart MCP tool for dev mode quick reload `#implementation` (2026-01-27)
+  - [x] **#250.5** Design: Plan MCP tool API - add restart tool or modify update tool for dev mode `#design` (2026-01-27)
+    > DESIGN: Add dedicated `restart` MCP tool - zero version logic, just triggers server restart. Keep `update` for production use, but improve its dev mode behavior.
+  - [x] **#250.4** Design: Define dev mode update behavior - skip version check, offer restart-only option `#design` (2026-01-27)
+    > DESIGN: In dev mode, skip version checks entirely. Provide direct restart with message 'Restarting MCP server to pick up code changes...'
+  - [x] **#250.3** Analyze: Review how other dev tools handle hot-reload/restart patterns `#analysis` (2026-01-27)
+  - [x] **#250.2** Analyze: Identify use cases - version check vs simple restart vs git pull + restart `#analysis` (2026-01-27)
+    > Use cases: (1) Simple restart - pick up code changes without any version checks, (2) Update+restart - for production installs. In dev mode, only #1 matters.
+  - [x] **#250.1** Analyze: Review current update command behavior in dev mode `#analysis` (2026-01-27)
+    > Current behavior: `check_update` shows 'Running in development mode at version X (latest: X)' - version comparison is irrelevant in dev. `update` in dev mode suggests git pull but the restart capability is what developers actually want.
 
 - [x] **#247** Investigate and fix GitHub task number coordination - last sync was 2 days ago (Issue #23) `#bug` `#coordination` `#github` (2026-01-27)
   > CONTEXT: GitHub Issue #23 (https://github.com/fxstein/ai-todo/issues/23) is used for atomic task number coordination across multiple contributors. Last update was 2 days ago, suggesting v3 refactor may have broken the coordination sync.
@@ -1343,6 +1347,8 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#250.9** Implement: Add CLI restart command for development workflow `#implementation` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#250.6** Design: Consider CLI flags for dev workflow (--restart-only, --force) `#design` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#248** Tell a joke `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#244** Parent task (deleted 2026-01-27, expires 2026-02-26)
@@ -1488,4 +1494,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 15:22:53
+**ai-todo** | Last Updated: 2026-01-27 15:29:53

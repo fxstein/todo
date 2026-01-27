@@ -766,3 +766,198 @@ def test_footer_timestamp_not_captured_as_interleaved(tmp_path):
     # Note: Footer timestamp is intentionally NOT captured in footer_lines
     # because we always regenerate the footer with current timestamp on write.
     # This prevents timestamp duplication (GitHub Issue #47)
+
+
+# =============================================================================
+# Task Metadata Persistence Tests (task#263)
+# =============================================================================
+
+
+def test_task_timestamps_parsing(tmp_path):
+    """Test that task timestamps are parsed from TASK_METADATA block."""
+    content = """# ai-todo Task List
+
+## Tasks
+
+- [ ] **#1** Test task
+
+---
+
+## Task Metadata
+
+<!-- TASK_METADATA
+# Format: task_id:created_at[:updated_at]
+1:2026-01-15T10:30:00
+-->
+
+---
+**ai-todo** | Last Updated: 2026-01-27 00:00:00
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    assert len(tasks) == 1
+    task = tasks[0]
+
+    # Timestamp should be parsed from TASK_METADATA
+    assert task.created_at is not None
+    assert task.created_at.year == 2026
+    assert task.created_at.month == 1
+    assert task.created_at.day == 15
+    assert task.created_at.hour == 10
+    assert task.created_at.minute == 30
+
+
+def test_task_timestamps_with_updated_at(tmp_path):
+    """Test parsing task timestamps with both created_at and updated_at."""
+    content = """# ai-todo Task List
+
+## Tasks
+
+- [ ] **#1** Test task
+
+---
+
+## Task Metadata
+
+<!-- TASK_METADATA
+# Format: task_id:created_at[:updated_at]
+1:2026-01-10T09:00:00:2026-01-20T16:00:00
+-->
+
+---
+**ai-todo** | Last Updated: 2026-01-27 00:00:00
+"""
+    todo_path = tmp_path / "TODO.md"
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    task = tasks[0]
+
+    assert task.created_at is not None
+    assert task.created_at.day == 10
+    assert task.updated_at is not None
+    assert task.updated_at.day == 20
+
+
+def test_task_timestamps_written_to_file(tmp_path):
+    """Test that task timestamps are written to TASK_METADATA block."""
+    from datetime import datetime
+
+    from ai_todo.core.task import Task, TaskStatus
+
+    todo_path = tmp_path / "TODO.md"
+    ops = FileOps(str(todo_path))
+
+    # Create task with explicit timestamps
+    task = Task(
+        id="1",
+        description="Test task",
+        status=TaskStatus.PENDING,
+        created_at=datetime(2026, 1, 15, 10, 30, 0),
+        updated_at=datetime(2026, 1, 20, 14, 0, 0),
+    )
+    ops.write_tasks([task])
+
+    content = todo_path.read_text(encoding="utf-8")
+
+    # Should contain TASK_METADATA block
+    assert "<!-- TASK_METADATA" in content
+    assert "1:2026-01-15T10:30:00" in content
+
+
+def test_task_timestamps_roundtrip(tmp_path):
+    """Test that task timestamps survive read-write-read cycle."""
+    from datetime import datetime
+
+    from ai_todo.core.task import Task, TaskStatus
+
+    todo_path = tmp_path / "TODO.md"
+    ops = FileOps(str(todo_path))
+
+    # Create task with explicit timestamps
+    original_created = datetime(2026, 1, 15, 10, 30, 0)
+    original_updated = datetime(2026, 1, 20, 14, 0, 0)
+
+    task = Task(
+        id="1",
+        description="Test task",
+        status=TaskStatus.PENDING,
+        created_at=original_created,
+        updated_at=original_updated,
+    )
+    ops.write_tasks([task])
+
+    # Read back
+    ops2 = FileOps(str(todo_path))
+    tasks = ops2.read_tasks()
+
+    assert len(tasks) == 1
+    read_task = tasks[0]
+
+    # Timestamps should match (within same second - isoformat may lose microseconds)
+    assert read_task.created_at is not None
+    assert read_task.created_at.year == 2026
+    assert read_task.created_at.month == 1
+    assert read_task.created_at.day == 15
+    assert read_task.updated_at is not None
+    assert read_task.updated_at.day == 20
+
+
+def test_backfill_timestamps_new_task(tmp_path):
+    """Test that backfill_timestamps sets timestamps for new task."""
+    from ai_todo.core.task import Task, TaskStatus
+
+    todo_path = tmp_path / "TODO.md"
+    ops = FileOps(str(todo_path))
+
+    # Create task without explicit timestamps (uses datetime.now() defaults)
+    task = Task(id="1", description="Test task", status=TaskStatus.PENDING)
+
+    # Backfill should set timestamps
+    ops.backfill_timestamps(task)
+
+    assert task.created_at is not None
+    assert task.updated_at is not None
+
+
+def test_backfill_timestamps_preserves_existing_created_at(tmp_path):
+    """Test that backfill_timestamps preserves existing created_at from metadata."""
+
+    todo_path = tmp_path / "TODO.md"
+
+    # Create content with existing timestamp
+    content = """# ai-todo Task List
+
+## Tasks
+
+- [ ] **#1** Test task
+
+---
+
+## Task Metadata
+
+<!-- TASK_METADATA
+1:2026-01-01T00:00:00
+-->
+
+---
+**ai-todo** | Last Updated: 2026-01-27 00:00:00
+"""
+    todo_path.write_text(content, encoding="utf-8")
+
+    ops = FileOps(str(todo_path))
+    tasks = ops.read_tasks()
+
+    task = tasks[0]
+    original_created = task.created_at
+
+    # Backfill should NOT change created_at since it was persisted
+    ops.backfill_timestamps(task)
+
+    assert task.created_at == original_created

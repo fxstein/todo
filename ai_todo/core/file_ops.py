@@ -79,6 +79,9 @@ class FileOps:
         self.relationships: dict[
             str, dict[str, list[str]]
         ] = {}  # task_id -> {rel_type -> [targets]}
+        self.task_timestamps: dict[
+            str, dict[str, datetime]
+        ] = {}  # task_id -> {created_at, updated_at}
         self.tasks_header_format: str | None = None  # Preserve original Tasks section header format
         self.deleted_task_formats: dict[
             str, str
@@ -237,6 +240,36 @@ class FileOps:
 
         return new_hash
 
+    def backfill_timestamps(self, task: Task) -> None:
+        """Backfill timestamps for a task that is being mutated.
+
+        Called on task mutations to ensure timestamps are persisted.
+        - Sets created_at if not already set (uses earliest available date or now)
+        - Always sets updated_at to now
+        """
+        now = datetime.now()
+
+        # Backfill created_at if not set
+        if task.created_at is None or (
+            task.id not in self.task_timestamps
+            and task.created_at is not None
+            and (now - task.created_at).total_seconds() < 1
+        ):
+            # Task has no persisted created_at (was just created with datetime.now())
+            # Try to find earliest available date
+            earliest = None
+            if task.completed_at:
+                earliest = task.completed_at
+            if task.archived_at and (earliest is None or task.archived_at < earliest):
+                earliest = task.archived_at
+            if task.deleted_at and (earliest is None or task.deleted_at < earliest):
+                earliest = task.deleted_at
+
+            task.created_at = earliest if earliest else now
+
+        # Always update updated_at
+        task.updated_at = now
+
     def _log_action(self, action: str, task_id: str, checksum: str, description: str = "") -> None:
         """Log action to .ai-todo.log and local audit.log."""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -389,6 +422,7 @@ class FileOps:
         self.footer_lines = []
         self.metadata_lines = []
         self.relationships = {}  # Will be populated during parsing
+        self.task_timestamps = {}  # Will be populated during parsing
         self.interleaved_content = {}  # Reset interleaved content for each parse
 
         # Regex patterns
@@ -403,7 +437,7 @@ class FileOps:
         # Sections that contain tasks
         TASK_SECTIONS = {"Tasks", "Recently Completed", "Archived Tasks", "Deleted Tasks"}
         in_relationships_section = False
-        in_metadata_section = False
+        in_timestamps_section = False
         in_metadata_section = False
 
         for line in lines:
@@ -472,6 +506,13 @@ class FileOps:
             ):
                 current_section = "Footer"
 
+            # Check for timestamps section
+            if line_stripped == "<!-- TASK_METADATA":
+                in_timestamps_section = True
+                in_metadata_section = True
+                self.metadata_lines.append(line)
+                continue
+
             # Check for relationships section directly (even without Task Metadata header)
             if line_stripped == "<!-- TASK RELATIONSHIPS":
                 in_relationships_section = True
@@ -481,9 +522,56 @@ class FileOps:
 
             # Handle metadata section
             if in_metadata_section:
+                # Check for timestamps section
+                if line_stripped == "<!-- TASK_METADATA":
+                    in_timestamps_section = True
+                    self.metadata_lines.append(line)
+                    continue
+
                 # Check for Task Metadata section
                 if line_stripped == "<!-- TASK RELATIONSHIPS":
                     in_relationships_section = True
+                    self.metadata_lines.append(line)
+                    continue
+
+                if in_timestamps_section:
+                    if line_stripped == "-->":
+                        in_timestamps_section = False
+                        self.metadata_lines.append(line)
+                        continue
+                    # Parse timestamp line: task_id:created_at[:updated_at]
+                    # Skip comment lines starting with #
+                    if line_stripped.startswith("#"):
+                        self.metadata_lines.append(line)
+                        continue
+                    if ":" in line_stripped:
+                        # Split only on first colon to get task_id
+                        first_colon = line_stripped.index(":")
+                        task_id = line_stripped[:first_colon]
+                        timestamps_part = line_stripped[first_colon + 1 :]
+                        # Format: created_at[:updated_at] where each is ISO format
+                        # Look for pattern YYYY-MM-DDTHH:MM:SS and split on T-separator
+                        # to find where one timestamp ends and another begins
+                        try:
+                            # Check if there's a second ISO timestamp (starts with year)
+                            # by looking for pattern like :2026- or :2025- etc.
+                            second_ts_match = re.search(r":(\d{4}-\d{2}-\d{2}T)", timestamps_part)
+                            if second_ts_match:
+                                split_pos = second_ts_match.start()
+                                created_str = timestamps_part[:split_pos]
+                                updated_str = timestamps_part[split_pos + 1 :]
+                                created_at = datetime.fromisoformat(created_str)
+                                updated_at = datetime.fromisoformat(updated_str)
+                                self.task_timestamps[task_id] = {
+                                    "created_at": created_at,
+                                    "updated_at": updated_at,
+                                }
+                            else:
+                                # Only created_at
+                                created_at = datetime.fromisoformat(timestamps_part)
+                                self.task_timestamps[task_id] = {"created_at": created_at}
+                        except ValueError:
+                            pass  # Skip malformed timestamp lines
                     self.metadata_lines.append(line)
                     continue
 
@@ -647,6 +735,15 @@ class FileOps:
             # Ignore empty lines inside task sections to clean up output?
             # Or preserve? If we ignore, we generate standard spacing.
             pass
+
+        # Apply timestamps from TASK_METADATA to tasks
+        for task in tasks:
+            if task.id in self.task_timestamps:
+                ts = self.task_timestamps[task.id]
+                if "created_at" in ts:
+                    task.created_at = ts["created_at"]
+                if "updated_at" in ts:
+                    task.updated_at = ts["updated_at"]
 
         return tasks
 
@@ -1077,24 +1174,39 @@ class FileOps:
             for t in deleted_tasks:
                 lines.append(format_task(t))
 
-        # 5. Task Metadata Section (if relationships exist or section was present)
+        # 5. Task Metadata Section (if relationships, timestamps, or section was present)
         metadata_lines_to_use = snapshot.metadata_lines
-        if self.relationships or metadata_lines_to_use:
+        has_timestamps = any(t.created_at is not None or t.updated_at is not None for t in tasks)
+        if self.relationships or has_timestamps or metadata_lines_to_use:
             lines.append("")
             lines.append("---")
             lines.append("")
-            # If we have relationships, write them
+            # Check if metadata section header exists in preserved lines
+            has_metadata_header = any("## Task Metadata" in line for line in metadata_lines_to_use)
+            if not has_metadata_header and (self.relationships or has_timestamps):
+                lines.append("## Task Metadata")
+                lines.append("")
+                lines.append("Task relationships and dependencies (managed by ai-todo).")
+                lines.append("View with: `ai-todo show <task-id>`")
+                lines.append("")
+
+            # Write timestamps if any tasks have them
+            if has_timestamps:
+                lines.append("<!-- TASK_METADATA")
+                lines.append("# Format: task_id:created_at[:updated_at]")
+                for t in sorted(tasks, key=lambda x: x.id):
+                    if t.created_at is not None:
+                        created_str = t.created_at.isoformat()
+                        if t.updated_at is not None and t.updated_at != t.created_at:
+                            updated_str = t.updated_at.isoformat()
+                            lines.append(f"{t.id}:{created_str}:{updated_str}")
+                        else:
+                            lines.append(f"{t.id}:{created_str}")
+                lines.append("-->")
+                lines.append("")
+
+            # Write relationships if any
             if self.relationships:
-                # Check if metadata section header exists in preserved lines
-                has_metadata_header = any(
-                    "## Task Metadata" in line for line in metadata_lines_to_use
-                )
-                if not has_metadata_header:
-                    lines.append("## Task Metadata")
-                    lines.append("")
-                    lines.append("Task relationships and dependencies (managed by todo.ai tool).")
-                    lines.append("View with: `./todo.ai show <task-id>`")
-                    lines.append("")
                 lines.append("<!-- TASK RELATIONSHIPS")
                 # Write relationships
                 for task_id in sorted(self.relationships.keys()):
@@ -1102,10 +1214,10 @@ class FileOps:
                         targets = " ".join(self.relationships[task_id][rel_type])
                         lines.append(f"{task_id}:{rel_type}:{targets}")
                 lines.append("-->")
-            else:
-                # Preserve existing metadata section if no relationships
-                if metadata_lines_to_use:
-                    lines.extend(metadata_lines_to_use)
+
+            # Preserve other existing metadata if no relationships or timestamps
+            if not self.relationships and not has_timestamps and metadata_lines_to_use:
+                lines.extend(metadata_lines_to_use)
 
         # 6. Footer - Always regenerate with current timestamp
         # (snapshot.footer_lines captured for parsing but we always generate fresh footer)

@@ -4,13 +4,21 @@
 
 ## Tasks
 
-- [ ] **#263** Design task metadata persistence for timestamps (created_at, updated_at, completed_at)    `#v3.1` `#design` `#enhancement` `#metadata`
+- [x] **#263** Design task metadata persistence for timestamps (created_at, updated_at, completed_at)    `#v3.1` `#design` `#enhancement` `#metadata` (2026-01-27)
   > MCP resources revealed that task timestamps (created_at, updated_at, completed_at) are not being persisted. Currently generated at parse-time rather than stored. Need to design metadata storage that persists these values across sessions.
-  - [ ] **#263.8** Document: Update TODO.md format documentation `#documentation`
-  - [ ] **#263.7** Verify: Confirm MCP resources return accurate timestamps `#verification`
-  - [ ] **#263.6** Test: Create unit tests for metadata persistence `#testing`
-  - [ ] **#263.5** Implement: Update parser to read persisted metadata `#implementation`
-  - [ ] **#263.4** Implement: Add metadata storage to file_ops write operations `#implementation`
+  - [x] **#263.8** Document: Update TODO.md format documentation `#documentation` (2026-01-27)
+    > Document: Update TODO.md format documentation
+    > > SKIPPED: Format is self-documenting via comment in TASK_METADATA block.
+  - [x] **#263.7** Verify: Confirm MCP resources return accurate timestamps `#verification` (2026-01-27)
+  - [x] **#263.6** Test: Create unit tests for metadata persistence `#testing` (2026-01-27)
+    > Test: Create unit tests for metadata persistence
+    > > DONE: Added 6 tests covering timestamp parsing, roundtrip, and backfill behavior.
+  - [x] **#263.5** Implement: Update parser to read persisted metadata `#implementation` (2026-01-27)
+    > Implement: Update parser to read persisted metadata
+    > > DONE: Added parsing for <!-- TASK_METADATA ... --> block, applied timestamps to Task objects after parsing.
+  - [x] **#263.4** Implement: Add metadata storage to file_ops write operations `#implementation` (2026-01-27)
+    > Implement: Add metadata storage to file_ops write operations
+    > > DONE: Added task_timestamps dict, TASK_METADATA comment block writing in _generate_markdown, and backfill_timestamps() helper.
   - [x] **#263.3** Design: Create metadata persistence design document with storage format and migration strategy `#design` (2026-01-27)
     > Design: Create metadata persistence design document with storage format and migration strategy
     > > APPROVED: Hybrid (Option C + inline dates) with lazy backfilling on mutations. No migration scripts. See docs/task-metadata-design.md
@@ -1672,4 +1680,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 23:37:13
+**ai-todo** | Last Updated: 2026-01-27 23:43:48

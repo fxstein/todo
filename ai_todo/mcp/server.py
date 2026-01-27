@@ -2,6 +2,7 @@
 
 import asyncio
 import io
+import json
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -495,6 +496,193 @@ def accept_tamper(reason: str) -> str:
     from ai_todo.cli.tamper_ops import tamper_accept_command
 
     return _capture_output(tamper_accept_command, reason, todo_path=CURRENT_TODO_PATH)
+
+
+# =============================================================================
+# MCP Resources - Read-only data endpoints for IDE integration
+# =============================================================================
+
+
+def _task_to_dict(task) -> dict:
+    """Convert a Task object to a JSON-serializable dictionary."""
+    return {
+        "id": task.id,
+        "description": task.description,
+        "status": task.status.value,
+        "tags": sorted(task.tags) if task.tags else [],
+        "notes": task.notes if task.notes else [],
+        "is_subtask": "." in task.id,
+        "created_at": task.created_at.isoformat() if task.created_at else None,
+        "updated_at": task.updated_at.isoformat() if task.updated_at else None,
+        "completed_at": task.completed_at.isoformat() if task.completed_at else None,
+    }
+
+
+def _get_open_tasks_data(todo_path: str) -> dict:
+    """Get open tasks data (internal helper for testing).
+
+    Returns dict with tasks list, count, filter, and timestamp.
+    """
+    from ai_todo.cli.commands import get_manager
+    from ai_todo.core.task import IN_PROGRESS_TAG
+
+    manager = get_manager(todo_path)
+    tasks = manager.list_tasks()
+
+    # Filter to open tasks: pending status OR has inprogress tag
+    open_tasks = [
+        t for t in tasks if t.status.value == "pending" or IN_PROGRESS_TAG in (t.tags or set())
+    ]
+
+    # Only include root tasks (not subtasks)
+    root_tasks = [t for t in open_tasks if "." not in t.id]
+
+    # Add subtask count for each root task
+    result_tasks = []
+    for task in root_tasks:
+        task_dict = _task_to_dict(task)
+        subtasks = [t for t in open_tasks if t.id.startswith(f"{task.id}.")]
+        task_dict["subtask_count"] = len(subtasks)
+        result_tasks.append(task_dict)
+
+    return {
+        "tasks": result_tasks,
+        "count": len(result_tasks),
+        "filter": "open",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+def _get_active_tasks_data(todo_path: str) -> dict:
+    """Get active tasks data (internal helper for testing).
+
+    Returns dict with tasks list, count, filter, and timestamp.
+    """
+    from ai_todo.cli.commands import get_manager
+    from ai_todo.core.task import IN_PROGRESS_TAG
+
+    manager = get_manager(todo_path)
+    tasks = manager.list_tasks()
+
+    # Filter to active tasks (has inprogress tag)
+    active_tasks = [t for t in tasks if IN_PROGRESS_TAG in (t.tags or set())]
+
+    result_tasks = [_task_to_dict(t) for t in active_tasks]
+
+    return {
+        "tasks": result_tasks,
+        "count": len(result_tasks),
+        "filter": "active",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+def _get_task_data(task_id: str, todo_path: str) -> dict:
+    """Get task data (internal helper for testing).
+
+    Returns dict with task, subtasks, relationships, and timestamp.
+    """
+    from ai_todo.cli.commands import get_manager
+    from ai_todo.core.file_ops import FileOps
+
+    file_ops = FileOps(todo_path)
+    file_ops.read_tasks()  # Initialize file_ops with task data
+    manager = get_manager(todo_path)
+
+    task = manager.get_task(task_id)
+    if not task:
+        return {"error": f"Task #{task_id} not found", "timestamp": datetime.now().isoformat()}
+
+    # Get subtasks
+    subtasks = manager.get_subtasks(task_id)
+    subtask_dicts = [_task_to_dict(s) for s in sorted(subtasks, key=lambda t: t.id)]
+
+    # Get relationships
+    relationships = file_ops.get_relationships(task_id) or {}
+
+    return {
+        "task": _task_to_dict(task),
+        "subtasks": subtask_dicts,
+        "relationships": relationships,
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+def _get_config_data(todo_path: str) -> dict:
+    """Get config data (internal helper for testing).
+
+    Returns dict with numbering, security, coordination, and timestamp.
+    """
+    from ai_todo.core.config import Config
+    from ai_todo.core.file_ops import FileOps
+
+    # Get file_ops for paths
+    file_ops = FileOps(todo_path)
+    config_path = file_ops.config_dir / "config.yaml"
+    config = Config(str(config_path))
+
+    # Get next task ID
+    next_id = None
+    try:
+        serial_path = file_ops.config_dir / ".ai-todo.serial"
+        if serial_path.exists():
+            next_id = int(serial_path.read_text().strip()) + 1
+    except (ValueError, FileNotFoundError):
+        pass
+
+    return {
+        "numbering": {
+            "mode": config.get_numbering_mode(),
+            "next_id": next_id,
+        },
+        "security": {
+            "tamper_proof": config.get("security.tamper_proof", False),
+        },
+        "coordination": {
+            "enabled": config.get("coordination.enabled", False),
+            "type": config.get_coordination_type(),
+        },
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@mcp.resource("tasks://open", mime_type="application/json")
+def get_open_tasks() -> str:
+    """List of all open tasks (pending and in-progress).
+
+    Returns JSON with task list, count, and timestamp.
+    """
+    return json.dumps(_get_open_tasks_data(CURRENT_TODO_PATH), indent=2)
+
+
+@mcp.resource("tasks://active", mime_type="application/json")
+def get_active_tasks_resource() -> str:
+    """List of currently active tasks (marked #inprogress).
+
+    Returns JSON with task list, count, and timestamp.
+    """
+    return json.dumps(_get_active_tasks_data(CURRENT_TODO_PATH), indent=2)
+
+
+@mcp.resource("tasks://{task_id}", mime_type="application/json")
+def get_task_resource(task_id: str) -> str:
+    """Details of a specific task including subtasks and relationships.
+
+    Args:
+        task_id: The task ID (e.g., "262" or "262.1")
+
+    Returns JSON with task details, subtasks, relationships, and timestamp.
+    """
+    return json.dumps(_get_task_data(task_id, CURRENT_TODO_PATH), indent=2)
+
+
+@mcp.resource("config://settings", mime_type="application/json")
+def get_config_resource() -> str:
+    """Current ai-todo configuration.
+
+    Returns JSON with numbering mode, security settings, and coordination config.
+    """
+    return json.dumps(_get_config_data(CURRENT_TODO_PATH), indent=2)
 
 
 AI_TODO_CURSOR_RULE = """---

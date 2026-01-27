@@ -4,6 +4,51 @@
 
 ## Tasks
 
+- [ ] **#263** Design task metadata persistence for timestamps (created_at, updated_at, completed_at)    `#v3.1` `#design` `#enhancement` `#metadata`
+  > MCP resources revealed that task timestamps (created_at, updated_at, completed_at) are not being persisted. Currently generated at parse-time rather than stored. Need to design metadata storage that persists these values across sessions.
+  - [ ] **#263.8** Document: Update TODO.md format documentation `#documentation`
+  - [ ] **#263.7** Verify: Confirm MCP resources return accurate timestamps `#verification`
+  - [ ] **#263.6** Test: Create unit tests for metadata persistence `#testing`
+  - [ ] **#263.5** Implement: Update parser to read persisted metadata `#implementation`
+  - [ ] **#263.4** Implement: Add metadata storage to file_ops write operations `#implementation`
+  - [x] **#263.3** Design: Create metadata persistence design document with storage format and migration strategy `#design` (2026-01-27)
+    > Design: Create metadata persistence design document with storage format and migration strategy
+    > > APPROVED: Hybrid (Option C + inline dates) with lazy backfilling on mutations. No migration scripts. See docs/task-metadata-design.md
+  - [x] **#263.2** Analyze: Identify storage options (inline markdown, separate metadata file, hidden comments) `#analysis` (2026-01-27)
+    > Analyze: Identify storage options (inline markdown, separate metadata file, hidden comments)
+    > > DONE: Analyzed 3 options based on existing patterns (inline dates, metadata.json, HTML comments). Ready for design document.
+  - [x] **#263.1** Investigate: Audit current timestamp handling in Task dataclass and file_ops `#research` (2026-01-27)
+    > Investigate: Audit current timestamp handling in Task dataclass and file_ops
+    > > DONE: Found that created_at/updated_at use datetime.now() at parse-time (not persisted). completed_at is approximated. Only deleted_at/expires_at are properly persisted in markdown.
+
+- [x] **#262** GitHub Issue #48: Expose task lists as MCP resources for IDE integration    `#v3.1` `#enhancement` `#github-issue` `#mcp` (2026-01-27)
+  > GitHub Issue #48: Expose task lists as MCP resources for IDE integration `#v3.1` `#enhancement` `#github-issue` `#mcp`
+  > > COMPLETE: Implemented Option A (Minimal Set) with 4 resources: tasks://open, tasks://active, tasks://{id}, config://settings. Added unit tests and documentation. GitHub issue #48 closed.
+  - [x] **#262.12** Document: Update MCP documentation and close GitHub issue #48 `#documentation` (2026-01-27)
+    > Document: Update MCP documentation and close GitHub issue #48
+    > > DONE: Updated docs/user/MCP_SETUP.md with resources section. Closed GitHub issue #48.
+  - [x] **#262.11** Verify: Test resources in Cursor IDE with MCP Inspector `#verification` (2026-01-27)
+    > Verify: Test resources in Cursor IDE with MCP Inspector
+    > > READY FOR MANUAL VERIFICATION: Reload MCP server and check that resources (tasks://open, tasks://active, tasks://{id}, config://settings) appear in inspector.
+  - [x] **#262.9** Test: Create unit tests for MCP resource handlers `#testing` (2026-01-27)
+    > Test: Create unit tests for MCP resource handlers
+    > > DONE: Created tests/unit/test_mcp_resources.py with 9 tests for task-to-dict and data helper functions.
+  - [x] **#262.7** Implement: Add config://settings resource for ai-todo configuration `#implementation` (2026-01-27)
+  - [x] **#262.6** Implement: Add tasks://{id} dynamic resource for individual task details `#implementation` (2026-01-27)
+  - [x] **#262.5** Implement: Add tasks://active resource for in-progress tasks `#implementation` (2026-01-27)
+  - [x] **#262.4** Implement: Add tasks://open resource (pending + in-progress tasks) `#implementation` (2026-01-27)
+    > Implement: Add tasks://open resource (pending + in-progress tasks)
+    > > DONE: Added @mcp.resource('tasks://open') returning JSON with root tasks, subtask counts, and metadata.
+  - [x] **#262.3** Design: Create MCP resources design document with URI schema and change notification strategy `#design` (2026-01-27)
+    > Design: Create MCP resources design document with URI schema and change notification strategy
+    > > APPROVED: Option A (Minimal Set) - tasks://open, tasks://active, tasks://{id}, config://settings. Built-in notifications only. See docs/mcp-resources-design.md
+  - [x] **#262.2** Analyze: Identify resource URIs and data structures for task lists `#analysis` (2026-01-27)
+    > Analyze: Identify resource URIs and data structures for task lists
+    > > DONE: Task dataclass has id, description, status, tags, notes, timestamps. Status: PENDING, COMPLETED, ARCHIVED, DELETED. IN_PROGRESS tracked via #inprogress tag. Resources should return JSON (not markdown) for better client integration.
+  - [x] **#262.1** Investigate: Research FastMCP resource patterns and subscription capabilities `#research` (2026-01-27)
+    > Investigate: Research FastMCP resource patterns and subscription capabilities
+    > > DONE: FastMCP uses @mcp.resource() decorator with URI-based addressing. Supports static resources and dynamic templates with {param} placeholders. Change notifications via automatic list_changed events.
+
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
@@ -1471,14 +1516,16 @@
 ---
 
 ## Deleted Tasks
-  - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2026-01-27, expires 2026-02-26)
-  - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#262.10** Test: Create integration tests for resource subscriptions and change notifications `#testing` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#262.8** Implement: Add notify_resource_changed() calls to task mutation tools `#implementation` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#252** Test task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#248** Tell a joke `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#244** Parent task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#243** Parent task (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#51.3** Test update command from system-wide installation location `#test` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#51.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#237.12** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#design` `#safety` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#237.11** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#mcp` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#237.10** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#mcp` (deleted 2026-01-26, expires 2026-02-25)
@@ -1615,9 +1662,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 23:04:21
+**ai-todo** | Last Updated: 2026-01-27 23:37:13

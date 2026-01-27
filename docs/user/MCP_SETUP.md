@@ -67,6 +67,19 @@ Once connected, you can ask Cursor's AI (Composer or Chat) to manage your tasks 
 
 Cursor will automatically call the appropriate ai-todo tools (`add_task`, `list_tasks`, `complete_task`) to perform the action.
 
+## MCP Resources
+
+In addition to tools, the ai-todo MCP server exposes **resources** for read-only access to task data:
+
+| Resource URI | Description |
+|--------------|-------------|
+| `tasks://open` | All open tasks (pending + in-progress) |
+| `tasks://active` | Currently active tasks (#inprogress) |
+| `tasks://{id}` | Single task details with subtasks |
+| `config://settings` | Current ai-todo configuration |
+
+Resources return JSON data and can be accessed by MCP clients for building task panels or monitoring task state.
+
 ## Security & Privacy
 
 - The MCP server runs locally on your machine.

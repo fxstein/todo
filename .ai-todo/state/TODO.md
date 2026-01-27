@@ -4,6 +4,43 @@
 
 ## Tasks
 
+- [ ] **#245** Add version pinning and maximum version constraints to self-update feature (builds on #241) `#feature` `#mcp` `#update`
+  > DESIGN: Two deployment modes with different constraint sources:
+  > - Project-local (uv add ai-todo): Use pyproject.toml constraints (uv handles automatically)
+  > - System-global (uv tool install): Use ~/.config/ai-todo/config.yaml for version constraints
+  > DESIGN: Global config location follows uv pattern (~/.config/uv/uv.toml):
+  > - Linux/macOS: ~/.config/ai-todo/config.yaml
+  > - Windows: %APPDATA%\ai-todo\config.yaml
+  > - XDG override: $XDG_CONFIG_HOME/ai-todo/config.yaml
+  > DESIGN: Constraint precedence (highest to lowest):
+  > 1. CLI flags (--version=X.Y.Z)
+  > 2. Project pyproject.toml (if ai-todo is a dependency)
+  > 3. User-level ~/.config/ai-todo/config.yaml (for global installs)
+  > 4. Built-in default (upgrade to latest)
+  > DESIGN: Use PEP 440 version specifiers (same as pyproject.toml):
+  > - Pin exact: version_constraint: "==3.0.2"
+  > - Min+max: version_constraint: ">=3.0.0,<4.0.0" (like fastmcp in this repo)
+  > - Minimum only: version_constraint: ">=3.0.0"
+  > DESIGN: Version mismatch warning for global installs:
+  > - On MCP startup, check if project has ai-todo in pyproject.toml
+  > - If global version doesn't satisfy project's constraint, emit warning
+  > - Example: "Warning: Global ai-todo 4.1.0 doesn't match project constraint >=3.0.0,<4.0.0"
+  > - Suggest: "Consider using project-local install: uv add ai-todo"
+  > IMPLEMENTATION: MCP protocol safety - all warnings MUST use stderr (file=sys.stderr), never stdout. MCP uses stdout for JSON-RPC; any raw text to stdout corrupts the protocol stream.
+  - [ ] **#245.13** Implement: Add startup warning when global install version mismatches project pyproject.toml constraint
+  - [ ] **#245.12** Implement: Extend updater.py to check constraints before performing update
+  - [ ] **#245.11** Docs: Document version constraint configuration options in user guide
+  - [ ] **#245.10** Test: Integration tests for update with max_version constraint (should cap at boundary)
+  - [ ] **#245.9** Test: Integration tests for update with pinned version (should skip upgrade)
+  - [ ] **#245.8** Test: Unit tests for version constraint parsing and comparison logic
+  - [ ] **#245.7** Implement: Update MCP check_update/update tools to respect version constraints
+  - [ ] **#245.6** Implement: Add CLI commands for setting/viewing version constraints (ai-todo config update.pin-version)
+  - [ ] **#245.5** Implement: Add version constraint fields to config schema and loader
+  - [ ] **#245.4** Design: Plan update behavior with constraints (skip if pinned, cap at max_version, warn on constraint violations)
+  - [ ] **#245.3** Design: Define version constraint schema for config.yaml (pinned_version, max_version, allow_prerelease)
+  - [ ] **#245.2** Analyze: Investigate how other tools handle version locks (e.g., uv.lock, pip-tools, poetry.lock)
+  - [ ] **#245.1** Analyze: Research uv/pip version specifier patterns (==, <=, <, ~=, ^) and common ecosystem practices
+
 - [x] **#242** Investigate archive/delete task ordering bug - root task appears below subtasks `#bug` `#file-ops` (2026-01-27)
   - [x] **#242.11** Docs: Document fix if behavior change affects user expectations (2026-01-27)
   - [x] **#242.10** Test: Run full test suite to verify no regressions (2026-01-27)
@@ -17,19 +54,20 @@
   - [x] **#242.2** Analyze: Verify if delete operation has the same ordering issue (2026-01-27)
   - [x] **#242.1** Analyze: Reproduce archive ordering issue with root task and subtasks (2026-01-27)
 
-- [ ] **#241** Implement self-update feature via uv with MCP server graceful shutdown `#feature` `#mcp`
-  - [ ] **#241.12** Docs: Add troubleshooting section for update failures and rollback
-  - [ ] **#241.11** Docs: Document self-update feature in README and user guide
-  - [ ] **#241.10** Test: Verify graceful shutdown signals pending operations to complete
-  - [ ] **#241.9** Test: Integration tests for MCP update tool with mocked uv commands
-  - [ ] **#241.8** Test: Unit tests for version comparison and update detection logic
-  - [ ] **#241.7** Implement: Add CLI `ai-todo update` command for manual updates
-  - [ ] **#241.6** Implement: Add graceful shutdown mechanism for MCP server after update completes
-  - [ ] **#241.5** Implement: Create `update` MCP tool that triggers uv upgrade subprocess
-  - [ ] **#241.4** Implement: Add version check against PyPI to detect available updates
-  - [ ] **#241.3** Design: Determine graceful shutdown strategy for MCP server (signal handling, cleanup)
-  - [ ] **#241.2** Design: Define update workflow (check version, download, shutdown, restart by host)
-  - [ ] **#241.1** Design: Research uv self-update mechanisms and MCP server shutdown patterns
+- [x] **#241** Implement self-update feature via uv with MCP server graceful shutdown `#feature` `#mcp` (2026-01-27)
+  > REQUIREMENT: Must detect developer environment (running from live repo vs installed package). In dev mode, skip uv upgrade but still support restart to pick up code changes.
+  - [x] **#241.12** Docs: Add troubleshooting section for update failures and rollback (2026-01-27)
+  - [x] **#241.11** Docs: Document self-update feature in README and user guide (2026-01-27)
+  - [x] **#241.10** Test: Verify graceful shutdown signals pending operations to complete (2026-01-27)
+  - [x] **#241.9** Test: Integration tests for MCP update tool with mocked uv commands (2026-01-27)
+  - [x] **#241.8** Test: Unit tests for version comparison and update detection logic (2026-01-27)
+  - [x] **#241.7** Implement: Add CLI `ai-todo update` command for manual updates (2026-01-27)
+  - [x] **#241.6** Implement: Add graceful shutdown mechanism for MCP server after update completes (2026-01-27)
+  - [x] **#241.5** Implement: Create `update` MCP tool that triggers uv upgrade subprocess (2026-01-27)
+  - [x] **#241.4** Implement: Add version check against PyPI to detect available updates (2026-01-27)
+  - [x] **#241.3** Design: Determine graceful shutdown strategy for MCP server (signal handling, cleanup) (2026-01-27)
+  - [x] **#241.2** Design: Define update workflow (check version, download, shutdown, restart by host) (2026-01-27)
+  - [x] **#241.1** Design: Research uv self-update mechanisms and MCP server shutdown patterns (2026-01-27)
 
 - [x] **#240** Fix malformed TODO.md when adding subtasks via MCP on fresh repository (GitHub Issue #47: https://github.com/fxstein/ai-todo/issues/47) `#bug` `#file-ops` `#mcp` (2026-01-27)
   - [x] **#240.12** Test: Run full test suite to verify no regressions from branding/rule changes `#testing` (2026-01-27)
@@ -1413,4 +1451,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 11:35:33
+**ai-todo** | Last Updated: 2026-01-27 13:16:08

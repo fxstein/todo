@@ -296,6 +296,44 @@ def version() -> str:
     return f"ai-todo version {__version__}"
 
 
+@mcp.tool()
+def check_update() -> str:
+    """Check if an ai-todo update is available."""
+    from ai_todo.core.updater import check_for_updates
+
+    info = check_for_updates()
+    return info.message
+
+
+@mcp.tool()
+def update(restart: bool = True) -> str:
+    """Update ai-todo to the latest version and optionally restart.
+
+    Args:
+        restart: If True, restart the MCP server after update to apply changes.
+                 The host (e.g., Cursor) will automatically reconnect.
+    """
+    from ai_todo.core.updater import perform_update, restart_server
+
+    # Perform the update
+    success, message = perform_update(restart=restart)
+
+    if success and restart:
+        # Schedule restart after returning the message
+        # We use a small delay to ensure the response is sent
+        import threading
+
+        def delayed_restart():
+            import time
+
+            time.sleep(0.5)  # Allow response to be sent
+            restart_server()
+
+        threading.Thread(target=delayed_restart, daemon=True).start()
+
+    return message
+
+
 # Phase 7: Tamper Detection
 
 

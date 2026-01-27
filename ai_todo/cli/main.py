@@ -361,6 +361,32 @@ def version_long():
     version_tool_command()
 
 
+@cli.command("check-update")
+def check_update_cmd():
+    """Check if an ai-todo update is available."""
+    from ai_todo.core.updater import check_for_updates
+
+    info = check_for_updates()
+    print(info.message)
+
+
+@cli.command("update")
+@click.option("--check-only", is_flag=True, help="Only check for updates, don't install")
+def update_cmd(check_only):
+    """Update ai-todo to the latest version."""
+    from ai_todo.core.updater import check_for_updates, perform_update
+
+    if check_only:
+        info = check_for_updates()
+        print(info.message)
+        return
+
+    success, message = perform_update(restart=False)
+    print(message)
+    if not success:
+        raise SystemExit(1)
+
+
 @cli.command("serve")
 @click.option("--root", help="Root directory for the project")
 @click.pass_context

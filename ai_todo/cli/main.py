@@ -199,11 +199,11 @@ def archive(ctx, task_ids, reason):
 
 
 @cli.command()
-@click.argument("task_id")
+@click.argument("task_ids", nargs=-1, required=True)
 @click.pass_context
-def restore(ctx, task_id):
-    """Restore a task from Deleted or Recently Completed back to Tasks section."""
-    restore_command(task_id, todo_path=ctx.obj["todo_file"])
+def restore(ctx, task_ids):
+    """Restore task(s) from Deleted or Recently Completed back to Tasks section."""
+    restore_command(list(task_ids), todo_path=ctx.obj["todo_file"])
 
 
 @cli.command("show-root")

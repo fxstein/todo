@@ -28,6 +28,14 @@ alwaysApply: true
 5.  **Installation/Migration:**
     -   Installation logic resides in `ai_todo/cli/system_ops.py` (or dedicated modules).
     -   Migrations are handled by `ai_todo.core.migrations`.
+6.  **Development Methodology:**
+    -   Whenever you are asked to develop something, always create subtasks that cover:
+        analysis, design, implementation, creating unit and integration tests, verify and document
+    -   Whenever you are working on analysis or design always create a document with the findings and
+        options and stop for human review and approval. Always add the file link to the description
+        of the task or sub task that created it.
+    -   Use the task and subtask descriptions to provide high level summaries of the individual steps
+    -   Use tags to categorize individual steps
 
 ## File Integrity & Tamper Detection
 

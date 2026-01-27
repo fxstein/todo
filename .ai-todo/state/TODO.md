@@ -4,6 +4,36 @@
 
 ## Tasks
 
+- [x] **#261** Implement batch operations for task state commands `#api` `#batch-operations` `#enhancement` (2026-01-27)
+  > Add batch support (one or list of task IDs) to complete, archive, delete, and restore commands. Ensure consistent API across CLI and MCP.
+  - [x] **#261.7** Document: Update API docs and CLI help for batch operations (2026-01-27)
+    > CLI help updated (shows TASK_IDS...). Design doc at docs/batch-operations-design.md
+  - [x] **#261.6** Verify: End-to-end validation of batch operations (2026-01-27)
+    > Full test suite: 241 passed. CLI and MCP batch operations verified.
+  - [x] **#261.5** Test: Create unit and integration tests for batch operations (2026-01-27)
+    > Updated test_mcp_cli_parity.py to use task_ids: list[str]. All 241 tests pass.
+  - [x] **#261.4** Implement: Add batch support to restore CLI command (2026-01-27)
+    > Updated restore CLI command to accept multiple task IDs via nargs=-1, refactored restore_command to accept list[str]
+  - [x] **#261.3** Implement: Add batch support to MCP tools (2026-01-27)
+    > Updated complete_task, delete_task, archive_task, restore_task MCP tools to accept task_ids: list[str]
+  - [x] **#261.2** Design: Create design document for batch operations API (2026-01-27)
+    > APPROVED: Option A - task_ids: list[str] (1 to n items). See docs/batch-operations-design.md
+  - [x] **#261.1** Investigate: Audit current batch support in CLI, MCP, and core (2026-01-27)
+
+- [ ] **#260** GitHub Issue #29: Add .cursorignore files for secrets/sensitive content `#enhancement` `#github-issue` `#security`
+  > Research and implement .cursorignore files to prevent secrets and sensitive content from being exposed to AI agents.
+  - [ ] **#260.7** Document: Add security best practices docs and close GitHub issue #29
+  - [ ] **#260.6** Verify: Confirm sensitive content is not exposed to AI agents
+  - [ ] **#260.5** Test: Verify ignore patterns work correctly in Cursor
+  - [ ] **#260.4** Implement: Add .cursorignore file with recommended patterns
+  - [ ] **#260.3** Decide: Define default ignore patterns and user customization options
+  - [ ] **#260.2** Analyze: Identify sensitive files/patterns that should be ignored
+  - [ ] **#260.1** Investigate: Research .cursorignore format and best practices for secrets
+
+- [x] **#258** GitHub Issue #31: Investigate Cursor CLI and Shell Commands `#cursor-integration` `#github-issue` `#investigation` (2026-01-27)
+  > COMPLETE: ai-todo already integrates with Cursor via MCP. Cursor CLI provides: (1) `cursor agent` for terminal AI with MCP support, (2) `cursor agent mcp list/list-tools/enable/disable` for server management, (3) `cursor --add-mcp` for programmatic setup. No additional integration work needed. Close GitHub issue #31.
+  - [x] **#258.8** Close GitHub issue #31 as complete - ai-todo MCP integration already works with Cursor CLI (2026-01-27)
+
 - [x] **#254** Freeze legacy shell scripts and remove from test comparisons `#cleanup` `#legacy` `#testing` (2026-01-27)
   > Implemented: (1) Added FROZEN header with date and reason to legacy/todo.ai and todo.bash, (2) Deleted parity test files (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py, test_show_root_shell.py), (3) Rewrote TEST_PLAN.md for Python-only testing, (4) CI runs pytest which now excludes deleted tests, (5) Release script references kept intentionally - scripts are frozen but still distributed for backward compatibility.
   - [x] **#254.6** Remove legacy script references from release scripts (release.sh, etc.) (2026-01-27)
@@ -52,6 +82,46 @@
 ---
 
 ## Archived Tasks
+- [x] **#259** GitHub Issue #30: Evaluate MCP server benefits over CLI `#github-issue` `#investigation` `#mcp` (2026-01-27)
+  > IMPLEMENTED in v3.0.0: MCP server fully implemented with CLI parity. Close GitHub issue #30.
+  - [x] **#259.8** Close GitHub issue #30 as implemented in v3.0.0 (2026-01-27)
+  - [x] **#259.7** Document: Update MCP documentation and close GitHub issue #30 (2026-01-27)
+  - [x] **#259.6** Verify: Validate MCP/CLI parity and integration quality (2026-01-27)
+  - [x] **#259.5** Test: Ensure MCP server has comprehensive test coverage (2026-01-27)
+  - [x] **#259.4** Implement: Address any identified MCP enhancement opportunities (2026-01-27)
+  - [x] **#259.3** Decide: Close issue if complete, or identify remaining enhancements (2026-01-27)
+  - [x] **#259.2** Analyze: Document MCP benefits realized vs original issue expectations (2026-01-27)
+  - [x] **#259.1** Investigate: Review GitHub issue #30 and current MCP server implementation (2026-01-27)
+- [x] **#257** GitHub Issue #33: Enhanced bug reporting with duplicate detection and privacy `#developer-experience` `#enhancement` `#github-issue` (2026-01-27)
+  > WON'T IMPLEMENT: Use native GitHub bug reporting instead of building custom tooling. Close GitHub issue #33.
+  - [x] **#257.8** Close GitHub issue #33 as won't implement - use native GitHub bug reporting (2026-01-27)
+  - [x] **#257.7** Document: Update CLI help and docs, close GitHub issue #33 (2026-01-27)
+  - [x] **#257.6** Verify: Test with real bug scenarios and private repo simulation (2026-01-27)
+  - [x] **#257.5** Test: Create tests for bug reporting enhancements (2026-01-27)
+  - [x] **#257.4** Implement: Add duplicate detection and privacy mode features (2026-01-27)
+  - [x] **#257.3** Decide: Design API for enhanced bug reporting options (2026-01-27)
+  - [x] **#257.2** Analyze: Prioritize features (duplicate detection, privacy, metadata, suggestions) (2026-01-27)
+  - [x] **#257.1** Investigate: Review GitHub issue #33 and current report-bug implementation (2026-01-27)
+- [x] **#256** GitHub Issue #34: Smart installer with bash/zsh auto-detection `#enhancement` `#github-issue` `#installer` (2026-01-27)
+  > WON'T FIX: Shell installer no longer relevant since v3.0.0 moved to Python with uv/pipx installation. Legacy shell scripts are frozen and no longer receive updates. Close GitHub issue #34.
+  - [x] **#256.8** Close GitHub issue #34 as won't fix - no longer relevant since v3.0.0 (2026-01-27)
+  - [x] **#256.7** Document: Update installation docs and close GitHub issue #34 (2026-01-27)
+  - [x] **#256.6** Verify: Test installer on macOS, Linux, and Windows environments (2026-01-27)
+  - [x] **#256.5** Test: Create tests for installer across different OS/shell combinations (2026-01-27)
+  - [x] **#256.4** Implement: Create smart installer with OS/shell auto-detection (2026-01-27)
+  - [x] **#256.3** Decide: Design installer architecture and shell detection strategy (2026-01-27)
+  - [x] **#256.2** Analyze: Evaluate bash vs zsh performance and compatibility requirements (2026-01-27)
+  - [x] **#256.1** Investigate: Review GitHub issue #34 and existing installer research docs (2026-01-27)
+- [x] **#255** GitHub Issue #39: Python-based MCP server with pipx installation `#architecture` `#enhancement` `#github-issue` (2026-01-27)
+  > IMPLEMENTED in v3.0.0: Python-based ai-todo with dual interfaces (MCP server + CLI), shared core logic in ai_todo.core, and uv/pipx installation support. Close GitHub issue #39.
+  - [x] **#255.8** Close GitHub issue #39 as implemented in v3.0.0 (2026-01-27)
+  - [x] **#255.7** Document: Update README, docs, and close GitHub issue #39 (2026-01-27)
+  - [x] **#255.6** Verify: Run full test suite and validate implementation (2026-01-27)
+  - [x] **#255.5** Test: Create/update tests for any new functionality (2026-01-27)
+  - [x] **#255.4** Implement: Address any remaining requirements (2026-01-27)
+  - [x] **#255.3** Decide: Determine remaining gaps and next steps (or close issue if complete) (2026-01-27)
+  - [x] **#255.2** Analyze: Compare current codebase against issue requirements (2026-01-27)
+  - [x] **#255.1** Investigate: Review GitHub issue #39 details and current implementation status (2026-01-27)
 - [x] **#251** Debug and fix MCP server restart functionality in Cursor `#bug` `#mcp` (2026-01-27)
   - [x] **#251.8** Document restart behavior and any limitations (2026-01-27)
   - [x] **#251.7** Test restart across multiple scenarios (dev mode, after updates) (2026-01-27)
@@ -1393,6 +1463,13 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#258.7** Document: Update docs with Cursor integration guide, close GitHub issue #31 (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#258.6** Verify: Test integration in real Cursor environment (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#258.5** Test: Create tests for Cursor CLI integration (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#258.4** Implement: Build Cursor CLI integration features (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#258.3** Decide: Determine which integrations provide most value (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#258.2** Analyze: Identify integration opportunities between ai-todo and Cursor CLI (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#258.1** Investigate: Research Cursor CLI features and shell command capabilities (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#252** Test task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#248** Tell a joke `#test` (deleted 2026-01-27, expires 2026-02-26)
@@ -1539,4 +1616,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 21:49:23
+**ai-todo** | Last Updated: 2026-01-27 22:29:56

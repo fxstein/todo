@@ -126,14 +126,18 @@ def add_subtask(
 
 
 @mcp.tool()
-def complete_task(task_id: str, with_subtasks: bool = False) -> str:
-    """Mark a task as complete."""
-    result = _capture_output(
-        complete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH
-    )
+def complete_task(task_ids: list[str], with_subtasks: bool = False) -> str:
+    """Mark task(s) as complete.
+
+    Args:
+        task_ids: List of task IDs (1 to n items)
+        with_subtasks: Include subtasks in operation
+    """
+    result = _capture_output(complete_command, task_ids, with_subtasks, todo_path=CURRENT_TODO_PATH)
     # Track completion time for archive cooldown (session-based)
-    if "Completed:" in result or "Error" not in result:
-        SESSION_COMPLETIONS[task_id] = datetime.now()
+    for task_id in task_ids:
+        if "Completed:" in result or "Error" not in result:
+            SESSION_COMPLETIONS[task_id] = datetime.now()
     return result
 
 
@@ -183,27 +187,44 @@ def modify_task(
 
 
 @mcp.tool()
-def delete_task(task_id: str, with_subtasks: bool = True) -> str:
-    """Delete a task and its subtasks (move to Deleted section)."""
-    return _capture_output(delete_command, [task_id], with_subtasks, todo_path=CURRENT_TODO_PATH)
+def delete_task(task_ids: list[str], with_subtasks: bool = True) -> str:
+    """Delete task(s) and move to Deleted section.
+
+    Args:
+        task_ids: List of task IDs (1 to n items)
+        with_subtasks: Include subtasks (default: True)
+    """
+    return _capture_output(delete_command, task_ids, with_subtasks, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()
-def archive_task(task_id: str, reason: str | None = None, with_subtasks: bool = False) -> str:
-    """Archive a task (move to Recently Completed section)."""
+def archive_task(
+    task_ids: list[str], reason: str | None = None, with_subtasks: bool = False
+) -> str:
+    """Archive task(s) to Recently Completed section.
+
+    Args:
+        task_ids: List of task IDs (1 to n items)
+        reason: Optional reason for archiving
+        with_subtasks: Include subtasks (default: False)
+    """
     # Session-based cooldown check for root tasks completed in this session
-    if "." not in task_id and task_id in SESSION_COMPLETIONS:
-        elapsed = (datetime.now() - SESSION_COMPLETIONS[task_id]).total_seconds()
-        if elapsed < ARCHIVE_COOLDOWN_SECONDS:
-            return f"Task #{task_id} requires human review before archiving."
-    # Note: archive_command doesn't support with_subtasks yet in CLI signature used here
-    return _capture_output(archive_command, [task_id], reason, todo_path=CURRENT_TODO_PATH)
+    for task_id in task_ids:
+        if "." not in task_id and task_id in SESSION_COMPLETIONS:
+            elapsed = (datetime.now() - SESSION_COMPLETIONS[task_id]).total_seconds()
+            if elapsed < ARCHIVE_COOLDOWN_SECONDS:
+                return f"Task #{task_id} requires human review before archiving."
+    return _capture_output(archive_command, task_ids, reason, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()
-def restore_task(task_id: str) -> str:
-    """Restore a task from Deleted or Recently Completed back to Tasks section."""
-    return _capture_output(restore_command, task_id, todo_path=CURRENT_TODO_PATH)
+def restore_task(task_ids: list[str]) -> str:
+    """Restore task(s) from Deleted or Archived back to Tasks section.
+
+    Args:
+        task_ids: List of task IDs (1 to n items)
+    """
+    return _capture_output(restore_command, task_ids, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()

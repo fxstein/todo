@@ -187,7 +187,7 @@ class TestMCPCLIParity:
 
         # MCP output
         mcp_output = await capture_mcp_output(
-            "complete_task", {"task_id": "1", "with_subtasks": False}, test_todo_file
+            "complete_task", {"task_ids": ["1"], "with_subtasks": False}, test_todo_file
         )
 
         # Compare
@@ -261,7 +261,7 @@ class TestMCPCLIParity:
 
         # MCP output
         mcp_output = await capture_mcp_output(
-            "delete_task", {"task_id": "1", "with_subtasks": False}, test_todo_file
+            "delete_task", {"task_ids": ["1"], "with_subtasks": False}, test_todo_file
         )
 
         # Compare
@@ -319,7 +319,7 @@ class TestMCPCLIParity:
         )
 
         # MCP output (no cooldown since task wasn't completed in this session)
-        mcp_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
+        mcp_output = await capture_mcp_output("archive_task", {"task_ids": ["1"]}, test_todo_file)
 
         # Compare
         assert cli_output.strip() == mcp_output.strip()
@@ -461,11 +461,11 @@ async def test_mcp_archive_cooldown_blocks_immediate_archive(test_todo_file):
     mcp_server_module.SESSION_COMPLETIONS.clear()
 
     # Complete a task via MCP (this adds it to SESSION_COMPLETIONS)
-    complete_output = await capture_mcp_output("complete_task", {"task_id": "1"}, test_todo_file)
+    complete_output = await capture_mcp_output("complete_task", {"task_ids": ["1"]}, test_todo_file)
     assert "Completed:" in complete_output
 
     # Try to archive immediately via MCP - should be blocked by session cooldown
-    archive_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
+    archive_output = await capture_mcp_output("archive_task", {"task_ids": ["1"]}, test_todo_file)
     assert "requires human review" in archive_output
     assert "Archived" not in archive_output
 
@@ -495,7 +495,7 @@ async def test_mcp_archive_cooldown_allows_non_session_tasks(test_todo_file):
     )
 
     # Archive via MCP - should work (task wasn't completed in this session)
-    archive_output = await capture_mcp_output("archive_task", {"task_id": "1"}, test_todo_file)
+    archive_output = await capture_mcp_output("archive_task", {"task_ids": ["1"]}, test_todo_file)
     assert "Archived 1 task(s)" in archive_output
 
 

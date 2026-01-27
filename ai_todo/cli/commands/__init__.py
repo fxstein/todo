@@ -432,98 +432,112 @@ def archive_command(
         print(f"Archived {archived_count} task(s)")
 
 
-def restore_command(task_id: str, todo_path: str = "TODO.md"):
-    """Restore task from Deleted or Archived Tasks to active Tasks."""
+def restore_command(task_ids: list[str], todo_path: str = "TODO.md"):
+    """Restore task(s) from Deleted or Archived Tasks to active Tasks.
 
-    manager = get_manager(todo_path)
-    try:
-        # Read file state BEFORE restore
-        file_ops = FileOps(todo_path)
-        file_ops.read_tasks()
+    Args:
+        task_ids: List of task IDs to restore (1 to n items)
+        todo_path: Path to TODO.md file
+    """
+    restored_count = 0
+    for task_id in task_ids:
+        try:
+            _restore_single_task(task_id, todo_path)
+            restored_count += 1
+        except ValueError as e:
+            print(f"Error restoring {task_id}: {e}")
 
-        task = manager.restore_task(task_id)
-
-        # CRITICAL: Positioning depends on whether this is a root task or subtask
-        all_tasks = manager.list_tasks()
-
-        # Check if this is a subtask (contains a dot in the ID)
-        if "." in task_id:
-            # Subtask: Insert after parent
-            parent_id = task_id.rsplit(".", 1)[0]
-            tasks_without_restored = [t for t in all_tasks if t.id != task.id]
-
-            # Find parent index
-            parent_index = -1
-            for i, t in enumerate(tasks_without_restored):
-                if t.id == parent_id:
-                    parent_index = i
-                    break
-
-            if parent_index != -1:
-                # Insert after parent
-                reordered_tasks = (
-                    tasks_without_restored[: parent_index + 1]
-                    + [task]
-                    + tasks_without_restored[parent_index + 1 :]
-                )
-            else:
-                # Parent not found, put at top as fallback
-                reordered_tasks = [task] + tasks_without_restored
-        else:
-            # Root task: Put at the TOP of the Tasks section
-            reordered_tasks = [task] + [t for t in all_tasks if t.id != task.id]
-
-        # Phase 14: Structure preservation is handled automatically by snapshot
-        # No manual file editing needed
-        file_ops.write_tasks(reordered_tasks)
-
-        print(f"Restored task #{task.id} to Tasks section")
-
-        # Idempotent/Self-healing restore: Check for missing subtasks and restore them
-        # This handles cases where a previous restore failed or was incomplete
-        subtasks = manager.get_subtasks(task_id)
-        restored_subtasks = []
-        for subtask in subtasks:
-            # Check if subtask is "missing" (not in Tasks section)
-            # A subtask is missing if it is ARCHIVED or DELETED
-            if subtask.status in (TaskStatus.ARCHIVED, TaskStatus.DELETED):
-                subtask.restore()
-                restored_subtasks.append(subtask)
-
-        if restored_subtasks:
-            # Re-write tasks to save restored subtasks
-            # CRITICAL: Use reordered_tasks (with parent at top), not a fresh fetch
-            # If we re-fetch from manager, we lose the top position!
-
-            # 1. Remove restored subtasks from their current position in reordered_tasks
-            tasks_without_subtasks = [t for t in reordered_tasks if t not in restored_subtasks]
-
-            # 2. Find parent index
-            parent_index = -1
-            for i, t in enumerate(tasks_without_subtasks):
-                if t.id == task_id:
-                    parent_index = i
-                    break
-
-            # 3. Insert subtasks after parent
-            if parent_index != -1:
-                final_tasks = (
-                    tasks_without_subtasks[: parent_index + 1]
-                    + sorted(
-                        restored_subtasks,
-                        key=lambda t: [int(x) for x in t.id.split(".")],
-                        reverse=True,
-                    )
-                    + tasks_without_subtasks[parent_index + 1 :]
-                )
-                file_ops.write_tasks(final_tasks)
-                print(f"  Also restored {len(restored_subtasks)} subtask(s)")
-
-    except ValueError as e:
-        print(f"Error: {e}")
+    if restored_count == 0 and len(task_ids) > 0:
         import sys
 
         sys.exit(1)
+
+
+def _restore_single_task(task_id: str, todo_path: str = "TODO.md"):
+    """Restore a single task from Deleted or Archived Tasks to active Tasks."""
+    manager = get_manager(todo_path)
+
+    # Read file state BEFORE restore
+    file_ops = FileOps(todo_path)
+    file_ops.read_tasks()
+
+    task = manager.restore_task(task_id)
+
+    # CRITICAL: Positioning depends on whether this is a root task or subtask
+    all_tasks = manager.list_tasks()
+
+    # Check if this is a subtask (contains a dot in the ID)
+    if "." in task_id:
+        # Subtask: Insert after parent
+        parent_id = task_id.rsplit(".", 1)[0]
+        tasks_without_restored = [t for t in all_tasks if t.id != task.id]
+
+        # Find parent index
+        parent_index = -1
+        for i, t in enumerate(tasks_without_restored):
+            if t.id == parent_id:
+                parent_index = i
+                break
+
+        if parent_index != -1:
+            # Insert after parent
+            reordered_tasks = (
+                tasks_without_restored[: parent_index + 1]
+                + [task]
+                + tasks_without_restored[parent_index + 1 :]
+            )
+        else:
+            # Parent not found, put at top as fallback
+            reordered_tasks = [task] + tasks_without_restored
+    else:
+        # Root task: Put at the TOP of the Tasks section
+        reordered_tasks = [task] + [t for t in all_tasks if t.id != task.id]
+
+    # Phase 14: Structure preservation is handled automatically by snapshot
+    # No manual file editing needed
+    file_ops.write_tasks(reordered_tasks)
+
+    print(f"Restored task #{task.id} to Tasks section")
+
+    # Idempotent/Self-healing restore: Check for missing subtasks and restore them
+    # This handles cases where a previous restore failed or was incomplete
+    subtasks = manager.get_subtasks(task_id)
+    restored_subtasks = []
+    for subtask in subtasks:
+        # Check if subtask is "missing" (not in Tasks section)
+        # A subtask is missing if it is ARCHIVED or DELETED
+        if subtask.status in (TaskStatus.ARCHIVED, TaskStatus.DELETED):
+            subtask.restore()
+            restored_subtasks.append(subtask)
+
+    if restored_subtasks:
+        # Re-write tasks to save restored subtasks
+        # CRITICAL: Use reordered_tasks (with parent at top), not a fresh fetch
+        # If we re-fetch from manager, we lose the top position!
+
+        # 1. Remove restored subtasks from their current position in reordered_tasks
+        tasks_without_subtasks = [t for t in reordered_tasks if t not in restored_subtasks]
+
+        # 2. Find parent index
+        parent_index = -1
+        for i, t in enumerate(tasks_without_subtasks):
+            if t.id == task_id:
+                parent_index = i
+                break
+
+        # 3. Insert subtasks after parent
+        if parent_index != -1:
+            final_tasks = (
+                tasks_without_subtasks[: parent_index + 1]
+                + sorted(
+                    restored_subtasks,
+                    key=lambda t: [int(x) for x in t.id.split(".")],
+                    reverse=True,
+                )
+                + tasks_without_subtasks[parent_index + 1 :]
+            )
+            file_ops.write_tasks(final_tasks)
+            print(f"  Also restored {len(restored_subtasks)} subtask(s)")
 
 
 def undo_command(task_id: str, todo_path: str = "TODO.md"):

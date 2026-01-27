@@ -66,7 +66,11 @@ def test_github_coordination(manager, mock_config, mock_github_client):
     # Remote is ahead
     mock_github_client.get_issue_comments.return_value = [{"body": "Next task number: 15"}]
 
-    assert manager.generate_next_task_id(10) == "16"
+    result = manager.generate_next_task_id(10)
+    assert result == "16"
+
+    # Verify it posts the new task number back to GitHub
+    mock_github_client.create_issue_comment.assert_called_once_with(123, "Next task number: 16")
 
 
 def test_github_coordination_local_ahead(manager, mock_config, mock_github_client):
@@ -77,7 +81,11 @@ def test_github_coordination_local_ahead(manager, mock_config, mock_github_clien
     # Remote is behind
     mock_github_client.get_issue_comments.return_value = [{"body": "Next task number: 5"}]
 
-    assert manager.generate_next_task_id(10) == "11"
+    result = manager.generate_next_task_id(10)
+    assert result == "11"
+
+    # Verify it posts the new task number back to GitHub
+    mock_github_client.create_issue_comment.assert_called_once_with(123, "Next task number: 11")
 
 
 def test_github_coordination_failure(manager, mock_config, mock_github_client):
@@ -85,8 +93,25 @@ def test_github_coordination_failure(manager, mock_config, mock_github_client):
     mock_config.get_coordination_type.return_value = "github-issues"
     mock_config.get.return_value = 123
 
-    # API failure
+    # API failure on read
     mock_github_client.get_issue_comments.side_effect = Exception("API Error")
 
     # Should fallback to local increment
     assert manager.generate_next_task_id(10) == "11"
+
+    # Should not have called create_issue_comment since read failed
+    mock_github_client.create_issue_comment.assert_not_called()
+
+
+def test_github_coordination_post_failure(manager, mock_config, mock_github_client):
+    """Test that task creation succeeds even if posting to GitHub fails."""
+    mock_config.get_numbering_mode.return_value = "single-user"
+    mock_config.get_coordination_type.return_value = "github-issues"
+    mock_config.get.return_value = 123
+
+    mock_github_client.get_issue_comments.return_value = [{"body": "Next task number: 15"}]
+    mock_github_client.create_issue_comment.side_effect = Exception("Post failed")
+
+    # Should still return the correct task ID even if post fails
+    result = manager.generate_next_task_id(10)
+    assert result == "16"

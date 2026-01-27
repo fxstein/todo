@@ -93,3 +93,21 @@ def test_get_issue_comments(mock_repo_info, mock_get, github_client):
         "https://api.github.com/repos/owner/repo/issues/123/comments",
         headers=github_client._get_headers(),
     )
+
+
+@patch("requests.post")
+@patch("ai_todo.core.github_client.GitHubClient._get_repo_info")
+def test_create_issue_comment(mock_repo_info, mock_post, github_client):
+    """Test creating a comment on an issue for task number coordination."""
+    mock_repo_info.return_value = ("owner", "repo")
+    mock_response = MagicMock()
+    mock_response.json.return_value = {"id": 123, "body": "Next task number: 50"}
+    mock_post.return_value = mock_response
+
+    comment = github_client.create_issue_comment(23, "Next task number: 50")
+
+    assert comment["body"] == "Next task number: 50"
+    mock_post.assert_called_once()
+    args, kwargs = mock_post.call_args
+    assert args[0] == "https://api.github.com/repos/owner/repo/issues/23/comments"
+    assert kwargs["json"]["body"] == "Next task number: 50"

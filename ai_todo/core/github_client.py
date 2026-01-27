@@ -104,3 +104,19 @@ class GitHubClient:
         response.raise_for_status()
         result: list[dict[str, Any]] = response.json()
         return result
+
+    def create_issue_comment(self, issue_number: int, body: str) -> dict[str, Any]:
+        """Create a comment on an issue.
+
+        Used for task number coordination - posts the next task number
+        to the coordination issue for atomic multi-user synchronization.
+        """
+        owner, repo = self._get_repo_info()
+        url = f"{self.api_base}/repos/{owner}/{repo}/issues/{issue_number}/comments"
+
+        data = {"body": body}
+
+        response = requests.post(url, headers=self._get_headers(), json=data)
+        response.raise_for_status()
+        result: dict[str, Any] = response.json()
+        return result

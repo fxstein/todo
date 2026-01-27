@@ -79,33 +79,43 @@ class CoordinationManager:
 
     def _coordinate_via_github(self, current_max: int, issue_number: int) -> str:
         """
-        Fetch latest task ID from GitHub Issue comments.
-        Returns max(local, remote) + 1.
+        Fetch latest task ID from GitHub Issue comments and reserve the next one.
+        Returns max(local, remote) + 1 and posts the reservation to GitHub.
         """
+        import re
+
         try:
             comments = self.github_client.get_issue_comments(issue_number)
             remote_max = 0
 
-            # Simple parsing: look for digits in comments
-            # Shell script looks for "Next task number: 123" or just digits
+            # Parse comments to find the latest task number
+            # Format: "Next task number: 123"
             for comment in reversed(comments):
                 body = comment.get("body", "")
-                # Try to find numbers
-                # This is a simplified logic compared to shell script's regex
-                # Ideally we'd use a regex to find "Next task number: (\d+)"
-                import re
-
                 match = re.search(r"Next task number: (\d+)", body)
                 if match:
                     remote_max = int(match.group(1))
                     break
 
             next_val = max(current_max, remote_max) + 1
+
+            # Post the new task number to GitHub for coordination
+            self._post_task_number_to_github(next_val, issue_number)
+
             return str(next_val)
 
         except Exception as e:
             print(f"Warning: GitHub coordination failed: {e}")
             return str(current_max + 1)
+
+    def _post_task_number_to_github(self, task_number: int, issue_number: int) -> None:
+        """Post the reserved task number to the GitHub coordination issue."""
+        try:
+            body = f"Next task number: {task_number}"
+            self.github_client.create_issue_comment(issue_number, body)
+        except Exception as e:
+            # Don't fail task creation if posting fails - just warn
+            print(f"Warning: Failed to post task number to GitHub Issue #{issue_number}: {e}")
 
     def _get_github_user_id(self) -> str:
         """Get first 7 chars of GitHub username."""

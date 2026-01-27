@@ -4,6 +4,42 @@
 
 ## Tasks
 
+- [ ] **#250** Improve update command for development mode - skip version checks and provide direct restart capability `#dev-experience` `#enhancement` `#mcp`
+  > CONTEXT: In dev mode, version numbers are irrelevant - developers iterate on the same version many times. The update command should recognize this and provide a streamlined restart experience without unnecessary version checks or 'already up to date' messages.
+  - [ ] **#250.12** Docs: Update development workflow documentation with restart usage `#documentation`
+  - [ ] **#250.11** Verify: Test restart functionality in live dev environment `#verification`
+  - [ ] **#250.10** Test: Unit tests for dev mode detection and restart behavior `#testing`
+  - [ ] **#250.9** Implement: Add CLI restart command for development workflow `#implementation`
+  - [ ] **#250.8** Implement: Modify check_update to show dev-appropriate messaging `#implementation`
+  - [ ] **#250.7** Implement: Add restart MCP tool for dev mode quick reload `#implementation`
+  - [ ] **#250.6** Design: Consider CLI flags for dev workflow (--restart-only, --force) `#design`
+  - [ ] **#250.5** Design: Plan MCP tool API - add restart tool or modify update tool for dev mode `#design`
+  - [ ] **#250.4** Design: Define dev mode update behavior - skip version check, offer restart-only option `#design`
+  - [ ] **#250.3** Analyze: Review how other dev tools handle hot-reload/restart patterns `#analysis`
+  - [ ] **#250.2** Analyze: Identify use cases - version check vs simple restart vs git pull + restart `#analysis`
+  - [ ] **#250.1** Analyze: Review current update command behavior in dev mode `#analysis`
+
+- [x] **#247** Investigate and fix GitHub task number coordination - last sync was 2 days ago (Issue #23) `#bug` `#coordination` `#github` (2026-01-27)
+  > CONTEXT: GitHub Issue #23 (https://github.com/fxstein/ai-todo/issues/23) is used for atomic task number coordination across multiple contributors. Last update was 2 days ago, suggesting v3 refactor may have broken the coordination sync.
+  > CONFIRMED ROOT CAUSE: GitHubClient has get_issue_comments() but NO create_issue_comment() method. The Python code can READ the latest task number from Issue #23 but cannot WRITE back after creating a task. The shell script had this capability but it was not ported to Python.
+  - [x] **#247.13** Docs: Update coordination setup documentation if needed `#documentation` (2026-01-27)
+  - [x] **#247.12** Verify: Create test task and confirm Issue #23 is updated `#verification` (2026-01-27)
+    > MANUAL VERIFICATION NEEDED: After commit, create a test task and verify GitHub Issue #23 receives the 'Next task number: X' comment.
+  - [x] **#247.11** Test: Integration test verifying GitHub Issue update on task creation `#testing` (2026-01-27)
+  - [x] **#247.10** Test: Unit tests for coordination module integration `#testing` (2026-01-27)
+  - [x] **#247.9** Implement: Ensure GitHub Issue #23 gets updated on task number changes `#implementation` (2026-01-27)
+  - [x] **#247.8** Implement: Fix coordination calls in task creation/modification paths `#implementation` (2026-01-27)
+  - [x] **#247.7** Design: Plan fix for coordination integration with Python task manager `#design` (2026-01-27)
+  - [x] **#247.6** Diagnose: Check if coordination mode is enabled and GitHub token is configured `#diagnosis` (2026-01-27)
+  - [x] **#247.5** Diagnose: Compare v3 refactor changes that may have affected coordination calls `#diagnosis` (2026-01-27)
+  - [x] **#247.4** Analyze: Trace task creation flow to identify where coordination should trigger `#analysis` (2026-01-27)
+  - [x] **#247.3** Analyze: Check GitHub Issue #23 for last successful coordination update `#analysis` (2026-01-27)
+  - [x] **#247.2** Analyze: Review coordination.py implementation and GitHub client logic `#analysis` (2026-01-27)
+    > ROOT CAUSE FOUND: GitHubClient is missing `create_issue_comment` method. coordination.py only READS from Issue #23 but never WRITES back the new task number after creating a task.
+  - [x] **#247.1** Analyze: Review current coordination settings in .ai-todo/config.yaml `#analysis` (2026-01-27)
+    > FINDING: mode is 'single-user' but coordination.type is 'github-issues' with issue_number 23. Mode may need to be 'enhanced' for coordination to trigger.
+    > CORRECTION: Single-user mode DOES support coordination via github-issues - the `_generate_single_user_id` method checks coordination.type. The config is correct.
+
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
   - [x] **#51.3** Test update command from system-wide installation location `#test` (2026-01-27)
   - [x] **#51.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2026-01-27)
@@ -1307,6 +1343,8 @@
 ---
 
 ## Deleted Tasks
+- [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
+- [D] **#248** Tell a joke `#test` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#244** Parent task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#243** Parent task (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#237.12** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#design` `#safety` (deleted 2026-01-26, expires 2026-02-25)
@@ -1450,4 +1488,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 14:58:27
+**ai-todo** | Last Updated: 2026-01-27 15:22:53

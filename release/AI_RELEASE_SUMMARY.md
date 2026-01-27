@@ -1,5 +1,3 @@
-# Release Summary: v4.0.0
-
 ## Breaking Changes
 
 This release includes **API terminology standardization** (task#253) that aligns ai-todo with industry conventions. The MCP tools and CLI commands have been updated:

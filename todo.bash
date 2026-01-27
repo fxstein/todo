@@ -21,6 +21,14 @@
 # Version: 3.0.2
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
+#
+# ============================================================================
+# FROZEN: 2026-01-27
+# This shell script is frozen and no longer receives feature updates.
+# All new development happens in the Python implementation (ai_todo/).
+# This script is maintained only for backward compatibility and receives
+# only critical security fixes. Use the Python CLI or MCP server instead.
+# ============================================================================
 
 set -e
 set +x  # Explicitly disable debug/trace output

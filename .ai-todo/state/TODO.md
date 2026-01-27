@@ -4,6 +4,52 @@
 
 ## Tasks
 
+- [ ] **#254** Freeze legacy shell scripts and remove from test comparisons `#cleanup` `#legacy` `#testing`
+  > CONTEXT: After #253 (API terminology standardization), the Python implementation will diverge significantly from legacy shell scripts. Continuing to test parity is no longer valuable and creates maintenance burden.
+  - [ ] **#254.6** Remove legacy script references from release scripts (release.sh, etc.)
+  - [ ] **#254.5** Update CI workflow to skip legacy comparison tests
+  - [ ] **#254.4** Update TEST_PLAN.md to reflect Python-only testing strategy
+  - [ ] **#254.3** Remove test_show_root_shell.py (shell-based show command tests)
+  - [ ] **#254.2** Remove shell script parity tests (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py)
+  - [ ] **#254.1** Mark legacy/ scripts as frozen (add header comment with freeze date and reason)
+
+- [ ] **#253** Standardize API terminology to follow industry conventions (title/description) `#api` `#breaking-change` `#enhancement`
+  > DEPENDENCY: Complete #254 (freeze legacy scripts) before starting implementation phase (#253.4+)
+  - [ ] **#253.11** Update CHANGELOG with breaking change notes
+  - [ ] **#253.10** Run full test suite and verify no regressions
+  - [ ] **#253.9** Update all documentation (README, docs/, cursor rules)
+  - [ ] **#253.8** Update integration and e2e tests
+  - [ ] **#253.7** Create/update unit tests for renamed parameters
+  - [ ] **#253.6** Update core functions and internal APIs
+  - [ ] **#253.5** Update CLI commands with new parameter names
+  - [ ] **#253.4** Update MCP server tools (server.py) with new parameter names
+  - [ ] **#253.3** Design new naming standard with mapping table (old → new) - WAIT FOR APPROVAL
+  - [ ] **#253.2** Research industry standards: GitHub Issues, Jira, Linear, Todoist APIs for terminology
+  - [ ] **#253.1** Audit all current parameter names across MCP tools, CLI commands, and core functions
+
+- [x] **#251** Debug and fix MCP server restart functionality in Cursor `#bug` `#mcp` (2026-01-27)
+  - [x] **#251.8** Document restart behavior and any limitations (2026-01-27)
+  - [x] **#251.7** Test restart across multiple scenarios (dev mode, after updates) (2026-01-27)
+  - [x] **#251.6** Implement working restart solution (2026-01-27)
+    > SOLUTION: Use sys.exit() instead of os._exit()
+    > - os._exit() bypasses Python cleanup handlers, preventing Cursor from detecting proper shutdown
+    > - sys.exit() allows cleanup to run, enabling Cursor to restart the server correctly
+    > - Also flush stdout/stderr before exit and use 0.5s delay
+    > - Exit code 1 (error) didn't matter - the key was sys.exit() vs os._exit()
+  - [x] **#251.5** Investigate Cursor MCP logs to understand reconnection behavior (2026-01-27)
+  - [x] **#251.4** Test alternative exit strategies: sys.exit() vs os._exit(), various delays (2026-01-27)
+  - [x] **#251.3** Try non-zero exit code (simulate crash) to trigger different Cursor restart mechanism (2026-01-27)
+  - [x] **#251.2** Ensure response is fully sent before exit - verify threading/async behavior (2026-01-27)
+  - [x] **#251.1** Analyze current restart behavior - server exits but Cursor reconnects with 0 tools (2026-01-27)
+    > Current behavior observed:
+    > - restart() tool returns "Restarting MCP server..."
+    > - 0.5s later, os._exit(0) is called
+    > - Cursor log shows "Client closed for command"
+    > - Cursor reconnects: "Connected to stdio server, fetching offerings"
+    > - But reports "Found 0 tools, 0 prompts, and 0 resources"
+    > - Server code is correct - 30 tools register when run directly via `uv run`
+    > - Issue appears to be Cursor-specific with how it handles MCP process restarts
+
 - [x] **#250** Improve update command for development mode - skip version checks and provide direct restart capability `#dev-experience` `#enhancement` `#mcp` (2026-01-27)
   > CONTEXT: In dev mode, version numbers are irrelevant - developers iterate on the same version many times. The update command should recognize this and provide a streamlined restart experience without unnecessary version checks or 'already up to date' messages.
   > CLARIFICATION: CLI is one-shot (no restart concept). Only MCP server needs restart capability. Focus on: (1) dedicated `restart` MCP tool for dev quick-reload, (2) improve `update` tool messaging in dev mode.
@@ -1347,6 +1393,7 @@
 ---
 
 ## Deleted Tasks
+- [D] **#252** Test task (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#250.9** Implement: Add CLI restart command for development workflow `#implementation` (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#250.6** Design: Consider CLI flags for dev workflow (--restart-only, --force) `#design` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#249** Test coordination posting `#test` (deleted 2026-01-27, expires 2026-02-26)
@@ -1489,9 +1536,14 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by todo.ai tool).
+View with: `./todo.ai show <task-id>`
+
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 15:29:53
+**ai-todo** | Last Updated: 2026-01-27 20:44:06

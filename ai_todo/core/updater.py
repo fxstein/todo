@@ -5,7 +5,6 @@ Supports both production (installed via uv/pip) and development (editable) modes
 Respects version constraints from pyproject.toml or global config.
 """
 
-import os
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -265,12 +264,24 @@ def perform_update(restart: bool = True, project_root: Path | None = None) -> tu
         return (False, f"Update failed: {e}")
 
 
-def restart_server() -> None:
+def restart_server(exit_code: int = 1) -> None:
     """Exit the server process to trigger restart by host.
 
-    For MCP servers using stdio transport, exiting cleanly causes
-    the host (e.g., Cursor) to detect the exit and restart the server.
+    For MCP servers, we must fully exit so the host (Cursor) spawns
+    a completely new process with proper MCP initialization handshake.
+
+    Note: Must use os._exit() because sys.exit() from a daemon thread
+    only terminates that thread, not the whole process.
+
+    Args:
+        exit_code: Exit code to use.
     """
-    # Use os._exit to avoid any cleanup that might hang
-    # Exit code 0 indicates clean shutdown
-    os._exit(0)
+    import os
+    import sys
+
+    # Flush all output buffers to ensure response is fully sent
+    sys.stdout.flush()
+    sys.stderr.flush()
+
+    # Force exit entire process - sys.exit() doesn't work from daemon threads
+    os._exit(exit_code)

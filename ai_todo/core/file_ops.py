@@ -875,23 +875,67 @@ class FileOps:
         # Tasks should be written in the exact order they appear in the tasks list.
         # The ADD operation handles putting new tasks at the top BEFORE calling write.
         # All other operations (modify, complete, undo) preserve existing order.
-        # Archived tasks: sort by archive date (most recent first), then by ID (reverse)
-        archived_tasks.sort(
-            key=lambda t: (
-                t.archived_at if t.archived_at else datetime.min,
-                [int(x) for x in t.id.split(".")] if t.id.split(".")[0].isdigit() else [0],
-            ),
-            reverse=True,
-        )
-        # Deleted tasks: sort by deletion date (most recent first), then by ID (reverse)
-        # Tasks without deletion date go last
-        deleted_tasks.sort(
-            key=lambda t: (
-                t.deleted_at if t.deleted_at else datetime.min,
-                [int(x) for x in t.id.split(".")] if t.id.split(".")[0].isdigit() else [0],
-            ),
-            reverse=True,
-        )
+
+        def order_tasks_with_hierarchy(tasks: list[Task], date_attr: str) -> list[Task]:
+            """Order tasks preserving parent-child hierarchy.
+
+            Groups tasks by root parent ID, sorts groups by most recent date,
+            and within each group puts parent first, then subtasks in reverse order.
+
+            Args:
+                tasks: List of tasks to order
+                date_attr: Attribute name for the date to sort by ('archived_at' or 'deleted_at')
+
+            Returns:
+                Ordered list of tasks
+            """
+            if not tasks:
+                return tasks
+
+            # Group tasks by root parent ID (first number in ID)
+            groups: dict[str, list[Task]] = {}
+            for task in tasks:
+                # Extract root ID (e.g., "104" from "104.1" or "104" from "104")
+                root_id = task.id.split(".")[0]
+                if root_id not in groups:
+                    groups[root_id] = []
+                groups[root_id].append(task)
+
+            # For each group, find the most recent date and sort tasks within group
+            group_info: list[tuple[datetime, str, list[Task]]] = []
+            for root_id, group_tasks in groups.items():
+                # Find most recent date in group
+                max_date = datetime.min
+                for t in group_tasks:
+                    task_date = getattr(t, date_attr, None)
+                    if task_date and task_date > max_date:
+                        max_date = task_date
+
+                # Sort tasks within group: parent first, then subtasks in reverse order
+                # Parent has no dot, subtasks have dots
+                group_tasks.sort(
+                    key=lambda t: (
+                        0 if "." not in t.id else 1,  # Parent first
+                        # Subtasks in reverse order (highest number first)
+                        [-int(x) for x in t.id.split(".")[1:]] if "." in t.id else [],
+                    )
+                )
+                group_info.append((max_date, root_id, group_tasks))
+
+            # Sort groups by most recent date (newest first), then by root ID (reverse)
+            group_info.sort(key=lambda x: (x[0], int(x[1]) if x[1].isdigit() else 0), reverse=True)
+
+            # Flatten groups back into ordered list
+            result: list[Task] = []
+            for _, _, group_tasks in group_info:
+                result.extend(group_tasks)
+
+            return result
+
+        # Order archived tasks preserving hierarchy
+        archived_tasks = order_tasks_with_hierarchy(archived_tasks, "archived_at")
+        # Order deleted tasks preserving hierarchy
+        deleted_tasks = order_tasks_with_hierarchy(deleted_tasks, "deleted_at")
 
         lines: list[str] = []
 

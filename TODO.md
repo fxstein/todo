@@ -4,18 +4,18 @@
 
 ## Tasks
 
-- [ ] **#242** Investigate archive/delete task ordering bug - root task appears below subtasks `#bug` `#file-ops`
-  - [ ] **#242.11** Docs: Document fix if behavior change affects user expectations
-  - [ ] **#242.10** Test: Run full test suite to verify no regressions
-  - [ ] **#242.9** Test: Add unit tests for delete ordering with parent and subtasks
-  - [ ] **#242.8** Test: Add unit tests for archive ordering with parent and subtasks
-  - [ ] **#242.7** Implement: Fix task ordering in delete operation (if affected)
-  - [ ] **#242.6** Implement: Fix task ordering in archive operation
-  - [ ] **#242.5** Design: Define correct archive/delete ordering (root task first, then subtasks)
-  - [ ] **#242.4** Analyze: Check if legacy shell script has same behavior or handles ordering differently
-  - [ ] **#242.3** Analyze: Trace archive/delete code path in file_ops.py to identify root cause
-  - [ ] **#242.2** Analyze: Verify if delete operation has the same ordering issue
-  - [ ] **#242.1** Analyze: Reproduce archive ordering issue with root task and subtasks
+- [x] **#242** Investigate archive/delete task ordering bug - root task appears below subtasks `#bug` `#file-ops` (2026-01-27)
+  - [x] **#242.11** Docs: Document fix if behavior change affects user expectations (2026-01-27)
+  - [x] **#242.10** Test: Run full test suite to verify no regressions (2026-01-27)
+  - [x] **#242.9** Test: Add unit tests for delete ordering with parent and subtasks (2026-01-27)
+  - [x] **#242.8** Test: Add unit tests for archive ordering with parent and subtasks (2026-01-27)
+  - [x] **#242.7** Implement: Fix task ordering in delete operation (if affected) (2026-01-27)
+  - [x] **#242.6** Implement: Fix task ordering in archive operation (2026-01-27)
+  - [x] **#242.5** Design: Define correct archive/delete ordering (root task first, then subtasks) (2026-01-27)
+  - [x] **#242.4** Analyze: Check if legacy shell script has same behavior or handles ordering differently (2026-01-27)
+  - [x] **#242.3** Analyze: Trace archive/delete code path in file_ops.py to identify root cause (2026-01-27)
+  - [x] **#242.2** Analyze: Verify if delete operation has the same ordering issue (2026-01-27)
+  - [x] **#242.1** Analyze: Reproduce archive ordering issue with root task and subtasks (2026-01-27)
 
 - [ ] **#241** Implement self-update feature via uv with MCP server graceful shutdown `#feature` `#mcp`
   - [ ] **#241.12** Docs: Add troubleshooting section for update failures and rollback
@@ -1265,6 +1265,8 @@
 ---
 
 ## Deleted Tasks
+- [D] **#244** Parent task (deleted 2026-01-27, expires 2026-02-26)
+- [D] **#243** Parent task (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#237.12** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#design` `#safety` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#237.11** INFRA: Review MCP tool parameter naming consistency (task#190) `#infrastructure` `#mcp` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#237.10** INFRA: Harden MCP server setup for portability (task#191) `#infrastructure` `#mcp` (deleted 2026-01-26, expires 2026-02-25)
@@ -1411,4 +1413,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 11:28:21
+**ai-todo** | Last Updated: 2026-01-27 11:35:33

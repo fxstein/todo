@@ -1,4 +1,9 @@
-"""Reproduction test for Issue #195: Archiving a task does not archive its subtasks."""
+"""Reproduction test for Issue #195: Archiving a task does not archive its subtasks.
+
+Also includes tests for Issue #242: Archive/delete task ordering bug.
+"""
+
+import re
 
 import pytest
 
@@ -64,6 +69,77 @@ def test_archive_parent_archives_subtasks(test_todo_file):
     assert len(archived_tasks) == 2
     assert archived_tasks[0].id == "1"
     assert archived_tasks[1].id == "1.1"
+
+
+def test_archive_ordering_parent_before_subtasks(test_todo_file):
+    """Test that archived parent appears before its subtasks in the file (Issue #242)."""
+    # Setup: Add parent with multiple subtasks
+    add_command("Parent task", [], todo_path=test_todo_file)
+    add_subtask_command("1", "Subtask one", [], todo_path=test_todo_file)
+    add_subtask_command("1", "Subtask two", [], todo_path=test_todo_file)
+
+    # Archive parent (includes subtasks by default)
+    archive_command(["1"], todo_path=test_todo_file)
+
+    # Read file content and verify ordering
+    with open(test_todo_file) as f:
+        content = f.read()
+
+    # Extract task IDs from archived section in order
+    lines = content.split("\n")
+    in_archived = False
+    archived_ids = []
+    for line in lines:
+        if "## Archived Tasks" in line or "## Recently Completed" in line:
+            in_archived = True
+            continue
+        if in_archived and line.startswith("## "):
+            break
+        match = re.search(r"\*\*#([0-9.]+)\*\*", line)
+        if in_archived and match:
+            archived_ids.append(match.group(1))
+
+    # Parent should come before subtasks
+    assert archived_ids == ["1", "1.2", "1.1"], f"Expected ['1', '1.2', '1.1'], got {archived_ids}"
+
+
+def test_archive_ordering_multiple_parents(test_todo_file):
+    """Test that multiple archived parent-subtask groups maintain correct ordering (Issue #242)."""
+    # Setup: Add two parents with subtasks
+    add_command("First parent", [], todo_path=test_todo_file)
+    add_subtask_command("1", "First subtask 1", [], todo_path=test_todo_file)
+    add_subtask_command("1", "First subtask 2", [], todo_path=test_todo_file)
+
+    add_command("Second parent", [], todo_path=test_todo_file)
+    add_subtask_command("2", "Second subtask 1", [], todo_path=test_todo_file)
+
+    # Archive first parent, then second parent
+    archive_command(["1"], todo_path=test_todo_file)
+    archive_command(["2"], todo_path=test_todo_file)
+
+    # Read file content and verify ordering
+    with open(test_todo_file) as f:
+        content = f.read()
+
+    # Extract task IDs from archived section in order
+    lines = content.split("\n")
+    in_archived = False
+    archived_ids = []
+    for line in lines:
+        if "## Archived Tasks" in line or "## Recently Completed" in line:
+            in_archived = True
+            continue
+        if in_archived and line.startswith("## "):
+            break
+        match = re.search(r"\*\*#([0-9.]+)\*\*", line)
+        if in_archived and match:
+            archived_ids.append(match.group(1))
+
+    # Second parent (most recently archived) should come first, with its subtasks
+    # Then first parent with its subtasks
+    assert archived_ids == ["2", "2.1", "1", "1.2", "1.1"], (
+        f"Expected ['2', '2.1', '1', '1.2', '1.1'], got {archived_ids}"
+    )
 
 
 if __name__ == "__main__":

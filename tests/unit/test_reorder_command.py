@@ -175,3 +175,54 @@ def test_reorder_numerical_sorting(test_todo_file):
     assert tasks[5].id == "1.3"
     assert tasks[6].id == "1.2"
     assert tasks[7].id == "1.1"
+
+
+def test_reorder_archived_tasks(test_todo_file):
+    """Test that reorder_command also reorders archived tasks with proper hierarchy.
+
+    Issue #246: Verify archived tasks are reordered via order_tasks_with_hierarchy
+    during write_tasks, putting parent before subtasks and grouping by date.
+    """
+    # Setup: Archived tasks deliberately out of order
+    Path(test_todo_file).write_text(
+        """# TODO
+
+## Tasks
+
+- [ ] **#1** Active task
+
+## Archived Tasks
+
+- [x] **#10.3** Third subtask (2026-01-20)
+- [x] **#10** Parent task (2026-01-15)
+- [x] **#10.1** First subtask (2026-01-20)
+- [x] **#10.2** Second subtask (2026-01-20)
+- [x] **#5** Earlier parent (2026-01-10)
+
+## Deleted Tasks
+""",
+        encoding="utf-8",
+    )
+
+    # Verify initial state (wrong order)
+    file_ops = FileOps(test_todo_file)
+    tasks = file_ops.read_tasks()
+    archived = [t for t in tasks if t.status.name == "ARCHIVED"]
+    assert len(archived) == 5
+    # Initial order has subtask before parent
+    assert archived[0].id == "10.3"
+    assert archived[1].id == "10"
+
+    # Run reorder command
+    reorder_command(todo_path=test_todo_file)
+
+    # Verify archived tasks are now properly ordered
+    tasks = file_ops.read_tasks()
+    archived = [t for t in tasks if t.status.name == "ARCHIVED"]
+
+    # Expected order: #10 (parent) first, then subtasks in reverse order, then #5
+    assert archived[0].id == "10", "Parent #10 should be first in its group"
+    assert archived[1].id == "10.3", "Subtask #10.3 should follow parent"
+    assert archived[2].id == "10.2", "Subtask #10.2 should be next"
+    assert archived[3].id == "10.1", "Subtask #10.1 should be last in group"
+    assert archived[4].id == "5", "Earlier parent #5 should be at end"

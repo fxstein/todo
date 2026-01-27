@@ -4,6 +4,19 @@
 
 ## Tasks
 
+- [x] **#246** Investigate reorder command not reordering archived tasks `#archive` `#bug` `#reorder` (2026-01-27)
+  > CAUTION: May be false positive caused by IDE window refresh delays. Verify actual bug before implementing fixes. Start with analysis and test review.
+  > VERIFIED: Not a bug. Testing confirms reorder correctly reorders archived tasks. Original observation was IDE refresh delay.
+  - [x] **#246.10** Verify: Run reorder on live TODO.md and confirm archived tasks are properly ordered `#verification` (2026-01-27)
+  - [x] **#246.9** Test: Integration tests verifying reorder fixes out-of-order archived tasks `#testing` (2026-01-27)
+  - [x] **#246.8** Test: Unit tests for reorder affecting archived tasks `#testing` (2026-01-27)
+    > REVIEW: Existing test_reorder_command.py only covers active tasks. Should add test for archived task ordering.
+  - [x] **#246.4** Design: Determine expected behavior - should archived/deleted sections also be reordered? `#design` (2026-01-27)
+    > Expected behavior confirmed: reorder processes all sections. _generate_markdown calls order_tasks_with_hierarchy for archived/deleted during every write.
+  - [x] **#246.3** Analyze: Reproduce the bug - verify archived tasks remain out of order after reorder `#analysis` `#testing` (2026-01-27)
+  - [x] **#246.2** Analyze: Identify which sections reorder currently processes (Tasks only? Archived? Deleted?) `#analysis` (2026-01-27)
+  - [x] **#246.1** Analyze: Review current reorder command implementation in cli and core `#analysis` (2026-01-27)
+
 - [x] **#245** Add version pinning and maximum version constraints to self-update feature (builds on #241) `#feature` `#mcp` `#update` (2026-01-27)
   > DESIGN: Two deployment modes with different constraint sources:
   > - Project-local (uv add ai-todo): Use pyproject.toml constraints (uv handles automatically)
@@ -115,6 +128,7 @@
 ---
 
 ## Archived Tasks
+- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-27)
   - [x] **#238.12** RELEASE: Execute v3.0.0 stable release (task#172.5) `#final` `#release` `#step-12` (2026-01-27)
   - [x] **#238.11** RELEASE: Complete release phase for Python refactor (task#163.52) `#release` `#step-11` (2026-01-27)
   - [x] **#238.10** DOCS: Final review and publish README.md (task#203.9) `#documentation` `#step-10` (2026-01-27)
@@ -127,7 +141,7 @@
   - [x] **#238.3** POLISH: Review and optimize embedded Cursor rules (task#235) `#polish` `#step-3` (2026-01-27)
   - [x] **#238.2** BUG: Fix show_task displaying deleted tasks as [x] instead of [D] (task#222) `#bug` `#step-2` (2026-01-27)
   - [x] **#238.1** BUG: Fix delete task leaving orphaned subtasks (task#221) `#bug` `#step-1` (2026-01-27)
-- [x] **#238** v3.0 Release Checklist - Complete in order before stable release    `#v3.0` `#meta` `#ordered` `#release` (2026-01-27)
+- [x] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor` (2026-01-27)
   - [x] **#235.8** Test updated rules with fresh install (2026-01-27)
   - [x] **#235.7** Simplify/consolidate rules (remove redundancy) (2026-01-27)
   - [x] **#235.6** Update rules for ai-todo naming conventions (2026-01-27)
@@ -136,7 +150,7 @@
   - [x] **#235.3** Compare embedded rules vs .cursor/rules in this repo (2026-01-27)
   - [x] **#235.2** Inventory legacy shell script rules (todo.ai-*.mdc templates) (2026-01-27)
   - [x] **#235.1** Inventory embedded rules in Python code (init_cursor_rules) (2026-01-27)
-- [x] **#235** Review and optimize embedded Cursor rules for MCP server usage  `#v3.0` `#refactor` (2026-01-27)
+- [x] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor` (2026-01-27)
   - [x] **#234.7** Document recommendations for removals/additions (2026-01-27)
   - [x] **#234.6** Review tool naming consistency (ai-todo conventions) (2026-01-27)
   - [x] **#234.5** Identify missing MCP tools that should exist (2026-01-27)
@@ -144,11 +158,12 @@
   - [x] **#234.3** Compare MCP tools vs CLI commands for parity (2026-01-27)
   - [x] **#234.2** Inventory current CLI commands (list all available commands) (2026-01-27)
   - [x] **#234.1** Inventory current MCP tools (list all available tools) (2026-01-27)
-- [x] **#234** Audit MCP and CLI tools for post-migration cleanup  `#v3.0` `#refactor` (2026-01-27)
 - [x] **#222** Bug: show_task displays deleted tasks as completed [x] instead of [D] `#bug` `#fix` (2026-01-27)
   > When running show_task on #219, deleted task #219.5 was displayed with [x] (completed) instead of [D] (deleted).
 - [x] **#221** Bug: Delete task leaves orphaned subtasks behind `#bug` `#fix` (2026-01-27)
   > When task #220 was deleted, its subtasks (#220.1, #220.2, #220.3) were left behind as orphans. Delete task should recursively delete all subtasks.
+- [x] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming` (2026-01-27)
+  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
   - [x] **#219.13** Final verification: Re-run naming audit to confirm cleanup complete `#audit` `#verification` (2026-01-27)
   - [x] **#219.12** Cleanup: Update docs/ with ai-todo command references `#cleanup` `#documentation` (2026-01-27)
   - [x] **#219.11** Cleanup: Update test fixtures (GitHub URLs fxstein/todo.ai → ai-todo) `#cleanup` `#testing` (2026-01-27)
@@ -156,13 +171,6 @@
   - [x] **#219.9** Post-migration audit: Document remaining old naming references `#audit` `#documentation` (2026-01-27)
   - [x] **#219.8** Update all documentation with ai-todo naming (merge with task#203) `#documentation` (2026-01-27)
     > Task #203 (README redesign) has pending documentation changes. Merge those updates with ai-todo naming changes per Decision 5 (parallel sequencing).
-    - [x] **#219.6.7** Test migration from .todo.ai/ to .ai-todo/ preserves all data `#testing` (2026-01-27)
-    - [x] **#219.6.6** Update .gitignore templates for .ai-todo/ `#code` (2026-01-27)
-    - [x] **#219.6.5** Add migration logging and user notification `#code` `#ux` (2026-01-27)
-    - [x] **#219.6.4** Implement auto-migration: detect .todo.ai/ on startup, rename to .ai-todo/ `#code` `#migration` (2026-01-27)
-    - [x] **#219.6.3** Rename internal state files (.todo.ai.serial to .ai-todo.serial, etc.) `#code` (2026-01-27)
-    - [x] **#219.6.2** Update config.py to use .ai-todo/ paths `#code` (2026-01-27)
-    - [x] **#219.6.1** Update FileOps to use .ai-todo/ as default data directory `#code` (2026-01-27)
   - [x] **#219.6** Implement data directory migration (.todo.ai/ to .ai-todo/) `#implementation` `#migration` (2026-01-27)
   - [x] **#219.5** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` (2026-01-27)
     > Implementation steps: 1) Update FileOps to use .ai-todo/ as default, 2) Update config.py paths, 3) Rename state files (.todo.ai.serial → .ai-todo.serial), 4) Implement auto-migration on startup (detect old dir, rename), 5) Add migration logging/notification, 6) Update .gitignore templates, 7) Test migration preserves all data
@@ -172,29 +180,31 @@
   - [x] **#219.2** Impact analysis: GitHub rename, PyPI, documentation, user migration `#analysis` (2026-01-27)
   - [x] **#219.1** Write naming analysis document: current state, confusion points, options `#analysis` `#documentation` (2026-01-27)
     > Analysis document: docs/analysis/NAMING_UNIFICATION_ANALYSIS.md
-- [x] **#219** Evaluate unified naming: Rename to ai-todo across all platforms `#breaking-change` `#design` `#naming` (2026-01-27)
-  > Current naming confusion: repo=todo.ai, PyPI=ai-todo, CLI=todo-ai, MCP=todo-ai-mcp, shell=./todo.ai. With only 7 GitHub stars, a rename is low-risk. Consider unifying everything to 'ai-todo' to match PyPI.
+- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-27)
   - [x] **#218.5** Fix or disable auto-generation to prevent legacy rule restoration (2026-01-27)
   - [x] **#218.4** Determine if rules should be auto-generated or manually maintained (2026-01-27)
   - [x] **#218.3** Compare current legacy rules with expected/cleaned rules (2026-01-27)
   - [x] **#218.2** Trace when and how rules are regenerated (install, init, serve?) (2026-01-27)
   - [x] **#218.1** Identify which code generates Cursor rules (.cursor/rules/) (2026-01-27)
-- [x] **#218** Investigate and fix Cursor rules auto-generation bringing back legacy rules `#bug` `#cursor-rules` (2026-01-27)
 - [x] **#217** Update parity tests to ignore header/footer differences `#compatibility` `#test` (2026-01-26)
 - [x] **#216** Fix regression in file structure preservation (header/footer) `#bug` `#critical` `#regression` (2026-01-26)
+- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
   - [x] **#213.4** Verify fix by running pre-commit hooks on generated TODO.md `#verification` (2026-01-26)
   - [x] **#213.3** Configure pre-commit hooks to exclude .todo.ai/state/ directory `#config` (2026-01-26)
   - [x] **#213.2** Implement whitespace stripping in todo.ai FileOps/Templates `#code` (2026-01-26)
   - [x] **#213.1** Analyze todo.ai file writing logic to identify source of trailing whitespace `#analysis` (2026-01-26)
-- [x] **#213** Resolve whitespace conflict between todo.ai and pre-commit hooks `#bug` `#linter` `#maintenance` (2026-01-26)
+- [x] **#212** Clean up .cursor rules for MCP-first workflow `#maintenance` `#rules` (2026-01-26)
+  > Requirement: Remove all references to shell tool (./todo.ai) and CLI (todo-ai) in the rules. Focus exclusively on MCP tools.
   - [x] **#212.5** Verify new rules are concise and effective `#verify` (2026-01-26)
   - [x] **#212.4** Remove obsolete rules (e.g. zsh-first-development.mdc) `#cleanup` (2026-01-26)
   - [x] **#212.3** Update rules to mandate MCP tool usage `#mcp` (2026-01-26)
   - [x] **#212.2** Consolidate overlapping rules and simplify `#refactor` (2026-01-26)
   - [x] **#212.1** Audit existing rules for legacy shell/CLI references `#audit` (2026-01-26)
     > Create initial audit document for review
-- [x] **#212** Clean up .cursor rules for MCP-first workflow `#maintenance` `#rules` (2026-01-26)
-  > Requirement: Remove all references to shell tool (./todo.ai) and CLI (todo-ai) in the rules. Focus exclusively on MCP tools.
+- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
+  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
+  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
+  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
   - [x] **#210.6** Document tamper detection feature for users and developers `#documentation` (2026-01-26)
   - [x] **#210.5** Create unit and integration tests for tamper detection `#test` `#validation` (2026-01-26)
   - [x] **#210.4** Implement tamper detection in FileOps and CLI commands `#code` `#implementation` (2026-01-26)
@@ -208,16 +218,15 @@
     > 🟠 HIGH: Silent snapshot recapture on external edits, no agent warnings
     > Full analysis: docs/analysis/TODO_TAMPER_DETECTION_ANALYSIS.md
     > Recommended approach: Add SHA-256 checksum + mtime warning + diff display
-- [x] **#210** Implement TODO.md tamper detection and warnings `#feature` `#integrity` `#security` (2026-01-26)
-  > Goal: Detect and warn when TODO.md has been manually edited outside of todo-ai commands.
-  > Current issue: MANAGED FILE warning exists but no enforcement or detection mechanism.
-  > Scope: Design and implement integrity checks, provide clear warnings to agents/users, suggest recovery actions.
+- [x] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety` (2026-01-26)
   - [x] **#205.5** Create design document for 'Safe Archival' workflow `#design` `#documentation` (2026-01-26)
   - [x] **#205.4** Investigate MCP protocol capabilities for enforcing 'human-in-the-loop' confirmation for destructive/archival actions `#investigation` `#mcp` (2026-01-26)
   - [x] **#205.3** Design a 'review required' state or flag for completed tasks before they can be archived `#design` (2026-01-26)
   - [x] **#205.2** Research potential safeguards (e.g., time-based delays, explicit confirmation steps, 'cooldown' periods) `#research` (2026-01-26)
   - [x] **#205.1** Analyze current agent behavior and triggers for premature archiving `#analysis` (2026-01-26)
-- [x] **#205** Develop mechanism to prevent premature task archiving by agents `#design` `#safety` (2026-01-26)
+- [x] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` (2026-01-26)
+  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
+  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
   - [x] **#203.9** Final review and publish README.md changes `#release` `#review` (2026-01-26)
   - [x] **#203.8** Update docs/README.md index to reflect new structure `#documentation` (2026-01-26)
   - [x] **#203.7** Update docs/user/PYTHON_MIGRATION_GUIDE.md with uvx syntax `#documentation` (2026-01-26)
@@ -230,19 +239,18 @@
   - [x] **#203.2** Create docs/FAQ.md with 'Why not GitHub Issues?' content `#documentation` `#faq` (2026-01-26)
   - [x] **#203.1** Design new README structure (Overview, Legacy vs Next-Gen sections) `#design` `#documentation` (2026-01-26)
     > Design document: docs/design/README_REDESIGN_V3.md
-- [x] **#203** Redesign README.md for v3.0 (Python/MCP migration)  `#v3.0` `#documentation` (2026-01-26)
-  > Redesign focuses on MCP-first approach: uvx (zero-install) as primary, uv CLI as secondary, shell script as legacy only.
-  > HOLD: Final publish depends on naming decision in task#219. Documentation may need updates if rename is approved.
+- [x] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp` (2026-01-26)
+  > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
   - [x] **#191.6** Create documentation for default installation and alternatives `#documentation` `#mcp` (2026-01-26)
   - [x] **#191.5** Implement and test the portable setup solution `#implementation` `#mcp` (2026-01-26)
   - [x] **#191.4** Design a clean installation process that sets up portable MCP config `#design` `#mcp` (2026-01-26)
   - [x] **#191.3** Compare with MCP best practices for project-local configuration `#investigation` `#mcp` (2026-01-26)
   - [x] **#191.2** Investigate options for dynamic workspace root detection in MCP server `#investigation` `#mcp` (2026-01-26)
   - [x] **#191.1** Assess current situation: absolute paths in .cursor/mcp.json break portability `#mcp` (2026-01-26)
-- [x] **#191** Harden MCP server setup for portability and ease of installation `#design` `#infrastructure` `#mcp` (2026-01-26)
-  > Current issue: .cursor/mcp.json contains absolute paths (/Users/oratzes/...) which breaks portability. Need a way to reference the project root dynamically or rely on CWD. Cursor's stdio transport might default to home dir, causing the issue we saw earlier. Need to find a way to make `todo-ai-mcp` aware of the project context without hardcoding absolute paths in the config file.
 - [x] **#190** Review MCP tool parameter naming consistency across all tools to ensure intuitive usage `#design` `#mcp` (2026-01-26)
   > Current inconsistency example: CLI uses `note`, MCP uses `note_text`. This causes friction for agents guessing parameters. Should we align them or document them better?
+- [x] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature` (2026-01-26)
+  > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
   - [x] **#187.10** Update rules to handle shell script (./todo.ai) as fallback for v2.x+ users (shell script continues in v3.0) `#cursor-rules` (2026-01-26)
   - [x] **#187.9** Document version detection: MCP server (todo-ai-mcp) > Python CLI (todo-ai) > Shell script (./todo.ai) - all v3.0+ except shell script also supports v2.x `#documentation` (2026-01-26)
   - [x] **#187.8** Test updated rules: verify AI agents prefer MCP when available, fallback to CLI when not `#test` (2026-01-26)
@@ -253,8 +261,8 @@
   - [x] **#187.3** Update bug-review-workflow.mdc to use MCP tools (add_task, add_subtask) instead of CLI commands  (2026-01-25) `#cursor-rules` (2026-01-26)
   - [x] **#187.2** Update todo.ai-task-management.mdc: prefer MCP tools (todo-ai-mcp) > Python CLI (todo-ai) > shell script (./todo.ai)  (2026-01-25) `#cursor-rules` (2026-01-26)
   - [x] **#187.1** Review all cursor rules files to identify CLI command references  (2026-01-25) `#cursor-rules` (2026-01-26)
-- [x] **#187** Update cursor rules to prefer MCP server over CLI when available `#cursor-rules` `#feature` (2026-01-26)
-  > Three versions exist: 1) todo.ai (shell script v2.x+ including v3.0), 2) todo-ai (Python CLI v3.0+), 3) todo-ai-mcp (MCP server v3.0+). Rules should prefer MCP > CLI > shell script.
+- [x] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release` (2026-01-26)
+  > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
   - [x] **#172.5** Phase 5: Stable Release `#release` (2026-01-26)
     > Goal: Production release. Deliverable: v3.0.0 stable release, major announcement, all documentation updated, celebration! 🎉
   - [x] **#172.4** Phase 4: First Beta Release   (2026-01-25) `#release` `#testing` (2026-01-26)
@@ -268,11 +276,12 @@
   - [x] **#172.1** Phase 1: Core Beta Infrastructure   (2026-01-25) `#infrastructure` `#release` (2026-01-26)
     > Phase 1 complete: Beta flag parsing, GitHub detection, major release enforcement, enhanced state file, GitHub Actions pre-release detection, README beta installation docs
     > Goal: Enable basic beta releases with major release protection. Deliverable: Can create beta releases with --beta flag, major releases blocked without beta, GitHub Actions auto-publishes with pre-release flag
-- [x] **#172** Implement Beta/Pre-Release Strategy (2-Tier Approach) `#infrastructure` `#release` (2026-01-26)
-  > Implements simplified 2-tier beta strategy (Beta→Stable). See docs/design/BETA_PRERELEASE_STRATEGY.md v2.0. Core infrastructure complete in Phases 1-3.
 - [x] **#166** Implement utility modules (git, logging) (task#163.13)  (2026-01-25) `#code` (2026-01-26)
 - [x] **#165** Implement migration system module (task#163.12)  (2026-01-25) `#code` (2026-01-26)
 - [x] **#164** Implement configuration module (task#163.9)  (2026-01-25) `#code` (2026-01-26)
+- [x] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature` (2026-01-26)
+  > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
+  > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
   - [x] **#163.52** Phase 16: Release Phase - Beta/pre-release and final release with migration support `#release` (2026-01-26)
   - [x] **#163.51** Phase 15: Cleanup - Remove unused methods, update documentation, add unit tests  (2026-01-25) `#code` (2026-01-26)
   - [x] **#163.50** Phase 14: Simplify Commands (Breaking) - Remove manual file editing and state restoration from commands  (2026-01-25) `#code` (2026-01-26)
@@ -333,11 +342,9 @@
   - [x] **#163.2** Design phase: Define core logic API and interface contracts  (2026-01-25) `#design` (2026-01-26)
   - [x] **#163.1** Design phase: Create architecture design document for Python refactor  (2026-01-25) `#design` (2026-01-26)
     > Architecture design document created at docs/design/PYTHON_REFACTOR_ARCHITECTURE.md. Document validated (v1.1) and covers: current architecture analysis, proposed Python architecture with dual interfaces (MCP + CLI), core module design, installation via pipx, migration strategy, testing strategy with isolated test data, and implementation phases.
-- [x] **#163** Refactor todo.ai into Python-based MCP server with CLI interface (issue#39) `#feature` (2026-01-26)
-  > Implementation audit completed. See docs/analysis/TASK_163_IMPLEMENTATION_AUDIT.md. Key findings: Only 4 of 30+ CLI commands implemented (~13%), only 3 of 30+ MCP tools implemented (~10%). Core infrastructure complete, but CLI/MCP interfaces severely incomplete. Overall ~40% complete, not ready for release.
-  > Issue #39: Refactor into Python MCP server with dual interfaces (MCP + CLI). Core logic implemented once, exposed through both. Installable via pipx. Must maintain existing shell script functionality during development. Extensive testing required with dedicated test dataset.
 - [x] **#128** Create git commit hook for todo list linting and validation `#feature` (2026-01-26)
 - [x] **#127** Enhance --lint command with additional detection features `#feature` (2026-01-26)
+- [x] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security` (2026-01-26)
   - [x] **#49.10** Check and link to GitHub security features for the repo: https://github.com/fxstein/todo.ai/security `#security` (2026-01-26)
   - [x] **#49.9** Implement high-priority security improvements identified in audit `#code` (2026-01-26)
   - [x] **#49.8** Create security improvement recommendations document based on findings `#docs` (2026-01-26)
@@ -348,7 +355,8 @@
   - [x] **#49.3** Assess code execution risks: migration system, script execution, and dynamic code loading `#security` (2026-01-26)
   - [x] **#49.2** Investigate update process security: automatic update downloads, code verification, and execution risks `#security` (2026-01-26)
   - [x] **#49.1** Analyze installation security: curl download verification, HTTPS validation, and integrity checks `#security` (2026-01-26)
-- [x] **#49** Investigate cybersecurity implications of todo.ai installation, updates, and operations `#security` (2026-01-26)
+- [x] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature` `#wontfix` (2026-01-26)
+  > Decided not to implement. The bug reporting feature was removed in the v3.0 MCP/CLI audit, and feature requests would follow the same pattern. Users can create GitHub issues directly for feature requests.
   - [x] **#47.8** Test feature request creation, duplicate detection, and 'me too' workflow `#test` (2026-01-26)
   - [x] **#47.7** Update help screen and documentation with feature request command `#docs` (2026-01-26)
   - [x] **#47.6** Integrate feature request rules into cursor rules (similar to bug reporting rules) `#code` (2026-01-26)
@@ -357,8 +365,7 @@
   - [x] **#47.3** Add duplicate detection for existing feature requests (similarity matching) `#code` (2026-01-26)
   - [x] **#47.2** Implement feature request command handler and template generation `#code` (2026-01-26)
   - [x] **#47.1** Create design document for feature request system (similar to bug reporting design) `#docs` (2026-01-26)
-- [x] **#47** Implement feature request capability for todo.ai (similar to bug reporting) `#feature` `#wontfix` (2026-01-26)
-  > Decided not to implement. The bug reporting feature was removed in the v3.0 MCP/CLI audit, and feature requests would follow the same pattern. Users can create GitHub issues directly for feature requests.
+- [x] **#45** Enhance release process with pre-release support for beta/testing versions `#release` (2026-01-26)
   - [x] **#45.8** Test pre-release creation and promotion workflow `#test` (2026-01-26)
   - [x] **#45.7** Update release process documentation with pre-release workflow `#docs` (2026-01-26)
   - [x] **#45.6** Add command to promote pre-release to official release (remove --prerelease flag) `#code` (2026-01-26)
@@ -367,19 +374,20 @@
   - [x] **#45.3** Implement pre-release support in release.sh script (--prerelease flag, version parsing) `#code` (2026-01-26)
   - [x] **#45.2** Create design document for pre-release workflow and integration with existing release process `#docs` (2026-01-26)
   - [x] **#45.1** Research and analyze pre-release version standards (beta, rc, alpha, dev) and GitHub release integration `#research` (2026-01-26)
-- [x] **#45** Enhance release process with pre-release support for beta/testing versions `#release` (2026-01-26)
+- [x] **#42** Implement self-reporting bug feature for GitHub Issues `#feature` (2026-01-26)
+  > Feature removed as part of v3.0.0 MCP/CLI audit. The bug reporting tools (report_bug, backups, rollback) were eliminated to streamline the tool set. Users can report issues directly on GitHub.
   - [x] **#42.6** Test duplicate detection and 'me too' reply flow (2026-01-25) (2026-01-26)
   - [x] **#42.5** Test bug reporting with GitHub CLI integration (2026-01-25) (2026-01-26)
   - [x] **#42.4** Create bug report template with logs and data attachment (2026-01-25) (2026-01-26)
   - [x] **#42.3** Implement duplicate issue detection and 'me too' reply functionality (2026-01-25) (2026-01-26)
   - [x] **#42.2** Implement bug detection and reporting logic (2026-01-25) (2026-01-26)
   - [x] **#42.1** Create design document for bug reporting feature (2026-01-25) (2026-01-26)
-- [x] **#42** Implement self-reporting bug feature for GitHub Issues `#feature` (2026-01-26)
-  > Feature removed as part of v3.0.0 MCP/CLI audit. The bug reporting tools (report_bug, backups, rollback) were eliminated to streamline the tool set. Users can report issues directly on GitHub.
+- [x] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai` (2026-01-26)
   - [x] **#35.3** Create tests directory and draft detailed test plan document   (2026-01-25) `#docs` `#tests` (2026-01-26)
   - [x] **#35.2** Define test framework architecture and tooling   (2026-01-25) `#planning` `#tests` (2026-01-26)
   - [x] **#35.1** Research todo.ai testing requirements and existing docs   (2026-01-25) `#docs` `#tests` (2026-01-26)
-- [x] **#35** Build comprehensive test framework for todo.ai `#tests` `#todoai` (2026-01-26)
+- [x] **#211** Fix subtask ordering bug: IDs sorted alphabetically instead of numerically (125.10 before 125.2) `#bug` `#critical` `#sorting` (2026-01-25)
+  > Bug: Subtasks sorted alphabetically instead of numerically. Example: #125 subtasks appear as 125.1, 125.10, 125.11, 125.12, 125.13, 125.2, 125.3, etc. Should be: 125.13, 125.12, 125.11, 125.10, 125.9, 125.8, etc. (newest first). Root cause: Task IDs treated as strings, not numbers. Need to split by dots, convert to ints, sort numerically.
   - [x] **#211.4** Verify fix with task #125 (has subtasks 125.1-125.13) `#verification` (2026-01-25)
     > Verified with task #125 (has 13 subtasks).
     > After running `todo-ai reorder`, subtasks now appear in correct numerical order:
@@ -403,8 +411,7 @@
     > 2. FileOps archived_tasks (line 642): Only sorted by first ID segment
     > 3. FileOps deleted_tasks (line 651): Same issue as archived
     > Correct solution exists in reorder_command (line 1145): splits ID by dots, converts each part to int, creates list for comparison.
-- [x] **#211** Fix subtask ordering bug: IDs sorted alphabetically instead of numerically (125.10 before 125.2) `#bug` `#critical` `#sorting` (2026-01-25)
-  > Bug: Subtasks sorted alphabetically instead of numerically. Example: #125 subtasks appear as 125.1, 125.10, 125.11, 125.12, 125.13, 125.2, 125.3, etc. Should be: 125.13, 125.12, 125.11, 125.10, 125.9, 125.8, etc. (newest first). Root cause: Task IDs treated as strings, not numbers. Need to split by dots, convert to ints, sort numerically.
+- [x] **#209** Tell at least 3 funny jokes `#test` (2026-01-25)
   - [x] **#209.6** What do you call fake spaghetti? An impasta! `#joke` `#test` (2026-01-25)
     > The joke plays on the word 'imposter' (someone pretending to be something they're not) combined with 'pasta' to create 'impasta' - fake pasta that's pretending to be real spaghetti.
   - [x] **#209.5** Why don't scientists trust atoms? Because they make up everything! `#joke` `#test` (2026-01-25)
@@ -417,7 +424,9 @@
     > In geometry, parallel lines run alongside each other at the same distance forever but never intersect or 'meet'. The joke uses this mathematical fact as a metaphor for two things that are similar but will never come together, making it sound tragic or poetic when it's just a geometric property.
   - [x] **#209.1** Why did the scarecrow win an award? Because he was outstanding in his field! `#joke` `#test` (2026-01-25)
     > This is a double meaning joke. 'Outstanding in his field' is a common phrase meaning excellent or exceptional at what you do. But a scarecrow literally stands out in a field - that's its job. So the scarecrow won an award for being exceptional, but also because it physically stands in a field.
-- [x] **#209** Tell at least 3 funny jokes `#test` (2026-01-25)
+- [x] **#207** Fix shell/Python parity issues discovered in validation tests `#bug` (2026-01-25)
+  > Discovered while fixing task#206. After clearing TODO_FILE env var, validation tests revealed Python CLI isn't modifying TODO.md in test directories. Pattern: Tests create separate shell_env/python_env dirs, shell version works correctly, Python version appears to run but doesn't modify files. Likely issue: Python CLI not respecting cwd parameter or using different TODO.md path. Tests failing: test_complete_with_dataset, test_modify_with_dataset, test_delete_with_dataset, test_archive_with_dataset, test_undo_with_dataset, test_note_with_dataset, test_workflow_sequence_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[show].
+  > CONFIRMED: Python CLI ignores --root parameter. When --root /tmp/test is passed, CLI still modifies project TODO.md instead of /tmp/test/TODO.md. Shell script respects ROOT_DIR. Fix: Modify Python CLI main.py to resolve todo_file relative to root when root is provided. Line 48: ctx.obj['todo_file'] should become Path(root) / todo_file if root else todo_file.
   - [x] **#207.9** Verify all 9 parity tests pass after fixes `#bug` (2026-01-25)
   - [x] **#207.8** Fix test_show_command_parity (shell can't find task, Python can) `#bug` (2026-01-25)
   - [x] **#207.7** Fix test_undo_with_dataset and test_note_with_dataset failures `#bug` (2026-01-25)
@@ -428,9 +437,9 @@
   - [x] **#207.2** Analyze test fixture setup (test_env_shell vs python_env directories) `#bug` (2026-01-25)
   - [x] **#207.1** Investigate why Python CLI doesn't modify TODO.md in parity tests `#bug` (2026-01-25)
     > Root cause identified: Python CLI doesn't respect subprocess cwd parameter. FileOps(todo_path="TODO.md") resolves relative to Python process cwd, not the subprocess cwd. Solutions: (A) Add --root parameter to test commands, (B) Set TODO_AI_ROOT env var, (C) Pass absolute paths in tests, (D) Make FileOps resolve relative to os.getcwd() at runtime. Option B (env var) is cleanest - similar to our TODO_AI_TESTING fix.
-- [x] **#207** Fix shell/Python parity issues discovered in validation tests `#bug` (2026-01-25)
-  > Discovered while fixing task#206. After clearing TODO_FILE env var, validation tests revealed Python CLI isn't modifying TODO.md in test directories. Pattern: Tests create separate shell_env/python_env dirs, shell version works correctly, Python version appears to run but doesn't modify files. Likely issue: Python CLI not respecting cwd parameter or using different TODO.md path. Tests failing: test_complete_with_dataset, test_modify_with_dataset, test_delete_with_dataset, test_archive_with_dataset, test_undo_with_dataset, test_note_with_dataset, test_workflow_sequence_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[show].
-  > CONFIRMED: Python CLI ignores --root parameter. When --root /tmp/test is passed, CLI still modifies project TODO.md instead of /tmp/test/TODO.md. Shell script respects ROOT_DIR. Fix: Modify Python CLI main.py to resolve todo_file relative to root when root is provided. Line 48: ctx.obj['todo_file'] should become Path(root) / todo_file if root else todo_file.
+- [x] **#206** Fix shell script test failures (Cursor rules initialization during tests) `#bug` (2026-01-25)
+  > 5 parity tests failing: test_list_with_dataset, test_archive_with_dataset, test_note_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[command3-args3]. Root cause: Shell script outputs '⚠️ IMPORTANT: Cursor rules initialized' during test runs, causing exit code 1 instead of 0. Python version correctly returns exit code 0.
+  > Fix implemented: Added TODO_AI_TESTING environment variable check in todo.ai lines 1474-1476 (init_cursor_rules) and line 7134 (mode display). Test harnesses updated in test_dataset_parity.py lines 31-32 and test_feature_parity.py lines 40-41. When TODO_AI_TESTING=1, shell script suppresses all initialization output for clean test parity with Python version.
   - [x] **#206.7** Document the fix and add test to prevent regression `#bug` (2026-01-25)
   - [x] **#206.6** Verify all 5 parity tests pass (dataset_parity + feature_parity) `#bug` (2026-01-25)
   - [x] **#206.5** Implement fix in shell script (todo.ai) `#bug` (2026-01-25)
@@ -438,15 +447,6 @@
   - [x] **#206.3** Identify root cause (check if recent regression in shell script) `#bug` (2026-01-25)
   - [x] **#206.2** Investigate why Cursor rules initialization triggers during test runs `#bug` (2026-01-25)
   - [x] **#206.1** Reproduce shell script test failures locally `#bug` (2026-01-25)
-- [x] **#206** Fix shell script test failures (Cursor rules initialization during tests) `#bug` (2026-01-25)
-  > 5 parity tests failing: test_list_with_dataset, test_archive_with_dataset, test_note_with_dataset, test_show_command_parity, test_basic_commands_exit_codes[command3-args3]. Root cause: Shell script outputs '⚠️ IMPORTANT: Cursor rules initialized' during test runs, causing exit code 1 instead of 0. Python version correctly returns exit code 0.
-  > Fix implemented: Added TODO_AI_TESTING environment variable check in todo.ai lines 1474-1476 (init_cursor_rules) and line 7134 (mode display). Test harnesses updated in test_dataset_parity.py lines 31-32 and test_feature_parity.py lines 40-41. When TODO_AI_TESTING=1, shell script suppresses all initialization output for clean test parity with Python version.
-  - [x] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix` (2026-01-25)
-  - [x] **#204.5** Fix `restore_command` to restore subtasks in correct reverse-chronological order `#bug` `#fix` (2026-01-25)
-  - [x] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix` (2026-01-25)
-  - [x] **#204.3** Verify fix with regression test `#test` (2026-01-25)
-  - [x] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix` (2026-01-25)
-  - [x] **#204.1** Create reproduction test case for restore subtask failure `#test` (2026-01-25)
 - [x] **#204** Fix bug: Restoring a task does not restore its subtasks `#bug` `#fix` (2026-01-25)
   > Requirement: `restore_command` should be idempotent and self-healing.
   > If a previous restore failed to restore subtasks (leaving them archived), running `restore` on the parent again should detect and restore the missing subtasks.
@@ -457,15 +457,34 @@
   > - Issue: `restore_command` currently resets task status to `PENDING`. This is incorrect.
   > - Requirement: `restore_command` should ONLY move the task (and subtasks) back to the "Tasks" section. It must PRESERVE the completion status (`[x]` or `[ ]`).
   > - This allows restoring a completed task tree without losing the completion state of subtasks.
+  - [x] **#204.6** Fix `restore_command` to preserve completion status of tasks (do not reset to PENDING) `#bug` `#fix` (2026-01-25)
+  - [x] **#204.5** Fix `restore_command` to restore subtasks in correct reverse-chronological order `#bug` `#fix` (2026-01-25)
+  - [x] **#204.4** Ensure `restore_command` is idempotent and restores missing subtasks even if parent is already active `#code` `#fix` (2026-01-25)
+  - [x] **#204.3** Verify fix with regression test `#test` (2026-01-25)
+  - [x] **#204.2** Fix `restore_command` to recursively restore subtasks `#code` `#fix` (2026-01-25)
+  - [x] **#204.1** Create reproduction test case for restore subtask failure `#test` (2026-01-25)
+- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python` (2026-01-25)
+  > Reopening to restore legacy Python support (3.10-3.13).
+  > - Requirement: Keep 3.10+ support.
+  > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
   - [x] **#202.5** Update documentation to reflect Python 3.14 requirement and new dependency versions `#documentation` (2026-01-25)
   - [x] **#202.4** Run full test suite with Python 3.14 and updated dependencies `#test` (2026-01-25)
   - [x] **#202.3** Review and update all dependencies to latest stable versions in `pyproject.toml` `#dependencies` (2026-01-25)
   - [x] **#202.2** Update CI/CD workflows to use Python 3.14 as default (linting, building, etc.) `#cicd` (2026-01-25)
   - [x] **#202.1** Update `pyproject.toml` to require Python >= 3.14 and update classifiers `#configuration` (2026-01-25)
-- [x] **#202** Upgrade project to Python 3.14 and update dependencies `#infrastructure` `#python` (2026-01-25)
-  > Reopening to restore legacy Python support (3.10-3.13).
-  > - Requirement: Keep 3.10+ support.
-  > - Requirement: Use 3.14 for dev/linting/comprehensive CI.
+- [x] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` (2026-01-25)
+  > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
+  > - Avoids "project" terminology.
+  > - Provides zero-friction context retrieval.
+  > - Replaces task #201.13 (deleted).
+  > Added `stop` command to scope (subtasks #201.15 - #201.19).
+  > - Allows removing `#inprogress` tag without completing the task.
+  > - Mirrors `start` command functionality.
+  > Clarification: The `stop` command is optional and rarely needed.
+  > - `complete` implicitly stops a task (removes `#inprogress` tag).
+  > - `archive` implicitly stops a task.
+  > - `delete` implicitly stops a task.
+  > - `stop` is only for pausing work on a task without completing it.
   - [x] **#201.19** Document `stop` command usage `#documentation` (2026-01-25)
   - [x] **#201.18** Add tests for `stop` command `#test` (2026-01-25)
   - [x] **#201.17** Implement `stop_task` tool in MCP server `#code` `#mcp` (2026-01-25)
@@ -485,19 +504,9 @@
   - [x] **#201.3** Design logic to remove  tag on completion, deletion, or archiving `#design` `#logic` (2026-01-25)
   - [x] **#201.2** Design MCP server strategy to surface  tasks to agent `#design` `#mcp` (2026-01-25)
   - [x] **#201.1** Design `start` command to mark task as in progress with  tag `#design` (2026-01-25)
-- [x] **#201** Design and implement 'start' command and #inprogress tag lifecycle `#design` `#feature` (2026-01-25)
-  > Change of plan: Use dedicated `get_active_tasks` tool instead of overloading `list_tasks`.
-  > - Avoids "project" terminology.
-  > - Provides zero-friction context retrieval.
-  > - Replaces task #201.13 (deleted).
-  > Added `stop` command to scope (subtasks #201.15 - #201.19).
-  > - Allows removing `#inprogress` tag without completing the task.
-  > - Mirrors `start` command functionality.
-  > Clarification: The `stop` command is optional and rarely needed.
-  > - `complete` implicitly stops a task (removes `#inprogress` tag).
-  > - `archive` implicitly stops a task.
-  > - `delete` implicitly stops a task.
-  > - `stop` is only for pausing work on a task without completing it.
+- [x] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting` (2026-01-25)
+  > Design doc: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
+  > Tests: tests/unit/test_visual_standards.py (23 tests, all passing)
   - [x] **#200.23** Test reformat command: verify all formatting violations are auto-fixed `#reformat` `#test` (2026-01-25)
     > Covered by FileOps.write_tasks() auto-formatting which applies all visual standards on every write
   - [x] **#200.22** Test lint command: verify all formatting violations are detected `#linting` `#test` (2026-01-25)
@@ -573,11 +582,6 @@
     > Renamed design document to docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md to explicitly identify year and version.
     > Design document approved. Proceeding to implementation tasks.
   - [x] **#200.1** Review current TODO.md format and identify inconsistencies or issues `#investigation` (2026-01-25)
-- [x] **#200** Review and cleanup TODO.md file format and enhance formatting standards `#cleanup` `#formatting` `#linting` (2026-01-25)
-  > Design doc: docs/design/TODO_MD_VISUAL_STANDARDS_2026_V3.md (approved)
-  > Tests: tests/unit/test_visual_standards.py (23 tests, all passing)
-  - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test` (2026-01-25)
-  - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code` (2026-01-25)
 - [x] **#199** Enhance `archive_command` to enforce parent-child grouping in archive section `#archive` `#enhancement` (2026-01-25)
   > Scenario to test:
   > 1. Parent #1 is already archived (at bottom of file).
@@ -585,10 +589,8 @@
   > 3. Run `archive 1.1`.
   > 4. Result: #1.1 should move to bottom of file, immediately after #1.
   > Current behavior would leave #1.1 at top (but in Archive section), appearing before #1.
-  - [x] **#198.4** Update documentation to reflect new linting capabilities `#documentation` (2026-01-25)
-  - [x] **#198.3** Add unit tests for subtask ordering detection and fixing `#test` (2026-01-25)
-  - [x] **#198.2** Implement `reorder_command` as a separate fixer for subtask ordering (distinct from `reformat_command`) `#code` (2026-01-25)
-  - [x] **#198.1** Update `lint_command` to detect subtasks that violate reverse-chronological order (newest on top) `#code` (2026-01-25)
+  - [x] **#199.2** Add regression test case: archiving orphaned subtasks should group them under the already-archived parent `#test` (2026-01-25)
+  - [x] **#199.1** Implement logic to move archived subtasks immediately after their parent in the task list `#code` (2026-01-25)
 - [x] **#198** Enhance linting to detect and fix out-of-order subtasks `#feature` `#linting` (2026-01-25)
   > Goal: Enforce the "newest on top" rule for subtasks, matching the behavior we recently fixed in task creation (#188).
   > Current fixers:
@@ -597,9 +599,18 @@
   > We should likely add the reordering logic to `reformat_command` (optional or default?) or a new fixer. Given it changes content order, it should probably be part of `--reformat`.
   > Decision: Create a separate `reorder_command` (CLI: `reorder`) instead of overloading `reformat`.
   > Reasoning: Reordering changes content structure significantly, whereas reformat is cosmetic (indentation/checkboxes). Users should opt-in to reordering explicitly.
+  - [x] **#198.4** Update documentation to reflect new linting capabilities `#documentation` (2026-01-25)
+  - [x] **#198.3** Add unit tests for subtask ordering detection and fixing `#test` (2026-01-25)
+  - [x] **#198.2** Implement `reorder_command` as a separate fixer for subtask ordering (distinct from `reformat_command`) `#code` (2026-01-25)
+  - [x] **#198.1** Update `lint_command` to detect subtasks that violate reverse-chronological order (newest on top) `#code` (2026-01-25)
+- [x] **#197** Verify MCP server reload with ordering test `#mcp` `#test` (2026-01-25)
   - [x] **#197.2** Second subtask (should be at top) `#test` (2026-01-25)
   - [x] **#197.1** First subtask (should be at bottom) `#test` (2026-01-25)
-- [x] **#197** Verify MCP server reload with ordering test `#mcp` `#test` (2026-01-25)
+- [x] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality` (2026-01-25)
+  > Goal: Ensure `TODO.md` integrity is enforced automatically.
+  > - Pre-commit: Fast checks (linting, formatting).
+  > - CI: Deep checks (regression tests, logic validation).
+  > This prevents bugs like the "orphaned subtasks" from slipping through.
   - [x] **#196.5** Update documentation to reflect new quality gates `#documentation` (2026-01-25)
   - [x] **#196.4** Add regression test suite to CI (running `tests/integration/`) to catch logic bugs like #195 `#cicd` `#test` (2026-01-25)
   - [x] **#196.3** Investigate adding auto-fix (`--reformat`) to pre-commit (optional/manual trigger?) `#investigation` (2026-01-25)
@@ -609,20 +620,16 @@
     > - Recommendation: Add as `todo-ai-reformat` hook before linting.
   - [x] **#196.2** Add `todo-ai --lint` step to GitHub Actions CI workflow `#cicd` (2026-01-25)
   - [x] **#196.1** Add `todo-ai --lint` to pre-commit hooks to block commits with invalid TODO.md `#infrastructure` (2026-01-25)
-- [x] **#196** Enhance Pre-commit and CI/CD with todo-ai linting and validation `#cicd` `#infrastructure` `#quality` (2026-01-25)
-  > Goal: Ensure `TODO.md` integrity is enforced automatically.
-  > - Pre-commit: Fast checks (linting, formatting).
-  > - CI: Deep checks (regression tests, logic validation).
-  > This prevents bugs like the "orphaned subtasks" from slipping through.
-  - [x] **#195.3** Verify fix with regression test `#test` (2026-01-25)
-  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix` (2026-01-25)
-  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test` (2026-01-25)
 - [x] **#195** Fix bug: Archiving a task does not archive its subtasks `#bug` `#critical` (2026-01-25)
   > Decision: Archiving a task should ALWAYS archive its subtasks. We will not add an extra --with-subtasks option; instead, we will change the default behavior of archive_command to include subtasks automatically. This aligns with user expectations that archiving a parent implies archiving its children.
   > Status: Fix implemented (default with_subtasks=True), but verification test failed due to unexpected ordering of archived tasks.
   > Issue: Archived subtask (1.1) appears BEFORE parent (1) in 'Recently Completed', while we expected parent first.
   > Action: Pausing work on #195 to fix the underlying ordering inconsistency in #188 first. We will return to verify #195 once ordering is deterministic and correct.
+  - [x] **#195.3** Verify fix with regression test `#test` (2026-01-25)
+  - [x] **#195.2** Fix archive_command to recursively archive subtasks `#code` `#fix` (2026-01-25)
+  - [x] **#195.1** Create reproduction test case for archive subtask failure `#test` (2026-01-25)
 - [x] **#194** Hello World Test Task `#test` (2026-01-25)
+- [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor` (2026-01-25)
   - [x] **#192.7** Release beta version with unified executable for testing `#release` (2026-01-25)
   - [x] **#192.6** Update documentation to reflect unified executable and `serve` command `#documentation` (2026-01-25)
   - [x] **#192.5** Add test cases for `serve` command and argument parsing `#test` (2026-01-25)
@@ -630,11 +637,12 @@
   - [x] **#192.3** Implement `serve` command in CLI to launch MCP server `#code` `#implementation` (2026-01-25)
   - [x] **#192.2** Create design document for unified executable architecture `#design` `#documentation` (2026-01-25)
   - [x] **#192.1** Investigate default parameters for well-defined MCP server (e.g. logging, transport options) `#investigation` `#mcp` (2026-01-25)
-- [x] **#192** Combine CLI and MCP server into single `todo-ai` executable with `serve` command and `--root` support `#design` `#mcp` `#refactor` (2026-01-25)
-  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test` (2026-01-25)
-  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix` (2026-01-25)
 - [x] **#188** Investigate task ordering in Python version (todo-ai) - does not follow reverse order (newest on top) like shell script `#bug` `#python` (2026-01-25)
   > Shell script version (todo.ai) displays newest tasks first (reverse chronological). Python version (todo-ai) may not follow this same ordering. Need to investigate and ensure parity.
+  - [x] **#188.2** Create reproduction test case for subtask ordering (newest should be on top) `#test` (2026-01-25)
+  - [x] **#188.1** Fix task ordering inconsistency: Ensure subtasks follow the same reverse-chronological order (newest on top) as main tasks `#code` `#fix` (2026-01-25)
+- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2026-01-25)
+  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
   - [x] **#161.5** Verify fix works with both local and system-wide installations `#bug` (2026-01-25)
     > VERIFIED: Tested fix from different working directory (/tmp). Script correctly uses ORIGINAL_WORKING_DIR (/tmp) instead of script directory. Fixed glob error by using find instead of glob expansion. Fix works for both local and system-wide installations - migrations always run in user's working directory where .todo.ai exists.
   - [x] **#161.4** Fix migration path detection for system-wide installations `#bug` (2026-01-25)
@@ -643,13 +651,13 @@
   - [x] **#161.2** Review get_script_path() and migration system for system directory handling `#bug` (2026-01-25)
   - [x] **#161.1** Investigate migration path error: reproduce with system directory installation `#bug` (2026-01-25)
     > BUG IDENTIFIED: In update_tool() at line 5805, script changes directory to script_dir (e.g., /usr/local/bin) before executing new version. When run_migrations() is called, it uses $(pwd) which is now /usr/local/bin, so it looks for .todo.ai/migrations in wrong location. The .todo.ai directory should always be in the user's working directory, not next to the script. Fix: Capture original working directory at script startup and use it in run_migrations().
-- [x] **#161** Fix issue#26: Migration path error when todo.ai installed to system directory `#bug` (2026-01-25)
-  > Issue #26: When todo.ai installed to /usr/local/bin and config at /homeassistant/.todo.ai, update to v2.0.1 shows error: 'run_migrations:21: no matches found: /usr/local/bin/.todo.ai/migrations/v*_*.migrated'. Migration logic looks for .todo.ai next to script instead of working directory. Issue: https://github.com/fxstein/todo.ai/issues/26
+- [x] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode) `#bug` (2026-01-25)
   - [x] **#126.4** Add tests to verify coordination setup doesn't change numbering mode `#bug` `#test` (2026-01-25)
   - [x] **#126.3** Fix setup-coordination to preserve current mode when configuring coordination (completed - fixed hardcoded enhanced mode) `#bug` (2026-01-25)
   - [x] **#126.2** Verify coordination should work with single-user mode without forcing enhanced (verified - validation supports single-user + coordination) `#bug` (2026-01-25)
   - [x] **#126.1** Investigate setup-coordination command mode switching logic (completed - found hardcoded mode: enhanced on line 3353) `#bug` (2026-01-25)
-- [x] **#126** Fix issue#27: Setup coordinator automatically switches to enhanced mode without user consent (fixed - setup-coordination now preserves current mode) `#bug` (2026-01-25)
+- [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2026-01-25)
+  > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
   - [x] **#125.13** Update bug reporting design document with new implementation details `#docs` (2026-01-25)
     > Update docs/design/BUG_REPORTING_DESIGN.md: (1) Document GitHub issue template structure, (2) Explain callout block usage and markdown improvements, (3) Document agent vs human detection logic, (4) Add examples of new bug report format, (5) Document auto-labeling system, (6) Update template examples to match new generate_bug_report() implementation. Keep aligned with actual code.
   - [x] **#125.12** Test new bug report format with real GitHub issue creation `#test` (2026-01-25)
@@ -672,10 +680,10 @@
   - [x] **#125.3** Improve bug report formatting with better markdown structure `#bug` (2026-01-25)
   - [x] **#125.2** Update bug report template for better readability and structure `#bug` (2026-01-25)
   - [x] **#125.1** Eliminate user prompts - make bug reporting fully automated for AI agents `#bug` (2026-01-25)
-- [x] **#125** Overhaul bug reporting feature: eliminate prompts and improve formatting `#bug` `#feature` (2026-01-25)
-  > Current implementation has basic markdown but needs improvement: (1) Create GitHub issue template (.github/ISSUE_TEMPLATE/bug_report.yml), (2) Use GitHub callout blocks (> [!NOTE], > [!WARNING]), (3) Better structure with proper sections, (4) Remove prompts for agent workflow, (5) Auto-collect all context without user input
 - [x] **#189** Verify MCP server task creation with another test task `#mcp` `#test` (2026-01-24)
   > Why do programmers prefer dark mode? Because light attracts bugs. 🐛
+- [x] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug` (2026-01-24)
+  > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
   - [x] **#186.7** Verify release artifacts published successfully `#bug` (2026-01-24)
     > VERIFIED: v3.0.0b13 published successfully. GitHub release created with 7 assets (whl, tar.gz, attestations, install.sh, todo.ai, todo.bash). PyPI publish completed. First successful release since v3.0.0b7.
   - [x] **#186.6** Test fix with beta release tag (e.g., v3.0.0b8) `#bug` (2026-01-24)
@@ -697,17 +705,17 @@
   - [x] **#186.1** Examine recent workflow runs to gather diagnostic data `#bug` (2026-01-24)
     > Root cause: Commit dd9a222 removed job-level if condition from validate-release. Changes job outputs is_tag=true correctly, but validate-release skips entirely (no logs). Hypothesis: output not exported or GitHub Actions implicit skipping.
     > Use 'gh run list --limit 10' and 'gh run view <run-id>' to examine recent tag push workflows. Check for is_tag values in changes job output.
-- [x] **#186** Fix CI/CD release jobs skipping on tag pushes (validate-release and release) `#bug` (2026-01-24)
-  > See docs/analysis/CI_CD_SILENT_FAILURE_ANALYSIS.md lines 73-227 for detailed analysis. Key files: .github/workflows/ci-cd.yml lines 384-488 (validate-release) and 489-549 (release).
 - [x] **#185** Remove confirmation prompt when updating task notes `#feature` (2026-01-24)
 - [x] **#184** Remove confirmation prompt when deleting task notes `#feature` (2026-01-24)
+- [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
   - [x] **#183.5** Document CI/CD optimization and release impact `#docs` (2026-01-24)
     > Doc: release/RELEASE_PROCESS.md includes CI/CD triggers + optimization section.
   - [x] **#183.4** Add tests/verification for CI/CD changes `#infra` `#skipped` (2026-01-24)
   - [x] **#183.3** Implement optimized CI/CD workflow changes `#infra` (2026-01-24)
   - [x] **#183.2** Design CI/CD optimization plan (path filters, tiers) `#infra` (2026-01-24)
   - [x] **#183.1** Analyze current CI/CD triggers and test matrix `#infra` (2026-01-24)
-- [x] **#183** Optimize CI/CD pipeline to avoid full suite on minor changes `#infra` (2026-01-24)
+- [x] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature` (2026-01-23)
+  > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
   - [x] **#182.19** Execute beta release 3.0.0b7 `#release` (2026-01-23)
   - [x] **#182.18** Prepare beta release 3.0.0b7 `#release` (2026-01-23)
   - [x] **#182.17** Fix migrations root scoping for TODO_AI_ROOT `#bug` (2026-01-23)
@@ -736,48 +744,47 @@
     > Options doc: docs/analysis/PINNED_PROJECT_DIRECTORY_OPTIONS.md (recommended config-based pin, alternatives evaluated)
   - [x] **#182.1** Investigate current directory resolution & init flow `#feature` (2026-01-23)
     > Investigation doc: docs/analysis/PINNED_PROJECT_DIRECTORY_INVESTIGATION.md
-- [x] **#182** Design pinned project directory for todo.ai CLI (non-MCP) `#feature` (2026-01-23)
-  > Overall summary: Design pinned project directory for todo.ai CLI (non-MCP).
+- [x] **#181** Stabilize release process (no failures) `#release` (2026-01-23)
+  > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
+  > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
   - [x] **#181.4** Add regression tests for release.sh prepare/execute workflow `#release` (2026-01-23)
   - [x] **#181.3** Harden execute flow (preflight, cleanup, retries) `#release` (2026-01-23)
   - [x] **#181.2** Fix release notes lifecycle so prepare/execute are clean `#release` (2026-01-23)
   - [x] **#181.1** Investigate current release blockers (preflight failures, notes handling) `#release` (2026-01-23)
-- [x] **#181** Stabilize release process (no failures) `#release` (2026-01-23)
-  > Investigation: execute preflight fails due to uncommitted files. In release.sh preflight check (around 'Check 3'), git status excludes only release/RELEASE_LOG.log and .todo.ai/.todo.ai.{serial,log}. It still flags release/RELEASE_NOTES.md and TODO.md, which are expected after prepare or task updates. Suggest extend exclusion list to include release/RELEASE_NOTES.md, release/.prepare_state, TODO.md and .todo.ai/.todo.ai.log so execute can proceed and then commit them in version commit (execute already stages TODO.md/.todo.ai and RELEASE_NOTES.md).
-  > Focus on release.sh prepare/execute idempotency: keep RELEASE_NOTES.md for review without triggering auto-commit; ensure execute handles notes/log changes deterministically. Files: release/release.sh, release/RELEASE_NOTES.md, release/RELEASE_LOG.log.
+- [x] **#180** Investigate missing --set-version in release.sh `#bug` (2026-01-23)
+  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
+  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
   - [x] **#180.3** Implement change and update docs/tests `#bug` (2026-01-23)
   - [x] **#180.2** Decide whether to add --set-version or document alternative `#bug` (2026-01-23)
   - [x] **#180.1** Confirm supported release.sh options and expected override workflow `#bug` (2026-01-23)
     > release.sh does not support --help; running ./release/release.sh --help returns 'Unknown option' but prints usage. Usage currently lists --prepare/--execute/--abort, --beta, --summary, --set-version, --dry-run.
-- [x] **#180** Investigate missing --set-version in release.sh `#bug` (2026-01-23)
-  > Implemented --set-version override in release/release.sh (format X.Y.Z or X.Y.ZbN) with version comparison and beta-cycle base validation; documented override usage and constraints in release/RELEASE_PROCESS.md.
-  > Attempted to run './release/release.sh --set-version 3.0.0b3' after prepare; script errored with 'Unknown option: --set-version'. Current usage only lists --prepare/--execute/--abort/--beta/--summary. Need a supported way to override version for beta releases.
+- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug` (2026-01-23)
+  > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
   - [x] **#179.3** Implement fix and add regression test `#bug` (2026-01-23)
   - [x] **#179.2** Decide expected behavior for AI_RELEASE_SUMMARY.md vs RELEASE_SUMMARY.md `#bug` (2026-01-23)
   - [x] **#179.1** Reproduce stale summary detection in release.sh `#bug` (2026-01-23)
-- [x] **#179** Investigate release prepare failure on stale RELEASE_SUMMARY.md `#bug` (2026-01-23)
-  > Prepare failed with stale summary warning: release.sh auto-detected release/RELEASE_SUMMARY.md (timestamp 2025-12-18) and aborted in non-interactive mode despite new release/AI_RELEASE_SUMMARY.md. Error surfaced on 'release.sh --prepare' after summary commit d5208d4.
+- [x] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug` (2026-01-17)
+  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
   - [x] **#178.3** Add tests for multiple parents/subtasks `#bug` (2026-01-17)
   - [x] **#178.2** Fix subtask insertion to correct parent `#bug` (2026-01-17)
   - [x] **#178.1** Investigate subtask placement logic `#bug` (2026-01-17)
-- [x] **#178** Fix issue#40: Subtasks assigned to wrong parent `#bug` (2026-01-17)
-  > Investigate/fix in `todo_ai/cli/commands/__init__.py` add_subtask_command; tests in `tests/integration/test_cli.py` (add_subtasks_multiple_parents).
+- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure` (2026-01-17)
   - [x] **#177.3** Move GitHub release to workflow (after PyPI success) `#infrastructure` (2026-01-17)
   - [x] **#177.2** Remove GitHub release creation from release.sh `#infrastructure` (2026-01-17)
   - [x] **#177.1** Update PyPI Trusted Publisher config to ci-cd.yml/release `#infrastructure` (2026-01-17)
-- [x] **#177** Fix release process - PyPI must succeed before GitHub release `#critical` `#infrastructure` (2026-01-17)
 - [x] **#176** Fix CI/CD dependency flaw - merge workflows with job dependencies `#critical` `#infrastructure` (2026-01-17)
+- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure` (2026-01-17)
   - [x] **#175.3** Add CI/CD check to detect forbidden flags `#infrastructure` (2026-01-17)
   - [x] **#175.2** Add pytest test to detect forbidden flags `#infrastructure` (2026-01-17)
   - [x] **#175.1** Add pre-commit hook to detect forbidden flags `#infrastructure` (2026-01-17)
-- [x] **#175** Implement safeguards to prevent --no-verify from returning to codebase `#critical` `#infrastructure` (2026-01-17)
+- [x] **#174** Set up PyPI project for todo-ai package `#release` (2026-01-17)
+  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
+  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
   - [x] **#174.7** Test first beta release with trusted publisher `#testing` (2026-01-17)
   - [x] **#174.6** Update GitHub Actions workflow to use OIDC authentication `#infrastructure` (2026-01-17)
   - [x] **#174.5** Register GitHub as trusted publisher on PyPI `#setup` (2026-01-17)
   - [x] **#174.1** Create PyPI project 'todo-ai' (or verify name available) `#setup` (2026-01-17)
-- [x] **#174** Set up PyPI project for todo-ai package `#release` (2026-01-17)
-  > Changed PyPI package name from 'todo-ai' to 'ai-todo' (PyPI rejected original name as too similar to existing project). Updated pyproject.toml, README.md, and all documentation.
-  > Using PyPI Trusted Publisher (OpenID Connect) - no API token needed. Requires: 1) Create PyPI project, 2) Add GitHub as trusted publisher, 3) Update GitHub Actions workflow to use OIDC.
+- [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug` (2026-01-17)
   - [x] **#173.12** Remove --no-verify from release script (ETERNALLY FORBIDDEN) `#critical` (2026-01-17)
   - [x] **#173.11** Fix pre-commit hook handling - committed files don't include hook fixes `#bug` (2026-01-17)
     > Root cause: Pre-commit hooks ran AFTER staging, fixed files in working dir, but retry logic committed unfixed version from index. Fix: Run pre-commit BEFORE staging to let hooks fix files first, then stage clean files.
@@ -792,17 +799,18 @@
   - [x] **#173.2** Fix tag verification - fails even when versions are correct `#bug` (2026-01-17)
   - [x] **#173.1** Fix auto-commit logic - doesn't handle bash conversion artifacts properly `#bug` (2026-01-17)
     > Problem: todo.bash converted during --prepare (line 1034) but only added to git during --execute (lines 1297-1300). Leaves uncommitted file after prepare. Fix: Move bash conversion to execute phase OR commit it during prepare.
-- [x] **#173** Fix release script bugs found during v3.0.0b1 attempt `#bug` (2026-01-17)
 - [x] **#171** Improve CI/CD job grouping and naming `#cicd` `#enhancement` (2025-12-16)
   > Added 'needs: quality' dependency to all test jobs - tests won't run until code quality checks pass. Saves CI resources by failing fast on linting/typing/formatting issues.
   > Refactored to 3 separate jobs: 'Comprehensive Tests' (Py 3.14 × 3 OS, main only), 'Quick Tests' (Py 3.10-3.13 × 3 OS, main only), 'PR Tests' (Py 3.12 × ubuntu, PRs only). Creates clean grouping in GitHub Actions UI.
   > Added conditional job naming: '🔬 Comprehensive Tests' for Python 3.14 (full suite), '⚡ Quick Tests' for Python 3.10-3.13 (unit only). Makes GitHub Actions UI more readable and groups related tests.
 - [x] **#170** Further optimize CI/CD: Granular test strategy `#cicd` `#optimization` (2025-12-16)
   > Main branch: Full tests only on Python 3.14 (3 OS × 1 version = 3 jobs), unit tests on 3.10-3.13 (3 OS × 4 versions = 12 jobs). PRs: Full tests on ubuntu + 3.12 (1 job). Total main: 15 jobs but most are fast unit-only.
+- [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization` (2025-12-16)
   - [x] **#169.3** Phase 3: Cleanup and documentation `#cicd` (2025-12-16)
   - [x] **#169.2** Phase 2: Optimize pre-commit configuration `#cicd` (2025-12-16)
   - [x] **#169.1** Phase 1: Refactor CI/CD workflow `#cicd` (2025-12-16)
-- [x] **#169** Implement CI/CD optimizations from assessment `#cicd` `#optimization` (2025-12-16)
+- [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd` (2025-12-14)
+  > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
   - [x] **#167.9** Phase 3.3: Add documentation automation `#cicd` (2025-12-14)
   - [x] **#167.8** Phase 3.2: Expand test matrix to multiple OS (macOS, Windows) `#cicd` (2025-12-14)
   - [x] **#167.7** Phase 3.1: Add code coverage reporting (codecov) `#cicd` (2025-12-14)
@@ -819,8 +827,9 @@
     > Created .pre-commit-config.yaml with ruff, mypy, and standard pre-commit hooks. Updated scripts/setup-git-hooks.sh to use 'uv run pre-commit install' instead of custom shell script hooks.
   - [x] **#167.1** Phase 1.1: Add uv dependency management `#cicd` (2025-12-14)
     > Created uv.lock file via 'uv lock'. Updated pyproject.toml with dev dependencies section. Created setup.sh script with PATH handling for $HOME/.local/bin (default uv installation path). Created docs/development/SETUP.md with setup instructions.
-- [x] **#167** Implement CI/CD process parity with ascii-guard (Phase 1-3) `#cicd` (2025-12-14)
-  > Reference: docs/analysis/CI_CD_PROCESS_PARITY_ASSESSMENT.md. Implementation roadmap for achieving process parity with ascii-guard's modern Python development workflow (uv, pre-commit, GitHub Actions CI/CD).
+- [x] **#160** Fix issue#35: Task not found after successful modify command `#bug` (2025-12-12)
+  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
+  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
   - [x] **#160.5** Add tests to prevent regression `#bug` (2025-12-12)
   - [x] **#160.4** Fix task ID resolution in modify command if bug confirmed `#bug` (2025-12-12)
     > FIXED ALL FUNCTIONS: Updated modify_todo(), add_note(), complete_todo(), archive_task(), show_task(), add_relationship(), update_note(), and delete_note() to handle both bold and non-bold task ID formats. All functions now search for (\*\*#task_id\*\*|#task_id) pattern. Tested: modify and note commands work correctly with non-bold tasks.
@@ -829,9 +838,8 @@
   - [x] **#160.2** Review modify_task() function for task ID resolution issues `#bug` (2025-12-12)
   - [x] **#160.1** Investigate modify command: reproduce the bug and identify root cause `#bug` (2025-12-12)
     > BUG IDENTIFIED: modify_todo() finds tasks with pattern matching both bold and non-bold (line 2596), but sed replacement only matches bold format (lines 2669-2682). If task exists without bold (#2.6), modify finds it but sed replacement fails silently, leaving task unchanged. Then add_note() only searches bold format (line 4417), so it can't find the task. Fix: Make sed patterns match both bold and non-bold like grep does.
-- [x] **#160** Fix issue#35: Task not found after successful modify command `#bug` (2025-12-12)
-  > All functions fixed to handle both bold and non-bold task ID formats. Tested: modify and note commands work. Complete command may need additional testing with tags.
-  > Issue #35: User ran './todo.ai modify 2.6' which succeeded, then immediately ran './todo.ai note 2.6' but got 'Task #2.6 not found'. The modify command reported success but task became unfindable. Version 2.4.0, macOS. Issue: https://github.com/fxstein/todo.ai/issues/35
+- [x] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug` (2025-11-16)
+  > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
   - [x] **#157.9** Fix increment_serial() to check TODO.md for highest ID `#bug` (2025-11-16)
     > Fixed and tested. In no-coordination mode with serial=65, correctly assigned #159 (using TODO.md highest of 158).
     > Function increment_serial() (lines 1197-1213) blindly increments serial file without checking TODO.md. In no-coordination mode, assigned #65 when TODO.md highest was #158. Fix: Use MAX(serial_file, get_highest_task_number()) + 1. This is likely the actual root cause of issue#38.
@@ -852,10 +860,14 @@
   - [x] **#157.1** Investigate get_highest_task_number() function for ID extraction bugs `#bug` (2025-11-16)
     > Root cause: get_highest_task_number() was scanning ALL lines including blockquote examples (e.g., line 77 with example #42.1). Function lines 3650-3659.
     > Focus on lines ~2500-2600 in todo.ai. Check regex pattern for extracting task IDs, especially handling of BASH_CONVERT markers and  usage. Verify it correctly reads all task IDs including completed ones.
-- [x] **#157** Fix issue#38: Single-user mode assigns duplicate task IDs `#bug` (2025-11-16)
-  > Critical data integrity bug in v2.4.0 and v2.5.0. Duplicate ID #21 assigned in single-user mode. Error context suggests relation to recent bash compatibility fixes (match array conversion). Issue reported at https://github.com/fxstein/todo.ai/issues/38
 - [x] **#155** Fix get_config_value sed fallback to work in bash (uses zsh-specific $match array) `#bug` (2025-11-16)
   > Fixed 3 critical $match[ ] usages in get_config_value() and get_highest_task_number(). Found 60 total occurrences throughout codebase. Need systematic conversion: all regex match references must check BASH_VERSION and use BASH_REMATCH[ ] for bash or $match[ ] for zsh.
+- [x] **#153** Add note management: update and delete note commands `#feature` (2025-11-16)
+  > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
+  > - delete-note: Remove all notes from a task
+  > - update-note: Replace existing notes with new text
+  >
+  > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
   - [x] **#153.8** Update GETTING_STARTED.md with note management examples `#feature` (2025-11-16)
   - [x] **#153.7** Add commands to help text and usage documentation `#feature` (2025-11-16)
   - [x] **#153.6** Test note management at all nesting levels (0, 1, 2) `#feature` (2025-11-16)
@@ -927,12 +939,7 @@
     > - Returns error if task has no notes to update
     >
     > Alternative: Could add --force to skip confirmations for both commands.
-- [x] **#153** Add note management: update and delete note commands `#feature` (2025-11-16)
-  > Currently can only ADD notes with './todo.ai note <id> "text"'. Need to add:
-  > - delete-note: Remove all notes from a task
-  > - update-note: Replace existing notes with new text
-  >
-  > This allows fixing mistakes, removing outdated info, and updating context without manual TODO.md editing.
+- [x] **#152** Test bug reporting feature before v2.5.0 release `#testing` (2025-11-16)
   - [x] **#152.7** Verify GitHub issue template structure `#testing` (2025-11-16)
   - [x] **#152.6** Test label categorization for different error types `#testing` (2025-11-16)
   - [x] **#152.5** Verify markdown formatting (callout blocks, tables, collapsible) `#testing` (2025-11-16)
@@ -949,7 +956,8 @@
   - [x] **#152.3** Test AI agent detection and auto-submission (with CURSOR_AI set) `#testing` (2025-11-16)
   - [x] **#152.2** Verify context collection (git, TODO.md, env vars, commands) `#testing` (2025-11-16)
   - [x] **#152.1** Test bug report generation with mock error `#testing` (2025-11-16)
-- [x] **#152** Test bug reporting feature before v2.5.0 release `#testing` (2025-11-16)
+- [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug` (2025-11-16)
+  > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
   - [x] **#149.7** Commit fix and verify TODO.md structure is valid `#bug` (2025-11-16)
   - [x] **#149.6** Manually fix broken notes in TODO.md (tasks 147.3-147.6) `#bug` (2025-11-16)
     > Manually fix ALL broken multi-line notes in TODO.md by adding proper indentation and blockquote markers (2 spaces + > + space for level-1 subtasks):
@@ -1013,8 +1021,8 @@
     > > Line 3 with marker
     >
     > All note lines must have proper indentation (matching task depth) AND blockquote marker (>).
-- [x] **#149** Fix multi-line note indentation bug in add_note() function `#bug` (2025-11-16)
-  > When adding multi-line notes, only the first line gets the blockquote marker (>) and proper indentation. Subsequent lines are inserted as raw text without indentation or markers, breaking TODO.md structure. Affects tasks 147.3 (lines 36-45), 147.4 (lines 27-32), 147.5 (lines 21-23), 147.6 (lines 14-18). Example: First line is '  > Text' but second line is just 'More text' instead of '  > More text'.
+- [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug` (2025-11-16)
+  > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
   - [x] **#147.8** Commit fix and close issue#36 with release reference `#bug` (2025-11-16)
     > Issue #36 auto-closed by GitHub when commit contained 'Closes #36'. Added detailed comment explaining root cause, solution, and verification. Issue closed at 2025-11-15 11:47:54 UTC. Comment: https://github.com/fxstein/todo.ai/issues/36#issuecomment-3536410881
   - [x] **#147.7** Update documentation if nesting limitations exist `#bug` (2025-11-16)
@@ -1057,8 +1065,8 @@
     > Bug confirmed: Task #148.1.1 exists in TODO.md with 4-space indentation but 'show 148.1.1' returns 'Task not found'. Tasks #148 (0 spaces) and #148.1 (2 spaces) work correctly.
   - [x] **#147.1** Investigate task ID parsing logic for nested subtasks `#bug` (2025-11-16)
     > Search for functions: find_task_by_id(), get_task_by_id(), parse_task_id(), or similar. Look in action handlers for 'show', 'modify', 'note' commands. Check how task IDs are split (1.2.1 -> [1,2,1]) and how TODO.md is traversed. Likely issue: regex pattern or nesting loop only handles 2 levels.
-- [x] **#147** Fix issue#36: Task show command fails for deeply nested subtasks `#bug` (2025-11-16)
-  > Issue #36 reports that 'show 1.2.1' fails with 'Task not found' even though task exists. Commands work for 1-level (#1) and 2-level (#1.2) but fail at 3-level (#1.2.1). This affects show, modify, note commands. Need to find task ID parsing/resolution logic and fix for arbitrary nesting depth. All 7 subtasks under #1.2 (tasks #1.2.1 through #1.2.7) affected.
+- [x] **#146** Test task#144 implementation before release `#test` (2025-11-12)
+  > Validate all task#144 features before creating release: bash conversion, smart installer, release assets. All tests passed successfully. Release v2.4.0 is LIVE with smart installer, bash version, and automated conversion workflow.
   - [x] **#146.7** Clean up pre-release and verify ready for production release `#test` (2025-11-12)
     > v2.4.0 created and tested successfully. Converted from pre-release to production for installer testing. All tests passed: bash conversion works, smart installer works, both versions identical. Release is LIVE and ready for production use.
   - [x] **#146.6** Verify zsh and bash versions produce identical results `#test` (2025-11-12)
@@ -1069,8 +1077,8 @@
     > Installer correctly detects v.3.1 but assets don't exist (404). This is expected - v2.3.1 was before task#144. Need pre-release with new assets to test full flow. Fallback logic working correctly.
   - [x] **#146.2** Test bash version functionality matches zsh version `#test` (2025-11-12)
   - [x] **#146.1** Test bash conversion with release.sh --prepare `#test` (2025-11-12)
-- [x] **#146** Test task#144 implementation before release `#test` (2025-11-12)
-  > Validate all task#144 features before creating release: bash conversion, smart installer, release assets. All tests passed successfully. Release v2.4.0 is LIVE with smart installer, bash version, and automated conversion workflow.
+- [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature` (2025-11-12)
+  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). Installs from releases (not main branch) to avoid incomplete/broken commits. Clear dev workflow: develop in zsh, auto-convert to bash during release. Released in v2.4.0.
   - [x] **#144.9** Update release script to include both todo.ai and todo.bash as assets `#release` (2025-11-12)
   - [x] **#144.8** Add cursor rule to prevent accidental todo.bash editing `#docs` (2025-11-12)
   - [x] **#144.7** Update GETTING_STARTED.md and other documentation references `#docs` (2025-11-12)
@@ -1080,8 +1088,8 @@
   - [x] **#144.3** Create release-aware smart installer script (install.sh) `#installer` (2025-11-12)
   - [x] **#144.2** Add automated bash conversion to release script `#release` (2025-11-12)
   - [x] **#144.1** Create development guidelines document for zsh-first workflow `#docs` (2025-11-12)
-- [x] **#144** Implement release-aware smart installer with bash/zsh dual-version support `#feature` (2025-11-12)
-  > Smart installer that detects OS/shell and installs optimal version (zsh/bash). Installs from releases (not main branch) to avoid incomplete/broken commits. Clear dev workflow: develop in zsh, auto-convert to bash during release. Released in v2.4.0.
+- [x] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization` (2025-11-12)
+  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
   - [x] **#132.3** Explore bash version of todo.ai: evaluate impact on file size and platform compatibility `#research` (2025-11-12)
     > Smart installer created: install.sh detects OS/shell and installs optimal version. See docs/design/SMART_INSTALLER_DESIGN.md for full design. One-liner: curl -fsSL .../install.sh | sh maintains simplicity while adding intelligence.
     > Compare bash vs zsh syntax differences, evaluate portability benefits (works on more platforms), analyze if simpler syntax reduces file size. Current tool is zsh-specific with features like [[ ]], read patterns, arrays.
@@ -1089,8 +1097,8 @@
     > Keep MIGRATIONS array and run_migrations() infrastructure, but remove all version-specific migration functions (v1_3_5, v2_0_0_cursor_rules, v2_1_0_git_coordination). Add comments pointing to git history for old migrations if needed for legacy installs. See docs/analysis/CODE_SIZE_ANALYSIS.md lines 66-67 for details.
   - [x] **#132.1** Create code size analysis document documenting current state and optimization opportunities `#docs` (2025-11-12)
     > Analysis document created at docs/analysis/CODE_SIZE_ANALYSIS.md - documents current 5952 lines with breakdown by functionality and identifies optimization opportunities
-- [x] **#132** Optimize todo.ai codebase: reduce size and complexity `#optimization` (2025-11-12)
-  > Current codebase is 5952 lines. Goal: reduce size and complexity by removing obsolete code, cleaning up old migrations, and improving maintainability. See docs/analysis/CODE_SIZE_ANALYSIS.md for detailed breakdown and recommendations.
+- [x] **#145** Reorganize docs folder with logical subdirectory structure `#docs` (2025-11-11)
+  > Proposed structure: guides/ (user docs), design/ (technical specs), development/ (contributor docs), analysis/ (research), archive/ (historical). Currently 29 files in flat structure need categorization and organization. Must update all cross-references, docs/README.md, and main README.md links.
   - [x] **#145.11** Verify all links work and no broken references remain `#docs` (2025-11-11)
     > Test: (1) Click through all links in README.md, (2) Check docs/README.md links, (3) Verify cross-references between docs, (4) Check .cursor/rules references, (5) Test any links in todo.ai script itself. Use grep to find any remaining old paths that weren't updated.
   - [x] **#145.10** Update main README.md documentation links `#docs` (2025-11-11)
@@ -1113,22 +1121,22 @@
     > Create directories: mkdir -p docs/{guides,design,development,analysis,archive}. Verify structure with tree or ls. Do not move files yet - that's next step.
   - [x] **#145.1** Define and document docs folder structure with categories `#docs` (2025-11-11)
     > Create docs/STRUCTURE.md documenting: guides/ (GETTING_STARTED, INSTALLATION, USAGE_PATTERNS, NUMBERING_MODES_GUIDE, COORDINATION_SETUP), design/ (8 design docs), development/ (DEVELOPMENT_GUIDELINES, MIGRATION_GUIDE, test plans), analysis/ (7 analysis/research docs), archive/ (migration/historical docs). Keep README.md at root with overview.
-- [x] **#145** Reorganize docs folder with logical subdirectory structure `#docs` (2025-11-11)
-  > Proposed structure: guides/ (user docs), design/ (technical specs), development/ (contributor docs), analysis/ (research), archive/ (historical). Currently 29 files in flat structure need categorization and organization. Must update all cross-references, docs/README.md, and main README.md links.
+- [x] **#143** Prevent stale release summaries from being used in releases `#bug` (2025-11-11)
+  > Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
+  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
   - [x] **#143.5** Test: Verify detection works with old and new summary files `#bug` (2025-11-11)
   - [x] **#143.4** Option: Prompt to continue or abort if stale summary detected `#bug` (2025-11-11)
   - [x] **#143.3** Add warning if summary appears stale (older than last release) `#bug` (2025-11-11)
   - [x] **#143.2** Add validation: Compare summary file mtime with last release tag date `#bug` (2025-11-11)
   - [x] **#143.1** Investigate: How to detect if summary file is stale `#bug` (2025-11-11)
-- [x] **#143** Prevent stale release summaries from being used in releases `#bug` (2025-11-11)
-  > Tested with old file (2024-11-11) vs v2.3.0 (2025-11-11): correctly detected and aborted. Fresh file passes validation.
-  > Bug caused v2.3.0 to be released with v2.2.1's summary. Script used stale release/RELEASE_SUMMARY.md without validation. Fix: Check if summary file mtime > last release tag date.
+- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug` (2025-11-11)
+  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
   - [x] **#142.4** Test: Verify execute works after failed/aborted release attempt `#test` (2025-11-11)
   - [x] **#142.3** Fix: Get correct commit hash when 'no commit needed' returned `#code` (2025-11-11)
   - [x] **#142.2** Fix: Handle case where version already correct in working directory `#code` (2025-11-11)
   - [x] **#142.1** Investigate execute_release: why version verification fails `#bug` (2025-11-11)
-- [x] **#142** Fix release script bug: version verification fails when version already updated in working directory `#bug` (2025-11-11)
-  > Execute mode assumes version needs updating, but if version already changed in working dir (from failed attempt), commit has no changes and version_commit_hash points to old commit. Need to handle case where version already correct.
+- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature` (2025-11-11)
+  > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
   - [x] **#141.9** Update release documentation and Cursor rules with new workflow `#docs` (2025-11-11)
   - [x] **#141.8** Test execute mode: verify release completes without any prompts `#test` (2025-11-11)
   - [x] **#141.7** Test prepare mode: verify preview displays correctly with execution command `#test` (2025-11-11)
@@ -1141,10 +1149,10 @@
     > Default behavior when called without --execute. Generate preview, save to temp file, display release notes. End with highlighted command to execute.
   - [x] **#141.2** Design new workflow: prepare (default) vs execute modes `#design` (2025-11-11)
   - [x] **#141.1** Analyze current release.sh: identify all prompts and manual confirmation points `#research` (2025-11-11)
-- [x] **#141** Redesign release workflow: separate prepare (default) and execute steps, eliminate prompts `#feature` (2025-11-11)
-  > New workflow: release.sh defaults to --prepare (analyze, preview, show execution command). Then run release.sh --execute to perform release. No prompts in either mode.
 - [x] **#140** Fix bug: Note command doesn't work for nested sub-subtasks (4-space indentation) `#bug` (2025-11-11)
   > add_note() line 4303 only searches for 0-space and 2-space patterns, missing 4-space sub-subtask pattern. Need to add: |^    - \[.\] \*\*#\*\*
+- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature` (2025-11-11)
+  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
   - [x] **#139.7** Test: verify nested subtask notes displayed correctly `#test` (2025-11-11)
   - [x] **#139.6** Test: verify subtask notes displayed for all subtasks `#test` (2025-11-11)
     > This note should appear in show output after implementing the fix - verifies subtask notes are displayed.
@@ -1155,27 +1163,26 @@
   - [x] **#139.2** Verify current behavior: confirm only parent notes shown, subtask notes missing `#bug` (2025-11-11)
   - [x] **#139.1** Investigate show_task function: find where notes are displayed `#research` (2025-11-11)
     > Find show_task() function in todo.ai script. Look for note display logic around lines 4000-4100.
-- [x] **#139** Enhance show command to display notes for subtasks, not just parent task `#feature` (2025-11-11)
-  > Investigate show_task() function. Currently only displays notes for parent task. Need to display notes for all subtasks shown in output.
 - [x] **#136** Fix bug: Adding subtask splits task notes - subtask inserts between task and note `#bug` (2025-11-09)
   > Investigate add_subtask() function. Fix to insert subtasks after parent task notes, not between task and notes.
-  - [x] **#135.1** Level 1 subtask `#test` (2025-11-09)
 - [x] **#135** Test nested subtasks with notes `#test` (2025-11-09)
+  - [x] **#135.1** Level 1 subtask `#test` (2025-11-09)
+- [x] **#134** Test parent task with subtasks and notes `#test` (2025-11-09)
   - [x] **#134.2** Subtask two with note `#test` (2025-11-09)
     > Subtask two note - should move with subtask
   - [x] **#134.1** Subtask one with note `#test` (2025-11-09)
     > Subtask one note - should move with subtask
     > Parent task note - should move with parent
-- [x] **#134** Test parent task with subtasks and notes `#test` (2025-11-09)
 - [x] **#133** Test task with note for archive bug fix `#test` (2025-11-09)
   > This is a test note that should move with the task when archived
+- [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
+  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
   - [x] **#131.5** Test rule installation and verify agents follow note-adding guidelines `#test` (2025-11-09)
   - [x] **#131.4** Add rule to init_cursor_rules() function in todo.ai script `#code` (2025-11-09)
   - [x] **#131.3** Create .cursor/rules/todo.ai-task-notes.mdc with concise guidelines and examples `#code` (2025-11-09)
   - [x] **#131.2** Draft Cursor rule: define when agents should add notes to tasks (implementation details, context, decisions) `#docs` (2025-11-09)
   - [x] **#131.1** Research current note usage patterns: when and how notes are used in TODO.md `#research` (2025-11-09)
-- [x] **#131** Create Cursor rule encouraging agents to use notes for task implementation details `#feature` (2025-11-09)
-  > Rule should encourage agents to add notes for: implementation approach, technical decisions, context about why certain choices were made, file locations to modify, dependencies between tasks. Keep rule short (~15-20 lines) following cursor-rules-guidelines.mdc principles.
+- [x] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug` (2025-11-09)
   - [x] **#130.10** Verify no orphaned notes remain in active section after archiving `#bug` (2025-11-09)
   - [x] **#130.9** Test with nested subtasks (2 levels) with notes at each level `#bug` (2025-11-09)
   - [x] **#130.8** Test with parent task and subtasks with notes (verify all notes move) `#bug` (2025-11-09)
@@ -1186,15 +1193,15 @@
   - [x] **#130.3** Design solution: create function to collect notes for a task and all its subtasks `#bug` (2025-11-09)
   - [x] **#130.2** Analyze delete_task function: study how it properly removes notes (lines 2926-2935) `#bug` (2025-11-09)
   - [x] **#130.1** Investigate archive_task function: how notes are currently handled (or not handled) `#bug` (2025-11-09)
-- [x] **#130** Fix issue#32: Archive command doesn't move task notes with the task `#bug` (2025-11-09)
 - [x] **#56** Fix release script: exclude .todo.ai/.todo.ai.serial from uncommitted changes check `#bug` (2025-11-02)
+- [x] **#55** Fix update command when installed to system directory in PATH (GitHub issue #17) `#bug` (2025-11-02)
   - [x] **#55.4** Close GitHub issue #17 when fix has been confirmed `close-issue` (2025-11-02)
   - [x] **#55.3** Test update command from system-wide installation location `#test` (2025-11-02)
   - [x] **#55.2** Fix get_script_path() to handle system-wide installations in /usr/local/bin or /usr/bin `#code` (2025-11-02)
   - [x] **#55.1** Investigate get_script_path() function: how it detects script location when installed system-wide `#research` (2025-11-02)
-- [x] **#55** Fix update command when installed to system directory in PATH (GitHub issue #17) `#bug` (2025-11-02)
-  - [x] **#53.1** Test bug reporting from a different repository to verify it reports to todo.ai repo (2025-11-02)
 - [x] **#53** Fix bug reporting: reports to wrong repository (customer repo instead of todo.ai repo) `#bug` (2025-11-02)
+  - [x] **#53.1** Test bug reporting from a different repository to verify it reports to todo.ai repo (2025-11-02)
+- [x] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#MAJOR` `#feature` (2025-11-02)
   - [x] **#52.24** Document setup instructions for each coordination service: prerequisites, configuration steps, and verification `#docs` (2025-11-02)
   - [x] **#52.23** Add setup wizard/command that guides users through mode and coordination selection with validation `#feature` (2025-11-02)
   - [x] **#52.22** Create comprehensive documentation for all mode and coordination combinations (single-user, multi-user, branch, enhanced with github-issues, counterapi, none) `#docs` (2025-11-02)
@@ -1219,24 +1226,24 @@
   - [x] **#52.3** Design document: propose solution architecture for conflict-free task numbering in multi-user environment `#docs` (2025-11-02)
   - [x] **#52.2** Research existing solutions: how other task management tools handle multi-user numbering conflicts `#research` (2025-11-02)
   - [x] **#52.1** Analyze need: identify scenarios where multi-user/multi-branch task conflicts occur `#research` (2025-11-02)
-- [x] **#52** Design multi-user/multi-branch/PR support system for todo.ai with conflict-free task numbering `#MAJOR` `#feature` (2025-11-02)
+- [x] **#50** Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages `#research` (2025-11-02)
   - [x] **#50.4** Check existing commits for wrong format (#nn instead of task#nn) and create migration plan to fix or document them `#code` (2025-11-02)
   - [x] **#50.3** Propose solution: design numbering schema or commit message format to avoid conflicts `#docs` (2025-11-02)
   - [x] **#50.2** Research alternative numbering schemas: prefixes, formats, or conventions to distinguish task numbers from GitHub issues/PRs `#research` (2025-11-02)
   - [x] **#50.1** Create analysis document: investigate how GitHub treats task numbers in commit messages and potential conflicts with issue/PR numbers `#docs` (2025-11-02)
-- [x] **#50** Investigate task numbering schema to avoid GitHub issue/PR number conflicts in commit messages `#research` (2025-11-02)
+- [x] **#48** Fix update logic error: new version update logic never executes (2025-11-02)
   - [x] **#48.4** Test update workflow: verify migrations execute in new version after update `#test` (2025-11-02)
   - [x] **#48.3** Implement update fix: execute new version's migrations and update logic before replacement `#code` (2025-11-02)
   - [x] **#48.2** Design solution: download → execute new version → replace old version `#docs` (2025-11-02)
   - [x] **#48.1** Research update execution pattern: how to execute new version's code after download `#research` (2025-11-02)
-- [x] **#48** Fix update logic error: new version update logic never executes (2025-11-02)
+- [x] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug` (2025-11-02)
   - [x] **#46.6** Create mapping document: tags to release types with priority matrix showing numbering decisions `#docs` (2025-11-02)
   - [x] **#46.5** Test fix: verify cursor rules migration would be classified as MINOR with fix applied `#test` (2025-11-02)
   - [x] **#46.4** Handle ambiguous cases: migrations that affect users vs pure infrastructure changes `#code` (2025-11-02)
   - [x] **#46.3** Implement fix: check for functional changes in todo.ai before file-based classification `#code` (2025-11-02)
   - [x] **#46.2** Design fix: prioritize commit message prefixes (feat:) over file analysis for user-facing features `#docs` (2025-11-02)
   - [x] **#46.1** Investigate release numbering logic: why feat: commits with .cursor/rules/ changes are classified as PATCH `#research` (2025-11-02)
-- [x] **#46** Fix release numbering bug: cursor rules migration incorrectly classified as PATCH instead of MINOR `#bug` (2025-11-02)
+- [x] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration` (2025-11-02)
   - [x] **#44.10** Cleanup .cursorrules during migration: remove todo.ai references and create timestamped backup before edits `#code` (2025-11-02)
   - [x] **#44.9** Manage installation path of tool relative to cursor rules `#code` (2025-11-02)
   - [x] **#44.8** Update release process docs to reference .cursor/rules/ instead of .cursorrules `#docs` (2025-11-02)
@@ -1247,12 +1254,12 @@
   - [x] **#44.3** Implement migration logic to convert .cursorrules sections to .mdc files `#code` (2025-11-02)
   - [x] **#44.2** Create design document for .cursorrules to .cursor/rules/ migration `#docs` (2025-11-02)
   - [x] **#44.1** Verify .cursor/rules/ is the latest official Cursor implementation from docs.cursor.com `#research` (2025-11-02)
-- [x] **#44** Migrate cursor rules from .cursorrules to .cursor/rules/ directory structure `#migration` (2025-11-02)
+- [x] **#43** Create uninstall feature (2025-11-02)
   - [x] **#43.4** Create dedicated cursor rule for uninstall process: require agents to use ./todo.ai uninstall command and NOT delete files directly to control uninstall scope `#code` (2025-11-02)
   - [x] **#43.3** Enhance README.md to show simple uninstall command (2025-11-02)
   - [x] **#43.2** Implement and test uninstall feature (2025-11-02)
   - [x] **#43.1** Write design document for uninstall feature (2025-11-02)
-- [x] **#43** Create uninstall feature (2025-11-02)
+- [x] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature` (2025-11-02)
   - [x] **#37.12** Update release process documentation to include migration workflow (2025-11-02)
   - [x] **#37.11** Document migration creation process for developers (2025-11-02)
   - [x] **#37.10** Test migration system with real TODO.md files (wrong section order) (2025-11-02)
@@ -1265,22 +1272,21 @@
   - [x] **#37.3** Implement version comparison function for semantic versioning (2025-11-02)
   - [x] **#37.2** Create migration registry structure in todo.ai script (2025-11-02)
   - [x] **#37.1** Create design document for migration/cleanup system architecture (2025-11-02)
-- [x] **#37** Build release migration and cleanup system for one-time migrations and cleanups `#feature` (2025-11-02)
 - [x] **#19** Move Deleted Tasks section below Recently Completed section `#setup` (2025-11-02)
 - [x] **#15** Setup git hooks with pre-commit validation for Markdown, YAML, JSON, and TODO.md linting `#git` `#setup` (2025-11-02)
+- [x] **#38** Fix orphaned subtasks bug: delete subtasks when deleting parent task `#bug` (2025-11-01)
   - [x] **#38.6** Verify orphaned subtask detection still works correctly (2025-11-01)
   - [x] **#38.5** Test deletion of subtask only (should not delete parent or siblings) (2025-11-01)
   - [x] **#38.4** Test deletion of parent task with nested subtasks (2-level) (2025-11-01)
   - [x] **#38.3** Test deletion of parent task with subtasks (verify subtasks deleted) (2025-11-01)
   - [x] **#38.2** Implement automatic subtask deletion when deleting parent task (2025-11-01)
   - [x] **#38.1** Analyze current delete_task function behavior (2025-11-01)
-- [x] **#38** Fix orphaned subtasks bug: delete subtasks when deleting parent task `#bug` (2025-11-01)
+- [x] **#36** Create release process for todo.ai on GitHub (2025-11-01)
   - [x] **#36.5** Review and finetune release numbering logic (2025-11-01)
   - [x] **#36.4** Create permanent release log file with detailed timestamps (2025-11-01)
   - [x] **#36.3** Create release management process (2025-11-01)
   - [x] **#36.2** Review release process document (2025-11-01)
   - [x] **#36.1** Create release process document (2025-11-01)
-- [x] **#36** Create release process for todo.ai on GitHub (2025-11-01)
 - [x] **#14** Formatting fixes complete `#setup` (2025-11-01)
 - [x] **#7** Remove gitignore entry for .todo.ai directory - .todo.ai/ must be tracked in git `#git` `#setup` (2025-11-01)
 - [x] **#5** Initialize repository structure and configuration `#repo` `#setup` (2025-11-01)
@@ -1303,6 +1309,10 @@
 ---
 
 ## Deleted Tasks
+  - [D] **#246.11** Docs: Update reorder command help text to mention all sections are processed `#documentation` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#246.7** Implement: Ensure archived/deleted sections use order_tasks_with_hierarchy for parent-subtask grouping `#implementation` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#246.6** Implement: Update reorder logic to process all sections (Tasks, Archived, Deleted) `#implementation` (deleted 2026-01-27, expires 2026-02-26)
+  - [D] **#246.5** Design: Plan fix to extend reorder to archived/deleted sections with proper hierarchy ordering `#design` (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#244** Parent task (deleted 2026-01-27, expires 2026-02-26)
 - [D] **#243** Parent task (deleted 2026-01-27, expires 2026-02-26)
   - [D] **#237.12** SAFETY: Develop mechanism to prevent premature archiving (task#205) `#design` `#safety` (deleted 2026-01-26, expires 2026-02-25)
@@ -1317,6 +1327,7 @@
   - [D] **#237.3** CRITICAL: Final review and publish README.md (task#203.9) `#critical` `#documentation` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#237.2** CRITICAL: Complete release phase for Python refactor (task#163.52) `#critical` `#release` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#237.1** CRITICAL: Complete stable release phase (task#172.5) `#critical` `#release` (deleted 2026-01-26, expires 2026-02-25)
+- [D] **#233** Programmer jokes collection `#fun` `#joke` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.10** ['hip', 'hip'] — Sorry, I was just making a hip hop array. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.9** I would tell you a UDP joke, but you might not get it. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.8** Why was the JavaScript developer sad? Because he didn't Node how to Express himself. (deleted 2026-01-26, expires 2026-02-25)
@@ -1327,7 +1338,6 @@
   - [D] **#233.3** There are only 10 types of people in the world: those who understand binary and those who don't. (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.2** A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?' (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#233.1** Why do programmers prefer dark mode? Because light attracts bugs. (deleted 2026-01-26, expires 2026-02-25)
-- [D] **#233** Programmer jokes collection `#fun` `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#232** ['hip', 'hip'] — Sorry, I was just making a hip hop array. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#231** I would tell you a UDP joke, but you might not get it. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#230** Why was the JavaScript developer sad? Because he didn't Node how to Express himself. `#joke` (deleted 2026-01-26, expires 2026-02-25)
@@ -1338,10 +1348,11 @@
 - [D] **#225** There are only 10 types of people in the world: those who understand binary and those who don't. `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#224** A SQL query walks into a bar, walks up to two tables and asks... 'Can I join you?' `#joke` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#223** Why do programmers prefer dark mode? Because light attracts bugs. `#joke` (deleted 2026-01-26, expires 2026-02-25)
+- [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#220.3** Rename internal state files (.todo.ai.serial → .ai-todo.serial, .todo.ai.log → .ai-todo.log) `#code` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#220.2** Update config.py to use .ai-todo/ paths `#code` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#220.1** Update FileOps to use .ai-todo/ as default data directory `#code` (deleted 2026-01-26, expires 2026-02-25)
-- [D] **#220** Implement data directory migration (.todo.ai/ → .ai-todo/) `#implementation` `#migration` `#naming` (deleted 2026-01-26, expires 2026-02-25)
+- [D] **#215** Collection of 10 Funny Jokes `#fun` `#jokes` (deleted 2026-01-26, expires 2026-02-25)
   - [D] **#215.10** !false (It's funny because it's true). (deleted 2026-01-26, expires 2026-02-25)
     > Explanation: The exclamation mark '!' is the logical NOT operator in many programming languages. Therefore, '!false' reads as 'NOT false', which evaluates to 'true'.
   - [D] **#215.9** 0 is false and 1 is true, right? 1. (deleted 2026-01-26, expires 2026-02-25)
@@ -1362,9 +1373,14 @@
     > Explanation: Programmers write software (code) and often distinguish it from hardware (physical devices like light bulbs). If a physical device fails, they jokingly claim it's not their department.
   - [D] **#215.1** Why do programmers prefer dark mode? Because light attracts bugs. (deleted 2026-01-26, expires 2026-02-25)
     > Explanation: In programming, software errors are called 'bugs'. Real bugs (insects) are attracted to light sources. Dark mode is a screen setting that emits less light, thus 'avoiding bugs'.
-- [D] **#215** Collection of 10 Funny Jokes `#fun` `#jokes` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#214** Test task for whitespace verification `#test` (deleted 2026-01-26, expires 2026-02-25)
 - [D] **#208** Test task from root (deleted 2026-01-25, expires 2026-02-24)
+- [D] **#193** Implement 'start task' command to track task progress and status `#design` `#feature` (deleted 2026-01-25, expires 2026-02-24)
+  > Key questions to answer:
+  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
+  > 2. Should we support time tracking (start/stop)?
+  > 3. How does this interact with todo.txt format (e.g. priority changes)?
+  > 4. Should this trigger any external integrations?
   - [D] **#193.7** Update documentation with 'start' command usage `#documentation` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.6** Add unit and integration tests for 'start' command `#test` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.5** Implement 'start_task' tool in MCP server `#code` `#mcp` (deleted 2026-01-25, expires 2026-02-24)
@@ -1372,12 +1388,6 @@
   - [D] **#193.3** Create design document for 'start' command architecture `#design` `#documentation` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research` (deleted 2026-01-25, expires 2026-02-24)
-- [D] **#193** Implement 'start task' command to track task progress and status `#design` `#feature` (deleted 2026-01-25, expires 2026-02-24)
-  > Key questions to answer:
-  > 1. Does 'starting' a task imply a status change (e.g. to 'in-progress')?
-  > 2. Should we support time tracking (start/stop)?
-  > 3. How does this interact with todo.txt format (e.g. priority changes)?
-  > 4. Should this trigger any external integrations?
   - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
   - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
@@ -1441,14 +1451,9 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by todo.ai tool).
-View with: `./todo.ai show <task-id>`
-
 <!-- TASK RELATIONSHIPS
 203:depends-on:219
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 13:24:36
+**ai-todo** | Last Updated: 2026-01-27 14:57:02

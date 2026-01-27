@@ -6,6 +6,11 @@ from pathlib import Path
 
 import pytest
 
+# Skip all tests in this module
+# After v3.1 API terminology standardization (#253), Python and shell are intentionally divergent
+# These tests will be removed as part of task #254
+pytestmark = pytest.mark.skip(reason="Shell tests obsolete after API standardization (#253)")
+
 _IS_WINDOWS = os.name == "nt"
 
 

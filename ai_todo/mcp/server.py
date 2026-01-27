@@ -70,21 +70,59 @@ def _capture_output(func, *args, **kwargs) -> str:
 
 
 @mcp.tool()
-def add_task(description: str, tags: list[str] | None = None) -> str:
-    """Add a new task to TODO.md."""
+def add_task(title: str, description: str | None = None, tags: list[str] | None = None) -> str:
+    """Add a new task to TODO.md.
+
+    Args:
+        title: The task headline (required)
+        description: Optional detailed notes for the task
+        tags: Optional list of tags
+    """
     if tags is None:
         tags = []
-    return _capture_output(add_command, description, tags, todo_path=CURRENT_TODO_PATH)
+    result = _capture_output(add_command, title, tags, todo_path=CURRENT_TODO_PATH)
+
+    # If description provided and task was added successfully, add notes
+    if description and "Added:" in result:
+        # Extract task ID from result (format: "Added: #123 ...")
+        import re
+
+        match = re.search(r"Added: #(\S+)", result)
+        if match:
+            task_id = match.group(1)
+            _capture_output(note_command, task_id, description, todo_path=CURRENT_TODO_PATH)
+
+    return result
 
 
 @mcp.tool()
-def add_subtask(parent_id: str, description: str, tags: list[str] | None = None) -> str:
-    """Add a subtask to an existing task."""
+def add_subtask(
+    parent_id: str, title: str, description: str | None = None, tags: list[str] | None = None
+) -> str:
+    """Add a subtask to an existing task.
+
+    Args:
+        parent_id: ID of the parent task
+        title: The subtask headline (required)
+        description: Optional detailed notes for the subtask
+        tags: Optional list of tags
+    """
     if tags is None:
         tags = []
-    return _capture_output(
-        add_subtask_command, parent_id, description, tags, todo_path=CURRENT_TODO_PATH
+    result = _capture_output(
+        add_subtask_command, parent_id, title, tags, todo_path=CURRENT_TODO_PATH
     )
+
+    # If description provided and subtask was added successfully, add notes
+    if description and "Added subtask:" in result:
+        import re
+
+        match = re.search(r"Added subtask: #(\S+)", result)
+        if match:
+            task_id = match.group(1)
+            _capture_output(note_command, task_id, description, todo_path=CURRENT_TODO_PATH)
+
+    return result
 
 
 @mcp.tool()
@@ -117,11 +155,31 @@ def list_tasks(status: str | None = None, tag: str | None = None) -> str:
 
 
 @mcp.tool()
-def modify_task(task_id: str, description: str, tags: list[str] | None = None) -> str:
-    """Modify a task's description and/or tags."""
+def modify_task(
+    task_id: str, title: str, description: str | None = None, tags: list[str] | None = None
+) -> str:
+    """Modify a task's title, description, and/or tags.
+
+    Args:
+        task_id: ID of the task to modify
+        title: The new task headline (required)
+        description: Optional new detailed notes (replaces existing notes if provided)
+        tags: Optional list of tags (preserves existing tags if not provided)
+    """
     if tags is None:
         tags = []
-    return _capture_output(modify_command, task_id, description, tags, todo_path=CURRENT_TODO_PATH)
+    result = _capture_output(modify_command, task_id, title, tags, todo_path=CURRENT_TODO_PATH)
+
+    # If description provided and modify was successful, update notes
+    if description is not None and "Modified:" in result:
+        if description == "":
+            # Clear notes
+            _capture_output(delete_note_command, task_id, todo_path=CURRENT_TODO_PATH)
+        else:
+            # Set/replace notes
+            _capture_output(update_note_command, task_id, description, todo_path=CURRENT_TODO_PATH)
+
+    return result
 
 
 @mcp.tool()
@@ -186,25 +244,61 @@ def active_context() -> str:
     )
 
 
-# Phase 2: Note Management
+# Phase 2: Description Management
 
 
 @mcp.tool()
-def add_note(task_id: str, note_text: str) -> str:
-    """Add a note to a task."""
-    return _capture_output(note_command, task_id, note_text, todo_path=CURRENT_TODO_PATH)
+def set_description(task_id: str, description: str) -> str:
+    """Set or clear a task's description (notes).
+
+    This is idempotent - calling with the same description has no additional effect.
+
+    Args:
+        task_id: ID of the task
+        description: The description text. Use "" (empty string) to clear.
+    """
+    if description == "":
+        return _capture_output(delete_note_command, task_id, todo_path=CURRENT_TODO_PATH)
+    else:
+        # Check if task has existing notes - if so, update; otherwise add
+        from ai_todo.cli.commands import get_manager
+
+        manager = get_manager(CURRENT_TODO_PATH)
+        task = manager.get_task(task_id)
+        if task and task.notes:
+            return _capture_output(
+                update_note_command, task_id, description, todo_path=CURRENT_TODO_PATH
+            )
+        else:
+            return _capture_output(note_command, task_id, description, todo_path=CURRENT_TODO_PATH)
 
 
 @mcp.tool()
-def delete_note(task_id: str) -> str:
-    """Delete all notes from a task."""
-    return _capture_output(delete_note_command, task_id, todo_path=CURRENT_TODO_PATH)
+def set_tags(task_id: str, tags: list[str]) -> str:
+    """Set a task's tags (replaces all existing tags).
 
+    This is idempotent - calling with the same tags has no additional effect.
 
-@mcp.tool()
-def update_note(task_id: str, new_note_text: str) -> str:
-    """Replace existing notes with new text."""
-    return _capture_output(update_note_command, task_id, new_note_text, todo_path=CURRENT_TODO_PATH)
+    Args:
+        task_id: ID of the task
+        tags: List of tags. Use [] (empty list) to clear all tags.
+    """
+    from ai_todo.cli.commands import get_manager, save_changes
+
+    manager = get_manager(CURRENT_TODO_PATH)
+    task = manager.get_task(task_id)
+    if not task:
+        return f"Error: Task {task_id} not found"
+
+    # Set tags (replaces existing)
+    task.tags = set(tags)
+    save_changes(manager, CURRENT_TODO_PATH)
+
+    if tags:
+        tag_str = " ".join([f"`#{tag}`" for tag in sorted(tags)])
+        return f"Set tags on #{task_id}: {tag_str}"
+    else:
+        return f"Cleared tags from #{task_id}"
 
 
 # Phase 3: Task Display and Relationships
@@ -313,7 +407,7 @@ def check_update() -> str:
         return (
             f"Development mode (version {__version__})\n"
             "Version checks are not meaningful in dev mode.\n"
-            "Use the 'restart' tool to reload code changes."
+            "Use 'update' tool with restart=True to reload code changes."
         )
 
     # Get project root from TODO path
@@ -369,29 +463,6 @@ def update(restart: bool = True) -> str:
         threading.Thread(target=delayed_restart, daemon=True).start()
 
     return message
-
-
-@mcp.tool()
-def restart() -> str:
-    """Restart the MCP server to pick up code changes.
-
-    This is the preferred tool for development workflows where you're
-    iterating on code and need to reload without version checks.
-
-    The host (e.g., Cursor) will automatically reconnect after restart.
-    """
-    import threading
-
-    from ai_todo.core.updater import restart_server
-
-    def delayed_restart():
-        import time
-
-        time.sleep(0.5)
-        restart_server()
-
-    threading.Thread(target=delayed_restart, daemon=True).start()
-    return "Restarting MCP server..."
 
 
 # Phase 7: Tamper Detection

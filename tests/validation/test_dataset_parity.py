@@ -10,13 +10,17 @@ subprocess calls to ensure complete isolation.
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 import pytest
 
-# Skip all tests in this module on Windows
-pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="Shell script requires Zsh")
+# Skip all tests in this module
+# - Windows: Shell script requires Zsh
+# - All: After v3.1 API terminology standardization (#253), Python and shell are intentionally divergent
+#        These tests will be removed as part of task #254
+pytestmark = pytest.mark.skip(
+    reason="Shell/Python parity tests obsolete after API standardization (#253)"
+)
 
 # Path to shell script and test data
 SHELL_SCRIPT = Path(__file__).parent.parent.parent / "legacy" / "todo.ai"

@@ -167,10 +167,9 @@ def get_mcp_tools() -> set[str]:
         "start_task",
         "stop_task",
         "get_active_tasks",
-        # Notes
-        "add_note",
-        "delete_note",
-        "update_note",
+        # Description & Tags (v3.1 API terminology standardization)
+        "set_description",
+        "set_tags",
         # Display & Relationships
         "show_task",
         "relate_task",
@@ -188,6 +187,8 @@ def get_mcp_tools() -> set[str]:
         "accept_tamper",
         # Info
         "version",
+        "check_update",
+        "update",
     }
 
 
@@ -208,6 +209,7 @@ class TestCompleteParity:
         parsing_artifacts = {"to", "for", "ai", "the", "a", "an", "and", "or", "of"}
 
         # Commands removed in v3.0 cleanup (legacy shell script still has them)
+        # Also includes commands renamed in v3.1 API terminology standardization
         removed_commands = {
             "backups",
             "list-backups",
@@ -221,6 +223,12 @@ class TestCompleteParity:
             "edit",
             "setup-wizard",
             "detect-options",
+            # v3.1 API renames: old -> new
+            "add",  # -> add-task
+            "modify",  # -> modify-task
+            "note",  # -> set-description
+            "update-note",  # -> removed (use set-description)
+            "delete-note",  # -> removed (use set-description "")
         }
 
         missing_in_python = (
@@ -249,11 +257,11 @@ class TestCompleteParity:
 
         # Commands that map to different MCP names
         expected_core_tools = {
-            "add_task",  # add
+            "add_task",  # add-task
             "add_subtask",  # add-subtask
             "complete_task",  # complete
             "list_tasks",  # list
-            "modify_task",  # modify
+            "modify_task",  # modify-task
             "delete_task",  # delete
             "archive_task",  # archive
             "restore_task",  # restore
@@ -261,9 +269,8 @@ class TestCompleteParity:
             "start_task",  # start
             "stop_task",  # stop
             "get_active_tasks",  # get-active-tasks
-            "add_note",  # note
-            "delete_note",  # delete-note
-            "update_note",  # update-note
+            "set_description",  # set-description (replaces note, update-note, delete-note)
+            "set_tags",  # set-tags (new)
             "show_task",  # show
             "relate_task",  # relate
             "lint",  # lint
@@ -331,6 +338,7 @@ class TestCompleteParity:
         normalized_shell = normalized_shell - parsing_artifacts
 
         # Commands removed in v3.0 cleanup (legacy shell script still has them)
+        # Also includes commands renamed in v3.1 API terminology standardization
         removed_commands = {
             "backups",
             "list-backups",
@@ -344,6 +352,12 @@ class TestCompleteParity:
             "edit",
             "setup-wizard",
             "detect-options",
+            # v3.1 API renames: old -> new
+            "add",  # -> add-task
+            "modify",  # -> modify-task
+            "note",  # -> set-description
+            "update-note",  # -> removed (use set-description)
+            "delete-note",  # -> removed (use set-description "")
         }
         normalized_shell = normalized_shell - removed_commands
 
@@ -386,6 +400,7 @@ Only in Python:   {len(normalized_python - normalized_shell)}
         normalized_shell = normalized_shell - parsing_artifacts
 
         # Commands removed in v3.0 cleanup (legacy shell script still has them)
+        # Also includes commands renamed in v3.1 API terminology standardization
         removed_commands = {
             "backups",
             "list-backups",
@@ -399,6 +414,12 @@ Only in Python:   {len(normalized_python - normalized_shell)}
             "edit",
             "setup-wizard",
             "detect-options",
+            # v3.1 API renames: old -> new
+            "add",  # -> add-task
+            "modify",  # -> modify-task
+            "note",  # -> set-description
+            "update-note",  # -> removed (use set-description)
+            "delete-note",  # -> removed (use set-description "")
         }
         normalized_shell = normalized_shell - removed_commands
 

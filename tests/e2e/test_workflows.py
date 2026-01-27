@@ -26,10 +26,10 @@ def isolated_cli(runner, test_env):
 
 
 def test_workflow_basic(isolated_cli):
-    """Test basic add -> list -> complete workflow."""
+    """Test basic add-task -> list -> complete workflow."""
 
     # 1. Add a task
-    result = isolated_cli.invoke(cli, ["add", "Buy milk", "#shopping"])
+    result = isolated_cli.invoke(cli, ["add-task", "Buy milk", "#shopping"])
     assert result.exit_code == 0
     # Serial is 6 (Last Used), Max is 5. Next should be 7.
     assert "Added: #7 Buy milk" in result.output
@@ -53,7 +53,7 @@ def test_workflow_subtasks(isolated_cli):
     """Test subtask creation and management."""
 
     # 1. Add parent task
-    result = isolated_cli.invoke(cli, ["add", "Parent Task"])
+    result = isolated_cli.invoke(cli, ["add-task", "Parent Task"])
     assert result.exit_code == 0
     # Serial is 6 (Last Used). Next is 7.
     assert "Added: #7 Parent Task" in result.output

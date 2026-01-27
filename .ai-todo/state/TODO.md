@@ -13,19 +13,20 @@
   - [ ] **#254.2** Remove shell script parity tests (test_feature_parity.py, test_dataset_parity.py, compare_outputs.py)
   - [ ] **#254.1** Mark legacy/ scripts as frozen (add header comment with freeze date and reason)
 
-- [ ] **#253** Standardize API terminology to follow industry conventions (title/description) `#api` `#breaking-change` `#enhancement`
+- [x] **#253** Standardize API terminology to follow industry conventions (title/description) `#api` `#breaking-change` `#enhancement` (2026-01-27)
   > DEPENDENCY: Complete #254 (freeze legacy scripts) before starting implementation phase (#253.4+)
-  - [ ] **#253.11** Update CHANGELOG with breaking change notes
-  - [ ] **#253.10** Run full test suite and verify no regressions
-  - [ ] **#253.9** Update all documentation (README, docs/, cursor rules)
-  - [ ] **#253.8** Update integration and e2e tests
-  - [ ] **#253.7** Create/update unit tests for renamed parameters
-  - [ ] **#253.6** Update core functions and internal APIs
-  - [ ] **#253.5** Update CLI commands with new parameter names
-  - [ ] **#253.4** Update MCP server tools (server.py) with new parameter names
-  - [ ] **#253.3** Design new naming standard with mapping table (old → new) - WAIT FOR APPROVAL
-  - [ ] **#253.2** Research industry standards: GitHub Issues, Jira, Linear, Todoist APIs for terminology
-  - [ ] **#253.1** Audit all current parameter names across MCP tools, CLI commands, and core functions
+  > ANALYSIS: See docs/api-terminology-analysis.md for full audit, research, and design proposal.
+  - [x] **#253.11** Update CHANGELOG with breaking change notes (2026-01-27)
+  - [x] **#253.10** Run full test suite and verify no regressions (2026-01-27)
+  - [x] **#253.9** Update all documentation (README, docs/, cursor rules) (2026-01-27)
+  - [x] **#253.8** Update integration and e2e tests (2026-01-27)
+  - [x] **#253.7** Create/update unit tests for renamed parameters (2026-01-27)
+  - [x] **#253.6** Update core functions and internal APIs (2026-01-27)
+  - [x] **#253.5** Update CLI commands with new parameter names (2026-01-27)
+  - [x] **#253.4** Update MCP server tools (server.py) with new parameter names (2026-01-27)
+  - [x] **#253.3** Design new naming standard with mapping table (old → new) - WAIT FOR APPROVAL (2026-01-27)
+  - [x] **#253.2** Research industry standards: GitHub Issues, Jira, Linear, Todoist APIs for terminology (2026-01-27)
+  - [x] **#253.1** Audit all current parameter names across MCP tools, CLI commands, and core functions (2026-01-27)
 
 - [x] **#251** Debug and fix MCP server restart functionality in Cursor `#bug` `#mcp` (2026-01-27)
   - [x] **#251.8** Document restart behavior and any limitations (2026-01-27)
@@ -1546,4 +1547,4 @@ View with: `./todo.ai show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 20:44:06
+**ai-todo** | Last Updated: 2026-01-27 21:41:23

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes (API Terminology Standardization)
+
+This release standardizes API terminology to follow industry conventions (GitHub, Linear, Jira).
+
+#### MCP Tools
+- `add_task(description)` → `add_task(title, description?, tags?)`
+- `add_subtask(parent_id, description)` → `add_subtask(parent_id, title, description?, tags?)`
+- `modify_task(task_id, description)` → `modify_task(task_id, title, description?, tags?)`
+- `add_note`, `update_note`, `delete_note` → replaced by `set_description(task_id, description)` (use `""` to clear)
+- New: `set_tags(task_id, tags)` for idempotent tag management (use `[]` to clear)
+- Removed: `restart` tool (use `update` with `restart=True`)
+
+#### CLI Commands
+- `add` → `add-task`
+- `modify` → `modify-task`
+- `note`, `update-note`, `delete-note` → `set-description`
+- New: `set-tags`
+
+See `docs/api-terminology-analysis.md` for full details.
+
+---
+
 ## Release Channels
 
 - **Stable:** Production-ready releases (e.g., `3.0.0`)

@@ -29,15 +29,15 @@ def isolated_cli(runner, tmp_path):
 
 # Basic Commands (already tested, but keeping for completeness)
 def test_add_command(isolated_cli):
-    """Test add command."""
-    result = isolated_cli.invoke(cli, ["add", "Test task", "#tag1"])
+    """Test add-task command."""
+    result = isolated_cli.invoke(cli, ["add-task", "Test task", "#tag1"])
     assert result.exit_code == 0
     assert "Added: #1 Test task" in result.output
 
 
 def test_list_command(isolated_cli):
     """Test list command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["list"])
     assert result.exit_code == 0
     assert "**#1** Task 1" in result.output
@@ -45,7 +45,7 @@ def test_list_command(isolated_cli):
 
 def test_complete_command(isolated_cli):
     """Test complete command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["complete", "1"])
     assert result.exit_code == 0
     assert "Completed: #1 Task 1" in result.output
@@ -57,7 +57,7 @@ def test_complete_command(isolated_cli):
 
 def test_add_subtask_command(isolated_cli):
     """Test add-subtask command."""
-    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-task", "Parent task"])
     result = isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
     assert result.exit_code == 0
     assert "Added subtask: #1.1 Subtask 1" in result.output
@@ -65,9 +65,9 @@ def test_add_subtask_command(isolated_cli):
 
 def test_add_subtasks_multiple_parents(isolated_cli):
     """Ensure subtasks appear under their respective parents."""
-    isolated_cli.invoke(cli, ["add", "Task A"])
-    isolated_cli.invoke(cli, ["add", "Task B"])
-    isolated_cli.invoke(cli, ["add", "Task C"])
+    isolated_cli.invoke(cli, ["add-task", "Task A"])
+    isolated_cli.invoke(cli, ["add-task", "Task B"])
+    isolated_cli.invoke(cli, ["add-task", "Task C"])
 
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask A.1"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask A.2"])
@@ -114,9 +114,9 @@ def test_add_subtasks_multiple_parents(isolated_cli):
 
 # Phase 1: Task Management
 def test_modify_command(isolated_cli):
-    """Test modify command."""
-    isolated_cli.invoke(cli, ["add", "Original task"])
-    result = isolated_cli.invoke(cli, ["modify", "1", "Modified task", "#newtag"])
+    """Test modify-task command."""
+    isolated_cli.invoke(cli, ["add-task", "Original task"])
+    result = isolated_cli.invoke(cli, ["modify-task", "1", "Modified task", "#newtag"])
     assert result.exit_code == 0
     assert "Modified: #1 Modified task" in result.output
 
@@ -127,7 +127,7 @@ def test_modify_command(isolated_cli):
 
 def test_delete_command(isolated_cli):
     """Test delete command."""
-    isolated_cli.invoke(cli, ["add", "Task to delete"])
+    isolated_cli.invoke(cli, ["add-task", "Task to delete"])
     result = isolated_cli.invoke(cli, ["delete", "1"])
     assert result.exit_code == 0
     assert "Deleted" in result.output
@@ -142,7 +142,7 @@ def test_delete_command(isolated_cli):
 def test_delete_command_with_subtasks(isolated_cli):
     """Test delete command removes subtasks by default (task#221 fix)."""
     # Create parent task
-    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-task", "Parent task"])
     # Add subtasks
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 2"])
@@ -157,7 +157,7 @@ def test_delete_command_with_subtasks(isolated_cli):
 def test_delete_command_no_subtasks_flag(isolated_cli):
     """Test delete --no-subtasks only deletes the parent task."""
     # Create parent task
-    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-task", "Parent task"])
     # Add subtasks
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 2"])
@@ -171,7 +171,7 @@ def test_delete_command_no_subtasks_flag(isolated_cli):
 
 def test_archive_command(isolated_cli):
     """Test archive command."""
-    isolated_cli.invoke(cli, ["add", "Task to archive"])
+    isolated_cli.invoke(cli, ["add-task", "Task to archive"])
     result = isolated_cli.invoke(cli, ["archive", "1", "--reason", "No longer needed"])
     assert result.exit_code == 0
     assert "Archived" in result.output
@@ -180,7 +180,7 @@ def test_archive_command(isolated_cli):
 def test_archive_cli_no_cooldown(isolated_cli):
     """Test CLI archive has no cooldown (cooldown is session-based in MCP server only)."""
     # Create parent task with subtasks
-    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-task", "Parent task"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 1"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Subtask 2"])
 
@@ -196,7 +196,7 @@ def test_archive_cli_no_cooldown(isolated_cli):
 def test_archive_single_task(isolated_cli):
     """Test archiving a single task without subtasks."""
     # Create single task (no subtasks)
-    isolated_cli.invoke(cli, ["add", "Single task"])
+    isolated_cli.invoke(cli, ["add-task", "Single task"])
 
     # Complete it
     isolated_cli.invoke(cli, ["complete", "1"])
@@ -209,7 +209,7 @@ def test_archive_single_task(isolated_cli):
 
 def test_restore_command(isolated_cli):
     """Test restore command."""
-    isolated_cli.invoke(cli, ["add", "Task to restore"])
+    isolated_cli.invoke(cli, ["add-task", "Task to restore"])
     isolated_cli.invoke(cli, ["delete", "1"])
     result = isolated_cli.invoke(cli, ["restore", "1"])
     assert result.exit_code == 0
@@ -218,46 +218,64 @@ def test_restore_command(isolated_cli):
 
 def test_undo_command(isolated_cli):
     """Test undo command."""
-    isolated_cli.invoke(cli, ["add", "Task to undo"])
+    isolated_cli.invoke(cli, ["add-task", "Task to undo"])
     isolated_cli.invoke(cli, ["complete", "1"])
     result = isolated_cli.invoke(cli, ["undo", "1"])
     assert result.exit_code == 0
     assert "Reopened" in result.output and "#1" in result.output
 
 
-# Phase 2: Note Management
-def test_note_command(isolated_cli):
-    """Test note command."""
-    isolated_cli.invoke(cli, ["add", "Task with note"])
-    result = isolated_cli.invoke(cli, ["note", "1", "This is a note"])
+# Phase 2: Description Management
+def test_set_description_command(isolated_cli):
+    """Test set-description command."""
+    isolated_cli.invoke(cli, ["add-task", "Task with description"])
+    result = isolated_cli.invoke(cli, ["set-description", "1", "This is a description"])
     assert result.exit_code == 0
     assert "Added note" in result.output and "#1" in result.output
 
 
-def test_delete_note_command(isolated_cli):
-    """Test delete-note command."""
-    isolated_cli.invoke(cli, ["add", "Task with note"])
-    isolated_cli.invoke(cli, ["note", "1", "Note to delete"])
-    result = isolated_cli.invoke(cli, ["delete-note", "1"])
+def test_set_description_update(isolated_cli):
+    """Test set-description updates existing description."""
+    isolated_cli.invoke(cli, ["add-task", "Task with description"])
+    isolated_cli.invoke(cli, ["set-description", "1", "First description"])
+    result = isolated_cli.invoke(cli, ["set-description", "1", "Updated description"])
+    assert result.exit_code == 0
+    assert "Updated notes" in result.output and "#1" in result.output
+
+
+def test_set_description_clear(isolated_cli):
+    """Test set-description clears description with empty string."""
+    isolated_cli.invoke(cli, ["add-task", "Task with description"])
+    isolated_cli.invoke(cli, ["set-description", "1", "Description to clear"])
+    result = isolated_cli.invoke(cli, ["set-description", "1", ""])
     assert result.exit_code == 0
     assert "Deleted notes" in result.output and "#1" in result.output
 
 
-def test_update_note_command(isolated_cli):
-    """Test update-note command."""
-    isolated_cli.invoke(cli, ["add", "Task with note"])
-    isolated_cli.invoke(cli, ["note", "1", "Old note"])
-    result = isolated_cli.invoke(cli, ["update-note", "1", "New note"])
+def test_set_tags_command(isolated_cli):
+    """Test set-tags command."""
+    isolated_cli.invoke(cli, ["add-task", "Task with tags"])
+    result = isolated_cli.invoke(cli, ["set-tags", "1", "tag1", "tag2"])
     assert result.exit_code == 0
-    assert "Updated notes" in result.output and "#1" in result.output
+    assert "Set tags on #1" in result.output
+    assert "#tag1" in result.output
+    assert "#tag2" in result.output
+
+
+def test_set_tags_clear(isolated_cli):
+    """Test set-tags clears tags with no arguments."""
+    isolated_cli.invoke(cli, ["add-task", "Task with tags", "tag1", "tag2"])
+    result = isolated_cli.invoke(cli, ["set-tags", "1"])
+    assert result.exit_code == 0
+    assert "Cleared tags from #1" in result.output
 
 
 # Progress Commands
 def test_get_active_tasks_command(isolated_cli):
     """Test get-active-tasks command."""
     # Add tasks
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    isolated_cli.invoke(cli, ["add", "Task 2"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 2"])
 
     # Start a task
     isolated_cli.invoke(cli, ["start", "1"])
@@ -272,7 +290,7 @@ def test_get_active_tasks_command(isolated_cli):
 # Phase 3: Task Display and Relationships
 def test_show_command(isolated_cli):
     """Test show command."""
-    isolated_cli.invoke(cli, ["add", "Task to show"])
+    isolated_cli.invoke(cli, ["add-task", "Task to show"])
     result = isolated_cli.invoke(cli, ["show", "1"])
     assert result.exit_code == 0
     assert "#1" in result.output
@@ -282,7 +300,7 @@ def test_show_command(isolated_cli):
 def test_show_command_deleted_task_displays_d(isolated_cli):
     """Test show command displays [D] for deleted tasks (task#222 fix)."""
     # Create parent with subtasks
-    isolated_cli.invoke(cli, ["add", "Parent task"])
+    isolated_cli.invoke(cli, ["add-task", "Parent task"])
     isolated_cli.invoke(cli, ["add-subtask", "1", "Child task"])
 
     # Delete the subtask only
@@ -297,8 +315,8 @@ def test_show_command_deleted_task_displays_d(isolated_cli):
 
 def test_relate_command(isolated_cli):
     """Test relate command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
-    isolated_cli.invoke(cli, ["add", "Task 2"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 2"])
     result = isolated_cli.invoke(cli, ["relate", "1", "--depends-on", "2"])
     assert result.exit_code == 0
     assert "Added relationship" in result.output or "depends-on" in result.output.lower()
@@ -307,7 +325,7 @@ def test_relate_command(isolated_cli):
 # Phase 4: File Operations
 def test_lint_command(isolated_cli):
     """Test lint command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["lint"])
     assert result.exit_code == 0
     # Should report no issues or list issues found
@@ -315,7 +333,7 @@ def test_lint_command(isolated_cli):
 
 def test_reformat_command(isolated_cli):
     """Test reformat command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["reformat"])
     assert result.exit_code == 0
     # Should report reformatting results
@@ -323,7 +341,7 @@ def test_reformat_command(isolated_cli):
 
 def test_reformat_dry_run(isolated_cli):
     """Test reformat command with dry-run."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["reformat", "--dry-run"])
     assert result.exit_code == 0
     # Should show what would be changed without making changes
@@ -331,7 +349,7 @@ def test_reformat_dry_run(isolated_cli):
 
 def test_resolve_conflicts_command(isolated_cli):
     """Test resolve-conflicts command."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["resolve-conflicts"])
     assert result.exit_code == 0
     # Should report conflict resolution results
@@ -339,7 +357,7 @@ def test_resolve_conflicts_command(isolated_cli):
 
 def test_resolve_conflicts_dry_run(isolated_cli):
     """Test resolve-conflicts command with dry-run."""
-    isolated_cli.invoke(cli, ["add", "Task 1"])
+    isolated_cli.invoke(cli, ["add-task", "Task 1"])
     result = isolated_cli.invoke(cli, ["resolve-conflicts", "--dry-run"])
     assert result.exit_code == 0
     # Should show what would be changed without making changes
@@ -390,14 +408,14 @@ def test_version_long_flag(isolated_cli):
 
 # Complex Workflow Tests
 def test_complete_workflow(isolated_cli):
-    """Test a complete workflow: add -> modify -> complete -> undo."""
+    """Test a complete workflow: add-task -> modify-task -> complete -> undo."""
     # Add task
-    result = isolated_cli.invoke(cli, ["add", "Workflow task", "#test"])
+    result = isolated_cli.invoke(cli, ["add-task", "Workflow task", "#test"])
     assert result.exit_code == 0
     task_id = result.output.split("#")[1].split()[0]
 
     # Modify task
-    result = isolated_cli.invoke(cli, ["modify", task_id, "Modified workflow task"])
+    result = isolated_cli.invoke(cli, ["modify-task", task_id, "Modified workflow task"])
     assert result.exit_code == 0
 
     # Complete task
@@ -412,7 +430,7 @@ def test_complete_workflow(isolated_cli):
 def test_subtask_workflow(isolated_cli):
     """Test subtask workflow: add parent -> add subtask -> complete parent."""
     # Add parent
-    result = isolated_cli.invoke(cli, ["add", "Parent task"])
+    result = isolated_cli.invoke(cli, ["add-task", "Parent task"])
     assert result.exit_code == 0
     parent_id = result.output.split("#")[1].split()[0]
 
@@ -425,34 +443,34 @@ def test_subtask_workflow(isolated_cli):
     assert result.exit_code == 0
 
 
-def test_note_workflow(isolated_cli):
-    """Test note workflow: add task -> add note -> update note -> delete note."""
+def test_description_workflow(isolated_cli):
+    """Test description workflow: add task -> set description -> update -> clear."""
     # Add task
-    result = isolated_cli.invoke(cli, ["add", "Task with notes"])
+    result = isolated_cli.invoke(cli, ["add-task", "Task with descriptions"])
     assert result.exit_code == 0
     task_id = result.output.split("#")[1].split()[0]
 
-    # Add note
-    result = isolated_cli.invoke(cli, ["note", task_id, "First note"])
+    # Set description
+    result = isolated_cli.invoke(cli, ["set-description", task_id, "First description"])
     assert result.exit_code == 0
 
-    # Update note
-    result = isolated_cli.invoke(cli, ["update-note", task_id, "Updated note"])
+    # Update description
+    result = isolated_cli.invoke(cli, ["set-description", task_id, "Updated description"])
     assert result.exit_code == 0
 
-    # Delete note
-    result = isolated_cli.invoke(cli, ["delete-note", task_id])
+    # Clear description
+    result = isolated_cli.invoke(cli, ["set-description", task_id, ""])
     assert result.exit_code == 0
 
 
 def test_relationship_workflow(isolated_cli):
     """Test relationship workflow: add tasks -> relate them."""
     # Add tasks
-    result1 = isolated_cli.invoke(cli, ["add", "Task 1"])
+    result1 = isolated_cli.invoke(cli, ["add-task", "Task 1"])
     assert result1.exit_code == 0
     task1_id = result1.output.split("#")[1].split()[0]
 
-    result2 = isolated_cli.invoke(cli, ["add", "Task 2"])
+    result2 = isolated_cli.invoke(cli, ["add-task", "Task 2"])
     assert result2.exit_code == 0
     task2_id = result2.output.split("#")[1].split()[0]
 

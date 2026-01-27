@@ -54,7 +54,7 @@ def test_start_from_shell_repo():
         assert "**#1** Legacy Task 1" in result.output
 
         # B. Add task (should continue numbering from 2 -> 3)
-        result = runner.invoke(cli, ["add", "New Python Task"])
+        result = runner.invoke(cli, ["add-task", "New Python Task"])
         assert result.exit_code == 0
         assert "Added: #3 New Python Task" in result.output
 

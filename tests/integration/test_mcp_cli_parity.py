@@ -111,7 +111,7 @@ class TestMCPCLIParity:
 
     async def test_add_task_parity(self, test_todo_file):
         """Test add_task MCP tool matches add CLI command."""
-        # CLI output
+        # CLI output (add_command takes title as first arg)
         cli_output = capture_cli_output(
             add_command, "Test task", ["test", "feature"], todo_path=test_todo_file
         )
@@ -137,9 +137,9 @@ class TestMCPCLIParity:
             encoding="utf-8",
         )
 
-        # MCP output
+        # MCP output (add_task takes title as first param)
         mcp_output = await capture_mcp_output(
-            "add_task", {"description": "Test task", "tags": ["test", "feature"]}, test_todo_file
+            "add_task", {"title": "Test task", "tags": ["test", "feature"]}, test_todo_file
         )
 
         # Compare (both should show "Added: #N Test task `#feature` `#test`")
@@ -195,7 +195,7 @@ class TestMCPCLIParity:
 
     async def test_modify_task_parity(self, test_todo_file):
         """Test modify_task MCP tool matches modify CLI command."""
-        # CLI output
+        # CLI output (modify_command takes title as second arg)
         cli_output = capture_cli_output(
             modify_command, "1", "Modified task", ["test", "modified"], todo_path=test_todo_file
         )
@@ -221,10 +221,10 @@ class TestMCPCLIParity:
             encoding="utf-8",
         )
 
-        # MCP output
+        # MCP output (modify_task takes title as param)
         mcp_output = await capture_mcp_output(
             "modify_task",
-            {"task_id": "1", "description": "Modified task", "tags": ["test", "modified"]},
+            {"task_id": "1", "title": "Modified task", "tags": ["test", "modified"]},
             test_todo_file,
         )
 
@@ -324,14 +324,15 @@ class TestMCPCLIParity:
         # Compare
         assert cli_output.strip() == mcp_output.strip()
 
-    async def test_note_operations_parity(self, test_todo_file):
-        """Test note MCP tools match note CLI commands."""
-        # Add note - CLI
+    async def test_description_operations_parity(self, test_todo_file):
+        """Test set_description MCP tool matches note CLI command."""
+        # Use task #2 which has no notes
+        # Add note - CLI (note_command adds a note/description)
         cli_add_output = capture_cli_output(
-            note_command, "1", "Test note", todo_path=test_todo_file
+            note_command, "2", "Test note", todo_path=test_todo_file
         )
 
-        # Reset and add note - MCP
+        # Reset file (task #2 has no notes)
         Path(test_todo_file).write_text(
             """# TODO
 
@@ -352,8 +353,9 @@ class TestMCPCLIParity:
             encoding="utf-8",
         )
 
+        # set_description on task without notes matches note_command output
         mcp_add_output = await capture_mcp_output(
-            "add_note", {"task_id": "1", "note_text": "Test note"}, test_todo_file
+            "set_description", {"task_id": "2", "description": "Test note"}, test_todo_file
         )
 
         assert cli_add_output.strip() == mcp_add_output.strip()
@@ -420,10 +422,9 @@ async def test_all_mcp_tools_exist():
         "start_task",
         "stop_task",
         "get_active_tasks",
-        # Notes
-        "add_note",
-        "delete_note",
-        "update_note",
+        # Description & Tags
+        "set_description",
+        "set_tags",
         # Display & Relationships
         "show_task",
         "relate_task",

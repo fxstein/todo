@@ -68,23 +68,52 @@ def main():
         raise e
 
 
-@cli.command()
-@click.argument("description")
+@cli.command("add-task")
+@click.argument("title")
+@click.option("--description", "-d", help="Optional detailed notes for the task")
 @click.argument("tags", nargs=-1)
 @click.pass_context
-def add(ctx, description, tags):
+def add_task(ctx, title, description, tags):
     """Add a new task."""
-    add_command(description, list(tags), todo_path=ctx.obj["todo_file"])
+    add_command(title, list(tags), todo_path=ctx.obj["todo_file"])
+    # If description provided, add notes
+    if description:
+        import re
+
+        from ai_todo.cli.commands import get_manager
+
+        manager = get_manager(ctx.obj["todo_file"])
+        # Find the task we just added (newest task)
+        tasks = manager.list_tasks()
+        if tasks:
+            # Get task IDs and find highest
+            task_ids = [t.id for t in tasks if "." not in t.id]
+            if task_ids:
+                # Find newest task (highest ID)
+                newest_id = max(task_ids, key=lambda x: int(re.sub(r"[^0-9]", "", x) or "0"))
+                note_command(newest_id, description, todo_path=ctx.obj["todo_file"])
 
 
 @cli.command("add-subtask")
 @click.argument("parent_id")
-@click.argument("description")
+@click.argument("title")
+@click.option("--description", "-d", help="Optional detailed notes for the subtask")
 @click.argument("tags", nargs=-1)
 @click.pass_context
-def add_subtask(ctx, parent_id, description, tags):
+def add_subtask(ctx, parent_id, title, description, tags):
     """Add a subtask."""
-    add_subtask_command(parent_id, description, list(tags), todo_path=ctx.obj["todo_file"])
+    add_subtask_command(parent_id, title, list(tags), todo_path=ctx.obj["todo_file"])
+    # If description provided, add notes
+    if description:
+        from ai_todo.cli.commands import get_manager
+
+        manager = get_manager(ctx.obj["todo_file"])
+        # Find subtasks of this parent and get the newest one
+        subtasks = manager.get_subtasks(parent_id)
+        if subtasks:
+            # Get newest subtask (highest ID)
+            newest_subtask = max(subtasks, key=lambda t: [int(x) for x in t.id.split(".")])
+            note_command(newest_subtask.id, description, todo_path=ctx.obj["todo_file"])
 
 
 @cli.command()
@@ -105,14 +134,21 @@ def list_tasks(ctx, status, tag):
     list_command(status, tag, todo_path=ctx.obj["todo_file"])
 
 
-@cli.command()
+@cli.command("modify-task")
 @click.argument("task_id")
-@click.argument("description")
+@click.argument("title")
+@click.option("--description", "-d", help="Optional new detailed notes (replaces existing)")
 @click.argument("tags", nargs=-1)
 @click.pass_context
-def modify(ctx, task_id, description, tags):
-    """Modify a task's description and/or tags."""
-    modify_command(task_id, description, list(tags), todo_path=ctx.obj["todo_file"])
+def modify_task(ctx, task_id, title, description, tags):
+    """Modify a task's title, description, and/or tags."""
+    modify_command(task_id, title, list(tags), todo_path=ctx.obj["todo_file"])
+    # If description provided, update notes
+    if description is not None:
+        if description == "":
+            delete_note_command(task_id, todo_path=ctx.obj["todo_file"])
+        else:
+            update_note_command(task_id, description, todo_path=ctx.obj["todo_file"])
 
 
 @cli.command()
@@ -186,30 +222,55 @@ def undo(ctx, task_id):
     undo_command(task_id, todo_path=ctx.obj["todo_file"])
 
 
-@cli.command()
+@cli.command("set-description")
 @click.argument("task_id")
-@click.argument("note_text")
+@click.argument("description")
 @click.pass_context
-def note(ctx, task_id, note_text):
-    """Add a note to a task."""
-    note_command(task_id, note_text, todo_path=ctx.obj["todo_file"])
+def set_description(ctx, task_id, description):
+    """Set or clear a task's description (notes).
+
+    Use "" (empty string) to clear the description.
+    """
+    from ai_todo.cli.commands import get_manager
+
+    if description == "":
+        delete_note_command(task_id, todo_path=ctx.obj["todo_file"])
+    else:
+        # Check if task has existing notes - if so, update; otherwise add
+        manager = get_manager(ctx.obj["todo_file"])
+        task = manager.get_task(task_id)
+        if task and task.notes:
+            update_note_command(task_id, description, todo_path=ctx.obj["todo_file"])
+        else:
+            note_command(task_id, description, todo_path=ctx.obj["todo_file"])
 
 
-@cli.command("delete-note")
+@cli.command("set-tags")
 @click.argument("task_id")
+@click.argument("tags", nargs=-1)
 @click.pass_context
-def delete_note(ctx, task_id):
-    """Delete all notes from a task."""
-    delete_note_command(task_id, todo_path=ctx.obj["todo_file"])
+def set_tags(ctx, task_id, tags):
+    """Set a task's tags (replaces all existing tags).
 
+    Use no tags to clear all tags from the task.
+    """
+    from ai_todo.cli.commands import get_manager, save_changes
 
-@cli.command("update-note")
-@click.argument("task_id")
-@click.argument("new_note_text")
-@click.pass_context
-def update_note(ctx, task_id, new_note_text):
-    """Replace existing notes with new text."""
-    update_note_command(task_id, new_note_text, todo_path=ctx.obj["todo_file"])
+    manager = get_manager(ctx.obj["todo_file"])
+    task = manager.get_task(task_id)
+    if not task:
+        print(f"Error: Task {task_id} not found")
+        return
+
+    # Set tags (replaces existing)
+    task.tags = set(tags)
+    save_changes(manager, ctx.obj["todo_file"])
+
+    if tags:
+        tag_str = " ".join([f"`#{tag}`" for tag in sorted(tags)])
+        print(f"Set tags on #{task_id}: {tag_str}")
+    else:
+        print(f"Cleared tags from #{task_id}")
 
 
 @cli.command()

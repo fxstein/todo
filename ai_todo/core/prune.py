@@ -171,13 +171,21 @@ class PruneManager:
 
         return to_prune
 
-    def create_archive_backup(self, tasks_to_prune: list[Task], retention_days: int) -> str:
+    def create_archive_backup(
+        self,
+        tasks_to_prune: list[Task],
+        days: int | None = None,
+        older_than: str | None = None,
+        from_task: str | None = None,
+    ) -> str:
         """
         Create archive backup file before pruning.
 
         Args:
             tasks_to_prune: Tasks being pruned
-            retention_days: Retention period used for pruning
+            days: Retention period in days (if used)
+            older_than: Date filter (if used)
+            from_task: Task range filter (if used)
 
         Returns:
             Path to created archive file
@@ -204,17 +212,28 @@ class PruneManager:
         root_tasks = [t for t in tasks_to_prune if "." not in t.id]
         subtasks = [t for t in tasks_to_prune if "." in t.id]
 
+        # Determine pruning criteria description
+        if from_task:
+            criteria_desc = f"tasks from #1 to #{from_task}"
+            retention_desc = f"Task Range: #1 to #{from_task}"
+        elif older_than:
+            criteria_desc = f"tasks archived before {older_than}"
+            retention_desc = f"Date Filter: Before {older_than}"
+        else:
+            criteria_desc = f"tasks archived more than {days} days ago"
+            retention_desc = f"Retention Period: {days} days"
+
         # Generate archive content
         content = f"""# Archived Tasks - Pruned on {timestamp}
 
 This file contains tasks pruned from TODO.md on {timestamp}.
-These tasks were archived more than {retention_days} days ago.
+These tasks are {criteria_desc}.
 
 **Prune Statistics:**
 - Tasks Pruned: {len(root_tasks)} root tasks
 - Subtasks Pruned: {len(subtasks)} subtasks
 - Total: {len(tasks_to_prune)} items
-- Retention Period: {retention_days} days
+- {retention_desc}
 - Original TODO.md: {self.todo_path}
 
 ## Pruned Tasks
@@ -262,7 +281,7 @@ These tasks were archived more than {retention_days} days ago.
         # Add footer
         content += f"""---
 **Prune Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-**Retention Period:** {retention_days} days
+**{retention_desc.split(":")[0]}:** {retention_desc.split(": ")[1]}
 **Tasks Pruned:** {len(root_tasks)} tasks, {len(subtasks)} subtasks
 **Original TODO.md:** {self.todo_path}
 """
@@ -368,7 +387,9 @@ These tasks were archived more than {retention_days} days ago.
         # Create backup
         archive_path = None
         if backup:
-            archive_path = self.create_archive_backup(to_prune, days)
+            archive_path = self.create_archive_backup(
+                to_prune, days=days, older_than=older_than, from_task=from_task
+            )
 
         # Remove pruned tasks
         pruned_ids = {t.id for t in to_prune}

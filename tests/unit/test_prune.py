@@ -256,7 +256,7 @@ class TestPruneManager:
         # Get only archived tasks to prune
         to_prune = [t for t in sample_archived_tasks if t.id in ["100", "102", "102.1", "102.2"]]
 
-        archive_path = manager.create_archive_backup(to_prune, 30)
+        archive_path = manager.create_archive_backup(to_prune, days=30)
 
         # Verify archive file was created
         assert Path(archive_path).exists()
@@ -278,6 +278,34 @@ class TestPruneManager:
         assert "102.2:" in content  # Metadata for subtask
 
         # Cleanup
+        Path(archive_path).unlink()
+
+    def test_create_archive_backup_with_older_than(self, temp_todo_file, sample_archived_tasks):
+        """Test archive backup with older_than parameter."""
+        manager = PruneManager(temp_todo_file)
+        to_prune = [t for t in sample_archived_tasks if t.id in ["100", "102"]]
+
+        archive_path = manager.create_archive_backup(to_prune, older_than="2025-10-01")
+
+        content = Path(archive_path).read_text()
+        assert "archived before 2025-10-01" in content
+        assert "Date Filter: Before 2025-10-01" in content
+        assert "Retention Period:" not in content
+
+        Path(archive_path).unlink()
+
+    def test_create_archive_backup_with_from_task(self, temp_todo_file, sample_archived_tasks):
+        """Test archive backup with from_task parameter."""
+        manager = PruneManager(temp_todo_file)
+        to_prune = [t for t in sample_archived_tasks if t.id in ["100", "102"]]
+
+        archive_path = manager.create_archive_backup(to_prune, from_task="150")
+
+        content = Path(archive_path).read_text()
+        assert "tasks from #1 to #150" in content
+        assert "Task Range: #1 to #150" in content
+        assert "Retention Period:" not in content
+
         Path(archive_path).unlink()
 
     def test_prune_tasks_dry_run(self, temp_todo_file, sample_archived_tasks):

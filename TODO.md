@@ -12,8 +12,10 @@
     > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
   - [ ] **#266.3** Design: implementation plan for REVIEW `#design` `#review`
     > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
+    > Design doc: docs/linear_integration_design.md
   - [ ] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design`
     > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
+    > Design doc: docs/linear_integration_design.md
   - [ ] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment`
     > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
     > Assessment doc: docs/linear_integration_assessment.md
@@ -2639,8 +2641,8 @@ View with: `ai-todo show <task-id>`
 265.4:2026-01-28T13:55:21.121695:2026-01-28T21:02:25.578390
 266:2026-01-28T21:14:24.478468:2026-01-28T21:20:43.039724
 266.1:2026-01-28T21:14:29.590090:2026-01-28T21:26:54.195457
-266.2:2026-01-28T21:14:31.480490:2026-01-28T21:20:45.917283
-266.3:2026-01-28T21:14:33.184130:2026-01-28T21:20:47.249639
+266.2:2026-01-28T21:14:31.480490:2026-01-28T21:37:30.978320
+266.3:2026-01-28T21:14:33.184130:2026-01-28T21:37:31.891194
 266.4:2026-01-28T21:14:34.517139:2026-01-28T21:20:48.518930
 266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
@@ -2797,4 +2799,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 21:26:54
+**ai-todo** | Last Updated: 2026-01-28 21:37:31

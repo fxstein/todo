@@ -14,7 +14,7 @@
 |------|--------|
 | Workspace | **fxstein** (accessible via Linear MCP) |
 | Teams | **ai-todo** (id: `6e5ad3a4-ca85-4717-a40b-425d361e5191`), **Fxstein** (id: `78310e05-6a9c-4ea7-b500-1bfbad5e9b11`) |
-| Current user (MCP `get_user` "me") | Oliver Ratzesberger; id: `dfec2470-d1d9-4c0a-bf49-611340a53e84` |
+| Current user (MCP `get_user` "me") | fxstein; id: `dfec2470-d1d9-4c0a-bf49-611340a53e84` |
 | Cycles | `list_cycles` for team ai-todo returned `[]` — no cycles configured for that team, or not exposed in the same way |
 | Sample issue | AIT-1 (Test Issue) — team ai-todo, has GitHub attachment (#50) |
 
@@ -53,8 +53,8 @@ The following tools were **actually run** to capture real responses.
 
 **Yes.** Both `list_issues` and `get_issue` return **`gitBranchName`**.
 
-- Example (AIT-1): `"gitBranchName": "oliver/ait-1-test-issue"`
-- Format in sample data: `{displayName}/{identifier-kebab-title}` (e.g. `oliver/ait-1-test-issue`, `oliver/fxs-3-connect-your-tools`).
+- Example (AIT-1): `"gitBranchName": "fxstein/ait-1-test-issue"`
+- Format in sample data: `{displayName}/{identifier-kebab-title}` (e.g. `fxstein/ait-1-test-issue`, `fxstein/fxs-3-connect-your-tools`).
 
 So we **can** automate branch creation/linking from the issue payload.
 
@@ -90,7 +90,7 @@ Below is the **exact** structure returned by **user-linear.get_issue** for one i
   "title": "Test Issue",
   "description": "Testing Integration",
   "url": "https://linear.app/fxstein/issue/AIT-1/test-issue",
-  "gitBranchName": "oliver/ait-1-test-issue",
+  "gitBranchName": "fxstein/ait-1-test-issue",
   "createdAt": "2026-01-28T18:49:15.000Z",
   "updatedAt": "2026-01-28T18:50:55.390Z",
   "status": "Backlog",
@@ -103,7 +103,7 @@ Below is the **exact** structure returned by **user-linear.get_issue** for one i
     }
   ],
   "documents": [],
-  "createdBy": "Oliver Ratzesberger",
+  "createdBy": "fxstein",
   "createdById": "dfec2470-d1d9-4c0a-bf49-611340a53e84",
   "team": "ai-todo",
   "teamId": "6e5ad3a4-ca85-4717-a40b-425d361e5191",

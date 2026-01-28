@@ -1,0 +1,33 @@
+---
+description: "Linear MCP: document review & task completion workflows"
+alwaysApply: true
+---
+
+# Linear Document & Task Workflows
+
+**Extends:** `linear-ai-todo-integration.mdc`
+
+## Document Review
+
+**When:** New docs created for review (analysis, design)
+
+**Actions:**
+1. Push to remote: `git add [file] && git commit -m "docs: add [name] (task#nn)" && git push`
+2. Post GitHub URL to Linear issue via `user-linear.create_comment`
+
+✅ Auto-push docs immediately for linkable URLs
+❌ Don't wait for manual sharing
+
+## Task Completion
+
+**When:** Task completed or user requests "wrap up"
+
+**Action:** Post Cursor's natural completion summary to Linear via `user-linear.create_comment`
+
+✅ Use the summary Cursor naturally creates
+❌ Don't create custom format or verbose details
+
+## Issue ID
+
+Parse Linear ID from branch name: `fxstein/ait-12-feature` → `AIT-12`
+Use `user-linear.list_issues` to get UUID for `create_comment`

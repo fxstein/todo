@@ -16,9 +16,9 @@ jobs:
       - name: Check branch name format
         run: |
           BRANCH="${{ github.head_ref }}"
-          # Pattern: user/AIT-123-description (ai-todo team). Case-insensitive: AIT or ait.
-          if ! echo "$BRANCH" | grep -qiE '^.+/AIT-[0-9]+-.+$'; then
-            echo "::error::Branch must follow format user/AIT-123-description to auto-link Linear tickets."
+          # Pattern: username/AIT-123-description (any username allowed).
+          if ! echo "$BRANCH" | grep -qE '^.+\/AIT-[0-9]+-.+$'; then
+            echo "::error::Branch must follow format username/AIT-123-description."
             echo "Current branch: $BRANCH"
             exit 1
           fi

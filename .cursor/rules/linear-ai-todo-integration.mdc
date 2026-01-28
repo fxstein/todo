@@ -52,8 +52,9 @@ Create a branch for the issue:
 
 - **If `gitBranchName` is missing:**
   - **Get username:** Call **user-linear.get_user** with `{ "query": "me" }` to get the user's `displayName`.
+  - **Username override:** If the displayName is `oliver`, use `fxstein` as the branch prefix instead.
   - **Construct branch name:** `<username>/<IDENTIFIER>-<slug>` where:
-    - `<username>` is the displayName from Linear (lowercase, spaces removed).
+    - `<username>` is the displayName from Linear (lowercase, spaces removed), or `fxstein` if displayName is `oliver`.
     - `<IDENTIFIER>` is the issue identifier (e.g., `AIT-12`).
     - `<slug>` is a short kebab-case version of the issue title (e.g., `fix-login`, `add-feature`).
   - Example: `fxstein/AIT-12-fix-login`.

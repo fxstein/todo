@@ -269,6 +269,14 @@ class TestPruneManager:
         assert "**#100**" in content
         assert "**#102**" in content
 
+        # Verify TASK_METADATA is included
+        assert "<!-- TASK_METADATA" in content
+        assert "# Format: task_id:created_at[:updated_at]" in content
+        assert "100:" in content  # Metadata for task 100
+        assert "102:" in content  # Metadata for task 102
+        assert "102.1:" in content  # Metadata for subtask
+        assert "102.2:" in content  # Metadata for subtask
+
         # Cleanup
         Path(archive_path).unlink()
 

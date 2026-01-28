@@ -1,4 +1,31 @@
-# Release 4.0.0b1
+# Release 4.0.0b2
+
+This release addresses a critical bug (GitHub Issue #49) where archived tasks with incomplete subtasks would incorrectly reappear in the Tasks section when adding new tasks. The fix changes how task status is determined during parsing: section membership now takes precedence over checkbox state, ensuring that all tasks in "Recently Completed" or "Archived Tasks" sections are properly treated as archived regardless of their checkbox character.
+
+Additionally, this release fixes the `config://settings` MCP resource to correctly report `coordination.enabled` status. Previously it was checking for a non-existent configuration key, causing it to always return `false`. The resource now properly derives the enabled state from the configured coordination type.
+
+Both fixes include regression tests to prevent these issues from recurring. Users who experienced archived tasks unexpectedly appearing in their active task list should update to this version immediately.
+
+---
+
+## ✨ Features
+
+- Add task#264 for GitHub Issue #49 - archived tasks reappearing bug ([bbc4468](https://github.com/fxstein/ai-todo/commit/bbc4468c2c3525056ed52e1ff976865340b9b0e6))
+
+## 🐛 Bug Fixes
+
+- Prevent orphan subtasks from leaking into Tasks section (task#264) ([2508033](https://github.com/fxstein/ai-todo/commit/25080333c4421afa2d49afcd52337ba052a62d8b))
+- Derive coordination.enabled from type instead of non-existent key ([491842d](https://github.com/fxstein/ai-todo/commit/491842d0a5346704801bc25cbee75d7ac4406372))
+
+## 🔧 Other Changes
+
+- docs: Add AI release summary for v4.0.0b2 ([ceeea5c](https://github.com/fxstein/ai-todo/commit/ceeea5c40f0962d24c3f05a3191b792ac59ca69d))
+- internal: Archive completed task#264 (GitHub Issue #49 fix) ([be5c9b8](https://github.com/fxstein/ai-todo/commit/be5c9b8e1dc02e7d47d5bf0d7d7ae39f539f8b0b))
+- docs: Update CHANGELOG.md for v4.0.0b1 release ([401ed5b](https://github.com/fxstein/ai-todo/commit/401ed5bc5bcaa875eee70cae878f7d164e1c76d1))
+
+## Previous Beta Release Notes
+
+### Release 4.0.0b1
 
 ## Breaking Changes
 

@@ -2,6 +2,11 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-28 01:43:42 | fxstein | PREPARE | Release preview prepared for v4.0.0b2 (beta)
+2026-01-28 01:43:41 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b1 - File version (legacy/todo.ai): 4.0.0b1 - Proposed version: 4.0.0b2 - Release type: beta - Bump type: minor - Last tag: v4.0.0b1 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-28 01:43:41 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-28 01:43:40 | fxstein | BETA VERSION | Found existing betas up to b1 for 4.0.0, using b2
+2026-01-28 01:43:40 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
 2026-01-28 00:06:25 | fxstein | COMMIT ERROR | Failed to commit version changes after re-staging - hooks may still be modifying files
 2026-01-28 00:06:16 | fxstein | HOOK MODIFICATIONS | Pre-commit hooks modified: release/RELEASE_LOG.log release/RELEASE_NOTES.md todo.bash uv.lock
 2026-01-28 00:06:11 | fxstein | COMMIT RELEASE_NOTES | Adding release notes file to commit: release/RELEASE_NOTES.md

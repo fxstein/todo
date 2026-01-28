@@ -4,6 +4,77 @@
 
 ## Tasks
 
+- [ ] **#267** [AIT-2] Implement --prune function to remove archived tasks `#AIT-2` `#feature` `#linear`
+  > Linear issue: https://linear.app/fxstein/issue/AIT-2
+  > Migrated from task#129.
+  > Implement prune functionality to remove old archived tasks from TODO.md based on git history analysis.
+  > Key requirements:
+  > - 30-day default retention period
+  > - Task ID targeting options (--from-task)
+  > - Git history analysis to identify archive dates
+  > - CLI command with --days and --from-task options
+  > - MCP server equivalent
+  > Reuse existing work from task#129 where possible.
+  - [ ] **#267.9** Documentation: Update docs and help text `#documentation`
+    > Update all relevant documentation:
+    > - Add prune command to docs/cli.md
+    > - Add prune_tasks tool to docs/mcp.md
+    > - Update README.md with prune examples
+    > - Add inline help text to CLI
+    > - Update CHANGELOG.md
+    > - Create usage examples in docs/examples/
+  - [ ] **#267.8** Verification: Run full test suite and linting `#verification`
+    > Run complete verification:
+    > - Run all unit tests: uv run pytest tests/unit/
+    > - Run all integration tests: uv run pytest tests/integration/
+    > - Run linting: uv run ruff check ai_todo/
+    > - Verify no regressions in existing functionality
+    > - Test manually with real TODO.md
+  - [ ] **#267.7** Testing: Integration tests `#testing`
+    > Create integration tests in tests/integration/:
+    > - Test CLI prune command end-to-end
+    > - Test MCP prune_tasks tool
+    > - Test with real git history scenarios
+    > - Test --days and --from-task options
+    > - Test MCP-CLI parity
+  - [ ] **#267.6** Testing: Unit tests `#testing`
+    > Create comprehensive unit tests in tests/unit/:
+    > - Test git history parsing
+    > - Test date calculation logic
+    > - Test task filtering
+    > - Test edge cases (no git history, empty archives, etc.)
+    > - Ensure 100% code coverage for new modules
+  - [ ] **#267.5** Implementation: MCP server integration `#implementation`
+    > Add prune tool to MCP server in ai_todo/mcp/:
+    > - Implement prune_tasks MCP tool
+    > - Parameter validation
+    > - Integration with core prune logic
+  - [ ] **#267.4** Implementation: CLI command `#implementation`
+    > Add prune command to CLI in ai_todo/cli/:
+    > - Add --prune command with --days and --from-task options
+    > - Argument parsing and validation
+    > - User confirmation prompts
+    > - Output formatting
+  - [ ] **#267.3** Implementation: Core prune logic `#implementation`
+    > Implement core prune functionality in ai_todo/core/ following approved design:
+    > - Git history parser
+    > - Archive date identification
+    > - Task filtering and removal logic
+    > - FileOps integration for safe TODO.md updates
+  - [ ] **#267.2** Design: Create prune function design document `#design` `#inprogress`
+    > Create comprehensive design document covering:
+    > - Architecture and approach
+    > - Git history analysis strategy
+    > - CLI interface (--days, --from-task options)
+    > - MCP server integration
+    > - Edge cases and error handling
+    > - Backwards compatibility
+    > Design document: docs/design/prune_function_design.md
+    > ⚠️ STOP FOR REVIEW - Do not proceed to implementation until design is approved.
+  - [x] **#267.1** Analysis: Review existing task#129 and requirements `#analysis` (2026-01-28)
+    > Review existing work in task#129 and its subtasks to understand what was already planned. Analyze Linear issue requirements and identify gaps or changes needed. Document findings.
+    > Analysis document: docs/design/prune_function_analysis.md
+
 - [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
   > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
   - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
@@ -1718,6 +1789,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 10:2026-01-27T23:50:41.505246:2026-01-27T23:51:37.635574
@@ -2640,6 +2716,16 @@
 266.3:2026-01-28T21:14:33.184130:2026-01-28T21:55:22.383942
 266.4:2026-01-28T21:14:34.517139:2026-01-28T21:55:22.383943
 266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
+267:2026-01-28T22:26:05.473566:2026-01-28T22:26:05.504787
+267.1:2026-01-28T22:26:10.364212:2026-01-28T22:33:04.342614
+267.2:2026-01-28T22:26:12.171649:2026-01-28T22:35:19.918282
+267.3:2026-01-28T22:26:13.932631:2026-01-28T22:26:13.949650
+267.4:2026-01-28T22:26:15.253098:2026-01-28T22:26:15.269741
+267.5:2026-01-28T22:26:16.379299:2026-01-28T22:26:16.395953
+267.6:2026-01-28T22:26:17.788660:2026-01-28T22:26:17.803188
+267.7:2026-01-28T22:26:19.178103:2026-01-28T22:26:19.193390
+267.8:2026-01-28T22:26:20.882963:2026-01-28T22:26:20.900952
+267.9:2026-01-28T22:26:22.332652:2026-01-28T22:26:22.349900
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
@@ -2794,4 +2880,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 21:55:22
+**ai-todo** | Last Updated: 2026-01-28 22:35:19

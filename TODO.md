@@ -55,13 +55,13 @@
     > - Argument parsing and validation
     > - User confirmation prompts
     > - Output formatting
-  - [ ] **#267.3** Implementation: Core prune logic `#implementation`
+  - [ ] **#267.3** Implementation: Core prune logic `#implementation` `#inprogress`
     > Implement core prune functionality in ai_todo/core/ following approved design:
     > - Git history parser
     > - Archive date identification
     > - Task filtering and removal logic
     > - FileOps integration for safe TODO.md updates
-  - [ ] **#267.2** Design: Create prune function design document `#design` `#inprogress`
+  - [x] **#267.2** Design: Create prune function design document `#design` (2026-01-28)
     > Create comprehensive design document covering:
     > - Architecture and approach
     > - Git history analysis strategy
@@ -2718,8 +2718,8 @@ View with: `ai-todo show <task-id>`
 266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
 267:2026-01-28T22:26:05.473566:2026-01-28T22:26:05.504787
 267.1:2026-01-28T22:26:10.364212:2026-01-28T22:33:04.342614
-267.2:2026-01-28T22:26:12.171649:2026-01-28T22:35:19.918282
-267.3:2026-01-28T22:26:13.932631:2026-01-28T22:26:13.949650
+267.2:2026-01-28T22:26:12.171649:2026-01-28T23:01:13.307311
+267.3:2026-01-28T22:26:13.932631:2026-01-28T23:01:13.825419
 267.4:2026-01-28T22:26:15.253098:2026-01-28T22:26:15.269741
 267.5:2026-01-28T22:26:16.379299:2026-01-28T22:26:16.395953
 267.6:2026-01-28T22:26:17.788660:2026-01-28T22:26:17.803188
@@ -2880,4 +2880,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 22:35:19
+**ai-todo** | Last Updated: 2026-01-28 23:01:13

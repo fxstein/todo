@@ -4,7 +4,7 @@
 
 ## Tasks
 
-- [ ] **#267** [AIT-2] Implement --prune function to remove archived tasks `#AIT-2` `#feature` `#linear`
+- [x] **#267** [AIT-2] Implement --prune function to remove archived tasks `#AIT-2` `#feature` `#linear` (2026-01-29)
   > Linear issue: https://linear.app/fxstein/issue/AIT-2
   > Migrated from task#129.
   > Implement prune functionality to remove old archived tasks from TODO.md based on git history analysis.
@@ -15,7 +15,7 @@
   > - CLI command with --days and --from-task options
   > - MCP server equivalent
   > Reuse existing work from task#129 where possible.
-  - [ ] **#267.9** Documentation: Update docs and help text `#documentation` `#inprogress`
+  - [x] **#267.9** Documentation: Update docs and help text `#documentation` (2026-01-29)
     > Update all relevant documentation:
     > - Add prune command to docs/cli.md
     > - Add prune_tasks tool to docs/mcp.md
@@ -2093,7 +2093,7 @@ View with: `ai-todo show <task-id>`
 266.3:2026-01-28T21:14:33.184130:2026-01-28T21:55:22.383942
 266.4:2026-01-28T21:14:34.517139:2026-01-28T21:55:22.383943
 266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
-267:2026-01-28T22:26:05.473566:2026-01-28T22:26:05.504787
+267:2026-01-28T22:26:05.473566:2026-01-29T00:24:11.280415
 267.1:2026-01-28T22:26:10.364212:2026-01-28T22:33:04.342614
 267.2:2026-01-28T22:26:12.171649:2026-01-28T23:01:13.307311
 267.3:2026-01-28T22:26:13.932631:2026-01-28T23:05:24.846293
@@ -2102,7 +2102,7 @@ View with: `ai-todo show <task-id>`
 267.6:2026-01-28T22:26:17.788660:2026-01-28T23:06:43.635864
 267.7:2026-01-28T22:26:19.178103:2026-01-29T00:13:11.296401
 267.8:2026-01-28T22:26:20.882963:2026-01-29T00:13:46.345273
-267.9:2026-01-28T22:26:22.332652:2026-01-29T00:13:57.589030
+267.9:2026-01-28T22:26:22.332652:2026-01-29T00:15:57.466071
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
 28.3:2026-01-27T23:50:41.506076:2026-01-27T23:50:41.506077
@@ -2175,4 +2175,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 00:13:57
+**ai-todo** | Last Updated: 2026-01-29 00:24:11

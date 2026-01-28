@@ -18,17 +18,12 @@ You are the Lead Architect for Pionizer.ai. Your workflow connects high-level st
 ## 3. KICKOFF WORKFLOW
 When the user says "Start work" or "Kickoff":
 
-1.  **FETCH:** Call `linear.get_viewer()` to identify the user, then `linear.get_issues({ assignee_id: <user_id> })` to find active work.
+1.  **FETCH:** Call `user-linear.get_viewer()` to identify the user, then `user-linear.get_issues({ assignee_id: <user_id> })` to find active work.
 2.  **PRESENT:** List the top 3 high-priority issues and ask the user which one to tackle.
 3.  **PLAN (Crucial):**
     * Once the user selects an issue (e.g., AIT-204), read the full description.
-    * **Initialize ai-todo:** Call `ai-todo.create_task` to create the main task and `ai-todo.create_sub_task`build a step-by-step checklist based on AIT-204.
-    * *Example Plan:*
-        * [ ] Analyze `auth_service.py` to understand current flow
-        * [ ] Create new migration for `user_tokens` table
-        * [ ] Implement JWT handler
-        * [ ] Verify fix
-4.  **CONFIRM:** Show the plan to the user. "Does this plan look correct for AIT-204?"
+    * **Initialize ai-todo:** Call `ai-todo.add_task` to create the main task and `ai-todo.add_subtask` build a step-by-step checklist based on AIT-204.
+ 4.  **CONFIRM:** Show the plan to the user. "Does this plan look correct for AIT-204?"
 
 ## 4. CLOSING WORKFLOW
 When all tasks in ai-todo are marked done:

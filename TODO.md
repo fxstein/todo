@@ -15,7 +15,7 @@
     > Extend tests in tests/unit/test_cursor_rules.py to assert the written rule file contains the new commit guideline (e.g. “When committing”, “TODO.md”, “.ai-todo/”).
   - [x] **#265.2** Implement: extend AI_TODO_CURSOR_RULE in server.py `#implementation` (2026-01-28)
     > Add the commit guideline bullet to the rule string in ai_todo/mcp/server.py. Implement per approved design.
-  - [ ] **#265.1** Design: add commit bullet to rule content and get approval `#analysis` `#design`
+  - [x] **#265.1** Design: add commit bullet to rule content and get approval `#analysis` `#design` (2026-01-28)
     > Document where and how to add the commit guideline bullet to AI_TODO_CURSOR_RULE (wording, placement). Consider: existing installs already have the file (code only writes if missing)—document upgrade path or leave as "new installs only". Write design doc and link from this subtask; stop for human review and approval.
     > Design doc: docs/design/COMMIT_GUIDELINE_CURSOR_RULE_265.md
 
@@ -1703,6 +1703,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 10:2026-01-27T23:50:41.505246:2026-01-27T23:51:37.635574
@@ -2615,7 +2620,7 @@
 264.8:2026-01-28T01:20:18.404329:2026-01-28T01:39:14.758591
 264.9:2026-01-28T01:20:18.513973:2026-01-28T01:39:14.758592
 265:2026-01-28T13:51:58.432185:2026-01-28T14:12:59.166632
-265.1:2026-01-28T13:55:15.552146:2026-01-28T13:58:50.280857
+265.1:2026-01-28T13:55:15.552146:2026-01-28T21:00:53.140427
 265.2:2026-01-28T13:55:17.288324:2026-01-28T14:11:51.212698
 265.3:2026-01-28T13:55:19.415156:2026-01-28T14:12:29.723186
 265.4:2026-01-28T13:55:21.121695:2026-01-28T14:12:55.202650
@@ -2773,4 +2778,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 14:12:59
+**ai-todo** | Last Updated: 2026-01-28 21:00:53

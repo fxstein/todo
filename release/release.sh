@@ -843,28 +843,28 @@ generate_release_notes() {
 
     # Write categorized commits
     if [[ ${#breaking_commits[@]} -gt 0 ]]; then
-        echo "### 🔴 Breaking Changes" >> "$notes_file"
+        echo "## 🔴 Breaking Changes" >> "$notes_file"
         echo "" >> "$notes_file"
         printf '%s\n' "${breaking_commits[@]}" >> "$notes_file"
         echo "" >> "$notes_file"
     fi
 
     if [[ ${#feature_commits[@]} -gt 0 ]]; then
-        echo "### ✨ Features" >> "$notes_file"
+        echo "## ✨ Features" >> "$notes_file"
         echo "" >> "$notes_file"
         printf '%s\n' "${feature_commits[@]}" >> "$notes_file"
         echo "" >> "$notes_file"
     fi
 
     if [[ ${#fix_commits[@]} -gt 0 ]]; then
-        echo "### 🐛 Bug Fixes" >> "$notes_file"
+        echo "## 🐛 Bug Fixes" >> "$notes_file"
         echo "" >> "$notes_file"
         printf '%s\n' "${fix_commits[@]}" >> "$notes_file"
         echo "" >> "$notes_file"
     fi
 
     if [[ ${#other_commits[@]} -gt 0 ]]; then
-        echo "### 🔧 Other Changes" >> "$notes_file"
+        echo "## 🔧 Other Changes" >> "$notes_file"
         echo "" >> "$notes_file"
         printf '%s\n' "${other_commits[@]}" >> "$notes_file"
         echo "" >> "$notes_file"
@@ -876,7 +876,8 @@ generate_release_notes() {
         if [[ -n "$previous_notes" ]]; then
             echo "## Previous Beta Release Notes" >> "$notes_file"
             echo "" >> "$notes_file"
-            echo "$previous_notes" >> "$notes_file"
+            # Demote H1 to H3 and H2 to H3 to maintain proper heading hierarchy
+            echo "$previous_notes" | sed 's/^# /### /' | sed 's/^## /### /' >> "$notes_file"
             echo "" >> "$notes_file"
         fi
     fi

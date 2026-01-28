@@ -18,7 +18,7 @@
 # AI-agent first TODO list management tool
 # Keep AI agents on track and help humans supervise their work
 #
-# Version: 4.0.0b1
+# Version: 4.0.0b2
 # Repository: https://github.com/fxstein/todo.ai
 # Update: ./todo.ai update
 #
@@ -58,7 +58,7 @@ sed_inplace() {
 }
 
 # Version
-VERSION="4.0.0b1"
+VERSION="4.0.0b2"
 REPO_URL="https://github.com/fxstein/todo.ai"
 SCRIPT_URL="https://raw.githubusercontent.com/fxstein/todo.ai/main/todo.ai"
 

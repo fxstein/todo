@@ -218,13 +218,16 @@ class PruneManager:
         # Determine pruning criteria description
         if from_task:
             criteria_desc = f"tasks from #1 to #{from_task}"
-            retention_desc = f"Task Range: #1 to #{from_task}"
+            retention_label = "Task Range"
+            retention_value = f"#1 to #{from_task}"
         elif older_than:
             criteria_desc = f"tasks archived before {older_than}"
-            retention_desc = f"Date Filter: Before {older_than}"
+            retention_label = "Date Filter"
+            retention_value = f"Before {older_than}"
         else:
             criteria_desc = f"tasks archived more than {days} days ago"
-            retention_desc = f"Retention Period: {days} days"
+            retention_label = "Retention Period"
+            retention_value = f"{days} days"
 
         # Generate archive content
         content = f"""# Archived Tasks - Pruned on {timestamp}
@@ -236,7 +239,7 @@ These tasks are {criteria_desc}.
 - Tasks Pruned: {len(root_tasks)} root tasks
 - Subtasks Pruned: {len(subtasks)} subtasks
 - Total: {len(tasks_to_prune)} items
-- {retention_desc}
+- {retention_label}: {retention_value}
 - Original TODO.md: {self.todo_path}
 
 ## Pruned Tasks
@@ -284,7 +287,7 @@ These tasks are {criteria_desc}.
         # Add footer
         content += f"""---
 **Prune Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-**{retention_desc.split(":")[0]}:** {retention_desc.split(": ")[1]}
+**{retention_label}:** {retention_value}
 **Tasks Pruned:** {len(root_tasks)} tasks, {len(subtasks)} subtasks
 **Original TODO.md:** {self.todo_path}
 """

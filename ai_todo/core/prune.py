@@ -112,8 +112,17 @@ class PruneManager:
                 # No date found - skip this task
                 continue
 
+            # Normalize both dates to naive datetime for comparison
+            # (strip timezone info if present)
+            archive_date_naive = (
+                archive_date.replace(tzinfo=None) if archive_date.tzinfo else archive_date
+            )
+            cutoff_date_naive = (
+                cutoff_date.replace(tzinfo=None) if cutoff_date.tzinfo else cutoff_date
+            )
+
             # Check if older than cutoff
-            if archive_date < cutoff_date:
+            if archive_date_naive < cutoff_date_naive:
                 to_prune.append(task)
                 # Include all subtasks
                 subtasks = [t for t in tasks if t.id.startswith(f"{task.id}.")]

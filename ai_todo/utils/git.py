@@ -77,13 +77,14 @@ def get_task_archive_date(task_id: str, todo_path: str) -> datetime | None:
     """
     # Try git log first
     try:
+        # Use extended regex with OR (|) to match EITHER pattern
         result = subprocess.run(
             [
                 "git",
                 "log",
                 "--all",
-                f"--grep=archive.*{task_id}",
-                f"--grep=#{task_id}",
+                "--extended-regexp",
+                f"--grep=archive.*{task_id}|#{task_id}",
                 "--format=%ai",
                 "--",
                 todo_path,

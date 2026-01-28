@@ -35,6 +35,12 @@ class TestGitHistoryParsing:
                 assert result.year == 2026
                 assert result.month == 1
                 assert result.day == 15
+
+                # Verify git command uses extended-regexp for OR logic
+                mock_run.assert_called_once()
+                call_args = mock_run.call_args[0][0]
+                assert "--extended-regexp" in call_args
+                assert "--grep=archive.*129|#129" in call_args
         finally:
             Path(todo_path).unlink()
 

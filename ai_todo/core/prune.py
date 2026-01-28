@@ -324,7 +324,7 @@ These tasks are {criteria_desc}.
 
     def prune_tasks(
         self,
-        days: int = 30,
+        days: int | None = None,
         older_than: str | None = None,
         from_task: str | None = None,
         dry_run: bool = False,
@@ -334,7 +334,7 @@ These tasks are {criteria_desc}.
         Prune archived tasks from TODO.md.
 
         Args:
-            days: Prune tasks older than N days (default: 30)
+            days: Prune tasks older than N days (default: 30 if no other filter)
             older_than: Prune tasks before YYYY-MM-DD
             from_task: Prune tasks from #1 to #from_task
             dry_run: Preview without making changes

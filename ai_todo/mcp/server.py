@@ -230,7 +230,7 @@ def restore_task(task_ids: list[str]) -> str:
 
 @mcp.tool()
 def prune_tasks(
-    days: int = 30,
+    days: int | None = None,
     older_than: str | None = None,
     from_task: str | None = None,
     dry_run: bool = False,
@@ -240,7 +240,7 @@ def prune_tasks(
     Prune old archived tasks from TODO.md.
 
     Args:
-        days: Prune tasks older than N days (default: 30)
+        days: Prune tasks older than N days (default: 30 if no other filter)
         older_than: Prune tasks before YYYY-MM-DD (format: YYYY-MM-DD)
         from_task: Prune tasks from #1 to #ID (numeric task ID)
         dry_run: Preview without making changes (default: False)

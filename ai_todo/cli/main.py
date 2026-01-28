@@ -200,7 +200,7 @@ def archive(ctx, task_ids, reason):
 
 
 @cli.command()
-@click.option("--days", type=int, default=30, help="Prune tasks older than N days (default: 30)")
+@click.option("--days", type=int, default=None, help="Prune tasks older than N days (default: 30)")
 @click.option("--older-than", help="Prune tasks before YYYY-MM-DD")
 @click.option("--from-task", help="Prune tasks from #1 to #ID")
 @click.option("--dry-run", is_flag=True, help="Preview without making changes")

@@ -282,6 +282,48 @@ class TestPruneManager:
         result = manager.identify_tasks_to_prune(active_tasks)
         assert len(result) == 0
 
+    def test_identify_tasks_older_than_not_overridden(self, temp_todo_file, sample_archived_tasks):
+        """Test that older_than parameter is not overridden by default days."""
+        manager = PruneManager(temp_todo_file)
+
+        with patch("ai_todo.core.prune.get_task_archive_date") as mock_get_date:
+
+            def get_date(task_id, _path):
+                for task in sample_archived_tasks:
+                    if task.id == task_id:
+                        return task.completed_at
+                return None
+
+            mock_get_date.side_effect = get_date
+
+            # Use older_than without specifying days (days=None)
+            # Should use older_than cutoff, not default 30 days
+            result = manager.identify_tasks_to_prune(
+                sample_archived_tasks, days=None, older_than="2025-12-20"
+            )
+
+            # Should include only tasks older than 2025-12-20
+            # Task 100 (60 days old ~= 2025-11-30), 102 (45 days old ~= 2025-12-15)
+            # but NOT 101 (10 days old ~= 2026-01-19)
+            task_ids = {t.id for t in result}
+            assert "100" in task_ids
+            assert "102" in task_ids
+            assert "101" not in task_ids
+
+    def test_identify_tasks_from_task_not_overridden(self, temp_todo_file, sample_archived_tasks):
+        """Test that from_task parameter is not overridden by default days."""
+        manager = PruneManager(temp_todo_file)
+
+        # Use from_task without specifying days (days=None)
+        # Should use task range, not default 30 days
+        result = manager.identify_tasks_to_prune(sample_archived_tasks, days=None, from_task="101")
+
+        # Should include tasks 100 and 101, but NOT 102
+        task_ids = {t.id for t in result}
+        assert "100" in task_ids
+        assert "101" in task_ids
+        assert "102" not in task_ids
+
     def test_create_archive_backup(self, temp_todo_file, sample_archived_tasks):
         """Test archive backup creation."""
         manager = PruneManager(temp_todo_file)

@@ -1445,7 +1445,7 @@ def rollback_mode_tool_command(backup_name: str, todo_path: str = "TODO.md") -> 
 
 # Prune Command
 def prune_command(
-    days: int = 30,
+    days: int | None = None,
     older_than: str | None = None,
     from_task: str | None = None,
     dry_run: bool = False,
@@ -1457,7 +1457,7 @@ def prune_command(
     Prune old archived tasks from TODO.md.
 
     Args:
-        days: Prune tasks older than N days (default: 30)
+        days: Prune tasks older than N days (default: 30 if no other filter)
         older_than: Prune tasks before YYYY-MM-DD
         from_task: Prune tasks from #1 to #from_task
         dry_run: Preview without making changes

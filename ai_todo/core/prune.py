@@ -1,7 +1,7 @@
 """Prune functionality for removing old archived tasks from TODO.md."""
 
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from ai_todo.core.file_ops import FileOps
@@ -76,15 +76,16 @@ class PruneManager:
             return self._filter_by_task_range(archived_tasks, from_task)
         elif days is not None:
             # Age-based pruning: older than N days
-            cutoff_date = datetime.now() - timedelta(days=days)
+            cutoff_date = datetime.now(UTC) - timedelta(days=days)
             return self._filter_by_age(archived_tasks, cutoff_date)
         elif older_than:
             # Date-based pruning: before specific date
-            cutoff_date = datetime.strptime(older_than, "%Y-%m-%d")
+            # Parse as naive, then make UTC-aware at midnight
+            cutoff_date = datetime.strptime(older_than, "%Y-%m-%d").replace(tzinfo=UTC)
             return self._filter_by_age(archived_tasks, cutoff_date)
         else:
             # Default: 30 days
-            cutoff_date = datetime.now() - timedelta(days=30)
+            cutoff_date = datetime.now(UTC) - timedelta(days=30)
             return self._filter_by_age(archived_tasks, cutoff_date)
 
     def _filter_by_age(self, tasks: list[Task], cutoff_date: datetime) -> list[Task]:
@@ -93,7 +94,7 @@ class PruneManager:
 
         Args:
             tasks: List of archived tasks
-            cutoff_date: Cutoff datetime
+            cutoff_date: Cutoff datetime (must be timezone-aware in UTC)
 
         Returns:
             List of tasks to prune
@@ -112,17 +113,25 @@ class PruneManager:
                 # No date found - skip this task
                 continue
 
-            # Normalize both dates to naive datetime for comparison
-            # (strip timezone info if present)
-            archive_date_naive = (
-                archive_date.replace(tzinfo=None) if archive_date.tzinfo else archive_date
-            )
-            cutoff_date_naive = (
-                cutoff_date.replace(tzinfo=None) if cutoff_date.tzinfo else cutoff_date
-            )
+            # Normalize both dates to UTC timezone-aware datetime for comparison
+            # If archive_date is timezone-aware, convert to UTC
+            # If archive_date is naive, assume it's already in UTC
+            if archive_date.tzinfo is not None:
+                archive_date_utc = archive_date.astimezone(UTC)
+            else:
+                # Naive datetime - assume it's already UTC
+                archive_date_utc = archive_date.replace(tzinfo=UTC)
+
+            # cutoff_date should already be UTC-aware from identify_tasks_to_prune
+            # But ensure it's UTC for safety
+            if cutoff_date.tzinfo is not None:
+                cutoff_date_utc = cutoff_date.astimezone(UTC)
+            else:
+                # Naive datetime - assume it's UTC
+                cutoff_date_utc = cutoff_date.replace(tzinfo=UTC)
 
             # Check if older than cutoff
-            if archive_date_naive < cutoff_date_naive:
+            if archive_date_utc < cutoff_date_utc:
                 to_prune.append(task)
                 # Include all subtasks
                 subtasks = [t for t in tasks if t.id.startswith(f"{task.id}.")]

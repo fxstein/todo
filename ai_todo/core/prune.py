@@ -158,25 +158,19 @@ class PruneManager:
         to_prune = []
 
         for task in tasks:
-            # Extract numeric part of task ID
+            # Skip subtasks - they'll be included with parent
             if "." in task.id:
-                # Subtask - check parent ID
-                parent_id = task.id.split(".")[0]
-                try:
-                    if int(parent_id) <= max_id:
-                        to_prune.append(task)
-                except ValueError:
-                    continue
-            else:
-                # Root task
-                try:
-                    if int(task.id) <= max_id:
-                        to_prune.append(task)
-                        # Include all subtasks
-                        subtasks = [t for t in tasks if t.id.startswith(f"{task.id}.")]
-                        to_prune.extend(subtasks)
-                except ValueError:
-                    continue
+                continue
+
+            # Root task only
+            try:
+                if int(task.id) <= max_id:
+                    to_prune.append(task)
+                    # Include all subtasks
+                    subtasks = [t for t in tasks if t.id.startswith(f"{task.id}.")]
+                    to_prune.extend(subtasks)
+            except ValueError:
+                continue
 
         return to_prune
 

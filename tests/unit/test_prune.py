@@ -248,6 +248,46 @@ class TestPruneManager:
         assert "101" in task_ids
         assert "102" not in task_ids  # Above range
 
+        # Critical: Verify no duplicate task IDs in result
+        result_ids = [t.id for t in result]
+        assert len(result_ids) == len(set(result_ids)), "Duplicate task IDs found in result!"
+
+    def test_filter_by_task_range_no_duplicates(self, temp_todo_file):
+        """Test that subtasks are not added twice when filtering by task range."""
+        manager = PruneManager(temp_todo_file)
+
+        # Create tasks with multiple subtasks to test duplicate bug
+        tasks = [
+            Task(id="50", description="Root 50", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="50.1", description="Subtask 50.1", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="50.2", description="Subtask 50.2", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="50.3", description="Subtask 50.3", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="100", description="Root 100", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="100.1", description="Subtask 100.1", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="100.2", description="Subtask 100.2", status=TaskStatus.ARCHIVED, tags=set()),
+            Task(id="150", description="Root 150", status=TaskStatus.ARCHIVED, tags=set()),
+        ]
+
+        # Filter with from_task=100 (should include #1-#100)
+        result = manager._filter_by_task_range(tasks, "100")
+
+        # Count task IDs
+        result_ids = [t.id for t in result]
+
+        # Verify no duplicates
+        assert len(result_ids) == len(set(result_ids)), f"Duplicate IDs found: {result_ids}"
+
+        # Verify correct tasks included
+        expected_ids = {"50", "50.1", "50.2", "50.3", "100", "100.1", "100.2"}
+        actual_ids = set(result_ids)
+        assert actual_ids == expected_ids, f"Expected {expected_ids}, got {actual_ids}"
+
+        # Verify task 150 is NOT included (above range)
+        assert "150" not in actual_ids
+
+        # Verify exact count (7 tasks total: 2 root + 5 subtasks)
+        assert len(result_ids) == 7
+
     def test_identify_tasks_to_prune_default(self, temp_todo_file, sample_archived_tasks):
         """Test identify_tasks_to_prune with default 30-day retention."""
         manager = PruneManager(temp_todo_file)

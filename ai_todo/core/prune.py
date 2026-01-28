@@ -241,6 +241,24 @@ These tasks were archived more than {retention_days} days ago.
 
             content += "\n"
 
+        # Add TASK_METADATA section for pruned tasks
+        has_metadata = any(t.created_at is not None for t in tasks_to_prune)
+        if has_metadata:
+            content += "---\n\n## Task Metadata\n\n"
+            content += "<!-- TASK_METADATA\n"
+            content += "# Format: task_id:created_at[:updated_at]\n"
+
+            for task in sorted(tasks_to_prune, key=lambda x: x.id):
+                if task.created_at is not None:
+                    created_str = task.created_at.isoformat()
+                    if task.updated_at is not None and task.updated_at != task.created_at:
+                        updated_str = task.updated_at.isoformat()
+                        content += f"{task.id}:{created_str}:{updated_str}\n"
+                    else:
+                        content += f"{task.id}:{created_str}\n"
+
+            content += "-->\n\n"
+
         # Add footer
         content += f"""---
 **Prune Date:** {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}

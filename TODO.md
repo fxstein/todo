@@ -4,6 +4,21 @@
 
 ## Tasks
 
+- [x] **#265** Add commit guideline to ai-todo–written Cursor rule `#cursor-rules` `#guidance` (2026-01-28)
+  > Extend the Python code that writes the Cursor rule to `.cursor/rules/ai-todo-task-management.mdc` so the rule includes a commit guideline.
+  > **Context:** The rule content is the string `AI_TODO_CURSOR_RULE` in `ai_todo/mcp/server.py`, written by `_init_cursor_rules()` when the rule file does not exist. We need to add this bullet to that rule text:
+  > - **When committing:** If TODO.md or `.ai-todo/` have changes, always stage and commit them together (with other changes). They are versioned like the rest of the repo.
+  > **Flow:** Design (and get approved) → Implement → Write tests → Verify.
+  - [x] **#265.4** Verify: run tests and confirm rule output `#verification` (2026-01-28)
+    > Run unit tests and manually confirm the generated .cursor/rules/ai-todo-task-management.mdc contains the new bullet and renders correctly.
+  - [x] **#265.3** Write tests for new rule content `#testing` (2026-01-28)
+    > Extend tests in tests/unit/test_cursor_rules.py to assert the written rule file contains the new commit guideline (e.g. “When committing”, “TODO.md”, “.ai-todo/”).
+  - [x] **#265.2** Implement: extend AI_TODO_CURSOR_RULE in server.py `#implementation` (2026-01-28)
+    > Add the commit guideline bullet to the rule string in ai_todo/mcp/server.py. Implement per approved design.
+  - [ ] **#265.1** Design: add commit bullet to rule content and get approval `#analysis` `#design`
+    > Document where and how to add the commit guideline bullet to AI_TODO_CURSOR_RULE (wording, placement). Consider: existing installs already have the file (code only writes if missing)—document upgrade path or leave as "new installs only". Write design doc and link from this subtask; stop for human review and approval.
+    > Design doc: docs/design/COMMIT_GUIDELINE_CURSOR_RULE_265.md
+
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
@@ -2599,6 +2614,11 @@
 264.7:2026-01-28T01:20:18.287933:2026-01-28T01:39:14.758589
 264.8:2026-01-28T01:20:18.404329:2026-01-28T01:39:14.758591
 264.9:2026-01-28T01:20:18.513973:2026-01-28T01:39:14.758592
+265:2026-01-28T13:51:58.432185:2026-01-28T14:12:59.166632
+265.1:2026-01-28T13:55:15.552146:2026-01-28T13:58:50.280857
+265.2:2026-01-28T13:55:17.288324:2026-01-28T14:11:51.212698
+265.3:2026-01-28T13:55:19.415156:2026-01-28T14:12:29.723186
+265.4:2026-01-28T13:55:21.121695:2026-01-28T14:12:55.202650
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
@@ -2753,4 +2773,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 01:39:14
+**ai-todo** | Last Updated: 2026-01-28 14:12:59

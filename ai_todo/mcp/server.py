@@ -689,32 +689,38 @@ AI_TODO_CURSOR_RULE = """---
 description: "Task management via ai-todo MCP server"
 alwaysApply: true
 ---
+<!-- This file is managed by ai-todo. New versions may override any changes. -->
+
 # ai-todo Task Management
 
 **USE THE MCP SERVER** for all task management operations.
 
 - Use `ai-todo` MCP tools (`add_task`, `complete_task`, `list_tasks`, etc.)
 - **NEVER** use Cursor's built-in TODO tools
+- **NEVER** use the built-in TodoWrite or other tools for task tracking
+- **ALWAYS** use ai-todo for task tracking
 - **NEVER** edit TODO.md directly (protected by tamper detection)
 - **ASK** before completing root tasks or archiving
 - Tasks are displayed in **reverse chronological order** (newest on top)
+- **When committing:** If TODO.md or `.ai-todo/` have changes, always stage and commit them together (with other changes). They are versioned like the rest of the repo.
 
 The MCP server name is typically `ai-todo` or similar in your `.cursor/mcp.json`.
 """
 
 
 def _init_cursor_rules(root: Path) -> None:
-    """Initialize Cursor rules if they don't exist."""
+    """Create or update Cursor rule so it matches the content that ships with the tool."""
     try:
         rules_dir = root / ".cursor" / "rules"
         rule_file = rules_dir / "ai-todo-task-management.mdc"
-
-        # Only create if the file doesn't exist
-        if rule_file.exists():
-            return
+        canonical = AI_TODO_CURSOR_RULE.strip() + "\n"
 
         rules_dir.mkdir(parents=True, exist_ok=True)
-        rule_file.write_text(AI_TODO_CURSOR_RULE.strip() + "\n")
+        if rule_file.exists():
+            current = rule_file.read_text()
+            if current == canonical:
+                return
+        rule_file.write_text(canonical)
     except (OSError, PermissionError):
         # Silently fail - not critical for server operation
         pass

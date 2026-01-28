@@ -4,6 +4,18 @@
 
 ## Tasks
 
+- [ ] **#264** GitHub Issue #49: Archived tasks reappear under ## Tasks when adding new tasks    `#v4.0.1` `#bug` `#critical` `#file-ops`
+  > Bug: When starting with TODO.md where Tasks section is empty but Archived/Recently Completed has many entries, creating new tasks causes some archived tasks (e.g., #79.3.x, #58.x) to incorrectly appear under Tasks. Environment: ai-todo v4.0.0b1, MCP via Cursor. Repro: https://gist.github.com/fxstein/19a43595ce66e9ca7ba624ad9f19b081
+  - [ ] **#264.9** Document: Close GitHub Issue #49 with fix reference `#documentation`
+  - [ ] **#264.8** Test: Verify fix with user's TODO.md from gist `#testing`
+  - [ ] **#264.7** Test: Create unit tests for empty Tasks section with archived content `#testing`
+  - [ ] **#264.6** Implement: Ensure tasks stay in their original sections when writing `#implementation`
+  - [ ] **#264.5** Implement: Fix section parsing to respect task section membership `#implementation`
+  - [ ] **#264.4** Design: Document fix approach for section boundary handling `#design`
+  - [ ] **#264.3** Analyze: Identify how tasks get moved between sections during write operations `#analysis`
+  - [ ] **#264.2** Analyze: Trace file_ops.py parsing of non-standard sections (Recently Completed vs Archived Tasks) `#analysis`
+  - [ ] **#264.1** Investigate: Reproduce bug with empty Tasks section and archived tasks `#research`
+
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
 - [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
@@ -1668,11 +1680,6 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
-
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 10:2026-01-27T23:50:41.505246:2026-01-27T23:51:37.635574
@@ -2574,6 +2581,16 @@ View with: `ai-todo show <task-id>`
 263.6:2026-01-27T23:50:41.498372:2026-01-27T23:51:37.683606
 263.7:2026-01-27T23:50:41.498368:2026-01-27T23:51:37.683607
 263.8:2026-01-27T23:50:41.498358:2026-01-27T23:51:37.683608
+264:2026-01-28T01:20:08.553847:2026-01-28T01:20:24.838819
+264.1:2026-01-28T01:20:17.379514:2026-01-28T01:20:17.473910
+264.2:2026-01-28T01:20:17.481124:2026-01-28T01:20:17.587170
+264.3:2026-01-28T01:20:17.594393:2026-01-28T01:20:17.594394
+264.4:2026-01-28T01:20:17.854559:2026-01-28T01:20:17.854560
+264.5:2026-01-28T01:20:18.007716:2026-01-28T01:20:18.007722
+264.6:2026-01-28T01:20:18.118224:2026-01-28T01:20:18.118225
+264.7:2026-01-28T01:20:18.287933:2026-01-28T01:20:18.287934
+264.8:2026-01-28T01:20:18.404329:2026-01-28T01:20:18.404330
+264.9:2026-01-28T01:20:18.513973:2026-01-28T01:20:18.513980
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
@@ -2728,4 +2745,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-27 23:51:37
+**ai-todo** | Last Updated: 2026-01-28 01:20:24

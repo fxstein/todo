@@ -142,5 +142,86 @@ def test_archive_ordering_multiple_parents(test_todo_file):
     )
 
 
+def test_issue_49_orphan_subtasks_stay_in_archived_section(tmp_path):
+    """Test that incomplete subtasks in archived section stay archived (GitHub Issue #49).
+
+    Regression test for bug where tasks with [ ] checkbox in 'Recently Completed'
+    section would leak into 'Tasks' section when adding new tasks.
+    """
+    # Setup: Create TODO.md with archived parent that has incomplete subtasks
+    # Note: [~] checkbox is not supported by parser, using [x] for cancelled tasks
+    todo_file = tmp_path / "TODO.md"
+    todo_file.write_text(
+        """# TODO
+
+## Tasks
+
+## Recently Completed
+- [x] **#1** Completed parent task (2026-01-01)
+  - [ ] **#1.1** Incomplete subtask that was never finished
+  - [x] **#1.2** Completed subtask (2026-01-01)
+- [x] **#2** Another completed parent with incomplete subtasks (2026-01-01)
+  - [ ] **#2.1** First incomplete subtask
+  - [ ] **#2.2** Second incomplete subtask
+
+## Deleted Tasks
+""",
+        encoding="utf-8",
+    )
+
+    # Create .ai-todo directory
+    todo_ai_dir = tmp_path / ".ai-todo"
+    todo_ai_dir.mkdir(exist_ok=True)
+    (todo_ai_dir / ".ai-todo.serial").write_text("2", encoding="utf-8")
+    (todo_ai_dir / "config.yaml").write_text(
+        "project:\n  name: test\nnumbering:\n  format: numeric\n",
+        encoding="utf-8",
+    )
+
+    # Add a new task
+    add_command("New task", [], todo_path=str(todo_file))
+
+    # Read the file content
+    content = todo_file.read_text()
+
+    # Verify: Tasks section should ONLY have the new task
+    lines = content.split("\n")
+    in_tasks = False
+    tasks_section_tasks = []
+    for line in lines:
+        if "## Tasks" in line:
+            in_tasks = True
+            continue
+        if in_tasks and line.startswith("## "):
+            break
+        match = re.search(r"\*\*#([0-9.]+)\*\*", line)
+        if in_tasks and match:
+            tasks_section_tasks.append(match.group(1))
+
+    # Only the new task #3 should be in Tasks section
+    assert tasks_section_tasks == ["3"], (
+        f"Expected only ['3'] in Tasks section, got {tasks_section_tasks}. "
+        "Orphan subtasks from archived parents should NOT leak into Tasks section."
+    )
+
+    # Verify: Archived section should have all the original tasks
+    in_archived = False
+    archived_section_tasks = []
+    for line in lines:
+        if "## Archived Tasks" in line or "## Recently Completed" in line:
+            in_archived = True
+            continue
+        if in_archived and line.startswith("## "):
+            break
+        match = re.search(r"\*\*#([0-9.]+)\*\*", line)
+        if in_archived and match:
+            archived_section_tasks.append(match.group(1))
+
+    # All original tasks should be in archived section
+    assert set(archived_section_tasks) == {"1", "1.1", "1.2", "2", "2.1", "2.2"}, (
+        f"Expected all original tasks in Archived section, got {archived_section_tasks}"
+    )
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

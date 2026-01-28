@@ -644,27 +644,26 @@ class FileOps:
                     except ValueError:
                         pass
 
-                # Determine status
+                # Determine status - section takes precedence over checkbox
+                # Fix for GitHub Issue #49: Tasks in archived sections should be ARCHIVED
+                # regardless of checkbox state (handles orphan subtasks with [ ] under [x] parents)
                 status = TaskStatus.PENDING
                 completed_at = None
-                if completed_char.lower() == "x":
-                    if (
-                        current_section == "Recently Completed"
-                        or current_section == "Archived Tasks"
-                    ):
-                        status = TaskStatus.ARCHIVED
-                        # Fix for #204: Treat archived tasks as completed for restore purposes
-                        # We use archived_at as completed_at if available, or current time
+                if current_section == "Recently Completed" or current_section == "Archived Tasks":
+                    # All tasks in archived sections are ARCHIVED, regardless of checkbox
+                    status = TaskStatus.ARCHIVED
+                    # Fix for #204: Treat archived tasks as completed for restore purposes
+                    if completed_char.lower() == "x":
                         completed_at = archived_at or datetime.now()
-                    elif current_section == "Deleted Tasks":
-                        status = TaskStatus.DELETED
-                    else:
-                        status = TaskStatus.COMPLETED
-                        completed_at = (
-                            datetime.now()
-                        )  # Approximate since we don't store separate completed_at in file
                 elif current_section == "Deleted Tasks":
+                    # All tasks in deleted section are DELETED
                     status = TaskStatus.DELETED
+                elif completed_char.lower() == "x":
+                    # Only in Tasks section: [x] means COMPLETED
+                    status = TaskStatus.COMPLETED
+                    completed_at = (
+                        datetime.now()
+                    )  # Approximate since we don't store separate completed_at in file
 
                 # Check for [D] checkbox (deleted tasks) - overrides status
                 if completed_char.upper() == "D":

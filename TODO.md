@@ -4,17 +4,26 @@
 
 ## Tasks
 
-- [ ] **#264** GitHub Issue #49: Archived tasks reappear under ## Tasks when adding new tasks    `#v4.0.1` `#bug` `#critical` `#file-ops`
+- [x] **#264** GitHub Issue #49: Archived tasks reappear under ## Tasks when adding new tasks    `#v4.0.1` `#bug` `#critical` `#file-ops` (2026-01-28)
   > Bug: When starting with TODO.md where Tasks section is empty but Archived/Recently Completed has many entries, creating new tasks causes some archived tasks (e.g., #79.3.x, #58.x) to incorrectly appear under Tasks. Environment: ai-todo v4.0.0b1, MCP via Cursor. Repro: https://gist.github.com/fxstein/19a43595ce66e9ca7ba624ad9f19b081
-  - [ ] **#264.9** Document: Close GitHub Issue #49 with fix reference `#documentation`
-  - [ ] **#264.8** Test: Verify fix with user's TODO.md from gist `#testing`
-  - [ ] **#264.7** Test: Create unit tests for empty Tasks section with archived content `#testing`
-  - [ ] **#264.6** Implement: Ensure tasks stay in their original sections when writing `#implementation`
-  - [ ] **#264.5** Implement: Fix section parsing to respect task section membership `#implementation`
-  - [ ] **#264.4** Design: Document fix approach for section boundary handling `#design`
-  - [ ] **#264.3** Analyze: Identify how tasks get moved between sections during write operations `#analysis`
-  - [ ] **#264.2** Analyze: Trace file_ops.py parsing of non-standard sections (Recently Completed vs Archived Tasks) `#analysis`
-  - [ ] **#264.1** Investigate: Reproduce bug with empty Tasks section and archived tasks `#research`
+  - [x] **#264.9** Document: Close GitHub Issue #49 with fix reference `#documentation` (2026-01-28)
+    > CLOSED: Posted fix summary on GitHub Issue #49 (https://github.com/fxstein/ai-todo/issues/49#issuecomment-3808303422) and closed issue as fixed.
+  - [x] **#264.8** Test: Verify fix with user's TODO.md from gist `#testing` (2026-01-28)
+    > VERIFIED: Tested with user's actual TODO.md from /Users/oratzes/cursor/ascii-guard/TODO.md. Before fix: orphan subtasks #79.3.7, #79.3.5, #58.1-58.7 leaked into Tasks section. After fix: only new task appears in Tasks section, all archived content stays in Archived Tasks.
+  - [x] **#264.7** Test: Create unit tests for empty Tasks section with archived content `#testing` (2026-01-28)
+    > ADDED: test_issue_49_orphan_subtasks_stay_in_archived_section() in test_archive_subtasks.py. Tests that incomplete subtasks [ ] under archived parents [x] stay in Archived section when adding new tasks. Validates fix for GitHub Issue #49.
+  - [x] **#264.6** Implement: Ensure tasks stay in their original sections when writing `#implementation` (2026-01-28)
+    > VERIFIED: With fix to status determination, tasks now stay in their original sections during write. ARCHIVED tasks go to Archived Tasks section regardless of checkbox. Write logic in _generate_markdown routes by status which is now correctly set during parse.
+  - [x] **#264.5** Implement: Fix section parsing to respect task section membership `#implementation` (2026-01-28)
+    > FIXED: Modified _parse_markdown lines 647-668 to determine status based on section first, then checkbox. Tasks in 'Recently Completed' or 'Archived Tasks' sections are now ARCHIVED regardless of checkbox state. This prevents orphan subtasks with [ ] from leaking into Tasks section.
+  - [x] **#264.4** Design: Document fix approach for section boundary handling `#design` (2026-01-28)
+    > FIX APPROACH: Section takes precedence over checkbox for status determination. Changed order in _parse_markdown: (1) check section first, (2) if archived section → ARCHIVED, (3) if deleted section → DELETED, (4) only then check checkbox for COMPLETED in Tasks section.
+  - [x] **#264.3** Analyze: Identify how tasks get moved between sections during write operations `#analysis` (2026-01-28)
+    > ROOT CAUSE FOUND: In _parse_markdown lines 648-666, status determination only considers section for [x] checkboxes. Tasks with [ ] stay PENDING even when in 'Recently Completed' section. Fix: section should override checkbox for status determination - if task is in archived section, status=ARCHIVED regardless of checkbox.
+  - [x] **#264.2** Analyze: Trace file_ops.py parsing of non-standard sections (Recently Completed vs Archived Tasks) `#analysis` (2026-01-28)
+    > ANALYZED: Code properly handles 'Recently Completed' as a valid TASK_SECTION (line 438, 804). Tasks in this section with [x] get TaskStatus.ARCHIVED (line 652-655). Section is converted to 'Archived Tasks' on write. The code path is correct - unable to identify how tasks could leak into the Tasks section. The gist shows non-standard output format which suggests either a different tool or an edge case we haven't identified.
+  - [x] **#264.1** Investigate: Reproduce bug with empty Tasks section and archived tasks `#research` (2026-01-28)
+    > REPRODUCED! With user's original TODO.md from ascii-guard: (1) Empty Tasks section, (2) Recently Completed has parent tasks with incomplete subtasks (e.g., #58 with [~] has subtasks #58.1-58.7 with [ ], #79 with [x] has subtasks #79.3.5, #79.3.7 with [ ]). After adding new task #94, orphan subtasks appear under Tasks section. Root cause: subtask status based on checkbox [ ] not parent's section/status.
 
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
@@ -1680,6 +1689,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 10:2026-01-27T23:50:41.505246:2026-01-27T23:51:37.635574
@@ -2581,16 +2595,16 @@
 263.6:2026-01-27T23:50:41.498372:2026-01-27T23:51:37.683606
 263.7:2026-01-27T23:50:41.498368:2026-01-27T23:51:37.683607
 263.8:2026-01-27T23:50:41.498358:2026-01-27T23:51:37.683608
-264:2026-01-28T01:20:08.553847:2026-01-28T01:20:24.838819
-264.1:2026-01-28T01:20:17.379514:2026-01-28T01:20:17.473910
-264.2:2026-01-28T01:20:17.481124:2026-01-28T01:20:17.587170
-264.3:2026-01-28T01:20:17.594393:2026-01-28T01:20:17.594394
-264.4:2026-01-28T01:20:17.854559:2026-01-28T01:20:17.854560
-264.5:2026-01-28T01:20:18.007716:2026-01-28T01:20:18.007722
-264.6:2026-01-28T01:20:18.118224:2026-01-28T01:20:18.118225
-264.7:2026-01-28T01:20:18.287933:2026-01-28T01:20:18.287934
-264.8:2026-01-28T01:20:18.404329:2026-01-28T01:20:18.404330
-264.9:2026-01-28T01:20:18.513973:2026-01-28T01:20:18.513980
+264:2026-01-28T01:20:08.553847:2026-01-28T01:36:40.747101
+264.1:2026-01-28T01:20:17.379514:2026-01-28T01:36:40.747147
+264.2:2026-01-28T01:20:17.481124:2026-01-28T01:36:40.747135
+264.3:2026-01-28T01:20:17.594393:2026-01-28T01:36:40.747132
+264.4:2026-01-28T01:20:17.854559:2026-01-28T01:36:40.747130
+264.5:2026-01-28T01:20:18.007716:2026-01-28T01:36:40.747127
+264.6:2026-01-28T01:20:18.118224:2026-01-28T01:36:40.747111
+264.7:2026-01-28T01:20:18.287933:2026-01-28T01:36:40.747109
+264.8:2026-01-28T01:20:18.404329:2026-01-28T01:36:40.747107
+264.9:2026-01-28T01:20:18.513973:2026-01-28T01:36:40.747104
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
@@ -2745,4 +2759,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 01:20:24
+**ai-todo** | Last Updated: 2026-01-28 01:36:40

@@ -77,6 +77,8 @@ def get_task_archive_date(task_id: str, todo_path: str) -> datetime | None:
     """
     # Try git log first
     try:
+        # Escape task_id for regex (e.g., "129.1" -> "129\.1")
+        escaped_task_id = re.escape(task_id)
         # Use extended regex with OR (|) to match EITHER pattern
         result = subprocess.run(
             [
@@ -84,7 +86,7 @@ def get_task_archive_date(task_id: str, todo_path: str) -> datetime | None:
                 "log",
                 "--all",
                 "--extended-regexp",
-                f"--grep=archive.*{task_id}|#{task_id}",
+                f"--grep=archive.*{escaped_task_id}|#{escaped_task_id}",
                 "--format=%ai",
                 "--",
                 todo_path,

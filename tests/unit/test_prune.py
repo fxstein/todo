@@ -44,6 +44,33 @@ class TestGitHistoryParsing:
         finally:
             Path(todo_path).unlink()
 
+    def test_get_task_archive_date_escapes_subtask_dots(self):
+        """Test that subtask IDs with dots are properly escaped in regex."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:
+            todo_path = f.name
+            f.write("# TODO\n")
+
+        try:
+            # Mock subprocess to return a date
+            with patch("ai_todo.utils.git.subprocess.run") as mock_run:
+                mock_result = MagicMock()
+                mock_result.returncode = 0
+                mock_result.stdout = "2026-01-15 10:30:45 -0800\n"
+                mock_run.return_value = mock_result
+
+                # Test with subtask ID containing dots
+                result = get_task_archive_date("129.1", todo_path)
+
+                assert result is not None
+
+                # Verify dot is escaped in git grep pattern
+                mock_run.assert_called_once()
+                call_args = mock_run.call_args[0][0]
+                # The dot should be escaped as \. in the pattern
+                assert r"--grep=archive.*129\.1|#129\.1" in call_args
+        finally:
+            Path(todo_path).unlink()
+
     def test_get_task_archive_date_no_git_history(self):
         """Test fallback when git history unavailable."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False) as f:

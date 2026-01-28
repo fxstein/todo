@@ -8,15 +8,15 @@
   > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
   - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
     > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
-  - [ ] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation`
+  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-28)
     > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
-  - [ ] **#266.3** Design: implementation plan for REVIEW `#design` `#review`
+  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-28)
     > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
     > Design doc: docs/linear_integration_design.md
-  - [ ] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design`
+  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-28)
     > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
     > Design doc: docs/linear_integration_design.md
-  - [ ] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment`
+  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-28)
     > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
     > Assessment doc: docs/linear_integration_assessment.md
 
@@ -1718,11 +1718,6 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
-
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 10:2026-01-27T23:50:41.505246:2026-01-27T23:51:37.635574
@@ -2640,10 +2635,10 @@ View with: `ai-todo show <task-id>`
 265.3:2026-01-28T13:55:19.415156:2026-01-28T21:02:25.578388
 265.4:2026-01-28T13:55:21.121695:2026-01-28T21:02:25.578390
 266:2026-01-28T21:14:24.478468:2026-01-28T21:20:43.039724
-266.1:2026-01-28T21:14:29.590090:2026-01-28T21:26:54.195457
-266.2:2026-01-28T21:14:31.480490:2026-01-28T21:37:30.978320
-266.3:2026-01-28T21:14:33.184130:2026-01-28T21:37:31.891194
-266.4:2026-01-28T21:14:34.517139:2026-01-28T21:20:48.518930
+266.1:2026-01-28T21:14:29.590090:2026-01-28T21:55:22.383938
+266.2:2026-01-28T21:14:31.480490:2026-01-28T21:55:22.383941
+266.3:2026-01-28T21:14:33.184130:2026-01-28T21:55:22.383942
+266.4:2026-01-28T21:14:34.517139:2026-01-28T21:55:22.383943
 266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
@@ -2799,4 +2794,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 21:37:31
+**ai-todo** | Last Updated: 2026-01-28 21:55:22

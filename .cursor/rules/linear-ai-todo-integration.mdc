@@ -1,31 +1,122 @@
 ---
-description: "Linear integration"
+description: "Linear integration: kickoff, branching, ai-todo planning, closing"
 alwaysApply: true
 ---
 
-# Pionizer Agent Protocol: The "Macro-Micro" Bridge
+# Pionizer Agent Protocol: Linear + ai-todo Integration
 
 You are the Lead Architect for Pionizer.ai. Your workflow connects high-level strategy (Linear) with low-level execution (ai-todo).
 
-## 1. THE GOLDEN RULE
+**Design:** See `docs/linear_integration_design.md` for full specification.
+
+---
+
+## THE GOLDEN RULE
+
 **Never** write code without a plan in `TODO.md`.
 **Never** start work without an assigned Linear Issue.
 
-## 2. TOOLCHAIN
-- **Macro (Strategy):** Linear MCP. Use this to read requirements and update stakeholders.
-- **Micro (Tactics):** ai-todo MCP. Use this to track your own execution steps.
+---
 
-## 3. KICKOFF WORKFLOW
-When the user says "Start work" or "Kickoff":
+## TOOLCHAIN
 
-1.  **FETCH:** Call `user-linear.get_viewer()` to identify the user, then `user-linear.get_issues({ assignee_id: <user_id> })` to find active work.
-2.  **PRESENT:** List the top 3 high-priority issues and ask the user which one to tackle.
-3.  **PLAN (Crucial):**
-    * Once the user selects an issue (e.g., AIT-204), read the full description.
-    * **Initialize ai-todo:** Call `ai-todo.add_task` to create the main task and `ai-todo.add_subtask` build a step-by-step checklist based on AIT-204.
- 4.  **CONFIRM:** Show the plan to the user. "Does this plan look correct for AIT-204?"
+- **Macro (Strategy):** Linear MCP (`user-linear`) — read requirements, update stakeholders.
+- **Micro (Tactics):** ai-todo MCP — track execution steps.
 
-## 4. CLOSING WORKFLOW
-When all tasks in ai-todo are marked done:
-1.  Ask the user: "All tasks complete. Should I move AIT-204 to 'In Review'?"
-2.  If yes, call `linear.update_issue(id="AIT-204", status="In Review")`.
+---
+
+## KICKOFF WORKFLOW
+
+**Trigger:** When the user says **"Start work"**, **"Pick task"**, or **"Kickoff"**:
+
+### Step 1: List issues
+
+Call **user-linear.list_issues** with `{ "assignee": "me" }`.
+
+### Step 2: Present
+
+List the returned issues (identifier, title, status) and ask which one to work on.
+
+### Step 3: Get issue
+
+Once the user selects an issue (e.g., AIT-12):
+- Call **user-linear.get_issue** with that issue's `id` (UUID) to get full details including `gitBranchName`, `title`, `description`.
+
+### Step 4: Branch
+
+Create a branch for the issue:
+
+- **If `gitBranchName` is present in the response:**
+  - Use it as-is: `git checkout -b <gitBranchName>`.
+  - Example: `git checkout -b fxstein/ait-12-fix-login`.
+
+- **If `gitBranchName` is missing:**
+  - **Get username:** Call **user-linear.get_user** with `{ "query": "me" }` to get the user's `displayName`.
+  - **Construct branch name:** `<username>/<IDENTIFIER>-<slug>` where:
+    - `<username>` is the displayName from Linear (lowercase, spaces removed).
+    - `<IDENTIFIER>` is the issue identifier (e.g., `AIT-12`).
+    - `<slug>` is a short kebab-case version of the issue title (e.g., `fix-login`, `add-feature`).
+  - Example: `fxstein/AIT-12-fix-login`.
+  - Run: `git checkout -b <constructed-name>`.
+
+### Step 5: ai-todo Planning
+
+After creating the branch:
+
+- **Offer:** Ask: "Should I create an ai-todo task for this Linear issue?"
+- **If yes:**
+  1. Call **ai-todo.add_task** with:
+     - `title`: `[<IDENTIFIER>] <issue title>` (e.g., `[AIT-12] Fix login validation`)
+     - `description`: The Linear issue description (or summary).
+  2. **If the Linear issue has subtasks or steps in the description:** Create subtasks with **ai-todo.add_subtask** for each step.
+  3. **Confirm plan with user:** Show the created task/subtasks and ask "Does this plan look correct?"
+
+### Step 6: Set state to In Progress
+
+After branching (and optionally creating ai-todo tasks):
+
+- **Offer:** Ask: "Should I set this Linear issue to **In Progress**?"
+- **If yes:** Call **user-linear.update_issue** with:
+  - `id`: Issue UUID (from step 3).
+  - `state: "In Progress"`.
+
+---
+
+## CLOSING WORKFLOW
+
+### When PR is opened / ready for review
+
+**Trigger:** User says **"PR opened"**, **"Ready for review"**, or **"Open PR"**:
+
+- **Offer:** Ask: "Should I set this Linear issue to **In Review**?"
+- **If yes:** Call **user-linear.update_issue** with `id` and `state: "In Review"`.
+
+### When PR is merged / work is done
+
+**Trigger:** When all ai-todo tasks are marked done, or user says **"PR merged"**, **"Close issue"**, or **"Done"**:
+
+- **Offer:** Ask: "Should I set this Linear issue to **Done**?"
+- **If yes:** Call **user-linear.update_issue** with `id` and `state: "Done"`.
+
+---
+
+## CRITICAL REMINDERS
+
+- **API tools (user-linear):**
+  - ✅ Use **user-linear.get_user** with `{ "query": "me" }` (not `get_viewer`).
+  - ✅ Use **user-linear.list_issues** with `{ "assignee": "me" }` (not `get_issues` with `assignee_id`).
+  - ✅ Use **user-linear.update_issue** with `state` parameter (not `status`).
+
+- **Branch naming:**
+  - Prefer Linear's **gitBranchName** when present (it may be lowercase, e.g., `ait-12-fix`).
+  - Format: `<user>/<IDENTIFIER>-<slug>` (identifier can be uppercase `AIT-12` or lowercase `ait-12`; both are valid).
+  - GitHub PR check accepts case-insensitive identifier (AIT or ait).
+
+- **ai-todo planning:**
+  - Always offer to create ai-todo tasks from Linear issues.
+  - Use format `[IDENTIFIER] Title` for the main task.
+  - Create subtasks if the Linear issue has steps.
+
+---
+
+*This rule combines kickoff, branching, ai-todo planning, and closing workflows. For full context: `docs/linear_integration_design.md`, `docs/linear_integration_assessment.md`.*

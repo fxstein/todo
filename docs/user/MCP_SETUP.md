@@ -67,6 +67,18 @@ Once connected, you can ask Cursor's AI (Composer or Chat) to manage your tasks 
 
 Cursor will automatically call the appropriate ai-todo tools (`add_task`, `list_tasks`, `complete_task`) to perform the action.
 
+### Maintenance Operations
+
+The MCP server also supports maintenance operations for keeping your TODO.md clean:
+
+**Prune Old Archived Tasks:**
+
+- "Prune archived tasks older than 60 days"
+- "Remove tasks #1 through #50 from the archive"
+- "Preview what would be pruned with a dry run"
+
+The `prune_tasks` tool creates automatic backups in `.ai-todo/archives/` before making changes, preserving complete task metadata for restoration if needed.
+
 ## MCP Resources
 
 In addition to tools, the ai-todo MCP server exposes **resources** for read-only access to task data:

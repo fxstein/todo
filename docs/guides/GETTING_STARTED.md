@@ -155,6 +155,17 @@ ai-todo switch-mode <mode>        # Change numbering mode
 ai-todo setup-coordination <type> # Configure coordination
 ```
 
+### Maintenance
+
+```bash
+ai-todo prune                     # Remove archived tasks older than 30 days
+ai-todo prune --days 60           # Custom retention period
+ai-todo prune --from-task 100     # Remove tasks #1 to #100
+ai-todo prune --dry-run           # Preview what would be pruned
+```
+
+> **Note:** Pruning creates automatic backups in `.ai-todo/archives/` with complete restoration capability.
+
 ### Information
 
 ```bash

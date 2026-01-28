@@ -90,6 +90,7 @@ With ai-todo, you simply tell your AI agent what you want in plain English:
 - *"Mark task 1 as complete"*
 - *"Show me all tasks tagged with #bug"*
 - *"Archive completed tasks"*
+- *"Prune archived tasks older than 30 days"* — Keep TODO.md clean
 - *"Fix the issue from #123"* — Reference GitHub Issues in tasks
 
 Your agent handles the technical details. All tasks are stored in `TODO.md` in your repository.

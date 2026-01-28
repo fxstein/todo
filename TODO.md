@@ -4,20 +4,19 @@
 
 ## Tasks
 
-- [x] **#265** Add commit guideline to ai-todo–written Cursor rule `#cursor-rules` `#guidance` (2026-01-28)
-  > Extend the Python code that writes the Cursor rule to `.cursor/rules/ai-todo-task-management.mdc` so the rule includes a commit guideline.
-  > **Context:** The rule content is the string `AI_TODO_CURSOR_RULE` in `ai_todo/mcp/server.py`, written by `_init_cursor_rules()` when the rule file does not exist. We need to add this bullet to that rule text:
-  > - **When committing:** If TODO.md or `.ai-todo/` have changes, always stage and commit them together (with other changes). They are versioned like the rest of the repo.
-  > **Flow:** Design (and get approved) → Implement → Write tests → Verify.
-  - [x] **#265.4** Verify: run tests and confirm rule output `#verification` (2026-01-28)
-    > Run unit tests and manually confirm the generated .cursor/rules/ai-todo-task-management.mdc contains the new bullet and renders correctly.
-  - [x] **#265.3** Write tests for new rule content `#testing` (2026-01-28)
-    > Extend tests in tests/unit/test_cursor_rules.py to assert the written rule file contains the new commit guideline (e.g. “When committing”, “TODO.md”, “.ai-todo/”).
-  - [x] **#265.2** Implement: extend AI_TODO_CURSOR_RULE in server.py `#implementation` (2026-01-28)
-    > Add the commit guideline bullet to the rule string in ai_todo/mcp/server.py. Implement per approved design.
-  - [x] **#265.1** Design: add commit bullet to rule content and get approval `#analysis` `#design` (2026-01-28)
-    > Document where and how to add the commit guideline bullet to AI_TODO_CURSOR_RULE (wording, placement). Consider: existing installs already have the file (code only writes if missing)—document upgrade path or leave as "new installs only". Write design doc and link from this subtask; stop for human review and approval.
-    > Design doc: docs/design/COMMIT_GUIDELINE_CURSOR_RULE_265.md
+- [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
+  > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
+  - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
+    > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
+  - [ ] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation`
+    > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
+  - [ ] **#266.3** Design: implementation plan for REVIEW `#design` `#review`
+    > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
+  - [ ] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design`
+    > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
+  - [ ] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment`
+    > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
+    > Assessment doc: docs/linear_integration_assessment.md
 
 - [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
 
@@ -40,6 +39,20 @@
 ---
 
 ## Archived Tasks
+- [x] **#265** Add commit guideline to ai-todo–written Cursor rule `#cursor-rules` `#guidance` (2026-01-28)
+  > Extend the Python code that writes the Cursor rule to `.cursor/rules/ai-todo-task-management.mdc` so the rule includes a commit guideline.
+  > **Context:** The rule content is the string `AI_TODO_CURSOR_RULE` in `ai_todo/mcp/server.py`, written by `_init_cursor_rules()` when the rule file does not exist. We need to add this bullet to that rule text:
+  > - **When committing:** If TODO.md or `.ai-todo/` have changes, always stage and commit them together (with other changes). They are versioned like the rest of the repo.
+  > **Flow:** Design (and get approved) → Implement → Write tests → Verify.
+  - [x] **#265.4** Verify: run tests and confirm rule output `#verification` (2026-01-28)
+    > Run unit tests and manually confirm the generated .cursor/rules/ai-todo-task-management.mdc contains the new bullet and renders correctly.
+  - [x] **#265.3** Write tests for new rule content `#testing` (2026-01-28)
+    > Extend tests in tests/unit/test_cursor_rules.py to assert the written rule file contains the new commit guideline (e.g. “When committing”, “TODO.md”, “.ai-todo/”).
+  - [x] **#265.2** Implement: extend AI_TODO_CURSOR_RULE in server.py `#implementation` (2026-01-28)
+    > Add the commit guideline bullet to the rule string in ai_todo/mcp/server.py. Implement per approved design.
+  - [x] **#265.1** Design: add commit bullet to rule content and get approval `#analysis` `#design` (2026-01-28)
+    > Document where and how to add the commit guideline bullet to AI_TODO_CURSOR_RULE (wording, placement). Consider: existing installs already have the file (code only writes if missing)—document upgrade path or leave as "new installs only". Write design doc and link from this subtask; stop for human review and approval.
+    > Design doc: docs/design/COMMIT_GUIDELINE_CURSOR_RULE_265.md
 - [x] **#264** GitHub Issue #49: Archived tasks reappear under ## Tasks when adding new tasks    `#v4.0.1` `#bug` `#critical` `#file-ops` (2026-01-28)
   > Bug: When starting with TODO.md where Tasks section is empty but Archived/Recently Completed has many entries, creating new tasks causes some archived tasks (e.g., #79.3.x, #58.x) to incorrectly appear under Tasks. Environment: ai-todo v4.0.0b1, MCP via Cursor. Repro: https://gist.github.com/fxstein/19a43595ce66e9ca7ba624ad9f19b081
   - [x] **#264.9** Document: Close GitHub Issue #49 with fix reference `#documentation` (2026-01-28)
@@ -2619,11 +2632,17 @@ View with: `ai-todo show <task-id>`
 264.7:2026-01-28T01:20:18.287933:2026-01-28T01:39:14.758589
 264.8:2026-01-28T01:20:18.404329:2026-01-28T01:39:14.758591
 264.9:2026-01-28T01:20:18.513973:2026-01-28T01:39:14.758592
-265:2026-01-28T13:51:58.432185:2026-01-28T14:12:59.166632
-265.1:2026-01-28T13:55:15.552146:2026-01-28T21:00:53.140427
-265.2:2026-01-28T13:55:17.288324:2026-01-28T14:11:51.212698
-265.3:2026-01-28T13:55:19.415156:2026-01-28T14:12:29.723186
-265.4:2026-01-28T13:55:21.121695:2026-01-28T14:12:55.202650
+265:2026-01-28T13:51:58.432185:2026-01-28T21:02:25.578393
+265.1:2026-01-28T13:55:15.552146:2026-01-28T21:02:25.578379
+265.2:2026-01-28T13:55:17.288324:2026-01-28T21:02:25.578385
+265.3:2026-01-28T13:55:19.415156:2026-01-28T21:02:25.578388
+265.4:2026-01-28T13:55:21.121695:2026-01-28T21:02:25.578390
+266:2026-01-28T21:14:24.478468:2026-01-28T21:20:43.039724
+266.1:2026-01-28T21:14:29.590090:2026-01-28T21:26:54.195457
+266.2:2026-01-28T21:14:31.480490:2026-01-28T21:20:45.917283
+266.3:2026-01-28T21:14:33.184130:2026-01-28T21:20:47.249639
+266.4:2026-01-28T21:14:34.517139:2026-01-28T21:20:48.518930
+266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
 28:2026-01-27T23:50:41.505194:2026-01-27T23:51:37.635517
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
@@ -2778,4 +2797,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-28 21:00:53
+**ai-todo** | Last Updated: 2026-01-28 21:26:54

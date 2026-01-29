@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Prune Command**: Remove old archived tasks from TODO.md based on retention period or task ID range (GitHub Issue #51, task#267)
+  - CLI: `ai-todo prune --days 30` (remove tasks older than 30 days)
+  - CLI: `ai-todo prune --from-task 100` (remove tasks #1 to #100)
+  - MCP: `prune_tasks(days=30)` tool with same functionality
+  - Automatic backup creation in `.ai-todo/archives/` with complete TASK_METADATA
+  - Git history analysis to determine accurate archive dates
+  - Dry-run mode for safe preview before pruning
+
 ## Release Channels
 
 - **Stable:** Production-ready releases (e.g., `4.0.0`)

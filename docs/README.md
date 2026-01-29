@@ -45,6 +45,14 @@ Detailed guides for specific features and workflows.
 | [Beta Testing](guides/BETA_TESTING_GUIDE.md) | Testing pre-release versions |
 | [Security Best Practices](guides/SECURITY_BEST_PRACTICES.md) | .cursorignore and secrets protection |
 
+### 📝 examples/ - Usage Examples
+
+Practical examples for specific features.
+
+| Document | Description |
+|----------|-------------|
+| [Prune Examples](examples/PRUNE_EXAMPLES.md) | Pruning old archived tasks - CLI and MCP examples |
+
 ### ❓ FAQ
 
 | Document | Description |

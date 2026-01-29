@@ -13,6 +13,7 @@ from ai_todo.cli.commands import (
     list_command,
     modify_command,
     note_command,
+    prune_command,
     reformat_command,
     relate_command,
     reorder_command,
@@ -196,6 +197,27 @@ def delete(ctx, task_ids, no_subtasks):
 def archive(ctx, task_ids, reason):
     """Archive task(s) - move to Recently Completed section."""
     archive_command(list(task_ids), reason=reason, todo_path=ctx.obj["todo_file"])
+
+
+@cli.command()
+@click.option("--days", type=int, default=None, help="Prune tasks older than N days (default: 30)")
+@click.option("--older-than", help="Prune tasks before YYYY-MM-DD")
+@click.option("--from-task", help="Prune tasks from #1 to #ID")
+@click.option("--dry-run", is_flag=True, help="Preview without making changes")
+@click.option("--no-backup", is_flag=True, help="Skip archive backup creation")
+@click.option("--force", "-f", is_flag=True, help="Skip confirmation prompts")
+@click.pass_context
+def prune(ctx, days, older_than, from_task, dry_run, no_backup, force):
+    """Prune old archived tasks from TODO.md."""
+    prune_command(
+        days=days,
+        older_than=older_than,
+        from_task=from_task,
+        dry_run=dry_run,
+        backup=not no_backup,
+        force=force,
+        todo_path=ctx.obj["todo_file"],
+    )
 
 
 @cli.command()

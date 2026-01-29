@@ -1443,6 +1443,92 @@ def rollback_mode_tool_command(backup_name: str, todo_path: str = "TODO.md") -> 
     rollback_mode_command(backup_name, todo_path)
 
 
+# Prune Command
+def prune_command(
+    days: int | None = None,
+    older_than: str | None = None,
+    from_task: str | None = None,
+    dry_run: bool = False,
+    backup: bool = True,
+    force: bool = False,
+    todo_path: str = "TODO.md",
+):
+    """
+    Prune old archived tasks from TODO.md.
+
+    Args:
+        days: Prune tasks older than N days (default: 30 if no other filter)
+        older_than: Prune tasks before YYYY-MM-DD
+        from_task: Prune tasks from #1 to #from_task
+        dry_run: Preview without making changes
+        backup: Create archive backup (default: True)
+        force: Skip confirmation prompts
+        todo_path: Path to TODO.md
+    """
+    from ai_todo.core.prune import PruneManager
+
+    prune_mgr = PruneManager(todo_path)
+
+    # Run prune (dry-run first to preview)
+    preview_result = prune_mgr.prune_tasks(
+        days=days, older_than=older_than, from_task=from_task, dry_run=True, backup=False
+    )
+
+    # No tasks to prune
+    if preview_result.total_pruned == 0:
+        print("ℹ️  No archived tasks match the prune criteria.")
+        return
+
+    # Display preview
+    print(
+        f"🔍 Found {preview_result.tasks_pruned} task(s) and "
+        f"{preview_result.subtasks_pruned} subtask(s) to prune"
+    )
+    print(f"   Total: {preview_result.total_pruned} items")
+    print("")
+
+    # Dry run - show preview and exit
+    if dry_run:
+        print("📋 Tasks that would be pruned:")
+        for task_id in preview_result.pruned_task_ids[:10]:  # Show first 10
+            print(f"   - #{task_id}")
+        if len(preview_result.pruned_task_ids) > 10:
+            print(f"   ... and {len(preview_result.pruned_task_ids) - 10} more")
+        print("")
+        print("💡 Run without --dry-run to prune these tasks")
+        return
+
+    # Confirmation prompt (unless --force)
+    if not force:
+        print("⚠️  This will permanently remove these tasks from TODO.md")
+        if backup:
+            print("   (A backup will be created in .ai-todo/archives/)")
+        response = input("\nContinue? [y/N]: ").strip().lower()
+        if response != "y":
+            print("Cancelled.")
+            return
+
+    # Perform actual prune
+    print("")
+    print("🔧 Pruning tasks...")
+
+    result = prune_mgr.prune_tasks(
+        days=days,
+        older_than=older_than,
+        from_task=from_task,
+        dry_run=False,
+        backup=backup,
+    )
+
+    # Display result
+    print(f"✅ Pruned {result.tasks_pruned} task(s) and {result.subtasks_pruned} subtask(s)")
+
+    if result.archive_path:
+        print(f"📦 Archive backup: {result.archive_path}")
+
+    print("")
+
+
 # Phase 7: Utility Commands
 def report_bug_tool_command(
     error_description: str,

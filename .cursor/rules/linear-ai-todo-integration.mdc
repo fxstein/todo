@@ -44,21 +44,13 @@ Once the user selects an issue (e.g., AIT-12):
 
 ### Step 4: Branch
 
-Create a branch for the issue:
+**Always construct branch name:**
+1. Get git user: `git config user.name` (lowercase)
+2. Extract IDENTIFIER from Linear issue (e.g., `AIT-12`)
+3. Create slug from issue title (e.g., `fix-login`)
+4. Run: `git checkout -b <userid>/<IDENTIFIER>-<slug>`
 
-- **If `gitBranchName` is present in the response:**
-  - Use it as-is: `git checkout -b <gitBranchName>`.
-  - Example: `git checkout -b fxstein/ait-12-fix-login`.
-
-- **If `gitBranchName` is missing:**
-  - **Get username:** Call **user-linear.get_user** with `{ "query": "me" }` to get the user's `displayName`.
-  - **Username override:** If the displayName is `oliver`, use `fxstein` as the branch prefix instead.
-  - **Construct branch name:** `<username>/<IDENTIFIER>-<slug>` where:
-    - `<username>` is the displayName from Linear (lowercase, spaces removed), or `fxstein` if displayName is `oliver`.
-    - `<IDENTIFIER>` is the issue identifier (e.g., `AIT-12`).
-    - `<slug>` is a short kebab-case version of the issue title (e.g., `fix-login`, `add-feature`).
-  - Example: `fxstein/AIT-12-fix-login`.
-  - Run: `git checkout -b <constructed-name>`.
+**Example:** `oliver/AIT-12-fix-login`
 
 ### Step 5: ai-todo Planning
 
@@ -85,19 +77,40 @@ After branching (and optionally creating ai-todo tasks):
 
 ## CLOSING WORKFLOW
 
-### When PR is opened / ready for review
+### Open Pull Request
 
-**Trigger:** User says **"PR opened"**, **"Ready for review"**, or **"Open PR"**:
+**Trigger:** User says **"Open PR"**, **"Ready for review"**, or **"Create PR"**:
 
-- **Offer:** Ask: "Should I set this Linear issue to **In Review**?"
-- **If yes:** Call **user-linear.update_issue** with `id` and `state: "In Review"`.
+**Actions:**
+1. Push branch: `git push -u origin HEAD`
+2. Create PR with:
+   - Title: `[IDENTIFIER] Issue title`
+   - Body format:
+     ```
+     Closes [IDENTIFIER](linear-issue-url)
 
-### When PR is merged / work is done
+     ## Summary
+     [Brief description from Linear issue or ai-todo task]
 
-**Trigger:** When all ai-todo tasks are marked done, or user says **"PR merged"**, **"Close issue"**, or **"Done"**:
+     ## Changes
+     - [Key changes from commit messages]
 
-- **Offer:** Ask: "Should I set this Linear issue to **Done**?"
-- **If yes:** Call **user-linear.update_issue** with `id` and `state: "Done"`.
+     ## Test Plan
+     - [How to verify - optional]
+     ```
+3. Set Linear to **In Review**: Call **user-linear.update_issue** with `id` and `state: "In Review"`
+
+### After PR Merged
+
+**Trigger:** User says **"PR merged"**, **"Close issue"**, or **"Done"**:
+
+**Actions:**
+1. Set Linear to **Done**: Call **user-linear.update_issue** with `id` and `state: "Done"`
+2. Cleanup branch:
+   - Switch to main: `git checkout main`
+   - Update from upstream: `git pull origin main`
+   - Delete local branch: `git branch -d <branch-name>`
+   - Delete remote branch: `git push origin --delete <branch-name>`
 
 ---
 
@@ -109,8 +122,9 @@ After branching (and optionally creating ai-todo tasks):
   - ✅ Use **user-linear.update_issue** with `state` parameter (not `status`).
 
 - **Branch naming:**
-  - Prefer Linear's **gitBranchName** when present (it may be lowercase, e.g., `ait-12-fix`).
-  - Format: `<user>/<IDENTIFIER>-<slug>` (identifier can be uppercase `AIT-12` or lowercase `ait-12`; both are valid).
+  - Always construct: `<userid>/<IDENTIFIER>-<slug>` (e.g., `oliver/AIT-12-fix-login`).
+  - Get userid from: `git config user.name` (lowercase).
+  - Never use Linear's `gitBranchName` - always build it ourselves.
   - GitHub PR check accepts case-insensitive identifier (AIT or ait).
 
 - **ai-todo planning:**

@@ -229,6 +229,76 @@ def restore_task(task_ids: list[str]) -> str:
 
 
 @mcp.tool()
+def prune_tasks(
+    days: int | None = None,
+    older_than: str | None = None,
+    from_task: str | None = None,
+    dry_run: bool = False,
+    backup: bool = True,
+) -> dict:
+    """
+    Prune old archived tasks from TODO.md.
+
+    Args:
+        days: Prune tasks older than N days (default: 30 if no other filter)
+        older_than: Prune tasks before YYYY-MM-DD (format: YYYY-MM-DD)
+        from_task: Prune tasks from #1 to #ID (numeric task ID)
+        dry_run: Preview without making changes (default: False)
+        backup: Create archive backup (default: True)
+
+    Returns:
+        dict with keys:
+            - tasks_pruned: Number of root tasks pruned
+            - subtasks_pruned: Number of subtasks pruned
+            - total_pruned: Total items pruned
+            - archive_path: Path to backup archive (if created)
+            - dry_run: Whether this was a dry run
+            - pruned_task_ids: List of task IDs pruned (preview in dry run)
+
+    Examples:
+        # Prune tasks older than 30 days (default)
+        prune_tasks()
+
+        # Prune tasks older than 60 days
+        prune_tasks(days=60)
+
+        # Prune tasks before specific date
+        prune_tasks(older_than="2025-10-01")
+
+        # Prune tasks from #1 to #50
+        prune_tasks(from_task="50")
+
+        # Preview what would be pruned
+        prune_tasks(dry_run=True)
+
+        # Prune without backup (not recommended)
+        prune_tasks(backup=False)
+    """
+    from ai_todo.core.prune import PruneManager
+
+    try:
+        prune_mgr = PruneManager(CURRENT_TODO_PATH)
+        result = prune_mgr.prune_tasks(
+            days=days,
+            older_than=older_than,
+            from_task=from_task,
+            dry_run=dry_run,
+            backup=backup,
+        )
+
+        return {
+            "tasks_pruned": result.tasks_pruned,
+            "subtasks_pruned": result.subtasks_pruned,
+            "total_pruned": result.total_pruned,
+            "archive_path": result.archive_path,
+            "dry_run": result.dry_run,
+            "pruned_task_ids": result.pruned_task_ids,
+        }
+    except Exception as e:
+        raise ValueError(f"Prune operation failed: {e}") from e
+
+
+@mcp.tool()
 def undo_task(task_id: str) -> str:
     """Reopen (undo) a completed task."""
     return _capture_output(undo_command, task_id, todo_path=CURRENT_TODO_PATH)

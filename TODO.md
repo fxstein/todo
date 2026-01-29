@@ -17,7 +17,7 @@
   - [ ] **#268.5** Verification: Verify empty trash behavior `#verification`
   - [ ] **#268.4** Testing: Create unit and integration tests `#testing`
   - [ ] **#268.3** Implementation: Add empty trash functionality `#implementation`
-  - [ ] **#268.2** Design: Create empty trash implementation plan `#design` `#inprogress`
+  - [x] **#268.2** Design: Create empty trash implementation plan `#design` (2026-01-29)
     > Create empty trash implementation plan addressing all open questions from analysis phase.
     > Design document: docs/design/empty_trash_design.md
   - [x] **#268.1** Analysis: Review deleted tasks section and prune implementation `#analysis` (2026-01-29)
@@ -1337,6 +1337,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2118,7 +2123,7 @@
 267.9:2026-01-28T22:26:22.332652:2026-01-29T02:09:45.957108
 268:2026-01-29T02:12:17.206362:2026-01-29T02:29:10.116694
 268.1:2026-01-29T02:12:24.286400:2026-01-29T02:18:05.948270
-268.2:2026-01-29T02:12:24.853665:2026-01-29T02:40:56.733967
+268.2:2026-01-29T02:12:24.853665:2026-01-29T02:41:27.715291
 268.3:2026-01-29T02:12:25.395525:2026-01-29T02:12:25.395527
 268.4:2026-01-29T02:12:25.979364:2026-01-29T02:12:25.979366
 268.5:2026-01-29T02:12:26.526909:2026-01-29T02:12:26.526911
@@ -2195,4 +2200,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 02:40:56
+**ai-todo** | Last Updated: 2026-01-29 02:41:27

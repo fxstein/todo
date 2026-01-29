@@ -17,7 +17,7 @@ All open questions have been resolved:
 1. ✅ **Retention Period:** 30 days (use existing `expires_at` field)
 2. ✅ **Startup Behavior:** MCP server startup + manual CLI command
 3. ✅ **User Notification:** Silent with logging to `.ai-todo/.ai-todo.log`
-4. ✅ **Backup Default:** No backup (true "Empty Trash" semantics)
+4. ✅ **Backup:** No backup feature (true "Empty Trash" semantics - permanent deletion)
 
 ## Architecture
 
@@ -58,7 +58,6 @@ class EmptyTrashResult:
     subtasks_removed: int
     dry_run: bool
     removed_task_ids: list[str]
-    backup_path: str | None = None
 
     @property
     def total_removed(self) -> int:
@@ -77,14 +76,12 @@ class EmptyTrashManager:
     def empty_trash(
         self,
         dry_run: bool = False,
-        backup: bool = False,
     ) -> EmptyTrashResult:
         """
         Permanently remove expired deleted tasks.
 
         Args:
             dry_run: If True, only report what would be removed
-            backup: If True, create backup before removal
 
         Returns:
             EmptyTrashResult with operation details
@@ -102,17 +99,6 @@ class EmptyTrashManager:
         Returns:
             List of expired deleted tasks (includes root + subtasks)
         """
-
-    def _create_backup(self, tasks: list[Task]) -> str:
-        """
-        Create backup file with removed tasks (optional).
-
-        Args:
-            tasks: Tasks to backup
-
-        Returns:
-            Path to backup file
-        """
 ```
 
 ## Detailed Implementation
@@ -125,15 +111,14 @@ class EmptyTrashManager:
 1. Read all tasks from TODO.md via FileOps
 2. Identify expired deleted tasks
 3. If dry_run: return preview, exit
-4. If backup: create backup file
-5. Remove expired tasks from task manager
-6. Save changes via FileOps
-7. Log operation
-8. Return EmptyTrashResult
+4. Remove expired tasks from task manager
+5. Save changes via FileOps
+6. Log operation
+7. Return EmptyTrashResult
 
 **Pseudocode:**
 ```python
-def empty_trash(self, dry_run: bool = False, backup: bool = False) -> EmptyTrashResult:
+def empty_trash(self, dry_run: bool = False) -> EmptyTrashResult:
     # Read current state
     self.file_ops.read_tasks()
     all_tasks = self.file_ops.task_manager.list_tasks()
@@ -142,7 +127,7 @@ def empty_trash(self, dry_run: bool = False, backup: bool = False) -> EmptyTrash
     expired_tasks = self.identify_expired_deleted_tasks(all_tasks)
 
     if not expired_tasks:
-        return EmptyTrashResult(0, 0, dry_run, [], None)
+        return EmptyTrashResult(0, 0, dry_run, [])
 
     # Count root vs subtasks
     root_count = sum(1 for t in expired_tasks if "." not in t.id)
@@ -151,12 +136,7 @@ def empty_trash(self, dry_run: bool = False, backup: bool = False) -> EmptyTrash
 
     # Dry run: return preview
     if dry_run:
-        return EmptyTrashResult(root_count, subtask_count, True, task_ids, None)
-
-    # Optional backup
-    backup_path = None
-    if backup:
-        backup_path = self._create_backup(expired_tasks)
+        return EmptyTrashResult(root_count, subtask_count, True, task_ids)
 
     # Remove tasks
     for task in expired_tasks:
@@ -169,10 +149,10 @@ def empty_trash(self, dry_run: bool = False, backup: bool = False) -> EmptyTrash
     log_operation(
         "EMPTY_TRASH",
         f"Removed {len(expired_tasks)} expired deleted task(s)",
-        details={"task_ids": task_ids, "backup": backup_path}
+        details={"task_ids": task_ids}
     )
 
-    return EmptyTrashResult(root_count, subtask_count, False, task_ids, backup_path)
+    return EmptyTrashResult(root_count, subtask_count, False, task_ids)
 ```
 
 #### `identify_expired_deleted_tasks()` Method
@@ -208,37 +188,6 @@ def identify_expired_deleted_tasks(self, tasks: list[Task]) -> list[Task]:
     return expired
 ```
 
-#### `_create_backup()` Method
-
-**Backup Location:**
-- Directory: `.ai-todo/trash/`
-- Filename: `TRASH_BACKUP_YYYY-MM-DD[_N].md`
-- Format: Similar to prune archives
-
-**Backup Structure:**
-```markdown
-# Empty Trash Backup - YYYY-MM-DD HH:MM:SS
-
-**Retention Policy:** 30 days (expires_at)
-**Operation Date:** YYYY-MM-DD HH:MM:SS UTC
-**Tasks Removed:** N
-
----
-
-## Removed Tasks
-
-- [D] **#123** Task description (deleted 2026-01-27, expires 2026-02-26)
-- [D] **#125** Another task (deleted 2026-01-20, expires 2026-02-19)
-
-<!-- TASK_METADATA
-123:2026-01-15T10:00:00:2026-01-27T15:30:00
-125:2026-01-10T08:00:00:2026-01-20T12:00:00
--->
-
----
-**Backup Created:** YYYY-MM-DD HH:MM:SS UTC
-```
-
 ### 2. CLI Interface
 
 #### Command Definition (`ai_todo/cli/main.py`)
@@ -246,13 +195,11 @@ def identify_expired_deleted_tasks(self, tasks: list[Task]) -> list[Task]:
 ```python
 @cli.command("empty-trash")
 @click.option("--dry-run", is_flag=True, help="Preview without removing")
-@click.option("--backup", is_flag=True, help="Create backup before removal")
 @click.pass_context
-def empty_trash_cmd(ctx, dry_run: bool, backup: bool):
+def empty_trash_cmd(ctx, dry_run: bool):
     """Permanently remove expired deleted tasks (30-day retention)."""
     empty_trash_command(
         dry_run=dry_run,
-        backup=backup,
         todo_path=ctx.obj["todo_file"],
     )
 ```
@@ -262,14 +209,13 @@ def empty_trash_cmd(ctx, dry_run: bool, backup: bool):
 ```python
 def empty_trash_command(
     dry_run: bool = False,
-    backup: bool = False,
     todo_path: str = "TODO.md",
 ):
     """Permanently remove expired deleted tasks."""
     from ai_todo.core.empty_trash import EmptyTrashManager
 
     manager = EmptyTrashManager(todo_path)
-    result = manager.empty_trash(dry_run=dry_run, backup=backup)
+    result = manager.empty_trash(dry_run=dry_run)
 
     if result.total_removed == 0:
         print("ℹ️ No expired deleted tasks found.")
@@ -282,8 +228,6 @@ def empty_trash_command(
         print(f"   - IDs: {', '.join(result.removed_task_ids)}")
     else:
         print(f"🗑️ Removed {result.total_removed} expired task(s)")
-        if result.backup_path:
-            print(f"📦 Backup: {result.backup_path}")
 ```
 
 ### 3. MCP Interface
@@ -294,18 +238,16 @@ def empty_trash_command(
 @mcp.tool()
 def empty_trash(
     dry_run: bool = False,
-    backup: bool = False,
 ) -> dict:
     """
     Permanently remove expired deleted tasks (30-day retention).
 
     This operation removes tasks from the "Deleted Tasks" section where
-    the expiration date (expires_at) has passed. By default, no backup
-    is created (true "Empty Trash" semantics).
+    the expiration date (expires_at) has passed. This is a permanent
+    deletion with no backup (true "Empty Trash" semantics).
 
     Args:
         dry_run: Preview without removing (default: False)
-        backup: Create backup before removal (default: False)
 
     Returns:
         dict with operation results
@@ -313,7 +255,7 @@ def empty_trash(
     from ai_todo.core.empty_trash import EmptyTrashManager
 
     manager = EmptyTrashManager(CURRENT_TODO_PATH)
-    result = manager.empty_trash(dry_run=dry_run, backup=backup)
+    result = manager.empty_trash(dry_run=dry_run)
 
     return {
         "tasks_removed": result.tasks_removed,
@@ -321,7 +263,6 @@ def empty_trash(
         "total_removed": result.total_removed,
         "dry_run": result.dry_run,
         "removed_task_ids": result.removed_task_ids,
-        "backup_path": result.backup_path,
         "message": _format_result_message(result),
     }
 
@@ -337,10 +278,7 @@ def _format_result_message(result: EmptyTrashResult) -> str:
             f"{result.tasks_removed} root, {result.subtasks_removed} subtasks"
         )
 
-    msg = f"🗑️ Removed {result.total_removed} expired task(s)"
-    if result.backup_path:
-        msg += f" (backup: {result.backup_path})"
-    return msg
+    return f"🗑️ Removed {result.total_removed} expired task(s)"
 ```
 
 ### 4. Startup Hook
@@ -357,7 +295,7 @@ def _auto_empty_trash():
         from ai_todo.core.empty_trash import EmptyTrashManager
 
         manager = EmptyTrashManager(CURRENT_TODO_PATH)
-        result = manager.empty_trash(dry_run=False, backup=False)
+        result = manager.empty_trash(dry_run=False)
 
         # Only log if tasks were removed
         if result.total_removed > 0:
@@ -474,7 +412,6 @@ except Exception as e:
 2. **EMPTY_TRASH** (manual command)
    - Always log (even if 0 tasks)
    - Include dry_run flag
-   - Include backup path if created
 
 3. **AUTO_EMPTY_TRASH_ERROR** (startup failure)
    - Log error details for debugging
@@ -517,7 +454,6 @@ except Exception as e:
 |---------|-----|-----|-------|
 | **Remove expired tasks** | ✅ | ✅ | Core functionality |
 | **Dry run mode** | ✅ | ✅ | `--dry-run` flag |
-| **Optional backup** | ✅ | ✅ | `--backup` flag |
 | **Auto-run on startup** | ❌ | ✅ | MCP only |
 | **Result details** | ✅ | ✅ | Same info, different format |
 
@@ -539,7 +475,6 @@ except Exception as e:
   "total_removed": 3,
   "dry_run": false,
   "removed_task_ids": ["123", "125", "127"],
-  "backup_path": null,
   "message": "🗑️ Removed 3 expired task(s)"
 }
 ```
@@ -559,34 +494,6 @@ except Exception as e:
 - Atomic: all removals in memory, single write at end
 - FileOps handles checksums and shadow copies
 - Tamper detection works normally
-
-### Backup Creation (Optional)
-
-**Directory:** `.ai-todo/trash/`
-**Naming:** `TRASH_BACKUP_YYYY-MM-DD[_N].md`
-**Content:** Full task details + TASK_METADATA
-
-**Implementation:**
-```python
-def _create_backup(self, tasks: list[Task]) -> str:
-    backup_dir = Path(self.todo_path).parent / ".ai-todo" / "trash"
-    backup_dir.mkdir(parents=True, exist_ok=True)
-
-    # Generate unique filename
-    base_name = f"TRASH_BACKUP_{datetime.now(UTC).strftime('%Y-%m-%d')}"
-    backup_path = backup_dir / f"{base_name}.md"
-
-    counter = 1
-    while backup_path.exists():
-        backup_path = backup_dir / f"{base_name}_{counter}.md"
-        counter += 1
-
-    # Write backup file
-    with open(backup_path, "w") as f:
-        f.write(self._format_backup(tasks))
-
-    return str(backup_path)
-```
 
 ## Edge Cases
 
@@ -625,14 +532,6 @@ def _create_backup(self, tasks: list[Task]) -> str:
 - If tamper detected: operation fails safely
 - User must resolve with `ai-todo tamper`
 
-### 5. Backup Directory Doesn't Exist
-
-**Scenario:** `.ai-todo/trash/` doesn't exist
-
-**Behavior:**
-- Create directory automatically
-- No error, just create and proceed
-
 ## Testing Strategy
 
 ### Unit Tests (`tests/unit/test_empty_trash.py`)
@@ -644,29 +543,22 @@ def _create_backup(self, tasks: list[Task]) -> str:
 4. `identify_expired_deleted_tasks()` - not expired
 5. `empty_trash()` - dry run mode
 6. `empty_trash()` - actual removal
-7. `empty_trash()` - with backup
-8. `empty_trash()` - empty section
-9. `_create_backup()` - file creation
-10. `_create_backup()` - filename collision
+7. `empty_trash()` - empty section
 
 ### Integration Tests (`tests/integration/test_empty_trash_integration.py`)
 
 **Coverage:**
 1. CLI: Basic empty trash
 2. CLI: Dry run mode
-3. CLI: With backup flag
-4. CLI: Empty section handling
-5. MCP: Basic empty trash
-6. MCP: Dry run mode
-7. MCP: With backup flag
-8. MCP/CLI parity: Same result for same input
-9. Safety: Only removes from Deleted Tasks section
-10. Safety: Never touches Archived or active tasks
-11. Subtasks: Removed with parent
-12. Subtasks: Removed independently if parent not expired
-13. Logging: Operations logged correctly
-14. Backup: File created with correct content
-15. Backup: TASK_METADATA included
+3. CLI: Empty section handling
+4. MCP: Basic empty trash
+5. MCP: Dry run mode
+6. MCP/CLI parity: Same result for same input
+7. Safety: Only removes from Deleted Tasks section
+8. Safety: Never touches Archived or active tasks
+9. Subtasks: Removed with parent
+10. Subtasks: Removed independently if parent not expired
+11. Logging: Operations logged correctly
 
 ### Startup Tests
 
@@ -723,7 +615,6 @@ def _create_backup(self, tasks: list[Task]) -> str:
 - Manager class pattern
 - Result dataclass
 - Dry-run mode
-- Optional backup
 - CLI + MCP interfaces
 - FileOps integration
 - Logging
@@ -745,16 +636,14 @@ def _create_backup(self, tasks: list[Task]) -> str:
 
 **No Special Permissions Needed:**
 - Reads/writes TODO.md (same as other commands)
-- Creates backup in `.ai-todo/trash/` (user's directory)
 
 ### Data Loss Prevention
 
 **Mechanisms:**
 1. **30-day retention** - conservative default
-2. **Optional backup** - user can enable if paranoid
-3. **Dry-run mode** - preview before removal
-4. **Clear metadata** - users see expiration dates
-5. **Logging** - audit trail of all removals
+2. **Dry-run mode** - preview before removal
+3. **Clear metadata** - users see expiration dates
+4. **Logging** - audit trail of all removals
 
 ### Attack Vectors
 
@@ -772,7 +661,6 @@ def _create_backup(self, tasks: list[Task]) -> str:
 - [ ] Implement `EmptyTrashManager` class
 - [ ] Implement `identify_expired_deleted_tasks()` method
 - [ ] Implement `empty_trash()` method
-- [ ] Implement `_create_backup()` method (optional)
 - [ ] Add proper error handling
 - [ ] Add logging integration
 

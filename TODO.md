@@ -4,7 +4,7 @@
 
 ## Tasks
 
-- [ ] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear`
+- [x] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear` (2026-01-29)
   > Linear issue: https://linear.app/fxstein/issue/AIT-3/implement-empty-trash-on-startup-deleted-tasks
   > Startup policy to permanently remove items from "Deleted Tasks" section.
   > - Target: Only items explicitly in the "Deleted Tasks" section
@@ -13,7 +13,7 @@
   > - Strictly an "Empty Trash" operation
   > Blocked by: AIT-2 (✅ complete)
   > Change Request (2026-01-29): Updated retention from 7 to 30 days to align with existing expires_at metadata.
-  - [ ] **#268.6** Documentation: Update docs and examples `#documentation` `#inprogress`
+  - [x] **#268.6** Documentation: Update docs and examples `#documentation` (2026-01-29)
   - [x] **#268.5** Verification: Verify empty trash behavior `#verification` (2026-01-29)
   - [x] **#268.4** Testing: Create unit and integration tests `#testing` (2026-01-29)
   - [x] **#268.3** Implementation: Add empty trash functionality `#implementation` (2026-01-29)
@@ -2116,13 +2116,13 @@
 267.7:2026-01-28T22:26:19.178103:2026-01-29T02:09:45.957107
 267.8:2026-01-28T22:26:20.882963:2026-01-29T02:09:45.957108
 267.9:2026-01-28T22:26:22.332652:2026-01-29T02:09:45.957108
-268:2026-01-29T02:12:17.206362:2026-01-29T02:29:10.116694
+268:2026-01-29T02:12:17.206362:2026-01-29T03:11:08.286427
 268.1:2026-01-29T02:12:24.286400:2026-01-29T02:18:05.948270
 268.2:2026-01-29T02:12:24.853665:2026-01-29T02:41:27.715291
 268.3:2026-01-29T02:12:25.395525:2026-01-29T03:04:15.836833
 268.4:2026-01-29T02:12:25.979364:2026-01-29T03:08:59.298252
 268.5:2026-01-29T02:12:26.526909:2026-01-29T03:09:33.065180
-268.6:2026-01-29T02:12:27.093344:2026-01-29T03:09:33.477573
+268.6:2026-01-29T02:12:27.093344:2026-01-29T03:11:02.442815
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
 28.3:2026-01-27T23:50:41.506076:2026-01-27T23:50:41.506077
@@ -2195,4 +2195,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 03:09:33
+**ai-todo** | Last Updated: 2026-01-29 03:11:08

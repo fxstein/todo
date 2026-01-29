@@ -27,6 +27,21 @@ alwaysApply: true
 ✅ Use the summary Cursor naturally creates
 ❌ Don't create custom format or verbose details
 
+## Issue Investigation
+
+**When:** Asked to investigate potential issue from agent review
+
+**Action:** Post brief issue summary to Linear before starting investigation
+
+**Format:**
+- Issue description
+- Code location
+- Potential impact
+- Investigation status
+
+✅ Document what's being investigated
+❌ Don't post full investigation results (use completion summary instead)
+
 ## Issue ID
 
 Parse Linear ID from branch name: `fxstein/ait-12-feature` → `AIT-12`

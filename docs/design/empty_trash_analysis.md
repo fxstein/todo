@@ -267,27 +267,26 @@ async def init():
 - ✅ No custom retention period needed - use existing metadata
 - ✅ Simpler implementation, consistent behavior
 
-### 2. Startup Behavior
+### 2. Startup Behavior - RESOLVED ✅
 
-**Should empty trash run:**
-- On every command?
-- Only on MCP server startup?
-- Only when explicitly called?
-- Hybrid approach?
+**Resolution (2026-01-29):**
+- ✅ **Run on MCP server startup** (automatic when Cursor launches)
+- ✅ **Run on CLI command** (`ai-todo empty-trash`)
+- ❌ Not on every CLI command (too intrusive)
 
-### 3. User Notification
+### 3. User Notification - RESOLVED ✅
 
-**When auto-running on startup:**
-- Silent (no output)?
-- Log to `.ai-todo/.ai-todo.log`?
-- Show notification (could be annoying)?
+**Resolution (2026-01-29):**
+- ✅ **Silent** (no console output when auto-running)
+- ✅ **Log to `.ai-todo/.ai-todo.log`** (for audit trail)
+- ❌ No visible notification (could be annoying)
 
-### 4. Backup Default
+### 4. Backup Default - RESOLVED ✅
 
-**Empty trash implies permanence, but:**
-- Should we default to creating backups?
-- Or default to no backup (like desktop OS)?
-- User preference in config.yaml?
+**Resolution (2026-01-29):**
+- ✅ **Default to no backup** (matches desktop OS "Empty Trash" semantics)
+- ✅ **Optional `--backup` flag available** for safety-conscious users
+- No need for config.yaml preference
 
 ## Risk Assessment
 

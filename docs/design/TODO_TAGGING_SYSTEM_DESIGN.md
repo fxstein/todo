@@ -96,7 +96,7 @@ This document outlines the design decisions for implementing a tagging system in
 - [ ] #4 Add undo functionality to todo.zsh #feature #low #inprogress
 
 ## Recently Completed
-- [x] #5 Review PIONIZER documentation #docs #medium (2025-01-19)
+- [x] #5 Review project documentation #docs #medium (2025-01-19)
 - [x] #6 Fix todo.zsh script bugs #maintenance #high (2025-01-19)
 
 ## Tags Used

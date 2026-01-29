@@ -3,9 +3,9 @@ description: "Linear integration: kickoff, branching, ai-todo planning, closing"
 alwaysApply: true
 ---
 
-# Pionizer Agent Protocol: Linear + ai-todo Integration
+# Linear + ai-todo Integration Protocol
 
-You are the Lead Architect for Pionizer.ai. Your workflow connects high-level strategy (Linear) with low-level execution (ai-todo).
+Your workflow connects high-level strategy (Linear) with low-level execution (ai-todo).
 
 **Design:** See `docs/linear_integration_design.md` for full specification.
 

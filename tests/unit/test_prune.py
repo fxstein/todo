@@ -1,5 +1,6 @@
 """Unit tests for prune functionality."""
 
+import re
 import tempfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -206,6 +207,26 @@ class TestPruneManager:
         manager = PruneManager(temp_todo_file)
         assert manager.todo_path == temp_todo_file
         assert manager.file_ops is not None
+
+    def test_task_id_sort_key(self, temp_todo_file):
+        """Test numeric task ID sorting."""
+        manager = PruneManager(temp_todo_file)
+
+        # Test basic task IDs
+        assert manager._task_id_sort_key("9") == (9,)
+        assert manager._task_id_sort_key("10") == (10,)
+        assert manager._task_id_sort_key("100") == (100,)
+
+        # Test subtask IDs
+        assert manager._task_id_sort_key("10.1") == (10, 1)
+        assert manager._task_id_sort_key("10.2") == (10, 2)
+        assert manager._task_id_sort_key("10.10") == (10, 10)
+
+        # Verify correct ordering
+        task_ids = ["100", "10", "10.2", "10.10", "9", "10.1", "2"]
+        sorted_ids = sorted(task_ids, key=manager._task_id_sort_key)
+        expected = ["2", "9", "10", "10.1", "10.2", "10.10", "100"]
+        assert sorted_ids == expected
 
     def test_filter_by_age(self, temp_todo_file, sample_archived_tasks):
         """Test filtering tasks by age."""
@@ -513,6 +534,102 @@ class TestPruneManager:
         assert "tasks from #1 to #150" in content
         assert "Task Range: #1 to #150" in content
         assert "Retention Period:" not in content
+
+        Path(archive_path).unlink()
+
+    def test_archive_backup_numeric_task_id_sorting(self, temp_todo_file):
+        """Test that task IDs are sorted numerically, not lexicographically."""
+        manager = PruneManager(temp_todo_file)
+
+        # Create tasks with IDs that would be incorrectly ordered by string sort
+        tasks = [
+            Task(
+                id="100",
+                description="Task 100",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+            Task(
+                id="9",
+                description="Task 9",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+            Task(
+                id="10",
+                description="Task 10",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+            Task(
+                id="10.1",
+                description="Subtask 10.1",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+            Task(
+                id="10.10",
+                description="Subtask 10.10",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+            Task(
+                id="10.2",
+                description="Subtask 10.2",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+            Task(
+                id="2",
+                description="Task 2",
+                status=TaskStatus.ARCHIVED,
+                tags=set(),
+                created_at=datetime.now(UTC),
+            ),
+        ]
+
+        archive_path = manager.create_archive_backup(tasks, days=30)
+        content = Path(archive_path).read_text()
+
+        # Extract task IDs from TASK_METADATA section
+        # Pattern: <!-- TASK_METADATA ... task_id:timestamp ... -->
+        metadata_match = re.search(r"<!-- TASK_METADATA\n(.*?)\n-->", content, re.DOTALL)
+        assert metadata_match, "TASK_METADATA section not found"
+
+        metadata_content = metadata_match.group(1)
+        metadata_lines = [line.strip() for line in metadata_content.split("\n") if line.strip()]
+        # Skip the comment line
+        metadata_lines = [line for line in metadata_lines if not line.startswith("#")]
+
+        # Extract task IDs from metadata
+        task_ids_in_metadata = [line.split(":")[0] for line in metadata_lines]
+
+        # Verify numeric ordering
+        expected_order = ["2", "9", "10", "10.1", "10.2", "10.10", "100"]
+        assert task_ids_in_metadata == expected_order, (
+            f"Expected {expected_order}, got {task_ids_in_metadata}"
+        )
+
+        # Also verify task content ordering (check for ##Pruned Tasks section)
+        # Extract task IDs from the pruned tasks section
+        pruned_section = re.search(r"## Pruned Tasks\n\n(.*?)\n---", content, re.DOTALL)
+        assert pruned_section, "Pruned Tasks section not found"
+
+        # Find all task IDs in the section
+        task_id_matches = re.findall(r"\*\*#(\d+(?:\.\d+)?)\*\*", pruned_section.group(1))
+
+        # Verify numeric ordering in task content
+        # Note: Subtasks appear under their parent, so order is: 2, 9, 10, 10.1, 10.2, 10.10, 100
+        expected_content_order = ["2", "9", "10", "10.1", "10.2", "10.10", "100"]
+        assert task_id_matches == expected_content_order, (
+            f"Expected {expected_content_order}, got {task_id_matches}"
+        )
 
         Path(archive_path).unlink()
 

@@ -38,6 +38,32 @@ class PruneManager:
         self.todo_path = todo_path
         self.file_ops = FileOps(todo_path)
 
+    @staticmethod
+    def _task_id_sort_key(task_id: str) -> tuple[int, ...]:
+        """
+        Convert task ID to sortable tuple for numeric sorting.
+
+        Args:
+            task_id: Task ID (e.g., "9", "10", "10.1", "100")
+
+        Returns:
+            Tuple of integers for numeric comparison
+
+        Examples:
+            "9" -> (9,)
+            "10" -> (10,)
+            "10.1" -> (10, 1)
+            "100" -> (100,)
+
+        This ensures correct numeric ordering: 9, 10, 10.1, 10.2, 100
+        instead of lexicographic ordering: 10, 10.1, 10.2, 100, 9
+        """
+        try:
+            return tuple(int(part) for part in task_id.split("."))
+        except ValueError:
+            # Fallback for non-numeric IDs (shouldn't happen in practice)
+            return (0,)
+
     def identify_tasks_to_prune(
         self,
         tasks: list[Task],
@@ -247,11 +273,13 @@ These tasks are {criteria_desc}.
 """
 
         # Add tasks in standard TODO.md format
-        for task in tasks_to_prune:
-            # Skip subtasks - they'll be included under parent
-            if "." in task.id:
-                continue
+        # Sort root tasks numerically for correct ordering
+        root_tasks_sorted = sorted(
+            [t for t in tasks_to_prune if "." not in t.id],
+            key=lambda t: self._task_id_sort_key(t.id),
+        )
 
+        for task in root_tasks_sorted:
             # Add root task
             content += self._format_task(task)
 
@@ -261,7 +289,7 @@ These tasks are {criteria_desc}.
                 for t in tasks_to_prune
                 if t.id.startswith(f"{task.id}.") and t.id.count(".") == task.id.count(".") + 1
             ]
-            for subtask in sorted(task_subtasks, key=lambda t: t.id):
+            for subtask in sorted(task_subtasks, key=lambda t: self._task_id_sort_key(t.id)):
                 content += self._format_task(subtask)
 
             content += "\n"
@@ -273,7 +301,7 @@ These tasks are {criteria_desc}.
             content += "<!-- TASK_METADATA\n"
             content += "# Format: task_id:created_at[:updated_at]\n"
 
-            for task in sorted(tasks_to_prune, key=lambda x: x.id):
+            for task in sorted(tasks_to_prune, key=lambda x: self._task_id_sort_key(x.id)):
                 if task.created_at is not None:
                     created_str = task.created_at.isoformat()
                     if task.updated_at is not None and task.updated_at != task.created_at:

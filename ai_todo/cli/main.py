@@ -9,6 +9,7 @@ from ai_todo.cli.commands import (
     delete_command,
     delete_note_command,
     detect_coordination_tool_command,
+    empty_trash_command,
     lint_command,
     list_command,
     modify_command,
@@ -216,6 +217,17 @@ def prune(ctx, days, older_than, from_task, dry_run, no_backup, force):
         dry_run=dry_run,
         backup=not no_backup,
         force=force,
+        todo_path=ctx.obj["todo_file"],
+    )
+
+
+@cli.command("empty-trash")
+@click.option("--dry-run", is_flag=True, help="Preview without removing")
+@click.pass_context
+def empty_trash(ctx, dry_run):
+    """Permanently remove expired deleted tasks (30-day retention)."""
+    empty_trash_command(
+        dry_run=dry_run,
         todo_path=ctx.obj["todo_file"],
     )
 

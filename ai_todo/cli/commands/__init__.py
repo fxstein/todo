@@ -397,6 +397,17 @@ def delete_command(task_ids: list[str], with_subtasks: bool = True, todo_path: s
         save_changes(manager, todo_path)
         print(f"Deleted {deleted_count} task(s)")
 
+        # Auto-run empty trash after deletion (silent)
+        try:
+            from ai_todo.core.empty_trash import EmptyTrashManager
+
+            trash_mgr = EmptyTrashManager(todo_path)
+            trash_mgr.empty_trash(dry_run=False)
+            # Silent operation - FileOps handles logging automatically
+        except Exception:
+            # Fail silently - don't block delete operation
+            pass
+
 
 def archive_command(
     task_ids: list[str],
@@ -1444,6 +1455,41 @@ def rollback_mode_tool_command(backup_name: str, todo_path: str = "TODO.md") -> 
 
 
 # Prune Command
+def empty_trash_command(
+    dry_run: bool = False,
+    todo_path: str = "TODO.md",
+):
+    """
+    Permanently remove expired deleted tasks (30-day retention).
+
+    Args:
+        dry_run: Preview without making changes
+        todo_path: Path to TODO.md
+    """
+    from ai_todo.core.empty_trash import EmptyTrashManager
+
+    manager = EmptyTrashManager(todo_path)
+    result = manager.empty_trash(dry_run=dry_run)
+
+    if result.total_removed == 0:
+        print("ℹ️  No expired deleted tasks found.")
+        return
+
+    if dry_run:
+        print(f"🔍 Would remove {result.total_removed} expired task(s):")
+        print(f"   - Root tasks: {result.tasks_removed}")
+        print(f"   - Subtasks: {result.subtasks_removed}")
+        print(f"   - IDs: {', '.join(result.removed_task_ids[:10])}")
+        if len(result.removed_task_ids) > 10:
+            print(f"   ... and {len(result.removed_task_ids) - 10} more")
+        print("")
+        print("💡 Run without --dry-run to permanently remove these tasks")
+    else:
+        print(f"🗑️  Removed {result.total_removed} expired task(s)")
+        print(f"   - Root tasks: {result.tasks_removed}")
+        print(f"   - Subtasks: {result.subtasks_removed}")
+
+
 def prune_command(
     days: int | None = None,
     older_than: str | None = None,

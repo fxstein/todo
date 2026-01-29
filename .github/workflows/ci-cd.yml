@@ -140,6 +140,7 @@ jobs:
             !**/site-packages/**
             !**/dist-info/**
             !**/dist/**
+            !.ai-todo/**
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7

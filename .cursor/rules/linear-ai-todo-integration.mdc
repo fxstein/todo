@@ -46,19 +46,10 @@ Once the user selects an issue (e.g., AIT-12):
 
 Create a branch for the issue:
 
-- **If `gitBranchName` is present in the response:**
-  - Use it as-is: `git checkout -b <gitBranchName>`.
-  - Example: `git checkout -b fxstein/ait-12-fix-login`.
+- **If `gitBranchName` is present:** Use it as-is: `git checkout -b <gitBranchName>`
+- **If `gitBranchName` is missing:** Construct: `<IDENTIFIER>-<slug>` (e.g., `AIT-12-fix-login`)
 
-- **If `gitBranchName` is missing:**
-  - **Get username:** Call **user-linear.get_user** with `{ "query": "me" }` to get the user's `displayName`.
-  - **Username override:** If the displayName is `oliver`, use `fxstein` as the branch prefix instead.
-  - **Construct branch name:** `<username>/<IDENTIFIER>-<slug>` where:
-    - `<username>` is the displayName from Linear (lowercase, spaces removed), or `fxstein` if displayName is `oliver`.
-    - `<IDENTIFIER>` is the issue identifier (e.g., `AIT-12`).
-    - `<slug>` is a short kebab-case version of the issue title (e.g., `fix-login`, `add-feature`).
-  - Example: `fxstein/AIT-12-fix-login`.
-  - Run: `git checkout -b <constructed-name>`.
+Run: `git checkout -b <branch-name>`
 
 ### Step 5: ai-todo Planning
 
@@ -109,8 +100,8 @@ After branching (and optionally creating ai-todo tasks):
   - ✅ Use **user-linear.update_issue** with `state` parameter (not `status`).
 
 - **Branch naming:**
-  - Prefer Linear's **gitBranchName** when present (it may be lowercase, e.g., `ait-12-fix`).
-  - Format: `<user>/<IDENTIFIER>-<slug>` (identifier can be uppercase `AIT-12` or lowercase `ait-12`; both are valid).
+  - Prefer Linear's **gitBranchName** when present.
+  - If missing, use: `<IDENTIFIER>-<slug>` (e.g., `AIT-12-fix-login`).
   - GitHub PR check accepts case-insensitive identifier (AIT or ait).
 
 - **ai-todo planning:**

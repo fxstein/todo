@@ -76,19 +76,26 @@ After branching (and optionally creating ai-todo tasks):
 
 ## CLOSING WORKFLOW
 
-### When PR is opened / ready for review
+### Open Pull Request
 
-**Trigger:** User says **"PR opened"**, **"Ready for review"**, or **"Open PR"**:
+**Trigger:** User says **"Open PR"**, **"Ready for review"**, or **"Create PR"**:
 
-- **Offer:** Ask: "Should I set this Linear issue to **In Review**?"
-- **If yes:** Call **user-linear.update_issue** with `id` and `state: "In Review"`.
+**Actions:**
+1. Push branch: `git push -u origin HEAD`
+2. Create PR: `gh pr create --title "[IDENTIFIER] Title" --body "..."` (include Linear issue reference)
+3. Set Linear to **In Review**: Call **user-linear.update_issue** with `id` and `state: "In Review"`
 
-### When PR is merged / work is done
+### After PR Merged
 
-**Trigger:** When all ai-todo tasks are marked done, or user says **"PR merged"**, **"Close issue"**, or **"Done"**:
+**Trigger:** User says **"PR merged"**, **"Close issue"**, or **"Done"**:
 
-- **Offer:** Ask: "Should I set this Linear issue to **Done**?"
-- **If yes:** Call **user-linear.update_issue** with `id` and `state: "Done"`.
+**Actions:**
+1. Set Linear to **Done**: Call **user-linear.update_issue** with `id` and `state: "Done"`
+2. Cleanup branch:
+   - Switch to main: `git checkout main`
+   - Update from upstream: `git pull origin main`
+   - Delete local branch: `git branch -d <branch-name>`
+   - Delete remote branch: `git push origin --delete <branch-name>`
 
 ---
 

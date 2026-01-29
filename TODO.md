@@ -17,7 +17,9 @@
   - [ ] **#268.5** Verification: Verify empty trash behavior `#verification`
   - [ ] **#268.4** Testing: Create unit and integration tests `#testing`
   - [ ] **#268.3** Implementation: Add empty trash functionality `#implementation`
-  - [ ] **#268.2** Design: Create empty trash implementation plan `#design`
+  - [ ] **#268.2** Design: Create empty trash implementation plan `#design` `#inprogress`
+    > Create empty trash implementation plan addressing all open questions from analysis phase.
+    > Design document: docs/design/empty_trash_design.md
   - [x] **#268.1** Analysis: Review deleted tasks section and prune implementation `#analysis` (2026-01-29)
     > Review existing work in task#129 and its subtasks to understand what was already planned. Analyze Linear issue requirements and identify gaps or changes needed. Document findings.
     > Analysis document: docs/design/empty_trash_analysis.md
@@ -2116,7 +2118,7 @@
 267.9:2026-01-28T22:26:22.332652:2026-01-29T02:09:45.957108
 268:2026-01-29T02:12:17.206362:2026-01-29T02:29:10.116694
 268.1:2026-01-29T02:12:24.286400:2026-01-29T02:18:05.948270
-268.2:2026-01-29T02:12:24.853665:2026-01-29T02:12:25.390159
+268.2:2026-01-29T02:12:24.853665:2026-01-29T02:40:56.733967
 268.3:2026-01-29T02:12:25.395525:2026-01-29T02:12:25.395527
 268.4:2026-01-29T02:12:25.979364:2026-01-29T02:12:25.979366
 268.5:2026-01-29T02:12:26.526909:2026-01-29T02:12:26.526911
@@ -2193,4 +2195,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 02:29:10
+**ai-todo** | Last Updated: 2026-01-29 02:40:56

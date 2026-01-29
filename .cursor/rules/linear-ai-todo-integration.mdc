@@ -82,7 +82,21 @@ After branching (and optionally creating ai-todo tasks):
 
 **Actions:**
 1. Push branch: `git push -u origin HEAD`
-2. Create PR: `gh pr create --title "[IDENTIFIER] Title" --body "..."` (include Linear issue reference)
+2. Create PR with:
+   - Title: `[IDENTIFIER] Issue title`
+   - Body format:
+     ```
+     Closes [IDENTIFIER](linear-issue-url)
+
+     ## Summary
+     [Brief description from Linear issue or ai-todo task]
+
+     ## Changes
+     - [Key changes from commit messages]
+
+     ## Test Plan
+     - [How to verify - optional]
+     ```
 3. Set Linear to **In Review**: Call **user-linear.update_issue** with `id` and `state: "In Review"`
 
 ### After PR Merged

@@ -7,10 +7,10 @@
 - [ ] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear`
   > Linear issue: https://linear.app/fxstein/issue/AIT-3/implement-empty-trash-on-startup-deleted-tasks
   > Startup policy to permanently remove items from "Deleted Tasks" section.
-  > - Target: Only items explicitly in the "Deleted Tasks" section
-  > - Rule: Remove items older than 7 days
-  > - Safety: Do NOT touch "Archived" tasks or active tasks
-  > - Strictly an "Empty Trash" operation
+  > * Target: Only items explicitly in the "Deleted Tasks" section
+  > * Rule: Remove items older than 7 days
+  > * Safety: Do NOT touch "Archived" tasks or active tasks
+  > * Strictly an "Empty Trash" operation
   > Blocked by: AIT-2 (✅ complete)
   - [ ] **#268.6** Documentation: Update docs and examples `#documentation`
   - [ ] **#268.5** Verification: Verify empty trash behavior `#verification`

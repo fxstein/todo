@@ -4,6 +4,55 @@
 
 ## Tasks
 
+- [ ] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear`
+  > Linear issue: https://linear.app/fxstein/issue/AIT-3/implement-empty-trash-on-startup-deleted-tasks
+  > Startup policy to permanently remove items from "Deleted Tasks" section.
+  > - Target: Only items explicitly in the "Deleted Tasks" section
+  > - Rule: Remove items older than 7 days
+  > - Safety: Do NOT touch "Archived" tasks or active tasks
+  > - Strictly an "Empty Trash" operation
+  > Blocked by: AIT-2 (✅ complete)
+  - [ ] **#268.6** Documentation: Update docs and examples `#documentation`
+  - [ ] **#268.5** Verification: Verify empty trash behavior `#verification`
+  - [ ] **#268.4** Testing: Create unit and integration tests `#testing`
+  - [ ] **#268.3** Implementation: Add empty trash functionality `#implementation`
+  - [ ] **#268.2** Design: Create empty trash implementation plan `#design`
+  - [ ] **#268.1** Analysis: Review deleted tasks section and prune implementation `#analysis` `#inprogress`
+    > Review existing work in task#129 and its subtasks to understand what was already planned. Analyze Linear issue requirements and identify gaps or changes needed. Document findings.
+    > Analysis document: docs/design/empty_trash_analysis.md
+
+- [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
+  > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
+  - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
+    > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
+  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-29)
+    > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
+  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-29)
+    > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
+    > Design doc: docs/linear_integration_design.md
+  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-29)
+    > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
+    > Design doc: docs/linear_integration_design.md
+  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-29)
+    > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
+    > Assessment doc: docs/linear_integration_assessment.md
+
+- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
+
+- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
+  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
+  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
+  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
+  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
+  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
+  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
+  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
+
+- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
+
+---
+
+## Archived Tasks
 - [x] **#267** [AIT-2] Implement --prune function to remove archived tasks `#AIT-2` `#feature` `#linear` (2026-01-29)
   > Linear issue: https://linear.app/fxstein/issue/AIT-2
   > Migrated from task#129.
@@ -74,44 +123,10 @@
   - [x] **#267.1** Analysis: Review existing task#129 and requirements `#analysis` (2026-01-29)
     > Review existing work in task#129 and its subtasks to understand what was already planned. Analyze Linear issue requirements and identify gaps or changes needed. Document findings.
     > Analysis document: docs/design/prune_function_analysis.md
-
-- [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
-  > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
-  - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
-    > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
-  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-29)
-    > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
-  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-29)
-    > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
-    > Design doc: docs/linear_integration_design.md
-  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-29)
-    > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
-    > Design doc: docs/linear_integration_design.md
-  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-29)
-    > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
-    > Assessment doc: docs/linear_integration_assessment.md
-
-- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
-
-- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
-  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
-  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
-  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
-  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
-  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
-  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
-  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
-
-- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
-
-- [ ] **#129** Implement --prune function to remove old archived tasks based on git history `#feature`
-  - [ ] **#129.3** Add prune command with --days and --from-task options `#feature`
-  - [ ] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature`
-  - [ ] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature`
-
----
-
-## Archived Tasks
+- [x] **#129** Implement --prune function to remove old archived tasks based on git history `#feature` (2026-01-29)
+  - [x] **#129.3** Add prune command with --days and --from-task options `#feature` (2026-01-29)
+  - [x] **#129.2** Implement git history analysis to identify archive dates for tasks `#feature` (2026-01-29)
+  - [x] **#129.1** Design prune function with 30-day default and task ID targeting options `#feature` (2026-01-29)
 - [x] **#265** Add commit guideline to ai-todo–written Cursor rule `#cursor-rules` `#guidance` (2026-01-28)
   > Extend the Python code that writes the Cursor rule to `.cursor/rules/ai-todo-task-management.mdc` so the rule includes a commit guideline.
   > **Context:** The rule content is the string `AI_TODO_CURSOR_RULE` in `ai_todo/mcp/server.py`, written by `_init_cursor_rules()` when the rule file does not exist. We need to add this bullet to that rule text:
@@ -1319,11 +1334,6 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
-
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -1349,10 +1359,10 @@ View with: `ai-todo show <task-id>`
 126.4:2026-01-27T23:50:41.503143:2026-01-27T23:50:41.503144
 127:2026-01-27T23:50:41.502101:2026-01-27T23:51:37.630720
 128:2026-01-27T23:50:41.502095:2026-01-27T23:51:37.630716
-129:2026-01-27T23:50:41.498488:2026-01-27T23:51:37.628035
-129.1:2026-01-27T23:50:41.498495:2026-01-27T23:51:37.628043
-129.2:2026-01-27T23:50:41.498493:2026-01-27T23:51:37.628041
-129.3:2026-01-27T23:50:41.498491:2026-01-27T23:51:37.628038
+129:2026-01-27T23:50:41.498488:2026-01-29T02:09:45.957100
+129.1:2026-01-27T23:50:41.498495:2026-01-29T02:09:45.957095
+129.2:2026-01-27T23:50:41.498493:2026-01-29T02:09:45.957098
+129.3:2026-01-27T23:50:41.498491:2026-01-29T02:09:45.957099
 136.1:2026-01-27T23:50:41.506061:2026-01-27T23:51:37.636306
 136.2:2026-01-27T23:50:41.506053:2026-01-27T23:50:41.506054
 136.3:2026-01-27T23:50:41.506046:2026-01-27T23:51:37.636290
@@ -2093,16 +2103,23 @@ View with: `ai-todo show <task-id>`
 266.3:2026-01-28T21:14:33.184130:2026-01-28T21:55:22.383942
 266.4:2026-01-28T21:14:34.517139:2026-01-28T21:55:22.383943
 266.5:2026-01-28T21:14:35.898815:2026-01-28T21:20:49.690286
-267:2026-01-28T22:26:05.473566:2026-01-29T00:24:11.280415
-267.1:2026-01-28T22:26:10.364212:2026-01-28T22:33:04.342614
-267.2:2026-01-28T22:26:12.171649:2026-01-28T23:01:13.307311
-267.3:2026-01-28T22:26:13.932631:2026-01-28T23:05:24.846293
-267.4:2026-01-28T22:26:15.253098:2026-01-28T23:05:24.846294
-267.5:2026-01-28T22:26:16.379299:2026-01-28T23:05:24.846296
-267.6:2026-01-28T22:26:17.788660:2026-01-28T23:06:43.635864
-267.7:2026-01-28T22:26:19.178103:2026-01-29T00:13:11.296401
-267.8:2026-01-28T22:26:20.882963:2026-01-29T00:13:46.345273
-267.9:2026-01-28T22:26:22.332652:2026-01-29T00:15:57.466071
+267:2026-01-28T22:26:05.473566:2026-01-29T02:09:45.957109
+267.1:2026-01-28T22:26:10.364212:2026-01-29T02:09:45.957102
+267.2:2026-01-28T22:26:12.171649:2026-01-29T02:09:45.957102
+267.3:2026-01-28T22:26:13.932631:2026-01-29T02:09:45.957103
+267.4:2026-01-28T22:26:15.253098:2026-01-29T02:09:45.957104
+267.5:2026-01-28T22:26:16.379299:2026-01-29T02:09:45.957105
+267.6:2026-01-28T22:26:17.788660:2026-01-29T02:09:45.957106
+267.7:2026-01-28T22:26:19.178103:2026-01-29T02:09:45.957107
+267.8:2026-01-28T22:26:20.882963:2026-01-29T02:09:45.957108
+267.9:2026-01-28T22:26:22.332652:2026-01-29T02:09:45.957108
+268:2026-01-29T02:12:17.206362:2026-01-29T02:12:17.218604
+268.1:2026-01-29T02:12:24.286400:2026-01-29T02:14:54.452937
+268.2:2026-01-29T02:12:24.853665:2026-01-29T02:12:25.390159
+268.3:2026-01-29T02:12:25.395525:2026-01-29T02:12:25.395527
+268.4:2026-01-29T02:12:25.979364:2026-01-29T02:12:25.979366
+268.5:2026-01-29T02:12:26.526909:2026-01-29T02:12:26.526911
+268.6:2026-01-29T02:12:27.093344:2026-01-29T02:12:27.093345
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
 28.3:2026-01-27T23:50:41.506076:2026-01-27T23:50:41.506077
@@ -2175,4 +2192,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 00:24:11
+**ai-todo** | Last Updated: 2026-01-29 02:14:54

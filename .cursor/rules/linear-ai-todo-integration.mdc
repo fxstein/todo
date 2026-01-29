@@ -48,8 +48,7 @@ Once the user selects an issue (e.g., AIT-12):
 1. Get git user: `git config user.name` (lowercase)
 2. Extract IDENTIFIER from Linear issue (e.g., `AIT-12`)
 3. Create slug from issue title (e.g., `fix-login`)
-4. Construct: `<userid>/<IDENTIFIER>-<slug>`
-5. Run: `git checkout -b <userid>/<IDENTIFIER>-<slug>`
+4. Run: `git checkout -b <userid>/<IDENTIFIER>-<slug>`
 
 **Example:** `oliver/AIT-12-fix-login`
 

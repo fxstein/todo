@@ -43,31 +43,7 @@ Implement startup policy to permanently remove items from "Deleted Tasks" sectio
 
 **4. Legacy Bash Implementation**
 
-The legacy `todo.bash` script already has `purge_expired_deleted_tasks()` function:
-- Runs on startup (line 3224-3225)
-- Finds tasks with `[D]` checkbox
-- Parses expiration dates from metadata
-- Removes tasks where `expire_date < current_date`
-- Reports: "Auto-purged N expired task(s)"
-
-**Key Code:**
-```bash
-purge_expired_deleted_tasks() {
-    local current_date=$(date +"%Y-%m-%d")
-    local purged_count=0
-
-    while IFS= read -r line; do
-        if [[ "$line" =~ "expires ([0-9]{4}-[0-9]{2}-[0-9]{2})" ]]; then
-            local expire_date="${BASH_REMATCH[1]}"
-            if [[ "$expire_date" < "$current_date" ]]; then
-                # Remove expired task
-                sed_inplace "/$(echo "$line" | sed 's/[]\/$*.^[]/\\&/g')/d" "$TODO_FILE"
-                purged_count=$((purged_count + 1))
-            fi
-        fi
-    done < <(grep "^\- \[D\]" "$TODO_FILE")
-}
-```
+Note: The legacy `todo.bash` script already has a `purge_expired_deleted_tasks()` function that runs on startup and removes expired deleted tasks. This provides a reference implementation, though the legacy scripts are now frozen and no longer updated.
 
 ### Related: Prune Implementation (AIT-2/task#267)
 

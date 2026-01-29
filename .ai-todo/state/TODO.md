@@ -15,8 +15,8 @@
   > Change Request (2026-01-29): Updated retention from 7 to 30 days to align with existing expires_at metadata.
   - [ ] **#268.6** Documentation: Update docs and examples `#documentation`
   - [ ] **#268.5** Verification: Verify empty trash behavior `#verification`
-  - [ ] **#268.4** Testing: Create unit and integration tests `#testing`
-  - [ ] **#268.3** Implementation: Add empty trash functionality `#implementation`
+  - [ ] **#268.4** Testing: Create unit and integration tests `#inprogress` `#testing`
+  - [x] **#268.3** Implementation: Add empty trash functionality `#implementation` (2026-01-29)
   - [x] **#268.2** Design: Create empty trash implementation plan `#design` (2026-01-29)
     > Create empty trash implementation plan addressing all open questions from analysis phase.
     > Design document: docs/design/empty_trash_design.md
@@ -1337,11 +1337,6 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
-
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2124,8 +2119,8 @@ View with: `ai-todo show <task-id>`
 268:2026-01-29T02:12:17.206362:2026-01-29T02:29:10.116694
 268.1:2026-01-29T02:12:24.286400:2026-01-29T02:18:05.948270
 268.2:2026-01-29T02:12:24.853665:2026-01-29T02:41:27.715291
-268.3:2026-01-29T02:12:25.395525:2026-01-29T02:12:25.395527
-268.4:2026-01-29T02:12:25.979364:2026-01-29T02:12:25.979366
+268.3:2026-01-29T02:12:25.395525:2026-01-29T03:04:15.836833
+268.4:2026-01-29T02:12:25.979364:2026-01-29T03:04:16.180879
 268.5:2026-01-29T02:12:26.526909:2026-01-29T02:12:26.526911
 268.6:2026-01-29T02:12:27.093344:2026-01-29T02:12:27.093345
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
@@ -2200,4 +2195,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 02:41:27
+**ai-todo** | Last Updated: 2026-01-29 03:04:16

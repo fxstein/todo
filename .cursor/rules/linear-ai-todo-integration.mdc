@@ -47,7 +47,9 @@ Once the user selects an issue (e.g., AIT-12):
 Create a branch for the issue:
 
 - **If `gitBranchName` is present:** Use it as-is: `git checkout -b <gitBranchName>`
-- **If `gitBranchName` is missing:** Construct: `<IDENTIFIER>-<slug>` (e.g., `AIT-12-fix-login`)
+- **If `gitBranchName` is missing:**
+  - Get git user: `git config user.name`
+  - Construct: `<userid>/<IDENTIFIER>-<slug>` (e.g., `oliver/AIT-12-fix-login`)
 
 Run: `git checkout -b <branch-name>`
 
@@ -122,7 +124,8 @@ After branching (and optionally creating ai-todo tasks):
 
 - **Branch naming:**
   - Prefer Linear's **gitBranchName** when present.
-  - If missing, use: `<IDENTIFIER>-<slug>` (e.g., `AIT-12-fix-login`).
+  - If missing, construct: `<userid>/<IDENTIFIER>-<slug>` (e.g., `oliver/AIT-12-fix-login`).
+  - Get userid from: `git config user.name` (lowercase).
   - GitHub PR check accepts case-insensitive identifier (AIT or ait).
 
 - **ai-todo planning:**

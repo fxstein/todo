@@ -16,9 +16,9 @@ jobs:
       - name: Check branch name format
         run: |
           BRANCH="${{ github.head_ref }}"
-          # Pattern: username/AIT-123-description (any username allowed).
-          if ! echo "$BRANCH" | grep -qE '^.+\/AIT-[0-9]+-.+$'; then
-            echo "::error::Branch must follow format username/AIT-123-description."
+          # Pattern: username/AIT-123-description (case-insensitive AIT, any username)
+          if ! echo "$BRANCH" | grep -qiE '^.+\/[Aa][Ii][Tt]-[0-9]+-.+$'; then
+            echo "::error::Branch must follow format username/AIT-123-description (or ait-123-description)."
             echo "Current branch: $BRANCH"
             exit 1
           fi

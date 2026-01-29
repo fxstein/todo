@@ -15,7 +15,7 @@ This design implements an automatic "Empty Trash" operation that permanently rem
 All open questions have been resolved:
 
 1. ✅ **Retention Period:** 30 days (use existing `expires_at` field)
-2. ✅ **Startup Behavior:** MCP server startup + manual CLI command
+2. ✅ **Startup Behavior:** MCP server startup + CLI delete command + manual CLI command
 3. ✅ **User Notification:** Silent with logging to `.ai-todo/.ai-todo.log`
 4. ✅ **Backup:** No backup feature (true "Empty Trash" semantics - permanent deletion)
 
@@ -281,9 +281,9 @@ def _format_result_message(result: EmptyTrashResult) -> str:
     return f"🗑️ Removed {result.total_removed} expired task(s)"
 ```
 
-### 4. Startup Hook
+### 4. Automatic Empty Trash Triggers
 
-#### MCP Server Init (`ai_todo/mcp/server.py`)
+#### MCP Server Startup (`ai_todo/mcp/server.py`)
 
 **Location:** After server initialization, before accepting requests.
 
@@ -318,7 +318,38 @@ if __name__ == "__main__":
     mcp.run()
 ```
 
-**Note:** For CLI, empty trash is NOT auto-run on every command. Users must explicitly call `ai-todo empty-trash`.
+#### CLI Delete Command (`ai_todo/cli/commands/__init__.py`)
+
+**Location:** After task deletion completes successfully.
+
+```python
+def delete_command(task_id: str, todo_path: str = "TODO.md"):
+    """Delete a task (soft delete to Deleted Tasks section)."""
+    # ... existing delete logic ...
+
+    # After successful deletion, auto-run empty trash
+    try:
+        from ai_todo.core.empty_trash import EmptyTrashManager
+
+        manager = EmptyTrashManager(todo_path)
+        result = manager.empty_trash(dry_run=False)
+
+        # Silent operation - only log if tasks were removed
+        if result.total_removed > 0:
+            log_operation(
+                "AUTO_EMPTY_TRASH",
+                f"Post-delete: Removed {result.total_removed} expired task(s)",
+                details={"task_ids": result.removed_task_ids}
+            )
+    except Exception:
+        # Fail silently - don't block delete operation
+        pass
+```
+
+**CLI Behavior Summary:**
+- ✅ **After `ai-todo delete`**: Auto-run empty trash (silent)
+- ✅ **Manual `ai-todo empty-trash`**: Explicit command with output
+- ❌ **NOT on every command**: Only on deletes or explicit call
 
 ## Safety Mechanisms
 
@@ -454,7 +485,8 @@ except Exception as e:
 |---------|-----|-----|-------|
 | **Remove expired tasks** | ✅ | ✅ | Core functionality |
 | **Dry run mode** | ✅ | ✅ | `--dry-run` flag |
-| **Auto-run on startup** | ❌ | ✅ | MCP only |
+| **Auto-run on startup** | ❌ | ✅ | MCP server startup |
+| **Auto-run on delete** | ✅ | N/A | After `ai-todo delete` |
 | **Result details** | ✅ | ✅ | Same info, different format |
 
 ### Output Format Differences
@@ -669,6 +701,7 @@ except Exception as e:
 - [ ] Add CLI command to `ai_todo/cli/main.py`
 - [ ] Add `empty_trash` MCP tool to `ai_todo/mcp/server.py`
 - [ ] Add `_auto_empty_trash()` startup hook to `ai_todo/mcp/server.py`
+- [ ] Add auto empty trash call to `delete_command()` in `ai_todo/cli/commands/__init__.py`
 - [ ] Add `_format_result_message()` helper
 
 ### Phase 3: Testing (task#268.4)

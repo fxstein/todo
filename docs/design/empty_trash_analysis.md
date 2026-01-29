@@ -7,7 +7,9 @@
 
 ## Executive Summary
 
-Implement startup policy to permanently remove items from "Deleted Tasks" section older than 7 days, providing an "Empty Trash" operation similar to desktop operating systems.
+Implement startup policy to permanently remove items from "Deleted Tasks" section older than 30 days, providing an "Empty Trash" operation similar to desktop operating systems.
+
+**Change Request (2026-01-29):** Updated retention policy from 7 days to 30 days to align with existing `expires_at` metadata and avoid conflicts with previously deleted tasks.
 
 ## Current State
 
@@ -97,8 +99,8 @@ The recently completed prune functionality provides a strong foundation:
 - Never touch "Archived Tasks" or active "Tasks"
 
 **Retention Rule:**
-- Remove items older than 7 days (from deletion date)
-- Note: This is DIFFERENT from the existing 30-day expiration!
+- Remove items older than 30 days (from deletion date)
+- **UPDATED:** Changed from 7 days to align with existing `expires_at` metadata
 
 **Trigger:**
 - Automatic on startup (similar to legacy bash behavior)
@@ -113,33 +115,36 @@ The recently completed prune functionality provides a strong foundation:
 | Feature | Prune (task#267) | Empty Trash (task#268) |
 |---------|------------------|------------------------|
 | **Target Section** | Archived Tasks | Deleted Tasks |
-| **Retention** | 30 days (default, configurable) | 7 days (fixed) |
+| **Retention** | 30 days (default, configurable) | 30 days (uses `expires_at`) |
 | **Trigger** | Manual command | Automatic on startup |
-| **Backup** | Yes, in `.ai-todo/archives/` | Maybe (optional) |
-| **Git History** | Yes, for accurate dates | Not needed (has `deleted_at`) |
-| **Options** | --days, --older-than, --from-task | None (fixed policy) |
+| **Backup** | Yes, in `.ai-todo/archives/` | Optional (default: no) |
+| **Git History** | Yes, for accurate dates | Not needed (has `deleted_at`/`expires_at`) |
+| **Options** | --days, --older-than, --from-task | Minimal (fixed 30-day policy) |
 
 ## Technical Considerations
 
-### 1. Expiration Logic Conflict
+### 1. Expiration Logic - RESOLVED ✅
 
 **Current Behavior:**
 - Tasks are deleted with 30-day expiration: `expires_at = deleted_at + timedelta(days=30)`
 - Metadata shows: `(deleted 2026-01-27, expires 2026-02-26)`
 
-**AIT-3 Requirement:**
+**Original AIT-3 Requirement:**
 - Remove tasks older than 7 days from deletion
 
-**Issue:**
-The AIT-3 7-day policy is MORE AGGRESSIVE than the existing 30-day expiration metadata. This creates a conflict:
+**Issue Identified:**
+The original 7-day policy was MORE AGGRESSIVE than the existing 30-day expiration metadata, creating conflicts:
+- Previously deleted tasks show 30-day expiration dates
+- New policy would remove them prematurely
+- Inconsistency between displayed expiration and actual removal
 
-**Options:**
-1. **Ignore `expires_at`, use 7-day rule** - Most direct, but creates inconsistency
-2. **Update `expires_at` to 7 days** - Breaking change, affects existing deleted tasks
-3. **Make it configurable** - More flexible, aligns with prune's design
-4. **Separate policies** - Empty trash (7 days) vs expiration (30 days display)
-
-**Recommendation:** Option 3 or 4 - see Design section below.
+**Resolution (2026-01-29):**
+**Changed retention policy from 7 days to 30 days** to align with existing infrastructure:
+- ✅ Use `expires_at` field directly (no date math needed)
+- ✅ Consistent with all existing deleted tasks
+- ✅ Matches user expectations from displayed metadata
+- ✅ No breaking changes to Task model
+- ✅ Simpler implementation
 
 ### 2. Startup Trigger
 
@@ -163,15 +168,16 @@ The AIT-3 7-day policy is MORE AGGRESSIVE than the existing 30-day expiration me
 
 **Empty Trash** is different:
 - Users explicitly deleted these tasks
-- Tasks already have 7-30 day retention
+- Tasks already have 30-day retention window
 - "Empty Trash" implies permanence
+- Users see expiration dates in metadata
 
 **Options:**
 1. **No backup** - Matches desktop OS "Empty Trash" semantics
 2. **Optional backup** - Safety net, like prune's `--no-backup`
 3. **Temporary backup** - Keep for 24-48 hours then auto-remove
 
-**Recommendation:** Option 2 - default no backup, but allow `--backup` flag for paranoid users.
+**Recommendation:** Option 1 or 2 - lean toward no backup (true "Empty Trash"), but allow optional `--backup` flag for safety-conscious users.
 
 ### 4. Safety Verification
 
@@ -200,21 +206,20 @@ class EmptyTrashManager:
     """Manage empty trash operations on deleted tasks."""
 
     def identify_expired_deleted_tasks(
-        self, tasks: list[Task], days: int = 7
+        self, tasks: list[Task]
     ) -> list[Task]:
-        """Identify deleted tasks older than N days."""
+        """Identify deleted tasks where expires_at < current_date."""
 
     def empty_trash(
-        self, days: int = 7, dry_run: bool = False, backup: bool = False
+        self, dry_run: bool = False, backup: bool = False
     ) -> EmptyTrashResult:
-        """Permanently remove old deleted tasks."""
+        """Permanently remove expired deleted tasks (30-day retention)."""
 ```
 
 ### CLI Command: `ai-todo empty-trash`
 
 ```bash
-ai-todo empty-trash              # Remove deleted tasks older than 7 days
-ai-todo empty-trash --days 14    # Custom retention period
+ai-todo empty-trash              # Remove expired deleted tasks (30 days)
 ai-todo empty-trash --dry-run    # Preview what would be removed
 ai-todo empty-trash --backup     # Create backup before removal
 ```
@@ -224,11 +229,10 @@ ai-todo empty-trash --backup     # Create backup before removal
 ```python
 @mcp.tool()
 def empty_trash(
-    days: int = 7,
     dry_run: bool = False,
     backup: bool = False,
 ) -> dict:
-    """Permanently remove old deleted tasks."""
+    """Permanently remove expired deleted tasks (30-day retention)."""
 ```
 
 ### Startup Hook
@@ -239,10 +243,10 @@ def empty_trash(
 @mcp.init()
 async def init():
     """Initialize MCP server and run startup tasks."""
-    # Auto empty trash (silent, no backup)
+    # Auto empty trash (silent, no backup, uses expires_at)
     try:
         mgr = EmptyTrashManager(CURRENT_TODO_PATH)
-        mgr.empty_trash(days=7, dry_run=False, backup=False)
+        mgr.empty_trash(dry_run=False, backup=False)
     except Exception:
         pass  # Fail silently on startup
 ```
@@ -277,15 +281,15 @@ async def init():
 
 ## Open Questions
 
-### 1. Retention Period: 7 vs 30 days
+### 1. Retention Period: 7 vs 30 days - RESOLVED ✅
 
-**AIT-3 says:** 7 days
+**Original AIT-3:** 7 days
 **Current expiration:** 30 days (in `expires_at` metadata)
 
-**Resolution needed:**
-- Keep 7 days for AIT-3 (as specified)?
-- Make it configurable (default 7, allow override)?
-- Align with existing 30-day expiration?
+**Resolution (2026-01-29):**
+- ✅ **Changed to 30 days** to align with existing `expires_at` field
+- ✅ No custom retention period needed - use existing metadata
+- ✅ Simpler implementation, consistent behavior
 
 ### 2. Startup Behavior
 
@@ -317,7 +321,7 @@ async def init():
 
 ### Medium Risk
 - **Premature removal**: Removing tasks user wanted to keep
-  - *Mitigation*: Conservative default (7 days), dry-run mode, optional backup
+  - *Mitigation*: Conservative 30-day retention (matches displayed expiration), dry-run mode, optional backup
 
 ### Low Risk
 - **Performance**: Empty trash on every startup
@@ -338,16 +342,18 @@ async def init():
 
 ## Success Criteria
 
-1. ✅ Deleted tasks older than 7 days are permanently removed
-2. ✅ Only tasks in "Deleted Tasks" section are affected
-3. ✅ Archived and active tasks are never touched
-4. ✅ Operation runs automatically on MCP server startup
-5. ✅ CLI command available for manual operation
-6. ✅ Dry-run mode works correctly
-7. ✅ Optional backup creation works
-8. ✅ All operations logged
-9. ✅ Complete test coverage (unit + integration)
-10. ✅ Documentation updated
+1. ✅ Deleted tasks where `expires_at < current_date` are permanently removed (30-day retention)
+2. ✅ Uses existing `expires_at` metadata (no custom date calculations)
+3. ✅ Only tasks in "Deleted Tasks" section are affected
+4. ✅ Archived and active tasks are never touched
+5. ✅ Operation runs automatically on MCP server startup
+6. ✅ CLI command available for manual operation
+7. ✅ Dry-run mode works correctly
+8. ✅ Optional backup creation works
+9. ✅ All operations logged
+10. ✅ Complete test coverage (unit + integration)
+11. ✅ Documentation updated
+12. ✅ Consistent with displayed expiration dates in TODO.md
 
 ## Next Steps
 

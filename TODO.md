@@ -4,26 +4,6 @@
 
 ## Tasks
 
-- [x] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear` (2026-01-29)
-  > Linear issue: https://linear.app/fxstein/issue/AIT-3/implement-empty-trash-on-startup-deleted-tasks
-  > Startup policy to permanently remove items from "Deleted Tasks" section.
-  > - Target: Only items explicitly in the "Deleted Tasks" section
-  > - Rule: Remove items older than 30 days (UPDATED from 7 days)
-  > - Safety: Do NOT touch "Archived" tasks or active tasks
-  > - Strictly an "Empty Trash" operation
-  > Blocked by: AIT-2 (✅ complete)
-  > Change Request (2026-01-29): Updated retention from 7 to 30 days to align with existing expires_at metadata.
-  - [x] **#268.6** Documentation: Update docs and examples `#documentation` (2026-01-29)
-  - [x] **#268.5** Verification: Verify empty trash behavior `#verification` (2026-01-29)
-  - [x] **#268.4** Testing: Create unit and integration tests `#testing` (2026-01-29)
-  - [x] **#268.3** Implementation: Add empty trash functionality `#implementation` (2026-01-29)
-  - [x] **#268.2** Design: Create empty trash implementation plan `#design` (2026-01-29)
-    > Create empty trash implementation plan addressing all open questions from analysis phase.
-    > Design document: docs/design/empty_trash_design.md
-  - [x] **#268.1** Analysis: Review deleted tasks section and prune implementation `#analysis` (2026-01-29)
-    > Review existing work in task#129 and its subtasks to understand what was already planned. Analyze Linear issue requirements and identify gaps or changes needed. Document findings.
-    > Analysis document: docs/design/empty_trash_analysis.md
-
 - [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
   > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
   - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
@@ -56,6 +36,25 @@
 ---
 
 ## Archived Tasks
+- [x] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear` (2026-01-29)
+  > Linear issue: https://linear.app/fxstein/issue/AIT-3/implement-empty-trash-on-startup-deleted-tasks
+  > Startup policy to permanently remove items from "Deleted Tasks" section.
+  > - Target: Only items explicitly in the "Deleted Tasks" section
+  > - Rule: Remove items older than 30 days (UPDATED from 7 days)
+  > - Safety: Do NOT touch "Archived" tasks or active tasks
+  > - Strictly an "Empty Trash" operation
+  > Blocked by: AIT-2 (✅ complete)
+  > Change Request (2026-01-29): Updated retention from 7 to 30 days to align with existing expires_at metadata.
+  - [x] **#268.6** Documentation: Update docs and examples `#documentation` (2026-01-29)
+  - [x] **#268.5** Verification: Verify empty trash behavior `#verification` (2026-01-29)
+  - [x] **#268.4** Testing: Create unit and integration tests `#testing` (2026-01-29)
+  - [x] **#268.3** Implementation: Add empty trash functionality `#implementation` (2026-01-29)
+  - [x] **#268.2** Design: Create empty trash implementation plan `#design` (2026-01-29)
+    > Create empty trash implementation plan addressing all open questions from analysis phase.
+    > Design document: docs/design/empty_trash_design.md
+  - [x] **#268.1** Analysis: Review deleted tasks section and prune implementation `#analysis` (2026-01-29)
+    > Review existing work in task#129 and its subtasks to understand what was already planned. Analyze Linear issue requirements and identify gaps or changes needed. Document findings.
+    > Analysis document: docs/design/empty_trash_analysis.md
 - [x] **#267** [AIT-2] Implement --prune function to remove archived tasks `#AIT-2` `#feature` `#linear` (2026-01-29)
   > Linear issue: https://linear.app/fxstein/issue/AIT-2
   > Migrated from task#129.
@@ -1337,6 +1336,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2116,13 +2120,13 @@
 267.7:2026-01-28T22:26:19.178103:2026-01-29T02:09:45.957107
 267.8:2026-01-28T22:26:20.882963:2026-01-29T02:09:45.957108
 267.9:2026-01-28T22:26:22.332652:2026-01-29T02:09:45.957108
-268:2026-01-29T02:12:17.206362:2026-01-29T03:11:08.286427
-268.1:2026-01-29T02:12:24.286400:2026-01-29T02:18:05.948270
-268.2:2026-01-29T02:12:24.853665:2026-01-29T02:41:27.715291
-268.3:2026-01-29T02:12:25.395525:2026-01-29T03:04:15.836833
-268.4:2026-01-29T02:12:25.979364:2026-01-29T03:08:59.298252
-268.5:2026-01-29T02:12:26.526909:2026-01-29T03:09:33.065180
-268.6:2026-01-29T02:12:27.093344:2026-01-29T03:11:02.442815
+268:2026-01-29T02:12:17.206362:2026-01-29T04:20:05.940010
+268.1:2026-01-29T02:12:24.286400:2026-01-29T04:20:05.940003
+268.2:2026-01-29T02:12:24.853665:2026-01-29T04:20:05.940005
+268.3:2026-01-29T02:12:25.395525:2026-01-29T04:20:05.940006
+268.4:2026-01-29T02:12:25.979364:2026-01-29T04:20:05.940007
+268.5:2026-01-29T02:12:26.526909:2026-01-29T04:20:05.940008
+268.6:2026-01-29T02:12:27.093344:2026-01-29T04:20:05.940009
 28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
 28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
 28.3:2026-01-27T23:50:41.506076:2026-01-27T23:50:41.506077
@@ -2195,4 +2199,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 03:11:08
+**ai-todo** | Last Updated: 2026-01-29 04:20:05

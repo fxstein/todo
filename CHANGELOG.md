@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Empty Trash Command**: Permanently remove expired deleted tasks with 30-day retention (GitHub Issue #52, Linear AIT-3, task#268)
+  - CLI: `ai-todo empty-trash` (remove deleted tasks older than 30 days)
+  - CLI: `ai-todo empty-trash --dry-run` (preview what would be removed)
+  - MCP: `empty_trash(dry_run=False)` tool with same functionality
+  - Auto-run on MCP server startup (silent, keeps Deleted Tasks section clean)
+  - Auto-run after `ai-todo delete` command (silent, immediate cleanup)
+  - Uses existing `expires_at` field for simple date comparison
+  - No backup functionality (permanent deletion, true "Empty Trash" semantics)
+  - Dry-run mode for safe preview before removal
+
 - **Prune Command**: Remove old archived tasks from TODO.md based on retention period or task ID range (GitHub Issue #51, task#267)
   - CLI: `ai-todo prune --days 30` (remove tasks older than 30 days)
   - CLI: `ai-todo prune --from-task 100` (remove tasks #1 to #100)

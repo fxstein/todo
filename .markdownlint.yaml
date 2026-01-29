@@ -18,5 +18,5 @@
   "no-multiple-space-blockquote": false,
   "MD041": false,
   "MD060": false,
-  "globs": ["!tests/integration/test_data/TODO.md", "!docs/archive/*.md"]
+  "globs": ["!tests/integration/test_data/TODO.md", "!docs/archive/*.md", "!.ai-todo/tamper/**/*.md"]
 }

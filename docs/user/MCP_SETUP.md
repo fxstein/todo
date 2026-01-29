@@ -79,6 +79,18 @@ The MCP server also supports maintenance operations for keeping your TODO.md cle
 
 The `prune_tasks` tool creates automatic backups in `.ai-todo/archives/` before making changes, preserving complete task metadata for restoration if needed.
 
+### Trash Management: `empty_trash`
+
+Permanently remove expired deleted tasks (30-day retention).
+
+**Examples:**
+
+- "Empty the trash"
+- "Remove expired deleted tasks"
+- "Preview what would be removed from trash"
+
+The `empty_trash` tool permanently removes deleted tasks where the expiration date (`expires_at`) has passed. This operation runs automatically on MCP server startup and provides a manual tool for explicit cleanup. **No backup is created** (true "Empty Trash" semantics).
+
 ## MCP Resources
 
 In addition to tools, the ai-todo MCP server exposes **resources** for read-only access to task data:

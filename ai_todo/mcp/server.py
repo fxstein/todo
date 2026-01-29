@@ -299,6 +299,63 @@ def prune_tasks(
 
 
 @mcp.tool()
+def empty_trash(dry_run: bool = False) -> dict:
+    """
+    Permanently remove expired deleted tasks (30-day retention).
+
+    This operation removes tasks from the "Deleted Tasks" section where
+    the expiration date (expires_at) has passed. This is a permanent
+    deletion with no backup (true "Empty Trash" semantics).
+
+    Args:
+        dry_run: Preview without removing (default: False)
+
+    Returns:
+        dict with keys:
+            - tasks_removed: Number of root tasks removed
+            - subtasks_removed: Number of subtasks removed
+            - total_removed: Total items removed
+            - dry_run: Whether this was a dry run
+            - removed_task_ids: List of task IDs removed (preview in dry run)
+            - message: Human-readable result message
+
+    Examples:
+        # Remove expired deleted tasks
+        empty_trash()
+
+        # Preview what would be removed
+        empty_trash(dry_run=True)
+    """
+    from ai_todo.core.empty_trash import EmptyTrashManager
+
+    try:
+        manager = EmptyTrashManager(CURRENT_TODO_PATH)
+        result = manager.empty_trash(dry_run=dry_run)
+
+        # Format user-friendly message
+        if result.total_removed == 0:
+            message = "ℹ️  No expired deleted tasks found."
+        elif result.dry_run:
+            message = (
+                f"🔍 Would remove {result.total_removed} expired task(s): "
+                f"{result.tasks_removed} root, {result.subtasks_removed} subtasks"
+            )
+        else:
+            message = f"🗑️  Removed {result.total_removed} expired task(s)"
+
+        return {
+            "tasks_removed": result.tasks_removed,
+            "subtasks_removed": result.subtasks_removed,
+            "total_removed": result.total_removed,
+            "dry_run": result.dry_run,
+            "removed_task_ids": result.removed_task_ids,
+            "message": message,
+        }
+    except Exception as e:
+        raise ValueError(f"Empty trash operation failed: {e}") from e
+
+
+@mcp.tool()
 def undo_task(task_id: str) -> str:
     """Reopen (undo) a completed task."""
     return _capture_output(undo_command, task_id, todo_path=CURRENT_TODO_PATH)
@@ -809,6 +866,19 @@ def _check_version_mismatch(root: Path) -> None:
         pass
 
 
+def _auto_empty_trash(todo_path: str):
+    """Auto-run empty trash on server startup (silent)."""
+    from ai_todo.core.empty_trash import EmptyTrashManager
+
+    try:
+        manager = EmptyTrashManager(todo_path)
+        manager.empty_trash(dry_run=False)
+        # Silent operation - FileOps handles logging automatically
+    except Exception:
+        # Fail silently - don't block server startup
+        pass
+
+
 def run_server(root_path: str = "."):
     """Run the MCP server."""
     global CURRENT_TODO_PATH
@@ -820,6 +890,9 @@ def run_server(root_path: str = "."):
 
     # Check for version mismatch (warning to stderr, MCP-safe)
     _check_version_mismatch(root)
+
+    # Auto-run empty trash on startup (silent)
+    _auto_empty_trash(CURRENT_TODO_PATH)
 
     # Run the server using stdio transport
     mcp.run(transport="stdio")

@@ -158,13 +158,20 @@ ai-todo setup-coordination <type> # Configure coordination
 ### Maintenance
 
 ```bash
+# Prune old archived tasks
 ai-todo prune                     # Remove archived tasks older than 30 days
 ai-todo prune --days 60           # Custom retention period
 ai-todo prune --from-task 100     # Remove tasks #1 to #100
 ai-todo prune --dry-run           # Preview what would be pruned
+
+# Empty trash (remove expired deleted tasks)
+ai-todo empty-trash               # Remove deleted tasks older than 30 days
+ai-todo empty-trash --dry-run     # Preview what would be removed
 ```
 
 > **Note:** Pruning creates automatic backups in `.ai-todo/archives/` with complete restoration capability.
+>
+> **Note:** Empty trash permanently removes expired deleted tasks (30-day retention) with no backup. Tasks are auto-removed on MCP server startup and after `ai-todo delete` commands.
 
 ### Information
 

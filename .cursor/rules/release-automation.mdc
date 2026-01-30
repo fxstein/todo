@@ -1,0 +1,47 @@
+---
+description: "Automated release workflow with Linear tracking and approval gates"
+alwaysApply: true
+---
+
+# Automated Release Workflow
+
+**Trigger:** "start release" or "release <version>" with Linear issue ID
+
+## Workflow Steps
+
+1. **Create ai-todo task structure:**
+   - Root task: `[<AIT-ID>] Release <version>`
+   - Subtasks: Generate summary → Prepare → Approval gate → Execute → Monitor → Finalize
+
+2. **Mark in progress:** Start root task and first subtask before beginning
+
+3. **Generate summary:** `release/AI_RELEASE_SUMMARY.md` (2-3 paragraphs, user-facing changes)
+
+4. **Prepare:** Run `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
+
+5. **Commit & push:** `git add release/ && git commit && git push`
+
+6. **Update Linear:** Comment with summary link, request approval
+
+7. **Monitor Linear for approval:**
+   - Poll `user-linear.list_comments` every 60s
+   - Keywords: "Approve", "Proceed", "Execute" = continue | "Abort" = stop
+   - Complete approval subtask when approved
+
+8. **Execute:** Run `./release/release.sh --execute`
+
+9. **Monitor CI:** Poll `gh run list` until completion (30s intervals)
+
+10. **Finalize:**
+    - Complete all tasks
+    - Comment on Linear with release summary (PyPI link, GitHub release, duration)
+    - Update Linear issue to "Done"
+
+## Safety Rules
+
+- ✅ Mark subtask as in-progress when starting each step
+- ✅ **STOP** at approval gate until explicit Linear comment
+- ✅ **STOP** on ANY error - report to Linear, wait for user
+- ❌ Never skip approval step
+- ❌ Never proceed if CI fails
+- ❌ Never use `--no-verify`

@@ -18,7 +18,7 @@ The ai-todo project currently has release workflow instructions scattered across
 
 ### 1. Cursor Rules (`.cursor/rules/`)
 
-#### A. `release-workflow.mdc` (ACTIVE)
+#### `release-workflow.mdc` (ACTIVE)
 - **Status:** `alwaysApply: true` ⚠️
 - **Size:** 37 lines
 - **Purpose:** Provides instructions for "prepare release" and "execute release" commands
@@ -30,24 +30,11 @@ The ai-todo project currently has release workflow instructions scattered across
 
 **Migration Priority:** **HIGH** - This is always loaded and consumes context unnecessarily.
 
-#### B. `linear-release-workflow.mdc` (DISABLED)
-- **Status:** `alwaysApply: false` (explicitly disabled)
-- **Size:** 50 lines
-- **Purpose:** Automated release workflow with Linear tracking and approval gates
-- **Key Content:**
-  - 10-step automated workflow
-  - ai-todo task structure creation
-  - Linear comment monitoring for approvals
-  - Detailed safety rules
-
-**Migration Priority:** **MEDIUM** - Currently disabled, but could be useful if re-enabled as part of a skill.
-
 ### 2. Release Scripts (`release/`)
 
 **Scripts identified:**
 - `release.sh` - Main intelligent release automation script
 - `publish_pypi.sh` - PyPI publishing automation
-- `convert_zsh_to_bash.sh` - Shell conversion utility
 
 **Migration Priority:** **LOW** - These are executable scripts, not instructions. They should be **referenced** by the skill but not duplicated.
 
@@ -87,14 +74,6 @@ The ai-todo project currently has release workflow instructions scattered across
 
 **Why:** Use progressive disclosure - link to detailed docs rather than duplicating 720 lines in the skill.
 
-### Optional Enhancement
-
-**From `linear-release-workflow.mdc` (currently disabled):**
-- 🤔 Consider including the automated Linear workflow as an **advanced mode**
-- 🤔 Or create a **separate skill** for fully automated releases
-
-**Why:** The disabled workflow represents a more automated approach that might be valuable but is currently not in use.
-
 ---
 
 ## Recommendations
@@ -116,7 +95,7 @@ description: Guides release preparation and execution for ai-todo. Use when the 
 
 ## Quick Reference
 
-- **Prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
+- **Prepare:** `./release/release.sh --prepare [--beta] [--set-version X.Y.Z] --summary release/AI_RELEASE_SUMMARY.md`
 - **Execute:** `./release/release.sh --execute`
 - **Detailed docs:** See [release/RELEASE_PROCESS.md](../../release/RELEASE_PROCESS.md)
 
@@ -163,17 +142,9 @@ When user asks to "execute release":
 ### 2. Remove from Global Rules
 
 After skill creation:
-- **Delete** or **disable** `release-workflow.mdc`
-- **Keep disabled:** `linear-release-workflow.mdc` (already disabled)
+- **Delete** `release-workflow.mdc`
 
 This will **free up 37 lines** from the default context window.
-
-### 3. Optional: Create Advanced Skill (Future)
-
-If the automated Linear workflow proves valuable:
-- Create separate skill: `release-workflow-automated`
-- Include the 10-step automated workflow
-- User can explicitly invoke when needed
 
 ---
 
@@ -186,7 +157,7 @@ If the automated Linear workflow proves valuable:
 
 ### Phase 2: Cleanup
 1. Delete `.cursor/rules/release-workflow.mdc`
-2. Verify `linear-release-workflow.mdc` remains disabled
+2. Delete obsolete `release/convert_zsh_to_bash.sh` (shell version retired in 3.0.0)
 3. Commit changes
 
 ### Phase 3: Verification
@@ -227,9 +198,10 @@ If the automated Linear workflow proves valuable:
 ## Files to Delete
 
 - `.cursor/rules/release-workflow.mdc`
+- `release/convert_zsh_to_bash.sh` (obsolete, shell version retired in 3.0.0)
 
 ## Files to Keep (No Changes)
 
-- `.cursor/rules/linear-release-workflow.mdc` (already disabled)
 - `release/RELEASE_PROCESS.md` (documentation)
-- All release scripts in `release/` (executable tools)
+- `release/release.sh` (main release script)
+- `release/publish_pypi.sh` (PyPI publishing script)

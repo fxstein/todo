@@ -7,7 +7,7 @@ description: Guides release preparation and execution for ai-todo. Use when the 
 
 ## Quick Reference
 
-- **Prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
+- **Prepare:** `./release/release.sh --prepare [--beta] [--set-version X.Y.Z] --summary release/AI_RELEASE_SUMMARY.md`
 - **Execute:** `./release/release.sh --execute`
 - **Detailed docs:** [release/RELEASE_PROCESS.md](../../../release/RELEASE_PROCESS.md)
 

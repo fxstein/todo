@@ -3,6 +3,7 @@
   "packages": {
     ".": {
       "release-type": "python",
+      "versioning-strategy": "pep440",
       "package-name": "todo-ai",
       "include-component-in-tag": false,
       "bump-minor-pre-major": true,

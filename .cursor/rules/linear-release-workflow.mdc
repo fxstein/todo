@@ -1,6 +1,6 @@
 ---
 description: "Automated release workflow with Linear tracking and approval gates"
-alwaysApply: true
+alwaysApply: false # DISABLED
 ---
 
 # Automated Release Workflow
@@ -12,6 +12,7 @@ alwaysApply: true
 1. **Create ai-todo task structure:**
    - Root task: `[<AIT-ID>] Release <version>`
    - Subtasks: Generate summary → Prepare → Approval gate → Execute → Monitor → Finalize
+   - Update Linear issue to "In Progress"
 
 2. **Mark in progress:** Start root task and first subtask before beginning
 
@@ -26,6 +27,7 @@ alwaysApply: true
 7. **Monitor Linear for approval:**
    - Poll `user-linear.list_comments` every 60s
    - Keywords: "Approve", "Proceed", "Execute" = continue | "Abort" = stop
+   - If feedback about the document or version number is provided, make the changes as necessary and edit the release summary then go back to Commit & push and update linear with the latest changes and monitor linear again for approval
    - Complete approval subtask when approved
 
 8. **Execute:** Run `./release/release.sh --execute`
@@ -40,7 +42,7 @@ alwaysApply: true
 ## Safety Rules
 
 - ✅ Mark subtask as in-progress when starting each step
-- ✅ **STOP** at approval gate until explicit Linear comment
+- ✅ **WAIT and MONITOR** at approval gate until explicit Linear comment
 - ✅ **STOP** on ANY error - report to Linear, wait for user
 - ❌ Never skip approval step
 - ❌ Never proceed if CI fails

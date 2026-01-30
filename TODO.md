@@ -8,15 +8,15 @@
   > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
   - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
     > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
-  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-29)
+  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-30)
     > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
-  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-29)
+  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-30)
     > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
     > Design doc: docs/linear_integration_design.md
-  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-29)
+  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-30)
     > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
     > Design doc: docs/linear_integration_design.md
-  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-29)
+  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-30)
     > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
     > Assessment doc: docs/linear_integration_assessment.md
 
@@ -1273,73 +1273,8 @@
   - [D] **#193.3** Create design document for 'start' command architecture `#design` `#documentation` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.2** Design the 'start' functionality: status changes, timers, assignments, etc. `#design` (deleted 2026-01-25, expires 2026-02-24)
   - [D] **#193.1** Research existing 'start' command patterns in other todo apps and define requirements `#research` (deleted 2026-01-25, expires 2026-02-24)
-  - [D] **#174.4** Test PyPI authentication with manual upload `#testing` (deleted 2025-12-16, expires 2026-01-15)
-  - [D] **#174.3** Add PYPI_API_TOKEN to GitHub secrets `#setup` (deleted 2025-12-16, expires 2026-01-15)
-  - [D] **#174.2** Generate PyPI API token with upload permissions `#setup` (deleted 2025-12-16, expires 2026-01-15)
-- [D] **#168** Phase 10: Enhanced Parsing (Pre-requisite) - Update FileOps._parse_markdown() to capture non-task lines in Tasks section `#code` (deleted 2025-12-15, expires 2026-01-14)
-- [D] **#162** Test task for modify bug fix - MODIFIED `#test` (deleted 2025-12-12, expires 2026-01-11)
-  - [D] **#136.9** Verify note positioning remains correct after multiple subtask additions `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.8** Test: add second subtask when first subtask already exists with notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.7** Test: task with multiple notes + add subtask (all notes stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.6** Test: task with note + add first subtask (note should stay with parent) `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.5** Implement fix: modify add_subtask to skip over blockquotes before insertion `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.4** Design solution: insert subtasks after task AND any following notes `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.3** Analyze note detection: how to identify and skip over notes when inserting subtasks `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.2** Investigate add_subtask function: find where subtask insertion occurs `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#136.1** Reproduce bug: create task with note, add subtask, verify note is split `#bug` (deleted 2025-11-15, expires 2025-12-15)
-  - [D] **#28.4** Update SERIAL_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.3** Update LOG_FILE path reference in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.2** Rename .todo_serial to .todo.ai_serial using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#28.1** Rename .todo.log to .todo.ai.log using git mv `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.10** Update .cursorrules to reference .todo.ai/ instead of .todo/ `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.9** Verify git tracking of .todo.ai/ `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.8** Test script execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.7** Update any documentation files `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.6** Update README.md if it mentions .todo/ `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.5** Update environment variable names (TODO_SERIAL, TODO_LOG) `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.4** Update all references to .todo/ in script code `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.3** Update LOG_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.2** Update SERIAL_FILE path in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#26.1** Rename directory using git mv: .todo/ -> .todo.ai/ `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.6** Update header comment in todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.5** Update README.md repository references `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.4** Update SCRIPT_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.3** Update REPO_URL in todo.ai script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.2** Update local git remote URL after GitHub rename `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#25.1** Rename repository on GitHub (manual step) `#repo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.10** Test update command works with new filename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.9** Test installation and execution after rename `#test` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.8** Update all inline comments and documentation in script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.7** Update init_cursor_rules() to reference todo.ai `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.6** Update help text and show_usage() examples `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.5** Update Cursor rules to reference todo.ai instead of todo.zsh `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.4** Update self-references in update_tool() function `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.3** Update TODO.md template path references `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.2** Update all references in README.md (installation, examples, commands) `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#23.1** Update script filename: todo.zsh -> todo.ai `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.3** Option 3: Auto-check version on startup (informational only) `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.2** Option 2: Add version info + update command `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#22.1** Option 1: Simple re-download instruction in README `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#18.1** Remove path from todo.ai upon init `#fix` `#setup` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#17.3** Ensure TODO.md and .todo.ai/ are always committed together `#rules` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#17.1** Enforce todo.ai usage for all task tracking `#rules` `#todo` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.9** Create developer/ directory and setup script for automated linter installation, update design doc to reference the setup script `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.8** Investigate installation options for linters (markdownlint-cli2, yamllint, jq): document direct installation methods and agent-assisted installation for developers after forking the repo, reference GIT_HOOKS_DESIGN.md `#docs` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.7** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.6** Create setup script at scripts/setup-git-hooks.sh to install pre-commit hook and check for required linting tools `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.5** Create pre-commit hook script at scripts/pre-commit-hook.sh with file type detection, error aggregation, and exit handling `#code` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.4** TODO.md linting: implement validate_todo() using existing ./todo.ai --lint command, validates task IDs, subtask relationships, formatting, tags, and section structure `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.3** JSON linting: implement validate_json() using jq (recommended) or jsonlint/Python (fallback), validate .json files for syntax errors `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.2** YAML linting: implement validate_yaml() using yamllint (recommended) or yq (fallback), validate .yml/.yaml files, create .yamllint config with relaxed rules for .mdc front matter `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#15.1** Markdown linting: implement validate_markdown() using markdownlint-cli2 (recommended) or mdl (fallback), validate .md/.mdc files, create .markdownlint.yaml config `#lint` (deleted 2025-11-02, expires 2025-12-02)
-  - [D] **#7.1** Add setup instructions documenting that .todo.ai/ must be tracked in git `#docs` (deleted 2025-11-02, expires 2025-12-02)
 
 ---
-
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
 
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
@@ -1370,31 +1305,12 @@ View with: `ai-todo show <task-id>`
 129.1:2026-01-27T23:50:41.498495:2026-01-29T02:09:45.957095
 129.2:2026-01-27T23:50:41.498493:2026-01-29T02:09:45.957098
 129.3:2026-01-27T23:50:41.498491:2026-01-29T02:09:45.957099
-136.1:2026-01-27T23:50:41.506061:2026-01-27T23:51:37.636306
-136.2:2026-01-27T23:50:41.506053:2026-01-27T23:50:41.506054
-136.3:2026-01-27T23:50:41.506046:2026-01-27T23:51:37.636290
-136.4:2026-01-27T23:50:41.506038:2026-01-27T23:51:37.636281
-136.5:2026-01-27T23:50:41.506030:2026-01-27T23:51:37.636273
-136.6:2026-01-27T23:50:41.506020:2026-01-27T23:51:37.636265
-136.7:2026-01-27T23:50:41.506012:2026-01-27T23:50:41.506013
-136.8:2026-01-27T23:50:41.506004:2026-01-27T23:50:41.506005
-136.9:2026-01-27T23:50:41.505997:2026-01-27T23:51:37.636240
-15.1:2026-01-27T23:50:41.506414:2026-01-27T23:51:37.636695
-15.2:2026-01-27T23:50:41.506405:2026-01-27T23:51:37.636686
-15.3:2026-01-27T23:50:41.506394:2026-01-27T23:51:37.636676
-15.4:2026-01-27T23:50:41.506385:2026-01-27T23:50:41.506386
-15.5:2026-01-27T23:50:41.506377:2026-01-27T23:51:37.636658
-15.6:2026-01-27T23:50:41.506369:2026-01-27T23:51:37.636649
-15.7:2026-01-27T23:50:41.506360:2026-01-27T23:51:37.636634
-15.8:2026-01-27T23:50:41.506351:2026-01-27T23:51:37.636624
-15.9:2026-01-27T23:50:41.506342:2026-01-27T23:51:37.636614
 161:2026-01-27T23:50:41.503102:2026-01-27T23:50:41.503103
 161.1:2026-01-27T23:50:41.503131:2026-01-27T23:50:41.503133
 161.2:2026-01-27T23:50:41.503126:2026-01-27T23:51:37.631630
 161.3:2026-01-27T23:50:41.503121:2026-01-27T23:51:37.631626
 161.4:2026-01-27T23:50:41.503114:2026-01-27T23:50:41.503116
 161.5:2026-01-27T23:50:41.503108:2026-01-27T23:50:41.503110
-162:2026-01-27T23:50:41.505988:2026-01-27T23:50:41.505989
 163:2026-01-27T23:50:41.501267:2026-01-27T23:50:41.501269
 163.1:2026-01-27T23:50:41.502089:2026-01-27T23:50:41.502090
 163.10:2026-01-27T23:50:41.502037:2026-01-27T23:51:37.630670
@@ -1451,14 +1367,11 @@ View with: `ai-todo show <task-id>`
 164:2026-01-27T23:50:41.501261:2026-01-27T23:51:37.630435
 165:2026-01-27T23:50:41.501256:2026-01-27T23:51:37.630431
 166:2026-01-27T23:50:41.501250:2026-01-27T23:50:41.501251
-168:2026-01-27T23:50:41.505981:2026-01-27T23:51:37.636224
 169:2026-01-27T23:50:41.503740:2026-01-27T23:51:37.633940
 169.1:2026-01-27T23:50:41.503756:2026-01-27T23:51:37.633958
 169.2:2026-01-27T23:50:41.503750:2026-01-27T23:50:41.503751
 169.3:2026-01-27T23:50:41.503745:2026-01-27T23:51:37.633946
 17:2026-01-27T23:50:41.505227:2026-01-27T23:50:41.505228
-17.1:2026-01-27T23:50:41.506333:2026-01-27T23:51:37.636605
-17.3:2026-01-27T23:50:41.506325:2026-01-27T23:50:41.506326
 170:2026-01-27T23:50:41.503733:2026-01-27T23:50:41.503735
 171:2026-01-27T23:50:41.503724:2026-01-27T23:50:41.503728
 172:2026-01-27T23:50:41.501205:2026-01-27T23:50:41.501207
@@ -1482,9 +1395,6 @@ View with: `ai-todo show <task-id>`
 173.9:2026-01-27T23:50:41.503675:2026-01-27T23:50:41.503676
 174:2026-01-27T23:50:41.503625:2026-01-27T23:50:41.503628
 174.1:2026-01-27T23:50:41.503648:2026-01-27T23:51:37.633830
-174.2:2026-01-27T23:50:41.505972:2026-01-27T23:51:37.636215
-174.3:2026-01-27T23:50:41.505964:2026-01-27T23:50:41.505965
-174.4:2026-01-27T23:50:41.505957:2026-01-27T23:51:37.636193
 174.5:2026-01-27T23:50:41.503643:2026-01-27T23:51:37.633824
 174.6:2026-01-27T23:50:41.503638:2026-01-27T23:51:37.633818
 174.7:2026-01-27T23:50:41.503632:2026-01-27T23:50:41.503633
@@ -1506,7 +1416,6 @@ View with: `ai-todo show <task-id>`
 179.2:2026-01-27T23:50:41.503544:2026-01-27T23:51:37.633694
 179.3:2026-01-27T23:50:41.503539:2026-01-27T23:51:37.633687
 18:2026-01-27T23:50:41.505222:2026-01-27T23:50:41.505223
-18.1:2026-01-27T23:50:41.506318:2026-01-27T23:51:37.636589
 180:2026-01-27T23:50:41.503510:2026-01-27T23:50:41.503512
 180.1:2026-01-27T23:50:41.503527:2026-01-27T23:50:41.503528
 180.2:2026-01-27T23:50:41.503522:2026-01-27T23:51:37.633659
@@ -1771,9 +1680,6 @@ View with: `ai-todo show <task-id>`
 219.8:2026-01-27T23:50:41.500801:2026-01-27T23:50:41.500803
 219.9:2026-01-27T23:50:41.500796:2026-01-27T23:51:37.629857
 22:2026-01-27T23:50:41.505213:2026-01-27T23:51:37.635538
-22.1:2026-01-27T23:50:41.506310:2026-01-27T23:51:37.636581
-22.2:2026-01-27T23:50:41.506303:2026-01-27T23:51:37.636573
-22.3:2026-01-27T23:50:41.506295:2026-01-27T23:51:37.636565
 220:2026-01-27T23:50:41.505749:2026-01-27T23:51:37.635962
 220.1:2026-01-27T23:50:41.505773:2026-01-27T23:50:41.505774
 220.2:2026-01-27T23:50:41.505766:2026-01-27T23:51:37.635980
@@ -1788,16 +1694,6 @@ View with: `ai-todo show <task-id>`
 228:2026-01-27T23:50:41.505697:2026-01-27T23:50:41.505698
 229:2026-01-27T23:50:41.505689:2026-01-27T23:50:41.505690
 23:2026-01-27T23:50:41.505208:2026-01-27T23:51:37.635533
-23.1:2026-01-27T23:50:41.506287:2026-01-27T23:50:41.506288
-23.10:2026-01-27T23:50:41.506219:2026-01-27T23:50:41.506220
-23.2:2026-01-27T23:50:41.506280:2026-01-27T23:51:37.636549
-23.3:2026-01-27T23:50:41.506272:2026-01-27T23:51:37.636535
-23.4:2026-01-27T23:50:41.506264:2026-01-27T23:50:41.506265
-23.5:2026-01-27T23:50:41.506257:2026-01-27T23:51:37.636520
-23.6:2026-01-27T23:50:41.506249:2026-01-27T23:51:37.636512
-23.7:2026-01-27T23:50:41.506242:2026-01-27T23:51:37.636504
-23.8:2026-01-27T23:50:41.506234:2026-01-27T23:50:41.506235
-23.9:2026-01-27T23:50:41.506227:2026-01-27T23:51:37.636488
 230:2026-01-27T23:50:41.505682:2026-01-27T23:51:37.635888
 231:2026-01-27T23:50:41.505674:2026-01-27T23:51:37.635880
 232:2026-01-27T23:50:41.505666:2026-01-27T23:51:37.635871
@@ -1947,12 +1843,6 @@ View with: `ai-todo show <task-id>`
 248:2026-01-27T23:50:41.505432:2026-01-27T23:51:37.635618
 249:2026-01-27T23:50:41.505424:2026-01-27T23:51:37.635610
 25:2026-01-27T23:50:41.505203:2026-01-27T23:51:37.635528
-25.1:2026-01-27T23:50:41.506212:2026-01-27T23:51:37.636472
-25.2:2026-01-27T23:50:41.506204:2026-01-27T23:51:37.636464
-25.3:2026-01-27T23:50:41.506197:2026-01-27T23:51:37.636456
-25.4:2026-01-27T23:50:41.506189:2026-01-27T23:50:41.506190
-25.5:2026-01-27T23:50:41.506182:2026-01-27T23:51:37.636441
-25.6:2026-01-27T23:50:41.506175:2026-01-27T23:51:37.636433
 250:2026-01-27T23:50:41.500060:2026-01-27T23:50:41.500062
 250.1:2026-01-27T23:50:41.500133:2026-01-27T23:50:41.500135
 250.10:2026-01-27T23:50:41.500079:2026-01-27T23:51:37.629243
@@ -2041,16 +1931,6 @@ View with: `ai-todo show <task-id>`
 259.7:2026-01-27T23:50:41.499670:2026-01-27T23:51:37.628383
 259.8:2026-01-27T23:50:41.499665:2026-01-27T23:50:41.499666
 26:2026-01-27T23:50:41.505198:2026-01-27T23:50:41.505199
-26.1:2026-01-27T23:50:41.506167:2026-01-27T23:51:37.636425
-26.10:2026-01-27T23:50:41.506100:2026-01-27T23:51:37.636346
-26.2:2026-01-27T23:50:41.506160:2026-01-27T23:51:37.636417
-26.3:2026-01-27T23:50:41.506152:2026-01-27T23:51:37.636401
-26.4:2026-01-27T23:50:41.506145:2026-01-27T23:51:37.636394
-26.5:2026-01-27T23:50:41.506137:2026-01-27T23:51:37.636386
-26.6:2026-01-27T23:50:41.506129:2026-01-27T23:50:41.506130
-26.7:2026-01-27T23:50:41.506122:2026-01-27T23:51:37.636370
-26.8:2026-01-27T23:50:41.506115:2026-01-27T23:51:37.636362
-26.9:2026-01-27T23:50:41.506107:2026-01-27T23:50:41.506108
 260:2026-01-27T23:50:41.499608:2026-01-27T23:50:41.499611
 260.1:2026-01-27T23:50:41.499653:2026-01-27T23:51:37.628365
 260.2:2026-01-27T23:50:41.499647:2026-01-27T23:50:41.499648
@@ -2127,10 +2007,6 @@ View with: `ai-todo show <task-id>`
 268.4:2026-01-29T02:12:25.979364:2026-01-29T04:20:05.940007
 268.5:2026-01-29T02:12:26.526909:2026-01-29T04:20:05.940008
 268.6:2026-01-29T02:12:27.093344:2026-01-29T04:20:05.940009
-28.1:2026-01-27T23:50:41.506091:2026-01-27T23:50:41.506092
-28.2:2026-01-27T23:50:41.506084:2026-01-27T23:51:37.636330
-28.3:2026-01-27T23:50:41.506076:2026-01-27T23:50:41.506077
-28.4:2026-01-27T23:50:41.506069:2026-01-27T23:51:37.636314
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2190,7 +2066,6 @@ View with: `ai-todo show <task-id>`
 51.3:2026-01-27T23:50:41.505454:2026-01-27T23:50:41.505455
 6:2026-01-27T23:50:41.505256:2026-01-27T23:50:41.505257
 7:2026-01-27T23:50:41.505177:2026-01-27T23:51:37.635501
-7.1:2026-01-27T23:50:41.506423:2026-01-27T23:51:37.636704
 8:2026-01-27T23:50:41.505251:2026-01-27T23:50:41.505252
 -->
 
@@ -2199,4 +2074,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-29 04:20:05
+**ai-todo** | Last Updated: 2026-01-30 00:37:16

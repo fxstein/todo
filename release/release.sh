@@ -1090,15 +1090,6 @@ main() {
         echo -e "${BLUE}📄 Auto-detected AI release summary: $AI_SUMMARY_FILE${NC}"
     fi
 
-    # Clean up artifacts from previous prepare attempts to ensure idempotency
-    if [[ -f "todo.bash" ]]; then
-        # Check if todo.bash is uncommitted (indicates it's from a failed prepare)
-        if git status --porcelain 2>/dev/null | grep -q "todo.bash"; then
-            echo -e "${BLUE}🧹 Cleaning up uncommitted todo.bash from previous prepare attempt...${NC}"
-            rm -f todo.bash
-        fi
-    fi
-
     # Get current version from GitHub (source of truth)
     CURRENT_VERSION=$(get_current_version)
 
@@ -1958,19 +1949,6 @@ execute_release() {
     echo -e "${GREEN}✓ Verified version updated in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py${NC}"
     log_release_step "VERSION UPDATED" "Version updated successfully in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py"
 
-    # Run pre-commit hooks on generated files to fix formatting before staging
-    # This prevents the complex retry logic from needing to handle formatting fixes
-    echo -e "${BLUE}🔍 Running pre-commit hooks on generated files...${NC}"
-    if command -v pre-commit &> /dev/null; then
-        if uv run pre-commit run --files todo.bash 2>&1 | grep -q "Passed\|Skipped"; then
-            log_release_step "PRE-COMMIT" "Pre-commit hooks passed for todo.bash"
-        else
-            # Hooks may have fixed files - this is expected
-            log_release_step "PRE-COMMIT" "Pre-commit hooks fixed formatting in todo.bash"
-        fi
-    fi
-    echo -e "${GREEN}✓ Files ready for commit${NC}"
-
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
@@ -2000,11 +1978,6 @@ execute_release() {
             log_release_step "COMMIT TODO_DATA" "Adding .ai-todo/ files to commit"
             git add .ai-todo/.ai-todo.serial .ai-todo/.ai-todo.log 2>/dev/null || true
         fi
-    fi
-
-    # Add todo.bash if it was converted (should always be the case after prepare)
-    if [[ -f "todo.bash" ]]; then
-        git add todo.bash
     fi
 
     # Add uv.lock if it exists (may be modified by pre-commit hooks when version changes)

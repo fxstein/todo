@@ -39,7 +39,7 @@
     > - Set up manifest and config files
     > - Integrate with existing CI/CD pipeline
     > - Implement custom AI summary injection
-  - [ ] **#269.2** Design: Release Please integration plan `#design`
+  - [ ] **#269.2** Design: Release Please integration plan `#design` `#inprogress`
     > Design document for Release Please setup:
     > - Integration with CI/CD workflows
     > - Trigger Release tests and PyPI publishing
@@ -1326,11 +1326,6 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
-
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2064,7 +2059,7 @@ View with: `ai-todo show <task-id>`
 268.6:2026-01-29T02:12:27.093344:2026-01-29T04:20:05.940009
 269:2026-01-30T03:19:11.642404:2026-01-30T03:20:07.364656
 269.1:2026-01-30T03:19:17.717935:2026-01-30T03:22:56.426011
-269.2:2026-01-30T03:19:18.883730:2026-01-30T03:19:18.894790
+269.2:2026-01-30T03:19:18.883730:2026-01-30T03:23:54.976837
 269.3:2026-01-30T03:19:20.123921:2026-01-30T03:19:20.136232
 269.4:2026-01-30T03:19:21.417545:2026-01-30T03:19:21.428858
 269.5:2026-01-30T03:19:22.553112:2026-01-30T03:19:22.565374
@@ -2136,4 +2131,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-30 03:22:56
+**ai-todo** | Last Updated: 2026-01-30 03:23:54

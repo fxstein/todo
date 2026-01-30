@@ -29,7 +29,8 @@
           "glob": false
         }
       ],
-      "prerelease": false
+      "prerelease": true,
+      "prerelease-type": "b"
     }
   }
 }

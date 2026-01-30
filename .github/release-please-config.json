@@ -24,7 +24,7 @@
       ],
       "extra-files": [
         {
-          "type": "python",
+          "type": "generic",
           "path": "ai_todo/__init__.py",
           "glob": false
         }

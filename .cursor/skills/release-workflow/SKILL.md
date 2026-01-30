@@ -8,7 +8,9 @@ description: Guides release preparation and execution for ai-todo. Use when the 
 ## Quick Reference
 
 - **Prepare:** `./release/release.sh --prepare [--beta] [--set-version X.Y.Z] --summary release/AI_RELEASE_SUMMARY.md`
+- **Dry Run:** `./release/release.sh --prepare --dry-run` (preview without committing)
 - **Execute:** `./release/release.sh --execute`
+- **Abort:** `./release/release.sh --abort [version]` (cleanup failed release)
 - **Detailed docs:** [release/RELEASE_PROCESS.md](../../../release/RELEASE_PROCESS.md)
 
 ## Prepare a Release

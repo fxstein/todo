@@ -1730,6 +1730,7 @@ abort_release() {
     echo -e "${BLUE}🧹 Cleaning up release artifacts...${NC}"
     rm -f release/.prepare_state
     rm -f release/RELEASE_NOTES.md
+    rm -f release/AI_RELEASE_SUMMARY.md
     rm -f todo.bash
     echo -e "${GREEN}   ✓ Artifacts cleaned${NC}"
     log_release_step "ABORT CLEANUP" "Cleaned release artifacts"
@@ -1737,6 +1738,11 @@ abort_release() {
     # Step 7: Stage changes
     echo -e "${BLUE}📝 Staging changes...${NC}"
     git add pyproject.toml legacy/todo.ai ai_todo/__init__.py release/RELEASE_LOG.log
+
+    # Stage removal of AI_RELEASE_SUMMARY.md if it was deleted
+    if ! [[ -f "release/AI_RELEASE_SUMMARY.md" ]] && git ls-files --error-unmatch release/AI_RELEASE_SUMMARY.md > /dev/null 2>&1; then
+        git add release/AI_RELEASE_SUMMARY.md
+    fi
 
     # Add uv.lock if it changed (pytest may have updated it)
     if [[ -f "uv.lock" ]] && git diff --quiet uv.lock 2>/dev/null; then

@@ -965,28 +965,6 @@ update_version() {
     fi
 }
 
-# Convert zsh version to bash version
-convert_to_bash() {
-    local converter_script="release/convert_zsh_to_bash.sh"
-
-    if [[ ! -f "$converter_script" ]]; then
-        echo -e "${RED}❌ Error: Converter script not found: $converter_script${NC}"
-        echo -e "${RED}   → The bash conversion script is missing${NC}"
-        echo -e "${RED}   → Check that release/convert_zsh_to_bash.sh exists${NC}"
-        return 1
-    fi
-
-    # Run converter
-    if ! bash "$converter_script"; then
-        echo -e "${RED}❌ Error: Conversion failed${NC}"
-        echo -e "${RED}   → The zsh to bash conversion encountered errors${NC}"
-        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for syntax errors${NC}"
-        return 1
-    fi
-
-    return 0
-}
-
 # Main function
 main() {
     local MODE="prepare"  # Default to prepare mode
@@ -1973,18 +1951,6 @@ execute_release() {
     fi
     echo -e "${GREEN}✓ Verified version updated in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py${NC}"
     log_release_step "VERSION UPDATED" "Version updated successfully in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py"
-
-    # Convert to bash version (now that version is updated)
-    echo -e "${BLUE}🔄 Converting to bash version...${NC}"
-    if ! convert_to_bash; then
-        echo -e "${RED}❌ Error: Bash conversion failed${NC}"
-        echo -e "${RED}   → See error details above for specifics${NC}"
-        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for issues${NC}"
-        log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
-        exit 1
-    fi
-    log_release_step "BASH CONVERSION" "Successfully converted legacy/todo.ai to todo.bash with version ${NEW_VERSION}"
-    echo -e "${GREEN}✓ Bash version created${NC}"
 
     # Run pre-commit hooks on generated files to fix formatting before staging
     # This prevents the complex retry logic from needing to handle formatting fixes

@@ -4,6 +4,56 @@
 
 ## Tasks
 
+- [ ] **#269** [AIT-8] Release Please `#AIT-8` `#ci-cd` `#inprogress` `#linear` `#release`
+  > Linear issue: https://linear.app/fxstein/issue/AIT-8/release-please
+  > Migrate Release process to Release Please.
+  > Create a tasklist to migrate the project to release-please:
+  > - Analyze current release process, Cursor rules, scripting logic, version history
+  > - Design Release Please setup for CI/CD workflows (trigger tests, PyPI publishing)
+  > - Define method to create/inject custom AI-generated release summaries using Gemini
+  > - Implement the setup
+  > - Test and create tests
+  > - Document changes
+  > - Migrate from legacy release.sh to new setup
+  - [ ] **#269.6** Migration: Transition from legacy release.sh `#migration`
+    > Migrate from legacy release process:
+    > - Archive or remove release.sh and related scripts
+    > - Update any references to old release process
+    > - Verify all functionality preserved
+    > - Communicate changes to contributors
+  - [ ] **#269.5** Documentation: Update release docs `#documentation`
+    > Update documentation:
+    > - RELEASE_PROCESS.md with new Release Please workflow
+    > - Update CONTRIBUTING.md if needed
+    > - Update relevant Cursor rules
+    > - Add examples and migration guide
+  - [ ] **#269.4** Testing: Verify Release Please functionality `#testing`
+    > Create and execute tests:
+    > - Unit tests for any new utilities
+    > - Integration tests for release workflow
+    > - Dry-run Release Please to verify behavior
+    > - Test AI summary generation
+  - [ ] **#269.3** Implementation: Set up Release Please `#implementation`
+    > Implement Release Please:
+    > - Configure release-please-action in .github/workflows/
+    > - Set up manifest and config files
+    > - Integrate with existing CI/CD pipeline
+    > - Implement custom AI summary injection
+  - [ ] **#269.2** Design: Release Please integration plan `#design`
+    > Design document for Release Please setup:
+    > - Integration with CI/CD workflows
+    > - Trigger Release tests and PyPI publishing
+    > - Method to inject custom AI-generated summaries (Gemini)
+    > - Compatibility with existing version constraints
+    > Output: docs/design/release_please_design.md
+  - [x] **#269.1** Analysis: Document current release process `#analysis` (2026-01-30)
+    > Create analysis document for:
+    > - Current release process and workflows
+    > - Cursor rules in place (release-workflow.mdc, release-automation.mdc)
+    > - Scripting logic (release.sh, publish_pypi.sh, etc.)
+    > - Current release/tags version history
+    > Output: docs/design/release_please_analysis.md
+
 - [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
   > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
   - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
@@ -1276,6 +1326,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2007,6 +2062,13 @@
 268.4:2026-01-29T02:12:25.979364:2026-01-29T04:20:05.940007
 268.5:2026-01-29T02:12:26.526909:2026-01-29T04:20:05.940008
 268.6:2026-01-29T02:12:27.093344:2026-01-29T04:20:05.940009
+269:2026-01-30T03:19:11.642404:2026-01-30T03:20:07.364656
+269.1:2026-01-30T03:19:17.717935:2026-01-30T03:22:56.426011
+269.2:2026-01-30T03:19:18.883730:2026-01-30T03:19:18.894790
+269.3:2026-01-30T03:19:20.123921:2026-01-30T03:19:20.136232
+269.4:2026-01-30T03:19:21.417545:2026-01-30T03:19:21.428858
+269.5:2026-01-30T03:19:22.553112:2026-01-30T03:19:22.565374
+269.6:2026-01-30T03:19:23.744384:2026-01-30T03:19:23.759319
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2074,4 +2136,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-30 00:37:16
+**ai-todo** | Last Updated: 2026-01-30 03:22:56

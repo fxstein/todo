@@ -117,6 +117,112 @@ Design a migration from custom `release.sh` to Google's Release Please with cust
 
 ---
 
+## Review and Approval Workflow
+
+### How Release Preparation Works
+
+**CRITICAL:** Release Please creates a **Release PR** that serves as the review gate. This PR is where all review and approval happens BEFORE any release is executed.
+
+### Step-by-Step Review Process
+
+1. **Developer pushes to main:**
+   - Commits accumulate on main branch
+   - Each commit follows conventional commit format
+
+2. **Release Please creates/updates Release PR:**
+   - **Automated:** Runs on every push to main
+   - **PR Title:** `chore(main): release 4.0.1` (example)
+   - **PR Body:** Complete CHANGELOG preview
+   - **PR Contents:** Version bumps in all files
+   - **Single PR:** Same PR updated for all commits until merged
+
+3. **AI Summary Injection (custom):**
+   - **Triggered:** When Release PR is created/updated
+   - **Action:** Gemini API generates 2-3 paragraph summary
+   - **Injection:** Summary added to CHANGELOG.md header
+   - **Commit:** Updated CHANGELOG committed to Release PR
+
+4. **Beta Policy Check (custom, if major):**
+   - **Triggered:** When Release PR is opened
+   - **Check:** Validates beta exists if major release
+   - **Block:** Prevents merge if policy violated
+   - **Comment:** Posts instructions if blocked
+
+5. **Human Review (APPROVAL GATE):**
+   - **Review CHANGELOG:** Check AI summary quality and commit categorization
+   - **Verify version:** Ensure correct version bump (major/minor/patch)
+   - **Check beta policy:** If major, confirm beta was tested
+   - **Test locally:** Optional - install from PR branch
+   - **Approve PR:** Required status checks must pass
+   - **Merge PR:** This triggers the release execution
+
+6. **Release Execution (automated after merge):**
+   - **Tag creation:** Release Please creates git tag (e.g., `v4.0.1`)
+   - **CI/CD triggered:** Existing pipeline runs on tag push
+   - **Tests run:** Full test suite must pass
+   - **PyPI publish:** Trusted publisher uploads to PyPI
+   - **GitHub release:** Created with CHANGELOG and assets
+
+### Key Safety Features
+
+- **PR = Review Gate:** ALL changes visible before execution
+- **Required Checks:** CI, beta policy must pass before merge allowed
+- **Branch Protection:** Enforce reviewers, status checks
+- **No Direct Commits:** Main branch protected, only PR merges
+- **Audit Trail:** PR shows who approved, when, and why
+
+### Comparison to Current Process
+
+| Feature | Current (release.sh) | New (Release Please) |
+|---------|---------------------|---------------------|
+| **Prepare** | Manual `--prepare` command | Automatic Release PR creation |
+| **Review** | Preview in terminal | Review PR on GitHub |
+| **Approval** | User runs `--execute` | User merges PR |
+| **Safety** | Two-phase (prepare/execute) | PR merge = execution trigger |
+| **Visibility** | Local only | Public PR (team can review) |
+
+### Example Release PR
+
+**Title:** `chore(main): release 4.0.1`
+
+**Body Preview:**
+```markdown
+## 4.0.1 (2026-01-30)
+
+[AI-GENERATED SUMMARY INSERTED HERE]
+This release enhances the Release Please workflow with improved
+AI summary generation and fixes several edge cases in version bumping...
+
+---
+
+### ✨ Features
+
+* Add Release Please integration (#59) ([abc123](link))
+
+### 🐛 Bug Fixes
+
+* Fix version bumping for beta releases ([def456](link))
+
+### 📚 Documentation
+
+* Update RELEASE_PROCESS.md ([ghi789](link))
+```
+
+**Files Changed:**
+- `CHANGELOG.md` (AI summary + commit list)
+- `pyproject.toml` (version: 4.0.1)
+- `ai_todo/__init__.py` (version: 4.0.1)
+- `.github/release-please-manifest.json` (version: 4.0.1)
+
+**Checks:**
+- ✅ CI/CD (all tests pass)
+- ✅ Beta Policy (not major, no check needed)
+- ✅ Linters (markdown, python)
+
+**Human Decision:** Approve and merge when ready → Release executes automatically
+
+---
+
 ## Release Please Configuration
 
 ### 1. Workflow File
@@ -771,7 +877,6 @@ Our existing `ci-cd.yml` uses `release/RELEASE_NOTES.md` for release body. With 
     files: |
       dist/*
       legacy/todo.ai
-      legacy/todo.bash
     # OLD: body_path: release/RELEASE_NOTES.md
     # NEW: Extract relevant section from CHANGELOG.md
     body_path: .github/scripts/extract_changelog_section.sh
@@ -796,13 +901,12 @@ cat release_notes.txt
 **No changes needed** - existing workflow already attaches:
 - `dist/*` (Python distributions)
 - `legacy/todo.ai` (zsh script)
-- `legacy/todo.bash` (bash script)
 
 ---
 
 ## Migration Plan
 
-### Phase 1: Setup (Week 1)
+### Phase 1: Setup
 
 **Goal:** Configure Release Please without affecting current process
 
@@ -825,7 +929,7 @@ cat release_notes.txt
 **Branch:** `feat/release-please-setup`
 **PR:** Draft PR for review only, DO NOT MERGE
 
-### Phase 2: AI Summary Integration (Week 2)
+### Phase 2: AI Summary Integration
 
 **Goal:** Add AI summary generation workflow
 
@@ -848,7 +952,7 @@ cat release_notes.txt
 **Branch:** `feat/ai-summary-integration`
 **PR:** Draft PR for review only, DO NOT MERGE
 
-### Phase 3: Beta Policy Enforcement (Week 3)
+### Phase 3: Beta Policy Enforcement
 
 **Goal:** Add beta policy enforcement
 
@@ -869,7 +973,7 @@ cat release_notes.txt
 **Branch:** `feat/beta-policy-enforcement`
 **PR:** Draft PR for review only, DO NOT MERGE
 
-### Phase 4: Integration Testing (Week 4)
+### Phase 4: Integration Testing
 
 **Goal:** Test complete workflow end-to-end
 
@@ -901,7 +1005,7 @@ cat release_notes.txt
 **Branch:** `feat/release-please-integration`
 **Test Tag:** `v4.0.0-test1` (deleted after test)
 
-### Phase 5: Migration Cutover (Week 5)
+### Phase 5: Migration Cutover
 
 **Goal:** Replace `release.sh` with Release Please
 
@@ -932,7 +1036,7 @@ cat release_notes.txt
 **Branch:** `feat/release-please-cutover`
 **PR:** Regular PR for review and merge
 
-### Phase 6: First Production Release (Week 6)
+### Phase 6: First Production Release
 
 **Goal:** Create first production release with new system
 
@@ -1187,21 +1291,7 @@ cat release_notes.txt
 
 **Action:** Accept Release Please default, enhance with AI summary
 
-### 6. Legacy Script Maintenance
-
-**Question:** Keep `todo.bash` generation or deprecate?
-
-**Current:** `release.sh` converts `legacy/todo.ai` to `todo.bash`
-
-**Options:**
-- **A:** Keep conversion in CI/CD
-- **B:** Deprecate `todo.bash`, focus on Python package
-
-**Recommendation:** Option A (keep for backward compatibility)
-
-**Action:** Add conversion step to CI/CD workflow
-
-### 7. Linear Integration
+### 6. Linear Integration
 
 **Question:** Preserve automated Linear integration or manual updates?
 

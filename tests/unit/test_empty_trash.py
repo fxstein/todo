@@ -1,7 +1,7 @@
 """Unit tests for empty trash functionality."""
 
 import tempfile
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -32,8 +32,8 @@ class TestEmptyTrashManager:
             id="100",
             description="Old deleted task",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=60),
-            expires_at=datetime.now(UTC) - timedelta(days=30),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=60),
+            expires_at=datetime.now(timezone.utc) - timedelta(days=30),
         )
         tasks.append(task1)
 
@@ -42,15 +42,15 @@ class TestEmptyTrashManager:
             id="101",
             description="Expired parent task",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=40),
-            expires_at=datetime.now(UTC) - timedelta(days=10),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=40),
+            expires_at=datetime.now(timezone.utc) - timedelta(days=10),
         )
         task2_1 = Task(
             id="101.1",
             description="Expired subtask",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=40),
-            expires_at=datetime.now(UTC) - timedelta(days=10),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=40),
+            expires_at=datetime.now(timezone.utc) - timedelta(days=10),
         )
         tasks.extend([task2, task2_1])
 
@@ -59,8 +59,8 @@ class TestEmptyTrashManager:
             id="102",
             description="Recent deleted task",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=10),
-            expires_at=datetime.now(UTC) + timedelta(days=20),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=10),
+            expires_at=datetime.now(timezone.utc) + timedelta(days=20),
         )
         tasks.append(task3)
 
@@ -77,7 +77,7 @@ class TestEmptyTrashManager:
             id="104",
             description="Archived task",
             status=TaskStatus.ARCHIVED,
-            completed_at=datetime.now(UTC) - timedelta(days=40),
+            completed_at=datetime.now(timezone.utc) - timedelta(days=40),
         )
         tasks.append(task5)
 
@@ -86,7 +86,7 @@ class TestEmptyTrashManager:
             id="105",
             description="Deleted without expiration",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=40),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=40),
             expires_at=None,
         )
         tasks.append(task6)
@@ -112,8 +112,8 @@ class TestEmptyTrashManager:
             id="200",
             description="Timezone test",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=40),
-            expires_at=datetime.now(UTC) - timedelta(days=10),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=40),
+            expires_at=datetime.now(timezone.utc) - timedelta(days=10),
         )
 
         expired = manager.identify_expired_deleted_tasks([task])
@@ -124,13 +124,13 @@ class TestEmptyTrashManager:
         """Test handling of naive (no timezone) expires_at."""
         manager = EmptyTrashManager()
 
-        # Task with naive expires_at (assume UTC)
+        # Task with naive expires_at (assume timezone.utc)
         naive_date = datetime.now() - timedelta(days=10)  # No timezone
         task = Task(
             id="201",
             description="Naive datetime test",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC) - timedelta(days=40),
+            deleted_at=datetime.now(timezone.utc) - timedelta(days=40),
             expires_at=naive_date,
         )
 
@@ -190,8 +190,8 @@ class TestEmptyTrashManager:
             id="200",
             description="Recent delete",
             status=TaskStatus.DELETED,
-            deleted_at=datetime.now(UTC),
-            expires_at=datetime.now(UTC) + timedelta(days=29),
+            deleted_at=datetime.now(timezone.utc),
+            expires_at=datetime.now(timezone.utc) + timedelta(days=29),
         )
 
         manager.file_ops.read_tasks = lambda: [task]

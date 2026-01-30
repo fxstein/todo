@@ -2,7 +2,7 @@
 
 import re
 import tempfile
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -391,21 +391,21 @@ class TestPruneManager:
 
         # Create tasks with different timezone scenarios
         tasks = [
-            # Task archived 60 days ago in PST (UTC-8)
+            # Task archived 60 days ago in PST (timezone.utc-8)
             Task(
                 id="100",
                 description="Task in PST",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                completed_at=datetime.now(UTC) - timedelta(days=60),
+                completed_at=datetime.now(timezone.utc) - timedelta(days=60),
             ),
-            # Task archived 10 days ago in EST (UTC-5)
+            # Task archived 10 days ago in EST (timezone.utc-5)
             Task(
                 id="101",
                 description="Task in EST",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                completed_at=datetime.now(UTC) - timedelta(days=10),
+                completed_at=datetime.now(timezone.utc) - timedelta(days=10),
             ),
         ]
 
@@ -417,19 +417,19 @@ class TestPruneManager:
                     from datetime import timezone as tz
 
                     pst = tz(timedelta(hours=-8))
-                    return (datetime.now(UTC) - timedelta(days=60)).astimezone(pst)
+                    return (datetime.now(timezone.utc) - timedelta(days=60)).astimezone(pst)
                 elif task_id == "101":
                     # Return timezone-aware datetime in EST
                     from datetime import timezone as tz
 
                     est = tz(timedelta(hours=-5))
-                    return (datetime.now(UTC) - timedelta(days=10)).astimezone(est)
+                    return (datetime.now(timezone.utc) - timedelta(days=10)).astimezone(est)
                 return None
 
             mock_get_date.side_effect = get_date
 
-            # Filter with 30-day cutoff (UTC)
-            cutoff = datetime.now(UTC) - timedelta(days=30)
+            # Filter with 30-day cutoff (timezone.utc)
+            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
             result = manager._filter_by_age(tasks, cutoff)
 
             # Should include only task 100 (60 days old), not 101 (10 days old)
@@ -461,7 +461,7 @@ class TestPruneManager:
             def get_date(task_id, _path):
                 if task_id == "100":
                     # Return timezone-aware datetime (60 days ago in UTC)
-                    return datetime.now(UTC) - timedelta(days=60)
+                    return datetime.now(timezone.utc) - timedelta(days=60)
                 elif task_id == "101":
                     # Return naive datetime (10 days ago, assumed UTC)
                     return datetime.now() - timedelta(days=10)
@@ -469,8 +469,8 @@ class TestPruneManager:
 
             mock_get_date.side_effect = get_date
 
-            # Filter with 30-day cutoff (UTC-aware)
-            cutoff = datetime.now(UTC) - timedelta(days=30)
+            # Filter with 30-day cutoff (timezone.utc-aware)
+            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
             result = manager._filter_by_age(tasks, cutoff)
 
             # Should include only task 100 (60 days old)
@@ -548,49 +548,49 @@ class TestPruneManager:
                 description="Task 100",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
             Task(
                 id="9",
                 description="Task 9",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
             Task(
                 id="10",
                 description="Task 10",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
             Task(
                 id="10.1",
                 description="Subtask 10.1",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
             Task(
                 id="10.10",
                 description="Subtask 10.10",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
             Task(
                 id="10.2",
                 description="Subtask 10.2",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
             Task(
                 id="2",
                 description="Task 2",
                 status=TaskStatus.ARCHIVED,
                 tags=set(),
-                created_at=datetime.now(UTC),
+                created_at=datetime.now(timezone.utc),
             ),
         ]
 

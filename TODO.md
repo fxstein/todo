@@ -4,19 +4,33 @@
 
 ## Tasks
 
+- [x] **#270** [AIT-12] Refactor Release Workflow to Cursor Skill `#documentation` `#improvement` `#release` (2026-01-31)
+  > Migrate static release instructions from global .cursorrules to a dynamic Cursor Skill. This ensures release logic is only loaded when relevant, keeping the default context window clean.
+  > Linear: https://linear.app/fxstein/issue/AIT-12/refactor-release-workflow-to-cursor-skill
+  > GitHub: https://github.com/fxstein/ai-todo/issues/73
+  - [x] **#270.4** Verification: Confirm agent loads skill correctly `#testing` (2026-01-31)
+    > Test that the agent correctly loads and applies the release skill when asked to perform release tasks.
+  - [x] **#270.3** Cleanup: Remove migrated logic from .cursorrules `#cleanup` (2026-01-31)
+    > Remove release-specific content from global .cursorrules file to reduce context pollution.
+  - [x] **#270.2** Creation: Define new Cursor Skill with auto-detection `#implementation` (2026-01-31)
+    > Create SKILL.md with description that allows the agent to auto-detect when to use it for release tasks.
+  - [x] **#270.1** Discovery: Identify all release-specific logic and scripts `#analysis` (2026-01-31)
+    > Audit current .cursorrules and identify all release-related instructions, scripts, and workflows that should be migrated to a Cursor Skill.
+    > Discovery Document: docs/design/release_skill_discovery.md
+
 - [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
   > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
   - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
     > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
-  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-30)
+  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-31)
     > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
-  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-30)
+  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-31)
     > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
     > Design doc: docs/linear_integration_design.md
-  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-30)
+  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-31)
     > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
     > Design doc: docs/linear_integration_design.md
-  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-30)
+  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-31)
     > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
     > Assessment doc: docs/linear_integration_assessment.md
 
@@ -1325,11 +1339,6 @@
 
 ---
 
-## Task Metadata
-
-Task relationships and dependencies (managed by ai-todo).
-View with: `ai-todo show <task-id>`
-
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2068,6 +2077,11 @@ View with: `ai-todo show <task-id>`
 269.4:2026-01-30T03:19:21.417545:2026-01-30T23:45:42.165659
 269.5:2026-01-30T03:19:22.553112:2026-01-30T23:45:42.165658
 269.6:2026-01-30T03:19:23.744384:2026-01-30T23:45:42.165656
+270:2026-01-31T00:17:43.818509:2026-01-31T00:19:36.210764
+270.1:2026-01-31T00:17:48.491684:2026-01-31T00:19:00.806264
+270.2:2026-01-31T00:17:49.574775:2026-01-31T00:19:17.382722
+270.3:2026-01-31T00:17:50.469176:2026-01-31T00:19:24.975626
+270.4:2026-01-31T00:17:51.251369:2026-01-31T00:19:36.210762
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2135,4 +2149,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-30 23:45:42
+**ai-todo** | Last Updated: 2026-01-31 00:19:36

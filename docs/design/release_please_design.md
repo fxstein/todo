@@ -27,7 +27,7 @@ Design a migration from custom `release.sh` to Google's Release Please with cust
 6. [Migration Plan](#migration-plan)
 7. [Rollback Strategy](#rollback-strategy)
 8. [Testing Approach](#testing-approach)
-9. [Open Questions](#open-questions)
+9. [Approved Decisions](#approved-decisions)
 
 ---
 
@@ -876,7 +876,6 @@ Our existing `ci-cd.yml` uses `release/RELEASE_NOTES.md` for release body. With 
   with:
     files: |
       dist/*
-      legacy/todo.ai
     # OLD: body_path: release/RELEASE_NOTES.md
     # NEW: Extract relevant section from CHANGELOG.md
     body_path: .github/scripts/extract_changelog_section.sh
@@ -898,9 +897,9 @@ cat release_notes.txt
 
 ### 3. Asset Management
 
-**No changes needed** - existing workflow already attaches:
-- `dist/*` (Python distributions)
-- `legacy/todo.ai` (zsh script)
+**Changes needed:**
+- Remove `legacy/*` scripts from assets (retired in v3.0.0)
+- Keep only Python distributions: `dist/*`
 
 ---
 
@@ -1225,85 +1224,112 @@ cat release_notes.txt
 
 ---
 
-## Open Questions
+## Approved Decisions
 
-### 1. Gemini API Configuration
+All design questions have been reviewed and approved. Implementation will proceed with the following decisions:
 
-**Question:** Do we have Gemini API credentials for GitHub Actions?
+### 1. Gemini API Configuration ✅
 
-**Options:**
-- **A:** Use existing credentials (if available)
-- **B:** Create new service account
-- **C:** Use GitHub Copilot API (if available)
-- **D:** Use OpenAI API as fallback
+**Decision:** **Option B** - Create new service account
 
-**Recommendation:** Option B (dedicated service account for release automation)
+**Implementation:**
+- Create dedicated Gemini API service account for release automation
+- Configure `GEMINI_API_KEY` GitHub secret
+- Ensure API key has appropriate rate limits and quotas
 
-**Action:** Create Gemini API key and configure secret
+**Action Items:**
+- [ ] Create Gemini API service account
+- [ ] Generate API key
+- [ ] Configure GitHub repository secret: `GEMINI_API_KEY` # pragma: allowlist secret
 
-### 2. API Cost Management
+### 2. Backend-Only Detection ✅
 
-**Question:** What are cost implications of Gemini API calls per release?
+**Decision:** **Option B** - Enforce strict `infra:` prefix discipline
+
+**Implementation:**
+- Require `infra:`, `backend:`, `internal:` prefixes for infrastructure work
+- Document commit prefix guidelines in CONTRIBUTING.md
+- Add pre-commit linter to validate commit prefixes (optional)
+- Accept that Release Please will use conventional commit types only
+
+**Action Items:**
+- [ ] Update CONTRIBUTING.md with commit prefix guidelines
+- [ ] Add examples: `infra:` vs `feat:` usage
+- [ ] Consider pre-commit hook for prefix validation
+
+### 3. Beta Enforcement Strictness ✅
+
+**Decision:** **Option A** - Hard block (prevent merge)
+
+**Implementation:**
+- Major release PRs without beta will be blocked (cannot merge)
+- GitHub Action will fail required status check
+- Clear error message with instructions posted to PR
+- Requires workflow disable to bypass (intentional friction)
+
+**Action Items:**
+- [ ] Implement as designed in `.github/workflows/enforce-beta-policy.yml`
+- [ ] Add to branch protection required checks
+- [ ] Monitor for false positives after deployment
+
+### 4. CHANGELOG Format ✅
+
+**Decision:** **Option A** - Keep a Changelog (industry standard)
+
+**Implementation:**
+- Use Release Please default format
+- Enhance with AI-generated summary at top of each release section
+- Standard sections: Features, Bug Fixes, Documentation, etc.
+- Links to commits maintained
+
+**Action Items:**
+- [ ] Accept Release Please default CHANGELOG format
+- [ ] Ensure AI summary injection preserves format
+- [ ] Validate markdown linting passes
+
+### 5. Linear Integration ✅
+
+**Decision:** **Option A** - Manual updates initially
+
+**Implementation:**
+- Manual Linear comments on release PRs
+- Manual status updates after releases
+- Automation can be added later if workflow becomes repetitive
+
+**Action Items:**
+- [ ] Update Linear manually after each release
+- [ ] Document Linear update process
+- [ ] Revisit automation after 3-5 releases
+
+### 6. API Cost Management ✅
+
+**Decision:** **Confirmed** - Costs acceptable
 
 **Analysis:**
-- Calls per release: 1
-- Input tokens: ~2,000 (commit history)
-- Output tokens: ~500 (summary)
-- Gemini 2.0 Flash pricing: $0.15 / 1M tokens
-- Cost per release: ~$0.0004 (negligible)
+- Cost per release: ~$0.0004
+- Annual cost (50 releases): ~$0.02
+- Negligible impact on budget
 
-**Recommendation:** No cost concerns, proceed with Gemini
+**Action Items:**
+- [ ] Monitor actual API usage after deployment
+- [ ] Set up billing alerts if needed (optional)
 
-### 3. Backend-Only Detection
+### 7. Legacy Scripts Retirement ✅
 
-**Question:** Should we preserve backend-only detection or accept version inflation?
+**Decision:** Remove ALL `legacy/` scripts from releases
 
-**Options:**
-- **A:** Accept inflation (simpler, follow Release Please conventions)
-- **B:** Enforce strict `infra:` prefix discipline
-- **C:** Custom pre-processor (complex)
+**Implementation:**
+- Remove `legacy/todo.ai` from GitHub release assets
+- Remove `legacy/todo.bash` (already removed)
+- Exclude entire `legacy/` folder from release artifacts
+- Focus exclusively on Python package distribution
 
-**Recommendation:** Option B with documentation and linter support
+**Rationale:** Legacy scripts retired in v3.0.0, no longer maintained
 
-**Action:** Update CONTRIBUTING.md with commit prefix guidelines
-
-### 4. Beta Enforcement Strictness
-
-**Question:** Hard block (prevent merge) or soft warning (require override)?
-
-**Options:**
-- **A:** Hard block (requires workflow disable to bypass)
-- **B:** Soft warning (requires special approval)
-
-**Recommendation:** Option A (hard block) for consistency with current policy
-
-**Action:** Implement as designed, monitor for false positives
-
-### 5. CHANGELOG Format
-
-**Question:** Keep a Changelog format or customize?
-
-**Options:**
-- **A:** Keep a Changelog (Release Please default, industry standard)
-- **B:** Custom format (match current RELEASE_NOTES.md)
-
-**Recommendation:** Option A (standard format) with AI summary at top
-
-**Action:** Accept Release Please default, enhance with AI summary
-
-### 6. Linear Integration
-
-**Question:** Preserve automated Linear integration or manual updates?
-
-**Current:** `linear-release-workflow.mdc` is disabled
-
-**Options:**
-- **A:** Manual Linear updates (comment on PRs manually)
-- **B:** Automated Linear updates (custom workflow)
-
-**Recommendation:** Option A (manual) initially, automate later if needed
-
-**Action:** Update Linear manually after releases
+**Action Items:**
+- [x] Remove `legacy/todo.ai` from CI/CD workflow
+- [x] Update asset management documentation
+- [ ] Verify no other legacy references remain
 
 ---
 
@@ -1343,14 +1369,17 @@ cat release_notes.txt
 
 ## Next Steps
 
-1. **Get approval** on this design document
-2. **Answer open questions** (Gemini API, policies)
-3. **Start Phase 1** (Setup Release Please configuration)
-4. **Create GitHub secrets** (GEMINI_API_KEY)
-5. **Write unit tests** for custom scripts
+1. ✅ **Design approved** - All decisions confirmed
+2. ✅ **Open questions answered** - Implementation path clear
+3. **Start Phase 1** - Setup Release Please configuration
+4. **Create GitHub secrets** - GEMINI_API_KEY (service account)
+5. **Update CONTRIBUTING.md** - Commit prefix guidelines
+6. **Write unit tests** - Custom scripts (AI summary, beta policy)
 
 ---
 
-**Status:** Design complete, ready for implementation
+**Status:** Design approved, ready for implementation
+**Approver:** Oliver Ratzesberger
+**Approval Date:** 2026-01-30
 **Author:** AI Assistant
 **Date:** 2026-01-30

@@ -1,7 +1,7 @@
 """Empty trash functionality for removing expired deleted tasks from TODO.md."""
 
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from ai_todo.core.file_ops import FileOps
 from ai_todo.core.task import Task, TaskStatus
@@ -48,7 +48,7 @@ class EmptyTrashManager:
         Returns:
             List of expired deleted tasks (includes root + subtasks)
         """
-        current_date = datetime.now(UTC)
+        current_date = datetime.now(timezone.utc)
         expired = []
 
         for task in tasks:
@@ -61,10 +61,10 @@ class EmptyTrashManager:
             # Normalize expires_at to UTC if needed
             expires = task.expires_at
             if expires.tzinfo is not None:
-                expires_utc = expires.astimezone(UTC)
+                expires_utc = expires.astimezone(timezone.utc)
             else:
                 # Naive datetime - assume it's already UTC
-                expires_utc = expires.replace(tzinfo=UTC)
+                expires_utc = expires.replace(tzinfo=timezone.utc)
 
             # Check if expired
             if expires_utc < current_date:

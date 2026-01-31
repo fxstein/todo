@@ -1964,6 +1964,49 @@ execute_release() {
     echo -e "${GREEN}✓ Verified version updated in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py${NC}"
     log_release_step "VERSION UPDATED" "Version updated successfully in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py"
 
+    # Validate and auto-fix generated files before committing
+    echo -e "${BLUE}🔍 Validating generated files...${NC}"
+    local files_to_validate=()
+    [[ -f "release/RELEASE_NOTES.md" ]] && files_to_validate+=("release/RELEASE_NOTES.md")
+    [[ -f "release/RELEASE_SUMMARY.md" ]] && files_to_validate+=("release/RELEASE_SUMMARY.md")
+    [[ -f "legacy/todo.ai" ]] && files_to_validate+=("legacy/todo.ai")
+    [[ -f "pyproject.toml" ]] && files_to_validate+=("pyproject.toml")
+    [[ -f "ai_todo/__init__.py" ]] && files_to_validate+=("ai_todo/__init__.py")
+
+    if [[ ${#files_to_validate[@]} -gt 0 ]]; then
+        echo -e "${BLUE}   Checking: ${files_to_validate[*]}${NC}"
+        local validation_output
+        validation_output=$(uv run pre-commit run --files "${files_to_validate[@]}" 2>&1)
+        local validation_status=$?
+
+        if [[ $validation_status -eq 0 ]]; then
+            echo -e "${GREEN}✓ All files passed validation${NC}"
+            log_release_step "VALIDATION" "Pre-commit validation passed for generated files"
+        else
+            # Check if hooks modified files (auto-fix)
+            local modified_files=$(git status --porcelain "${files_to_validate[@]}" 2>/dev/null | grep "^ M" | cut -c4- || echo "")
+            if [[ -n "$modified_files" ]]; then
+                echo -e "${YELLOW}⚠️  Pre-commit hooks auto-fixed files: ${modified_files}${NC}"
+                log_release_step "VALIDATION FIX" "Pre-commit hooks auto-fixed: ${modified_files}"
+                echo -e "${GREEN}✓ Files auto-fixed and ready${NC}"
+            else
+                # Hooks failed validation without fixing - this is a critical error
+                echo -e "${RED}❌ Error: Generated files failed validation${NC}"
+                echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo "$validation_output"
+                echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo ""
+                echo -e "${RED}The release script generated files that failed pre-commit validation.${NC}"
+                echo -e "${RED}This is likely a bug in the release script itself.${NC}"
+                echo ""
+                echo -e "${YELLOW}Files checked: ${files_to_validate[*]}${NC}"
+                echo -e "${YELLOW}Run 'git diff' to see the changes${NC}"
+                log_release_step "VALIDATION ERROR" "Generated files failed validation: ${files_to_validate[*]}"
+                exit 1
+            fi
+        fi
+    fi
+
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
     log_release_step "COMMIT VERSION" "Committing version change to git"
@@ -2013,46 +2056,43 @@ Includes release summary from ${SUMMARY_FILE}"
     fi
 
     # Commit the version change
-    # Pre-commit hooks may modify files (e.g., uv run pytest updates uv.lock, ruff --fix formats code)
+    # Note: Generated files were already validated above, but hooks run on ALL staged files
+    # Pre-commit hooks may still modify other staged files (e.g., pytest updates uv.lock)
     # Strategy: Try commit, if it fails due to hook modifications, re-stage and retry
-    echo -e "${BLUE}💾 Committing version change (running pre-commit hooks)...${NC}"
+    echo -e "${BLUE}💾 Committing version change (running pre-commit hooks on all staged files)...${NC}"
 
-    # First attempt: let hooks run and potentially modify files
+    # First attempt: let hooks run on all staged files
     if git commit -m "$commit_message" > /dev/null 2>&1; then
         log_release_step "VERSION COMMITTED" "Version change committed successfully"
     else
-        # Commit failed - likely due to hook modifications
-        # Check if there are unstaged changes (hooks modified files after staging)
+        # Commit failed - check if hooks modified files
         local unstaged=$(git diff --name-only 2>/dev/null || echo "")
         if [[ -n "$unstaged" ]]; then
-            echo -e "${YELLOW}⚠️  Pre-commit hooks modified files: ${unstaged}${NC}"
-            echo -e "${BLUE}   Re-staging modified files and retrying commit...${NC}"
+            echo -e "${YELLOW}⚠️  Pre-commit hooks modified additional files: ${unstaged}${NC}"
+            echo -e "${BLUE}   Re-staging and retrying commit...${NC}"
             log_release_step "HOOK MODIFICATIONS" "Pre-commit hooks modified: ${unstaged}"
 
-            # Re-stage files that hooks modified (properly handle newlines)
-            # Use while loop to read each file and add it individually
+            # Re-stage modified files
             while IFS= read -r file; do
                 [[ -n "$file" ]] && git add "$file"
             done <<< "$unstaged"
 
-            # Retry commit - hooks will run again, which is correct
-            # If hooks modify files again, we'll fail and require manual intervention
+            # Retry commit
             if ! git commit -m "$commit_message" > /dev/null 2>&1; then
-                echo -e "${RED}❌ Error: Failed to commit version changes${NC}"
-                echo -e "${RED}   → Git commit failed even after re-staging${NC}"
-                echo -e "${RED}   → Pre-commit hooks may still be modifying files${NC}"
-                echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
-                echo -e "${RED}   → This indicates a deeper issue that needs investigation${NC}"
-                log_release_step "COMMIT ERROR" "Failed to commit version changes after re-staging - hooks may still be modifying files"
+                echo -e "${RED}❌ Error: Failed to commit version changes after retry${NC}"
+                echo -e "${RED}   → Pre-commit hooks may have failed validation${NC}"
+                echo -e "${RED}   → Run: git status && git diff${NC}"
+                log_release_step "COMMIT ERROR" "Failed to commit version changes after re-staging"
                 exit 1
             fi
-            log_release_step "VERSION COMMITTED" "Version change committed successfully (retried with hook modifications)"
+            log_release_step "VERSION COMMITTED" "Version change committed successfully (retried after hook modifications)"
         else
-            # Commit failed for another reason
-            echo -e "${RED}❌ Error: Failed to commit version changes${NC}"
-            echo -e "${RED}   → Git commit failed${NC}"
-            echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
-            log_release_step "COMMIT ERROR" "Failed to commit version changes"
+            # Commit failed without file modifications - validation failure
+            echo -e "${RED}❌ Error: Pre-commit hooks failed validation${NC}"
+            echo -e "${RED}   → Git commit was rejected by pre-commit hooks${NC}"
+            echo -e "${RED}   → Run: git commit -v to see hook output${NC}"
+            echo -e "${RED}   → Run: git status && git diff to see changes${NC}"
+            log_release_step "COMMIT ERROR" "Pre-commit hooks failed validation"
             exit 1
         fi
     fi

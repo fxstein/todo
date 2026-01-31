@@ -821,6 +821,11 @@ generate_release_notes() {
             continue
         fi
 
+        # Skip chore commits (internal maintenance, not user-facing)
+        if [[ "$message" =~ ^chore: ]]; then
+            continue
+        fi
+
         # Escape file paths containing underscores by wrapping in backticks
         # This prevents markdown lint from interpreting __init__.py as bold text
         # Pattern: word/word.ext or word/__word__.ext -> `word/word.ext` or `word/__word__.ext`

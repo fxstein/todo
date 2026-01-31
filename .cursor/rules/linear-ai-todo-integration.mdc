@@ -45,15 +45,23 @@ Once the user selects an issue (e.g., AIT-12):
 
 ### Step 4: Branch
 
-**CRITICAL: Always construct branch name from git config. NEVER use Linear's gitBranchName.**
+**CRITICAL: Always start from updated main. Always construct branch name from git config. NEVER use Linear's gitBranchName.**
 
-1. Get GitHub username: `git config user.name` (use as-is, case-sensitive)
-2. Extract IDENTIFIER from Linear issue (e.g., `AIT-12`, keep case from Linear)
-3. Create slug from issue title: lowercase with hyphens (e.g., `fix-login`)
-4. Run: `git checkout -b <username>/<IDENTIFIER>-<slug>`
+**Pre-branch checks:**
+1. Switch to main: `git checkout main`
+2. Update from origin: `git pull origin main`
+3. Verify clean state: `git status` (warn if uncommitted changes exist)
+
+**Create branch:**
+4. Get GitHub username: `git config user.name` (use as-is, case-sensitive)
+5. Extract IDENTIFIER from Linear issue (e.g., `AIT-12`, keep case from Linear)
+6. Create slug from issue title: lowercase with hyphens (e.g., `fix-login`)
+7. Run: `git checkout -b <username>/<IDENTIFIER>-<slug>`
 
 **Example:** If `git config user.name` returns "fxstein" and issue is AIT-12 "Fix Login":
 ```bash
+git checkout main
+git pull origin main
 git checkout -b fxstein/AIT-12-fix-login
 ```
 
@@ -126,7 +134,9 @@ After branching (and optionally creating ai-todo tasks):
   - ✅ Use **user-linear.list_issues** with `{ "assignee": "me" }` (not `get_issues` with `assignee_id`).
   - ✅ Use **user-linear.update_issue** with `state` parameter (not `status`).
 
-- **Branch naming:**
+- **Branch creation:**
+  - **ALWAYS start from updated main:** `git checkout main && git pull origin main`
+  - **NEVER create branches from stale or feature branches** (causes merge conflicts).
   - **NEVER use Linear's `gitBranchName` field** (it uses displayName, not GitHub username).
   - **ALWAYS** construct: `<username>/<IDENTIFIER>-<slug>`
   - Get username from: `git config user.name` (use as-is, case-sensitive).

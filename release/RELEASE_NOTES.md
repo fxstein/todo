@@ -1,15 +1,18 @@
 # Release 4.0.0b3
 
-This beta release focuses on workflow improvements and agent-facing enhancements. The release process has been refactored into a Cursor Skill (see [release-workflow/SKILL.md](https://github.com/fxstein/ai-todo/blob/main/.cursor/skills/release-workflow/SKILL.md)), providing better guidance for AI agents preparing releases with integrated Linear issue tracking. The new skill-based approach simplifies the release workflow while maintaining all safety checks, pre-flight validation, and approval gates.
+This release introduces significant workflow improvements and two major new features for task management. The release workflow has been completely refactored into a modular Cursor Skill with Linear integration, enabling automated issue tracking, pre-flight validation, and comprehensive release notes generation. This modernization improves release reliability and provides better visibility into the development process.
 
-Task management receives significant improvements with two new commands: `empty-trash` automatically removes deleted tasks after 30 days, and `prune` provides flexible cleanup of archived tasks with multiple filtering options (age, task ranges, or archive ranges). Both commands include comprehensive backup mechanisms to preserve task metadata and enable recovery if needed. Complete documentation is available in the [guides](https://github.com/fxstein/ai-todo/tree/main/docs/guides) and [examples](https://github.com/fxstein/ai-todo/blob/main/docs/examples/PRUNE_EXAMPLES.md) directories.
+The prune functionality (task#267) is now available, allowing users to permanently remove archived tasks from TODO.md with fine-grained control. Users can specify retention periods with `--days` or target specific task ranges, and all pruned tasks are automatically backed up to timestamped archive files. The empty trash feature (task#268) complements this by automatically removing deleted tasks older than 30 days on startup, with comprehensive test coverage ensuring data safety. Both features include extensive documentation in [docs/examples/PRUNE_EXAMPLES.md](https://github.com/fxstein/ai-todo/blob/main/docs/examples/PRUNE_EXAMPLES.md).
 
-Linear integration continues to mature with refined workflow rules, improved branch naming conventions (always using userid prefix), and better document review processes. Several bug fixes improve robustness including timezone-aware datetime comparisons in prune operations, regex metacharacter escaping for task IDs, duplicate prevention in subtask operations, and Python 3.10 compatibility improvements. This release includes comprehensive test coverage for all new features.
+Linear integration has been significantly enhanced with new Cursor rules that automate issue tracking workflows. The system now supports automated branch creation, task planning, PR workflows, and issue state management. Documentation includes [linear-ai-todo-integration.mdc](https://github.com/fxstein/ai-todo/blob/main/.cursor/rules/linear-ai-todo-integration.mdc) and [linear-document-workflow.mdc](https://github.com/fxstein/ai-todo/blob/main/.cursor/rules/linear-document-workflow.mdc) for comprehensive guidance.
+
+Several critical bug fixes improve system reliability, including timezone-aware date comparisons, duplicate task prevention, regex metacharacter escaping, and Python 3.10 compatibility fixes. The release also includes architectural improvements such as removing orphaned bash references and standardizing branch naming conventions.
 
 ---
 
 ## ✨ Features
 
+- Commit AI summary before prepare & add release notes link (task#270) ([297b720](https://github.com/fxstein/ai-todo/commit/297b720e639f7467c11fa4c32840b869b691aa24))
 - Add Linear issue tracking to release workflow (task#270) ([9661d3a](https://github.com/fxstein/ai-todo/commit/9661d3a84e7f0c61ce54f118f31fb6711cafe3d8))
 - Add pre-flight checks to release workflow (task#270) ([5ebb21c](https://github.com/fxstein/ai-todo/commit/5ebb21c450903fb366e784673af91df1ddf59824))
 - Add pre-validation of generated files (task#270) ([644e427](https://github.com/fxstein/ai-todo/commit/644e427c013537d14ea5c2b00d4a88015a2a3e46))

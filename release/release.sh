@@ -1772,6 +1772,21 @@ Ready for retry after fixes applied."
 
     log_release_step "ABORT COMPLETE" "Release ${abort_version} aborted, reverted to ${previous_version}"
 
+    # Step 10: Commit and push final release log
+    echo -e "${BLUE}📋 Committing final release log...${NC}"
+    if git diff --quiet "$RELEASE_LOG" 2>/dev/null; then
+        echo -e "${GREEN}✓ Release log already committed${NC}"
+    else
+        git add "$RELEASE_LOG"
+        if git commit -m "Update release log for ${abort_version} abort" > /dev/null 2>&1; then
+            echo -e "${GREEN}✓ Release log committed${NC}"
+            echo -e "${BLUE}📤 Pushing release log...${NC}"
+            git push origin main > /dev/null 2>&1 && echo -e "${GREEN}✓ Release log pushed${NC}" || echo -e "${YELLOW}⚠️  Release log push may have failed${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Release log commit may have failed (may already be committed)${NC}"
+        fi
+    fi
+
     return 0
 }
 

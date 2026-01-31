@@ -1980,6 +1980,14 @@ execute_release() {
 
     if [[ ${#files_to_validate[@]} -gt 0 ]]; then
         echo -e "${BLUE}   Checking: ${files_to_validate[*]}${NC}"
+
+        # Capture file checksums BEFORE running pre-commit
+        # This allows us to detect if pre-commit actually modified the files
+        declare -A checksums_before
+        for file in "${files_to_validate[@]}"; do
+            checksums_before["$file"]=$(shasum -a 256 "$file" 2>/dev/null | cut -d' ' -f1)
+        done
+
         local validation_output
         validation_output=$(uv run pre-commit run --files "${files_to_validate[@]}" 2>&1)
         local validation_status=$?
@@ -1988,14 +1996,22 @@ execute_release() {
             echo -e "${GREEN}✓ All files passed validation${NC}"
             log_release_step "VALIDATION" "Pre-commit validation passed for generated files"
         else
-            # Check if hooks modified files (auto-fix)
-            local modified_files=$(git status --porcelain "${files_to_validate[@]}" 2>/dev/null | grep "^ M" | cut -c4- || echo "")
-            if [[ -n "$modified_files" ]]; then
-                echo -e "${YELLOW}⚠️  Pre-commit hooks auto-fixed files: ${modified_files}${NC}"
-                log_release_step "VALIDATION FIX" "Pre-commit hooks auto-fixed: ${modified_files}"
+            # Pre-commit failed - determine if it was auto-fix or validation error
+            # Compare checksums to see if files actually changed
+            local auto_fixed_files=()
+            for file in "${files_to_validate[@]}"; do
+                local checksum_after=$(shasum -a 256 "$file" 2>/dev/null | cut -d' ' -f1)
+                if [[ "${checksums_before[$file]}" != "$checksum_after" ]]; then
+                    auto_fixed_files+=("$file")
+                fi
+            done
+
+            if [[ ${#auto_fixed_files[@]} -gt 0 ]]; then
+                echo -e "${YELLOW}⚠️  Pre-commit hooks auto-fixed files: ${auto_fixed_files[*]}${NC}"
+                log_release_step "VALIDATION FIX" "Pre-commit hooks auto-fixed: ${auto_fixed_files[*]}"
                 echo -e "${GREEN}✓ Files auto-fixed and ready${NC}"
             else
-                # Hooks failed validation without fixing - this is a critical error
+                # Hooks failed validation without modifying files - genuine validation error
                 echo -e "${RED}❌ Error: Generated files failed validation${NC}"
                 echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
                 echo "$validation_output"

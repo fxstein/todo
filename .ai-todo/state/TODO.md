@@ -4,6 +4,17 @@
 
 ## Tasks
 
+- [ ] **#271** [AIT-15] Incorrect branch names for linear issue
+  > When starting to work on a new linear issue, the branch that gets created has the wrong user id as the prefix. The cursor rule needs to explicitly use the GitHub userid and not any name Linear provides in its suggested branch name.
+  > Linear: https://linear.app/fxstein/issue/AIT-15/incorrect-branch-names-for-linear-issue
+  > GitHub: https://github.com/fxstein/ai-todo/issues/77
+  - [x] **#271.3** Fix or clarify: Update rule if needed (2026-01-31)
+    > Based on investigation findings, either fix the rule if there's a bug, or add better documentation/comments to clarify the correct behavior and prevent confusion.
+  - [x] **#271.2** Analysis: Document Linear displayName vs GitHub username mapping (2026-01-31)
+    > Create a document explaining the difference between Linear's displayName/gitBranchName suggestions and the correct GitHub username from git config. Include examples and rationale.
+  - [x] **#271.1** Investigation: Verify the actual branching behavior issue (2026-01-31)
+    > Examine recent git history and Linear integration usage to determine if there's an actual bug or if the current rule is working correctly. Check if previous branches were created with 'oliver' prefix incorrectly.
+
 - [x] **#270** [AIT-12] Refactor Release Workflow to Cursor Skill `#documentation` `#improvement` `#release` (2026-01-31)
   > Migrate static release instructions from global .cursorrules to a dynamic Cursor Skill. This ensures release logic is only loaded when relevant, keeping the default context window clean.
   > Linear: https://linear.app/fxstein/issue/AIT-12/refactor-release-workflow-to-cursor-skill
@@ -2082,6 +2093,10 @@
 270.2:2026-01-31T00:17:49.574775:2026-01-31T00:19:17.382722
 270.3:2026-01-31T00:17:50.469176:2026-01-31T00:19:24.975626
 270.4:2026-01-31T00:17:51.251369:2026-01-31T00:19:36.210762
+271:2026-01-31T02:47:48.102308:2026-01-31T02:47:48.128097
+271.1:2026-01-31T02:48:27.516905:2026-01-31T02:50:03.561272
+271.2:2026-01-31T02:48:28.906966:2026-01-31T02:50:03.561274
+271.3:2026-01-31T02:48:30.471793:2026-01-31T02:50:35.741187
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2149,4 +2164,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-31 00:19:36
+**ai-todo** | Last Updated: 2026-01-31 02:50:35

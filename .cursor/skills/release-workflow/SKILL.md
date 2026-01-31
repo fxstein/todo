@@ -11,25 +11,37 @@ description: Guides release preparation and execution for ai-todo. Use when the 
 - **Dry Run:** `./release/release.sh --prepare --dry-run` (preview without committing)
 - **Execute:** `./release/release.sh --execute`
 - **Abort:** `./release/release.sh --abort [version]` (cleanup failed release)
+- **Linear Tracking:** Release workflow integrated with Linear issues (auto-updates status)
 - **Detailed docs:** [release/RELEASE_PROCESS.md](../../../release/RELEASE_PROCESS.md)
 
 ## Prepare a Release
 
 When user asks to "prepare release" or "prepare beta release":
 
-1. **Pre-flight checks:** Verify repository is ready for release:
+1. **Check Linear for release issue:**
+   - Search Linear for release-related issues: `user-linear.list_issues` with filters for release keywords
+   - **If no issue found:** ⚠️ Warn "No Linear release issue found. Do you want to proceed anyway?"
+   - **If one issue found:** Show issue details and confirm
+   - **If multiple issues found:** Present list and ask user to select one
+   - **Once confirmed:** Mark issue as "In Progress" using `user-linear.update_issue`
+   - **Store issue ID** for later updates
+2. **Pre-flight checks:** Verify repository is ready for release:
    - **Check branch:** `git branch --show-current` (must be `main`)
    - **Check sync:** `git fetch origin && git status` (must be in sync with origin/main)
    - **Check clean:** `git status --porcelain` (must be empty - no uncommitted changes)
    - **If any check fails:** ⚠️ Warn user with specific issue and ask "Do you want to proceed anyway?"
    - **If user declines:** Stop and let them fix the issue first.
-2. **Wait for CI:** `./scripts/wait-for-ci.sh`
-3. **Generate summary:** Create 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
+3. **Wait for CI:** `./scripts/wait-for-ci.sh`
+4. **Generate summary:** Create 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
    - **For beta-to-beta releases:** Analyze commits since the last beta tag.
    - **For stable releases (graduating from beta):** Analyze ALL commits since the last **stable** release (not the last beta). This ensures the summary covers the entire beta cycle.
    - See "Generating Release Summary" section below for detailed guidance.
-4. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
-5. **STOP.** Show preview and let user review before proceeding.
+5. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
+6. **Update Linear issue:**
+   - Read `release/RELEASE_NOTES.md` content
+   - Post content to Linear issue as comment using `user-linear.create_comment`
+   - Mark issue as "In Review" using `user-linear.update_issue`
+7. **STOP.** Show preview and let user review before proceeding.
 
 ## Generating Release Summary
 
@@ -73,14 +85,34 @@ git log v3.0.2..HEAD --pretty=format:"%h %s" --no-merges
 When user asks to "execute release":
 
 1. **Run execute:** `./release/release.sh --execute`
-2. **Monitor:** Watch GitHub Actions until success.
+2. **Monitor CI:** Watch GitHub Actions until successful deployment:
+   - Poll `gh run list` for latest workflow run
+   - Wait for "completed" status with "success" conclusion
+   - If CI fails, report error and STOP (see Error Handling section)
+3. **Update Linear issue:**
+   - Read `release/RELEASE_SUMMARY.md` content
+   - Post release summary to Linear issue using `user-linear.create_comment`
+   - Include PyPI link: `https://pypi.org/project/ai-todo/[version]/`
+   - Include GitHub release link from workflow output
+   - Mark issue as "Done" using `user-linear.update_issue`
+
+## Abort a Release
+
+When user asks to "abort release":
+
+1. **Run abort:** `./release/release.sh --abort [version]`
+2. **Update Linear issue (if exists):**
+   - Post abort summary to Linear issue using `user-linear.create_comment`
+   - Include: reason for abort, version that was aborted, current state
+   - Leave issue status as-is (typically "In Review" or "In Progress")
 
 ## Error Handling
 
 **If ANY error occurs:**
 1. **STOP IMMEDIATELY.**
 2. Report the error.
-3. **WAIT FOR USER.** Do not attempt auto-recovery.
+3. **If Linear issue exists:** Post error details to issue
+4. **WAIT FOR USER.** Do not attempt auto-recovery.
 
 ## Forbidden Actions
 

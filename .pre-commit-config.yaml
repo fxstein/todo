@@ -61,14 +61,14 @@ repos:
         pass_filenames: true
         files: ^(release/|\.github/|scripts/)
 
-      # Temporarily disabled due to pipx environment issues
-      # - id: ascii-guard
-      #   name: ascii-guard
-      #   entry: ascii-guard lint
-      #   language: system
-      #   types: [markdown]
-      #   pass_filenames: true
-      #   files: \.(md|mdc)$
+      - id: ascii-guard
+        name: ascii-guard
+        entry: uv run ascii-guard lint
+        language: system
+        types: [markdown]
+        pass_filenames: true
+        files: \.(md|mdc)$
+        exclude: ^\.ai-todo/
 
       - id: todo-ai-lint
         name: ai-todo lint

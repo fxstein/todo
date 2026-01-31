@@ -32,7 +32,7 @@ When user asks to "prepare release" or "prepare beta release":
    - **If any check fails:** ⚠️ Warn user with specific issue and ask "Do you want to proceed anyway?"
    - **If user declines:** Stop and let them fix the issue first.
 3. **Wait for CI:** `./scripts/wait-for-ci.sh`
-4. **Generate summary:** Create 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
+4. **Generate summary:** Create 2-4 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
    - **For beta-to-beta releases:** Analyze commits since the last beta tag.
    - **For stable releases (graduating from beta):** Analyze ALL commits since the last **stable** release (not the last beta). This ensures the summary covers the entire beta cycle.
    - See "Generating Release Summary" section below for detailed guidance.

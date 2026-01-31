@@ -39,31 +39,31 @@ Currently, there are no automated checks before commits. This can lead to:
          │
          ▼
 ┌─────────────────────┐
-│ Pre-commit Hook    │
-│ Triggered          │
-└────────┬────────────┘
+│ Pre-commit Hook     │
+│ Triggered           │
+└─────────────────────┘
          │
          ▼
 ┌─────────────────────┐
 │ Get Staged Files    │
 │ - Detect file types │
-│ - Filter relevant  │
-└────────┬────────────┘
+│ - Filter relevant   │
+└─────────────────────┘
          │
          ▼
 ┌─────────────────────┐
-│ Run Validators     │
-│ ├─ Markdown linter │
-│ ├─ YAML linter     │
-│ ├─ JSON linter     │
-│ └─ TODO.md lint    │
-└────────┬────────────┘
+│ Run Validators      │
+│ ├─ Markdown linter  │
+│ ├─ YAML linter      │
+│ ├─ JSON linter      │
+│ └─ TODO.md lint     │
+└─────────────────────┘
          │
          ▼
 ┌─────────────────────┐
-│ Check Results      │
-│ - Any errors?      │
-└────────┬────────────┘
+│ Check Results       │
+│ - Any errors?       │
+└─────────────────────┘
          │
     ┌────┴────┐
     │         │

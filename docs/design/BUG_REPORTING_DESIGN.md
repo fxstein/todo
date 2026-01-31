@@ -206,7 +206,7 @@ Labels are passed to `gh issue create --label` command with fallback to basic "b
     ▼          ▼
 ┌──────────────────┐  ┌─────────────────┐
 │ Reply to Issue   │  │ Create New Issue│
-│ - "Me too" msg  │  │ - Full report   │
+│ - "Me too" msg  │  ││- Full report    │
 │ - Attach logs    │  │ - All context   │
 └──────────────────┘  └─────────────────┘
 ```

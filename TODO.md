@@ -4,6 +4,40 @@
 
 ## Tasks
 
+- [x] **#272** [AIT-9] ascii-guard linting `#documentation` `#tooling` `#urgent` (2026-01-31)
+  > Add fxstein/ascii-guard linting to pre-commit and CICD workflows. Need to make sure all documents are cleaned - especially documentation, and various documents created during analysis and design reviews.
+  > Linear Issue: https://linear.app/fxstein/issue/AIT-9/ascii-guard-linting
+  - [x] **#272.7** Verify and document ascii-guard integration `#documentation` `#validation` (2026-01-31)
+    > Final verification:
+    > - Test pre-commit hook locally
+    > - Verify CI/CD workflow runs successfully
+    > - Update relevant documentation
+    > - Ensure all documents are clean
+  - [x] **#272.6** Clean existing documentation files `#cleanup` `#documentation` (2026-01-31)
+    > Run ascii-guard on all existing documents and clean up any non-ASCII characters:
+    > - Documentation in docs/
+    > - Analysis and design documents
+    > - README and other markdown files
+    > - Any other documentation artifacts
+  - [x] **#272.5** Create tests for ascii-guard integration `#testing` `#validation` (2026-01-31)
+    > Create unit and integration tests to verify ascii-guard correctly identifies non-ASCII characters in documents and that the integration works in both pre-commit and CI/CD contexts.
+  - [x] **#272.4** Add ascii-guard to CI/CD workflows `#ci-cd` `#implementation` (2026-01-31)
+    > Integrate ascii-guard linting into GitHub Actions CI/CD pipeline (.github/workflows/ci-cd.yml).
+  - [x] **#272.3** Implement ascii-guard in pre-commit configuration `#implementation` `#pre-commit` (2026-01-31)
+    > Add ascii-guard hook to .pre-commit-config.yaml with appropriate configuration for the repository.
+  - [x] **#272.2** Human review of design document `#checkpoint` `#review` (2026-01-31)
+    > Pause for human review and approval of the design document before proceeding with implementation.
+    > This is a checkpoint to ensure the approach is correct.
+  - [x] **#272.1** Create design document for ascii-guard integration `#design` `#documentation` (2026-01-31)
+    > Research fxstein/ascii-guard tool and create a comprehensive design document covering:
+    > - How ascii-guard works and its purpose
+    > - Integration points (pre-commit, CI/CD workflows)
+    > - Configuration requirements
+    > - Document cleanup strategy
+    > - Testing approach
+    > Document location: docs/design/ascii-guard-integration.md
+    > ✅ Design document created: docs/design/ascii-guard-integration.md
+
 - [ ] **#271** [AIT-15] Incorrect branch names for linear issue
   > When starting to work on a new linear issue, the branch that gets created has the wrong user id as the prefix. The cursor rule needs to explicitly use the GitHub userid and not any name Linear provides in its suggested branch name.
   > Linear: https://linear.app/fxstein/issue/AIT-15/incorrect-branch-names-for-linear-issue
@@ -1350,6 +1384,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2097,6 +2136,14 @@
 271.1:2026-01-31T02:48:27.516905:2026-01-31T02:50:03.561272
 271.2:2026-01-31T02:48:28.906966:2026-01-31T02:50:03.561274
 271.3:2026-01-31T02:48:30.471793:2026-01-31T02:50:35.741187
+272:2026-01-31T03:27:13.275650:2026-01-31T03:42:50.364981
+272.1:2026-01-31T03:27:17.810592:2026-01-31T03:29:52.114908
+272.2:2026-01-31T03:27:19.023195:2026-01-31T03:38:54.198980
+272.3:2026-01-31T03:27:20.050615:2026-01-31T03:39:29.983224
+272.4:2026-01-31T03:27:21.336450:2026-01-31T03:39:55.033984
+272.5:2026-01-31T03:27:22.712250:2026-01-31T03:41:38.413677
+272.6:2026-01-31T03:27:24.206296:2026-01-31T03:42:12.881908
+272.7:2026-01-31T03:27:25.691111:2026-01-31T03:42:50.364979
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2164,4 +2211,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-31 02:50:35
+**ai-todo** | Last Updated: 2026-01-31 03:42:50

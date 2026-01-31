@@ -1,0 +1,44 @@
+# .ascii-guard.toml
+# Configuration for ascii-guard linter
+
+[files]
+# Scan all text files (empty = all)
+extensions = []
+
+# Exclude patterns (gitignore-style)
+exclude = [
+    ".git/",
+    "node_modules/",
+    "__pycache__/",
+    ".venv/",
+    "venv/",
+    ".tox/",
+    "build/",
+    "dist/",
+    ".mypy_cache/",
+    ".pytest_cache/",
+    ".ruff_cache/",
+    "*.egg-info/",
+    # Project-specific excludes:
+    ".ai-todo/",           # ai-todo state directory
+    "htmlcov/",
+    ".coverage",
+    "uv.lock",
+]
+
+# Follow symbolic links when scanning
+follow_symlinks = false
+
+# Maximum file size to scan in MB
+max_file_size = 10
+
+[rules]
+# Phase 2: Enable/disable specific validation rules (future)
+# check_alignment = true
+# check_corners = true
+# check_width = true
+
+[output]
+# Phase 2: Output customization (future)
+# color = "auto"
+# verbose = false

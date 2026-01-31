@@ -1,15 +1,18 @@
 # Release 4.0.0b3
 
-This beta release focuses on workflow improvements and agent-facing enhancements. The release process has been refactored into a Cursor Skill, providing better guidance for AI agents preparing releases. The new skill-based approach simplifies the release workflow while maintaining all safety checks and approval gates.
+This beta release focuses on workflow improvements and agent-facing enhancements. The release process has been refactored into a Cursor Skill (see [release-workflow/SKILL.md](https://github.com/fxstein/ai-todo/blob/main/.cursor/skills/release-workflow/SKILL.md)), providing better guidance for AI agents preparing releases with integrated Linear issue tracking. The new skill-based approach simplifies the release workflow while maintaining all safety checks, pre-flight validation, and approval gates.
 
-Task management receives significant improvements with two new commands: `empty-trash` automatically removes deleted tasks after 30 days, and `prune` provides flexible cleanup of archived tasks with multiple filtering options (age, task ranges, or archive ranges). Both commands include comprehensive backup mechanisms to preserve task metadata and enable recovery if needed.
+Task management receives significant improvements with two new commands: `empty-trash` automatically removes deleted tasks after 30 days, and `prune` provides flexible cleanup of archived tasks with multiple filtering options (age, task ranges, or archive ranges). Both commands include comprehensive backup mechanisms to preserve task metadata and enable recovery if needed. Complete documentation is available in the [guides](https://github.com/fxstein/ai-todo/tree/main/docs/guides) and [examples](https://github.com/fxstein/ai-todo/blob/main/docs/examples/PRUNE_EXAMPLES.md) directories.
 
-Linear integration continues to mature with refined workflow rules, improved branch naming conventions, and better document review processes. Several bug fixes improve robustness including timezone handling in date comparisons, regex escaping for task IDs, and duplicate prevention in subtask operations.
+Linear integration continues to mature with refined workflow rules, improved branch naming conventions (always using userid prefix), and better document review processes. Several bug fixes improve robustness including timezone-aware datetime comparisons in prune operations, regex metacharacter escaping for task IDs, duplicate prevention in subtask operations, and Python 3.10 compatibility improvements. This release includes comprehensive test coverage for all new features.
 
 ---
 
 ## ✨ Features
 
+- Add Linear issue tracking to release workflow (task#270) ([9661d3a](https://github.com/fxstein/ai-todo/commit/9661d3a84e7f0c61ce54f118f31fb6711cafe3d8))
+- Add pre-flight checks to release workflow (task#270) ([5ebb21c](https://github.com/fxstein/ai-todo/commit/5ebb21c450903fb366e784673af91df1ddf59824))
+- Add pre-validation of generated files (task#270) ([644e427](https://github.com/fxstein/ai-todo/commit/644e427c013537d14ea5c2b00d4a88015a2a3e46))
 - Refactor release workflow to Cursor Skill (task#270) ([d828f5e](https://github.com/fxstein/ai-todo/commit/d828f5ef4e4b19bfee61a8b5bb4a3d19c6daa2b3))
 - Add PEP 440 versioning strategy to release-please config ([c818c22](https://github.com/fxstein/ai-todo/commit/c818c224aa464dcfbbe45ba9af692204e6cd03ed))
 - Enable beta prerelease mode for 4.0.0 cycle (task#269.3) ([25628d4](https://github.com/fxstein/ai-todo/commit/25628d4774e3f96a6b11a0220b1d1087bb3890de))
@@ -25,6 +28,7 @@ Linear integration continues to mature with refined workflow rules, improved bra
 
 ## 🐛 Bug Fixes
 
+- Commit and push release log after abort (task#270) ([ae9fb0a](https://github.com/fxstein/ai-todo/commit/ae9fb0a4ea9d39a0d789554b0773f22c6f5749ec))
 - Remove orphaned todo.bash references (task#270) ([92db8c8](https://github.com/fxstein/ai-todo/commit/92db8c8cba68908bc6b314d24d8cecc12961bb67))
 - Address skill testing feedback (task#270) ([02ba6c7](https://github.com/fxstein/ai-todo/commit/02ba6c73101a568959958feab3a7f812ffadd8b6))
 - Use PEP 440 format in release-please manifest ([03ed8f4](https://github.com/fxstein/ai-todo/commit/03ed8f4e2d0f7922d4addce592f659b38b185369))
@@ -46,6 +50,9 @@ Linear integration continues to mature with refined workflow rules, improved bra
 
 ## 🔧 Other Changes
 
+- docs: Add release summary for v4.0.0b3 (task#270) ([4e06225](https://github.com/fxstein/ai-todo/commit/4e06225b53284f171933a1031de4278a1452e240))
+- docs: Align summary paragraph count with prompt template (task#270) ([0b5f54b](https://github.com/fxstein/ai-todo/commit/0b5f54b4e735be5ecad8633858fd08c0a2d25294))
+- docs: Add release summary prompt template to skill (task#270) ([5c2a79d](https://github.com/fxstein/ai-todo/commit/5c2a79d31c18e30e32d28dfc94a3672a318bfdcd))
 - docs: Add release summary for 4.0.0b3 ([94c98cb](https://github.com/fxstein/ai-todo/commit/94c98cbb3acdf46d755d9f7444edfec0402e9f9f))
 - docs: Add release summary for 4.0.0b3 ([68d7616](https://github.com/fxstein/ai-todo/commit/68d76163e95e32d3a8983150af91990072970141))
 - chore: Remove bash conversion from release script (task#270) ([a32999c](https://github.com/fxstein/ai-todo/commit/a32999cfe289af978e690f8b0b575b8f32a58f00))

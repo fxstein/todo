@@ -821,6 +821,11 @@ generate_release_notes() {
             continue
         fi
 
+        # Skip chore commits (internal maintenance, not user-facing)
+        if [[ "$message" =~ ^chore: ]]; then
+            continue
+        fi
+
         # Escape file paths containing underscores by wrapping in backticks
         # This prevents markdown lint from interpreting __init__.py as bold text
         # Pattern: word/word.ext or word/__word__.ext -> `word/word.ext` or `word/__word__.ext`
@@ -965,28 +970,6 @@ update_version() {
     fi
 }
 
-# Convert zsh version to bash version
-convert_to_bash() {
-    local converter_script="release/convert_zsh_to_bash.sh"
-
-    if [[ ! -f "$converter_script" ]]; then
-        echo -e "${RED}❌ Error: Converter script not found: $converter_script${NC}"
-        echo -e "${RED}   → The bash conversion script is missing${NC}"
-        echo -e "${RED}   → Check that release/convert_zsh_to_bash.sh exists${NC}"
-        return 1
-    fi
-
-    # Run converter
-    if ! bash "$converter_script"; then
-        echo -e "${RED}❌ Error: Conversion failed${NC}"
-        echo -e "${RED}   → The zsh to bash conversion encountered errors${NC}"
-        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for syntax errors${NC}"
-        return 1
-    fi
-
-    return 0
-}
-
 # Main function
 main() {
     local MODE="prepare"  # Default to prepare mode
@@ -1110,15 +1093,6 @@ main() {
     if [[ -z "$AI_SUMMARY_FILE" ]] && [[ -f "release/AI_RELEASE_SUMMARY.md" ]]; then
         AI_SUMMARY_FILE="release/AI_RELEASE_SUMMARY.md"
         echo -e "${BLUE}📄 Auto-detected AI release summary: $AI_SUMMARY_FILE${NC}"
-    fi
-
-    # Clean up artifacts from previous prepare attempts to ensure idempotency
-    if [[ -f "todo.bash" ]]; then
-        # Check if todo.bash is uncommitted (indicates it's from a failed prepare)
-        if git status --porcelain 2>/dev/null | grep -q "todo.bash"; then
-            echo -e "${BLUE}🧹 Cleaning up uncommitted todo.bash from previous prepare attempt...${NC}"
-            rm -f todo.bash
-        fi
     fi
 
     # Get current version from GitHub (source of truth)
@@ -1752,6 +1726,7 @@ abort_release() {
     echo -e "${BLUE}🧹 Cleaning up release artifacts...${NC}"
     rm -f release/.prepare_state
     rm -f release/RELEASE_NOTES.md
+    rm -f release/AI_RELEASE_SUMMARY.md
     rm -f todo.bash
     echo -e "${GREEN}   ✓ Artifacts cleaned${NC}"
     log_release_step "ABORT CLEANUP" "Cleaned release artifacts"
@@ -1759,6 +1734,11 @@ abort_release() {
     # Step 7: Stage changes
     echo -e "${BLUE}📝 Staging changes...${NC}"
     git add pyproject.toml legacy/todo.ai ai_todo/__init__.py release/RELEASE_LOG.log
+
+    # Stage removal of AI_RELEASE_SUMMARY.md if it was deleted
+    if ! [[ -f "release/AI_RELEASE_SUMMARY.md" ]] && git ls-files --error-unmatch release/AI_RELEASE_SUMMARY.md > /dev/null 2>&1; then
+        git add release/AI_RELEASE_SUMMARY.md
+    fi
 
     # Add uv.lock if it changed (pytest may have updated it)
     if [[ -f "uv.lock" ]] && git diff --quiet uv.lock 2>/dev/null; then
@@ -1796,6 +1776,21 @@ Ready for retry after fixes applied."
     echo ""
 
     log_release_step "ABORT COMPLETE" "Release ${abort_version} aborted, reverted to ${previous_version}"
+
+    # Step 10: Commit and push final release log
+    echo -e "${BLUE}📋 Committing final release log...${NC}"
+    if git diff --quiet "$RELEASE_LOG" 2>/dev/null; then
+        echo -e "${GREEN}✓ Release log already committed${NC}"
+    else
+        git add "$RELEASE_LOG"
+        if git commit -m "Update release log for ${abort_version} abort" > /dev/null 2>&1; then
+            echo -e "${GREEN}✓ Release log committed${NC}"
+            echo -e "${BLUE}📤 Pushing release log...${NC}"
+            git push origin main > /dev/null 2>&1 && echo -e "${GREEN}✓ Release log pushed${NC}" || echo -e "${YELLOW}⚠️  Release log push may have failed${NC}"
+        else
+            echo -e "${YELLOW}⚠️  Release log commit may have failed (may already be committed)${NC}"
+        fi
+    fi
 
     return 0
 }
@@ -1974,30 +1969,64 @@ execute_release() {
     echo -e "${GREEN}✓ Verified version updated in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py${NC}"
     log_release_step "VERSION UPDATED" "Version updated successfully in legacy/todo.ai, pyproject.toml, and ai_todo/__init__.py"
 
-    # Convert to bash version (now that version is updated)
-    echo -e "${BLUE}🔄 Converting to bash version...${NC}"
-    if ! convert_to_bash; then
-        echo -e "${RED}❌ Error: Bash conversion failed${NC}"
-        echo -e "${RED}   → See error details above for specifics${NC}"
-        echo -e "${RED}   → Check release/convert_zsh_to_bash.sh for issues${NC}"
-        log_release_step "ERROR - Bash Conversion Failed" "Failed to convert zsh version to bash"
-        exit 1
-    fi
-    log_release_step "BASH CONVERSION" "Successfully converted legacy/todo.ai to todo.bash with version ${NEW_VERSION}"
-    echo -e "${GREEN}✓ Bash version created${NC}"
+    # Validate and auto-fix generated files before committing
+    echo -e "${BLUE}🔍 Validating generated files...${NC}"
+    local files_to_validate=()
+    [[ -f "release/RELEASE_NOTES.md" ]] && files_to_validate+=("release/RELEASE_NOTES.md")
+    [[ -f "release/RELEASE_SUMMARY.md" ]] && files_to_validate+=("release/RELEASE_SUMMARY.md")
+    [[ -f "legacy/todo.ai" ]] && files_to_validate+=("legacy/todo.ai")
+    [[ -f "pyproject.toml" ]] && files_to_validate+=("pyproject.toml")
+    [[ -f "ai_todo/__init__.py" ]] && files_to_validate+=("ai_todo/__init__.py")
 
-    # Run pre-commit hooks on generated files to fix formatting before staging
-    # This prevents the complex retry logic from needing to handle formatting fixes
-    echo -e "${BLUE}🔍 Running pre-commit hooks on generated files...${NC}"
-    if command -v pre-commit &> /dev/null; then
-        if uv run pre-commit run --files todo.bash 2>&1 | grep -q "Passed\|Skipped"; then
-            log_release_step "PRE-COMMIT" "Pre-commit hooks passed for todo.bash"
+    if [[ ${#files_to_validate[@]} -gt 0 ]]; then
+        echo -e "${BLUE}   Checking: ${files_to_validate[*]}${NC}"
+
+        # Capture file checksums BEFORE running pre-commit
+        # This allows us to detect if pre-commit actually modified the files
+        declare -A checksums_before
+        for file in "${files_to_validate[@]}"; do
+            checksums_before["$file"]=$(shasum -a 256 "$file" 2>/dev/null | cut -d' ' -f1)
+        done
+
+        local validation_output
+        validation_output=$(uv run pre-commit run --files "${files_to_validate[@]}" 2>&1)
+        local validation_status=$?
+
+        if [[ $validation_status -eq 0 ]]; then
+            echo -e "${GREEN}✓ All files passed validation${NC}"
+            log_release_step "VALIDATION" "Pre-commit validation passed for generated files"
         else
-            # Hooks may have fixed files - this is expected
-            log_release_step "PRE-COMMIT" "Pre-commit hooks fixed formatting in todo.bash"
+            # Pre-commit failed - determine if it was auto-fix or validation error
+            # Compare checksums to see if files actually changed
+            local auto_fixed_files=()
+            for file in "${files_to_validate[@]}"; do
+                local checksum_after=$(shasum -a 256 "$file" 2>/dev/null | cut -d' ' -f1)
+                if [[ "${checksums_before[$file]}" != "$checksum_after" ]]; then
+                    auto_fixed_files+=("$file")
+                fi
+            done
+
+            if [[ ${#auto_fixed_files[@]} -gt 0 ]]; then
+                echo -e "${YELLOW}⚠️  Pre-commit hooks auto-fixed files: ${auto_fixed_files[*]}${NC}"
+                log_release_step "VALIDATION FIX" "Pre-commit hooks auto-fixed: ${auto_fixed_files[*]}"
+                echo -e "${GREEN}✓ Files auto-fixed and ready${NC}"
+            else
+                # Hooks failed validation without modifying files - genuine validation error
+                echo -e "${RED}❌ Error: Generated files failed validation${NC}"
+                echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo "$validation_output"
+                echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+                echo ""
+                echo -e "${RED}The release script generated files that failed pre-commit validation.${NC}"
+                echo -e "${RED}This is likely a bug in the release script itself.${NC}"
+                echo ""
+                echo -e "${YELLOW}Files checked: ${files_to_validate[*]}${NC}"
+                echo -e "${YELLOW}Run 'git diff' to see the changes${NC}"
+                log_release_step "VALIDATION ERROR" "Generated files failed validation: ${files_to_validate[*]}"
+                exit 1
+            fi
         fi
     fi
-    echo -e "${GREEN}✓ Files ready for commit${NC}"
 
     # Commit version change and summary file
     echo -e "${BLUE}💾 Committing version change and release summary...${NC}"
@@ -2030,11 +2059,6 @@ execute_release() {
         fi
     fi
 
-    # Add todo.bash if it was converted (should always be the case after prepare)
-    if [[ -f "todo.bash" ]]; then
-        git add todo.bash
-    fi
-
     # Add uv.lock if it exists (may be modified by pre-commit hooks when version changes)
     if [[ -f "uv.lock" ]]; then
         local lock_status=$(git status -s uv.lock 2>/dev/null || echo "")
@@ -2053,46 +2077,43 @@ Includes release summary from ${SUMMARY_FILE}"
     fi
 
     # Commit the version change
-    # Pre-commit hooks may modify files (e.g., uv run pytest updates uv.lock, ruff --fix formats code)
+    # Note: Generated files were already validated above, but hooks run on ALL staged files
+    # Pre-commit hooks may still modify other staged files (e.g., pytest updates uv.lock)
     # Strategy: Try commit, if it fails due to hook modifications, re-stage and retry
-    echo -e "${BLUE}💾 Committing version change (running pre-commit hooks)...${NC}"
+    echo -e "${BLUE}💾 Committing version change (running pre-commit hooks on all staged files)...${NC}"
 
-    # First attempt: let hooks run and potentially modify files
+    # First attempt: let hooks run on all staged files
     if git commit -m "$commit_message" > /dev/null 2>&1; then
         log_release_step "VERSION COMMITTED" "Version change committed successfully"
     else
-        # Commit failed - likely due to hook modifications
-        # Check if there are unstaged changes (hooks modified files after staging)
+        # Commit failed - check if hooks modified files
         local unstaged=$(git diff --name-only 2>/dev/null || echo "")
         if [[ -n "$unstaged" ]]; then
-            echo -e "${YELLOW}⚠️  Pre-commit hooks modified files: ${unstaged}${NC}"
-            echo -e "${BLUE}   Re-staging modified files and retrying commit...${NC}"
+            echo -e "${YELLOW}⚠️  Pre-commit hooks modified additional files: ${unstaged}${NC}"
+            echo -e "${BLUE}   Re-staging and retrying commit...${NC}"
             log_release_step "HOOK MODIFICATIONS" "Pre-commit hooks modified: ${unstaged}"
 
-            # Re-stage files that hooks modified (properly handle newlines)
-            # Use while loop to read each file and add it individually
+            # Re-stage modified files
             while IFS= read -r file; do
                 [[ -n "$file" ]] && git add "$file"
             done <<< "$unstaged"
 
-            # Retry commit - hooks will run again, which is correct
-            # If hooks modify files again, we'll fail and require manual intervention
+            # Retry commit
             if ! git commit -m "$commit_message" > /dev/null 2>&1; then
-                echo -e "${RED}❌ Error: Failed to commit version changes${NC}"
-                echo -e "${RED}   → Git commit failed even after re-staging${NC}"
-                echo -e "${RED}   → Pre-commit hooks may still be modifying files${NC}"
-                echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
-                echo -e "${RED}   → This indicates a deeper issue that needs investigation${NC}"
-                log_release_step "COMMIT ERROR" "Failed to commit version changes after re-staging - hooks may still be modifying files"
+                echo -e "${RED}❌ Error: Failed to commit version changes after retry${NC}"
+                echo -e "${RED}   → Pre-commit hooks may have failed validation${NC}"
+                echo -e "${RED}   → Run: git status && git diff${NC}"
+                log_release_step "COMMIT ERROR" "Failed to commit version changes after re-staging"
                 exit 1
             fi
-            log_release_step "VERSION COMMITTED" "Version change committed successfully (retried with hook modifications)"
+            log_release_step "VERSION COMMITTED" "Version change committed successfully (retried after hook modifications)"
         else
-            # Commit failed for another reason
-            echo -e "${RED}❌ Error: Failed to commit version changes${NC}"
-            echo -e "${RED}   → Git commit failed${NC}"
-            echo -e "${RED}   → Run: git status to see uncommitted changes${NC}"
-            log_release_step "COMMIT ERROR" "Failed to commit version changes"
+            # Commit failed without file modifications - validation failure
+            echo -e "${RED}❌ Error: Pre-commit hooks failed validation${NC}"
+            echo -e "${RED}   → Git commit was rejected by pre-commit hooks${NC}"
+            echo -e "${RED}   → Run: git commit -v to see hook output${NC}"
+            echo -e "${RED}   → Run: git status && git diff to see changes${NC}"
+            log_release_step "COMMIT ERROR" "Pre-commit hooks failed validation"
             exit 1
         fi
     fi

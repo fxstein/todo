@@ -2,6 +2,66 @@
 # Format: TIMESTAMP | USER | STEP | MESSAGE
 # Generated: Thu Oct 30 21:17:25 CET 2025
 
+2026-01-31 02:35:15 | fxstein | ABORT COMPLETE | Release 4.0.0b3 aborted, reverted to 4.0.0b2
+2026-01-31 02:35:15 | fxstein | ABORT PUSH | Pushed abort commit to remote
+2026-01-31 02:35:13 | fxstein | ABORT COMMIT | Created abort commit for 4.0.0b3
+2026-01-31 02:35:12 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2026-01-31 02:35:11 | fxstein | ABORT REVERT | Reverted version files to 4.0.0b2
+2026-01-31 02:35:10 | fxstein | ABORT TAG REMOTE | Deleted remote tag v4.0.0b3
+2026-01-31 02:35:09 | fxstein | ABORT START | Aborting release 4.0.0b3
+2026-01-31 02:28:01 | fxstein | PREPARE | Release preview prepared for v4.0.0b3 (beta)
+2026-01-31 02:28:00 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b2 - File version (legacy/todo.ai): 4.0.0b2 - Proposed version: 4.0.0b3 - Release type: beta - Bump type: minor - Last tag: v4.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-31 02:28:00 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-31 02:28:00 | fxstein | BETA VERSION | Found existing betas up to b2 for 4.0.0, using b3
+2026-01-31 02:27:59 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
+2026-01-31 02:27:42 | fxstein | ERROR - Auto-Commit Failed | Failed to auto-commit uncommitted changes
+2026-01-31 02:27:10 | fxstein | ABORT COMPLETE | Release 4.0.0b3 aborted, reverted to 4.0.0b2
+2026-01-31 02:27:10 | fxstein | ABORT PUSH | Pushed abort commit to remote
+2026-01-31 02:27:09 | fxstein | ABORT COMMIT | Created abort commit for 4.0.0b3
+2026-01-31 02:27:07 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2026-01-31 02:27:07 | fxstein | ABORT REVERT | Reverted version files to 4.0.0b2
+2026-01-31 02:27:06 | fxstein | ABORT TAG REMOTE | Deleted remote tag v4.0.0b3
+2026-01-31 02:27:05 | fxstein | ABORT START | Aborting release 4.0.0b3
+2026-01-31 02:21:39 | fxstein | PREPARE | Release preview prepared for v4.0.0b3 (beta)
+2026-01-31 02:21:38 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b2 - File version (legacy/todo.ai): 4.0.0b2 - Proposed version: 4.0.0b3 - Release type: beta - Bump type: minor - Last tag: v4.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-31 02:21:38 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-31 02:21:37 | fxstein | BETA VERSION | Found existing betas up to b2 for 4.0.0, using b3
+2026-01-31 02:21:37 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
+2026-01-31 02:13:25 | fxstein | ABORT COMPLETE | Release 4.0.0b3 aborted, reverted to 4.0.0b2
+2026-01-31 02:13:25 | fxstein | ABORT PUSH | Pushed abort commit to remote
+2026-01-31 02:13:23 | fxstein | ABORT COMMIT | Created abort commit for 4.0.0b3
+2026-01-31 02:13:22 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2026-01-31 02:13:21 | fxstein | ABORT REVERT | Reverted version files to 4.0.0b2
+2026-01-31 02:13:21 | fxstein | ABORT TAG REMOTE | Deleted remote tag v4.0.0b3
+2026-01-31 02:13:19 | fxstein | ABORT START | Aborting release 4.0.0b3
+2026-01-31 02:06:38 | fxstein | PREPARE | Release preview prepared for v4.0.0b3 (beta)
+2026-01-31 02:06:37 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b2 - File version (legacy/todo.ai): 4.0.0b2 - Proposed version: 4.0.0b3 - Release type: beta - Bump type: minor - Last tag: v4.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-31 02:06:37 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-31 02:06:36 | fxstein | BETA VERSION | Found existing betas up to b2 for 4.0.0, using b3
+2026-01-31 02:06:36 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
+2026-01-31 01:58:08 | fxstein | PREPARE | Release preview prepared for v4.0.0b3 (beta)
+2026-01-31 01:58:07 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b2 - File version (legacy/todo.ai): 4.0.0b2 - Proposed version: 4.0.0b3 - Release type: beta - Bump type: minor - Last tag: v4.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-31 01:58:07 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-31 01:58:06 | fxstein | BETA VERSION | Found existing betas up to b2 for 4.0.0, using b3
+2026-01-31 01:58:06 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
+2026-01-31 01:01:56 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2026-01-31 01:01:56 | fxstein | ABORT REVERT | Reverted version files to 4.0.0b2
+2026-01-31 01:01:55 | fxstein | ABORT TAG REMOTE | Deleted remote tag v4.0.0b3
+2026-01-31 01:01:54 | fxstein | ABORT START | Aborting release 4.0.0b3
+2026-01-31 01:00:48 | fxstein | PREPARE | Release preview prepared for v4.0.0b3 (beta)
+2026-01-31 01:00:47 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b2 - File version (legacy/todo.ai): 4.0.0b2 - Proposed version: 4.0.0b3 - Release type: beta - Bump type: minor - Last tag: v4.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-31 01:00:47 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-31 01:00:46 | fxstein | BETA VERSION | Found existing betas up to b2 for 4.0.0, using b3
+2026-01-31 01:00:45 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
+2026-01-31 00:43:54 | fxstein | ABORT CLEANUP | Cleaned release artifacts
+2026-01-31 00:43:53 | fxstein | ABORT REVERT | Reverted version files to 4.0.0b2
+2026-01-31 00:43:52 | fxstein | ABORT TAG REMOTE | Deleted remote tag v4.0.0
+2026-01-31 00:43:51 | fxstein | ABORT START | Aborting release v4.0.0
+2026-01-31 00:43:12 | fxstein | PREPARE | Release preview prepared for v4.0.0 (stable)
+2026-01-31 00:43:11 | fxstein | RELEASE START | Starting release process: - Current version (GitHub): 4.0.0b2 - File version (legacy/todo.ai): 4.0.0b2 - Proposed version: 4.0.0 - Release type: stable - Bump type: major - Last tag: v4.0.0b2 - Summary file: release/RELEASE_SUMMARY.md
+2026-01-31 00:43:11 | fxstein | SUMMARY GENERATED | Generated release summary from release/AI_RELEASE_SUMMARY.md into release/RELEASE_SUMMARY.md
+2026-01-31 00:43:11 | fxstein | BETA CYCLE | In beta cycle for 4.0.0, next beta will use same base version
+2026-01-31 00:43:07 | fxstein | BETA GRADUATION | Graduating from beta 4.0.0b2 to stable 4.0.0, analyzing commits since v3.0.2
 2026-01-28 01:47:38 | fxstein | COMMIT ERROR | Failed to commit version changes after re-staging - hooks may still be modifying files
 2026-01-28 01:47:34 | fxstein | HOOK MODIFICATIONS | Pre-commit hooks modified: release/RELEASE_LOG.log release/RELEASE_NOTES.md todo.bash uv.lock
 2026-01-28 01:47:26 | fxstein | COMMIT RELEASE_NOTES | Adding release notes file to commit: release/RELEASE_NOTES.md

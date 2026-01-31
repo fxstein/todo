@@ -157,7 +157,7 @@ jobs:
         run: uv sync --all-extras
 
       - name: Lint ASCII art boxes
-        run: uv run ascii-guard lint '**/*.md' '**/*.mdc'
+        run: uv run ascii-guard lint docs/
 
       - name: Lint TODO.md
         run: uv run ai-todo lint

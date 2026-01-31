@@ -4,10 +4,10 @@
 
 ## Tasks
 
-- [ ] **#272** [AIT-9] ascii-guard linting `#documentation` `#tooling` `#urgent`
+- [x] **#272** [AIT-9] ascii-guard linting `#documentation` `#tooling` `#urgent` (2026-01-31)
   > Add fxstein/ascii-guard linting to pre-commit and CICD workflows. Need to make sure all documents are cleaned - especially documentation, and various documents created during analysis and design reviews.
   > Linear Issue: https://linear.app/fxstein/issue/AIT-9/ascii-guard-linting
-  - [ ] **#272.7** Verify and document ascii-guard integration `#documentation` `#inprogress` `#validation`
+  - [x] **#272.7** Verify and document ascii-guard integration `#documentation` `#validation` (2026-01-31)
     > Final verification:
     > - Test pre-commit hook locally
     > - Verify CI/CD workflow runs successfully
@@ -1384,6 +1384,11 @@
 
 ---
 
+## Task Metadata
+
+Task relationships and dependencies (managed by ai-todo).
+View with: `ai-todo show <task-id>`
+
 <!-- TASK_METADATA
 # Format: task_id:created_at[:updated_at]
 11:2026-01-27T23:50:41.505242:2026-01-27T23:51:37.635568
@@ -2131,14 +2136,14 @@
 271.1:2026-01-31T02:48:27.516905:2026-01-31T02:50:03.561272
 271.2:2026-01-31T02:48:28.906966:2026-01-31T02:50:03.561274
 271.3:2026-01-31T02:48:30.471793:2026-01-31T02:50:35.741187
-272:2026-01-31T03:27:13.275650:2026-01-31T03:27:13.294094
+272:2026-01-31T03:27:13.275650:2026-01-31T03:42:50.364981
 272.1:2026-01-31T03:27:17.810592:2026-01-31T03:29:52.114908
 272.2:2026-01-31T03:27:19.023195:2026-01-31T03:38:54.198980
 272.3:2026-01-31T03:27:20.050615:2026-01-31T03:39:29.983224
 272.4:2026-01-31T03:27:21.336450:2026-01-31T03:39:55.033984
 272.5:2026-01-31T03:27:22.712250:2026-01-31T03:41:38.413677
 272.6:2026-01-31T03:27:24.206296:2026-01-31T03:42:12.881908
-272.7:2026-01-31T03:27:25.691111:2026-01-31T03:42:13.469864
+272.7:2026-01-31T03:27:25.691111:2026-01-31T03:42:50.364979
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2206,4 +2211,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-31 03:42:13
+**ai-todo** | Last Updated: 2026-01-31 03:42:50

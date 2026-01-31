@@ -40,17 +40,22 @@ List the returned issues (identifier, title, status) and ask which one to work o
 ### Step 3: Get issue
 
 Once the user selects an issue (e.g., AIT-12):
-- Call **user-linear.get_issue** with that issue's `id` (UUID) to get full details including `gitBranchName`, `title`, `description`.
+- Call **user-linear.get_issue** with that issue's `id` (UUID) to get full details including `title`, `description`.
+- **CRITICAL:** Linear returns a `gitBranchName` field - **IGNORE IT**. It uses Linear's `displayName` (e.g., "oliver"), not the GitHub username (e.g., "fxstein").
 
 ### Step 4: Branch
 
-**Always construct branch name:**
-1. Get git user: `git config user.name` (lowercase)
-2. Extract IDENTIFIER from Linear issue (e.g., `AIT-12`)
-3. Create slug from issue title (e.g., `fix-login`)
-4. Run: `git checkout -b <userid>/<IDENTIFIER>-<slug>`
+**CRITICAL: Always construct branch name from git config. NEVER use Linear's gitBranchName.**
 
-**Example:** `oliver/AIT-12-fix-login`
+1. Get GitHub username: `git config user.name` (use as-is, case-sensitive)
+2. Extract IDENTIFIER from Linear issue (e.g., `AIT-12`, keep case from Linear)
+3. Create slug from issue title: lowercase with hyphens (e.g., `fix-login`)
+4. Run: `git checkout -b <username>/<IDENTIFIER>-<slug>`
+
+**Example:** If `git config user.name` returns "fxstein" and issue is AIT-12 "Fix Login":
+```bash
+git checkout -b fxstein/AIT-12-fix-login
+```
 
 ### Step 5: ai-todo Planning
 
@@ -122,9 +127,10 @@ After branching (and optionally creating ai-todo tasks):
   - ✅ Use **user-linear.update_issue** with `state` parameter (not `status`).
 
 - **Branch naming:**
-  - Always construct: `<userid>/<IDENTIFIER>-<slug>` (e.g., `oliver/AIT-12-fix-login`).
-  - Get userid from: `git config user.name` (lowercase).
-  - Never use Linear's `gitBranchName` - always build it ourselves.
+  - **NEVER use Linear's `gitBranchName` field** (it uses displayName, not GitHub username).
+  - **ALWAYS** construct: `<username>/<IDENTIFIER>-<slug>`
+  - Get username from: `git config user.name` (use as-is, case-sensitive).
+  - Example: `fxstein/AIT-12-fix-login` (NOT `oliver/AIT-12-fix-login`)
   - GitHub PR check accepts case-insensitive identifier (AIT or ait).
 
 - **ai-todo planning:**

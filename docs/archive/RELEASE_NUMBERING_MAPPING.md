@@ -44,25 +44,25 @@ The release numbering logic uses a **highest-level-first approach** to determine
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│ Step 1: Scan ALL commits and classify each by release level       │
-│ ─────────────────────────────────────────────────────────────  │
-│ Process each commit individually:                              │
+│ Step 1: Scan ALL commits and classify each by release level     │ │
+│ ─────────────────────────────────────────────────────────────   │
+│ Process each commit individually:                               │
 │ → Classify each commit: MAJOR > MINOR > PATCH                   │
 │ → Step down from highest to lowest level per commit             │
 │ → Track the HIGHEST level found across all commits              │
 └─────────────────────────────────────────────────────────────────┘
                           ↓
 ┌─────────────────────────────────────────────────────────────────┐
-│ Step 2: Find Highest Level Across All Commits                    │
-│ ─────────────────────────────────────────────────────────────  │
-│ Logic:                                                           │
+│ Step 2: Find Highest Level Across All Commits                   │
+│ ─────────────────────────────────────────────────────────────   │
+│ Logic:                                                          │
 │ → A single MAJOR commit makes the entire release MAJOR          │
 │ → A single MINOR commit (with no MAJOR) makes release MINOR     │
 │ → Otherwise, it's PATCH                                         │
-│                                                                  │
+│                                                                 │
 │ Priority order (highest to lowest):                             │
 │ 1. MAJOR: breaking, break, major, !:, feat!:, fix!:             │
-│ 2. MINOR: feat:, feature: (if user-facing)                     │
+│ 2. MINOR: feat:, feature: (if user-facing)                      │
 │ 3. PATCH: backend:, infra:, release:, internal:, fix:, bugfix:  │
 │ 4. MINOR: add, new, implement, create, support (if not backend) │
 │ 5. PATCH: (default for all other commits)                       │

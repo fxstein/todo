@@ -37,7 +37,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "ascii-guard", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "ascii-guard", marker = "extra == 'dev'", specifier = ">=1.5.0" },
     { name = "build", marker = "extra == 'dev'", specifier = ">=1.0.0" },
     { name = "click", specifier = ">=8.1.0" },
     { name = "fastmcp", specifier = ">=2.14.4,<3.0.0" },

@@ -23,7 +23,7 @@ When user asks to "clean up branches" or "delete merged branches":
 
 3. **List local branches:**
    - `git branch --format='%(refname:short)'`
-   - Filter out: `main`, `master`, `develop`, `staging`, `production`
+   - Filter out: `main`, `master`, `develop`, `staging`, `production`, `archive*`
    - **If no branches:** Report "No local branches to clean up" and STOP.
 
 4. **Check PR status for each branch:**
@@ -97,6 +97,7 @@ gh pr list --head {branch} --state merged --json number,title,url --limit 1
 
 **Protected branches:**
 - `main`, `master`, `develop`, `staging`, `production`
+- Any branch starting with `archive` (e.g., `archive-2024`, `archive/old`)
 - Any branch matching `origin/*`
 
 ### Step 4: Present Cleanup List
@@ -147,6 +148,12 @@ If branch has commits not in main but PR is merged:
 - `git branch -d` will fail (expected)
 - Report: "⚠️ Skipped {branch}: has unmerged commits (possible rebase)"
 - User can manually verify with: `git log main..{branch}`
+
+### Archive Branches
+
+Branches starting with `archive` are preserved:
+- ❌ Skip: `archive-2024`, `archive/backup`, `archive-old-features`
+- **Reason:** Archive branches contain historical work that should be manually managed
 
 ### Remote Tracking Branches
 

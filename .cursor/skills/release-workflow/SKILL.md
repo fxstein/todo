@@ -17,13 +17,19 @@ description: Guides release preparation and execution for ai-todo. Use when the 
 
 When user asks to "prepare release" or "prepare beta release":
 
-1. **Wait for CI:** `./scripts/wait-for-ci.sh`
-2. **Generate summary:** Create 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
+1. **Pre-flight checks:** Verify repository is ready for release:
+   - **Check branch:** `git branch --show-current` (must be `main`)
+   - **Check sync:** `git fetch origin && git status` (must be in sync with origin/main)
+   - **Check clean:** `git status --porcelain` (must be empty - no uncommitted changes)
+   - **If any check fails:** ⚠️ Warn user with specific issue and ask "Do you want to proceed anyway?"
+   - **If user declines:** Stop and let them fix the issue first.
+2. **Wait for CI:** `./scripts/wait-for-ci.sh`
+3. **Generate summary:** Create 2-3 paragraphs highlighting user-facing changes. Save to `release/AI_RELEASE_SUMMARY.md`.
    - **For beta-to-beta releases:** Analyze commits since the last beta tag.
    - **For stable releases (graduating from beta):** Analyze ALL commits since the last **stable** release (not the last beta). This ensures the summary covers the entire beta cycle.
    - See "Generating Release Summary" section below for detailed guidance.
-3. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
-4. **STOP.** Show preview and let user review before proceeding.
+4. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
+5. **STOP.** Show preview and let user review before proceeding.
 
 ## Generating Release Summary
 

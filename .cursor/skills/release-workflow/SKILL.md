@@ -111,7 +111,7 @@ When user asks to "abort release":
 2. **Update Linear issue (if exists):**
    - Post abort summary to Linear issue using `user-linear.create_comment`
    - Include: reason for abort, version that was aborted, current state
-   - Leave issue status as-is (typically "In Review" or "In Progress")
+   - Mark issue as "Todo" using `user-linear.update_issue` (reset for retry)
 
 ## Error Handling
 

@@ -1,21 +1,18 @@
 # Release 4.0.0b3
 
-This release introduces two powerful new commands for managing task lifecycle: prune and empty-trash. The prune command (task#267) allows users to permanently remove archived tasks from TODO.md with fine-grained control over retention periods using `--days`, or by targeting specific task ranges with `--from-task` and `--to-task` options. All pruned tasks are automatically backed up to timestamped archive files in the `.ai-todo/archives/` directory, preserving full task metadata and enabling recovery if needed. Comprehensive documentation and examples are available in [docs/examples/PRUNE_EXAMPLES.md](https://github.com/fxstein/ai-todo/blob/main/docs/examples/PRUNE_EXAMPLES.md).
+This release introduces significant improvements to task lifecycle management and developer workflows. The new empty trash functionality automatically removes tasks from the Deleted section after 30 days, providing a clean safety net for accidentally deleted items while preventing TODO.md from growing indefinitely. Users no longer need to manually clean up deleted tasks, as the system now handles this transparently on startup.
 
-The empty-trash command (task#268) complements the prune functionality by automatically removing deleted tasks that are older than 30 days on startup, helping keep your TODO.md clean without manual intervention. This automatic cleanup runs quietly in the background and includes comprehensive test coverage to ensure data safety. Users can also manually trigger empty-trash operations when needed.
+The prune command offers powerful control over archived task retention with flexible filtering options. Users can remove archived tasks based on age thresholds, specific task ranges, or individual task IDs. The command includes robust safety features such as automatic backups before pruning, git history analysis to determine archive dates, and preservation of task metadata for audit trails. Comprehensive usage examples are available in [docs/examples/PRUNE_EXAMPLES.md](https://github.com/fxstein/ai-todo/blob/main/docs/examples/PRUNE_EXAMPLES.md).
 
-Several critical bug fixes improve system reliability across different Python versions and edge cases. Python 3.10 compatibility has been restored by replacing `datetime.UTC` with `timezone.utc` throughout the codebase. Timezone-aware datetime comparisons in prune operations now work correctly across different system configurations. Regex metacharacter escaping for task IDs prevents errors when working with tasks that contain special characters, and duplicate prevention in subtask operations ensures data integrity during complex task manipulations.
+For contributors, this release adds a new [CONTRIBUTING.md](https://github.com/fxstein/ai-todo/blob/main/CONTRIBUTING.md) guide that outlines project standards and best practices. The branch-cleanup skill helps developers maintain clean local repositories by identifying and safely deleting branches with merged pull requests. Additionally, ascii-guard linting has been integrated into the development workflow to ensure all documentation remains clean and properly formatted.
+
+Several bug fixes improve robustness including proper timezone handling in date comparisons, correct task ID sorting in archive backups, and Windows UTF-8 encoding support. These improvements enhance reliability across different platforms and edge cases.
 
 ---
 
 ## ✨ Features
 
-- Filter chore commits from release notes (task#270) ([08a0861](https://github.com/fxstein/ai-todo/commit/08a086172dedc37418133e6777df9c939391a367))
-- Commit AI summary before prepare & add release notes link (task#270) ([297b720](https://github.com/fxstein/ai-todo/commit/297b720e639f7467c11fa4c32840b869b691aa24))
-- Add Linear issue tracking to release workflow (task#270) ([9661d3a](https://github.com/fxstein/ai-todo/commit/9661d3a84e7f0c61ce54f118f31fb6711cafe3d8))
-- Add pre-flight checks to release workflow (task#270) ([5ebb21c](https://github.com/fxstein/ai-todo/commit/5ebb21c450903fb366e784673af91df1ddf59824))
-- Add pre-validation of generated files (task#270) ([644e427](https://github.com/fxstein/ai-todo/commit/644e427c013537d14ea5c2b00d4a88015a2a3e46))
-- Refactor release workflow to Cursor Skill (task#270) ([d828f5e](https://github.com/fxstein/ai-todo/commit/d828f5ef4e4b19bfee61a8b5bb4a3d19c6daa2b3))
+- Add branch-cleanup skill for automated branch maintenance ([a893e9f](https://github.com/fxstein/ai-todo/commit/a893e9f2de3ab7be6ceab610e07abb2d4a409ba8))
 - Add PEP 440 versioning strategy to release-please config ([c818c22](https://github.com/fxstein/ai-todo/commit/c818c224aa464dcfbbe45ba9af692204e6cd03ed))
 - Enable beta prerelease mode for 4.0.0 cycle (task#269.3) ([25628d4](https://github.com/fxstein/ai-todo/commit/25628d4774e3f96a6b11a0220b1d1087bb3890de))
 - Enable beta release workflow (task#269.3) ([f5312ec](https://github.com/fxstein/ai-todo/commit/f5312ecad09da89e3f3fb7b51f25c4705d8055ad))
@@ -30,11 +27,7 @@ Several critical bug fixes improve system reliability across different Python ve
 
 ## 🐛 Bug Fixes
 
-- Use checksums to detect pre-commit auto-fixes (task#270) ([5534602](https://github.com/fxstein/ai-todo/commit/553460271b48d15d69e57ca720b84ac0b5c69532))
-- Set Linear issue to Todo on release abort (task#270) ([7746135](https://github.com/fxstein/ai-todo/commit/774613528371b9da4ec3aedea7f33178728adf6c))
-- Commit and push release log after abort (task#270) ([ae9fb0a](https://github.com/fxstein/ai-todo/commit/ae9fb0a4ea9d39a0d789554b0773f22c6f5749ec))
-- Remove orphaned todo.bash references (task#270) ([92db8c8](https://github.com/fxstein/ai-todo/commit/92db8c8cba68908bc6b314d24d8cecc12961bb67))
-- Address skill testing feedback (task#270) ([02ba6c7](https://github.com/fxstein/ai-todo/commit/02ba6c73101a568959958feab3a7f812ffadd8b6))
+- Add UTF-8 encoding for ascii-guard on Windows (task#272.5) ([a6d3fab](https://github.com/fxstein/ai-todo/commit/a6d3fab04c5c18f352e6d909fff9152c19183aa8))
 - Use PEP 440 format in release-please manifest ([03ed8f4](https://github.com/fxstein/ai-todo/commit/03ed8f4e2d0f7922d4addce592f659b38b185369))
 - Replace UTC with timezone.utc in source files for Python 3.10 ([b2b02f9](https://github.com/fxstein/ai-todo/commit/b2b02f95ca997d652b5b054935a1b09cd124d0fc))
 - Replace datetime.UTC with timezone.utc for Python 3.10 compatibility ([04465f4](https://github.com/fxstein/ai-todo/commit/04465f46bb2e1ef6e0a31ec0ef67b22a424f9b9c))
@@ -54,13 +47,12 @@ Several critical bug fixes improve system reliability across different Python ve
 
 ## 🔧 Other Changes
 
-- Update release log for 4.0.0b3 abort ([c4d79f0](https://github.com/fxstein/ai-todo/commit/c4d79f046a44fca1d4375d80fbf616aae855f450))
-- Update release log for 4.0.0b3 abort ([f5d3faa](https://github.com/fxstein/ai-todo/commit/f5d3faa0b110375d8f7c61f4948e5e19a46d8449))
-- docs: Add release summary for v4.0.0b3 (task#270) ([4e06225](https://github.com/fxstein/ai-todo/commit/4e06225b53284f171933a1031de4278a1452e240))
-- docs: Align summary paragraph count with prompt template (task#270) ([0b5f54b](https://github.com/fxstein/ai-todo/commit/0b5f54b4e735be5ecad8633858fd08c0a2d25294))
-- docs: Add release summary prompt template to skill (task#270) ([5c2a79d](https://github.com/fxstein/ai-todo/commit/5c2a79d31c18e30e32d28dfc94a3672a318bfdcd))
-- docs: Add release summary for 4.0.0b3 ([94c98cb](https://github.com/fxstein/ai-todo/commit/94c98cbb3acdf46d755d9f7444edfec0402e9f9f))
-- docs: Add release summary for 4.0.0b3 ([68d7616](https://github.com/fxstein/ai-todo/commit/68d76163e95e32d3a8983150af91990072970141))
+- refactor: Remove redundant ascii-guard validation tests (task#272.5) ([d3f8fe3](https://github.com/fxstein/ai-todo/commit/d3f8fe364e8430e85f2f3d2a9bbec8ffe2d93155))
+- infra: Archive completed tasks (task#270, task#271, task#272) ([9b85194](https://github.com/fxstein/ai-todo/commit/9b851946038a75a33004edf8bd3241f211a4e263))
+- docs: ascii-guard linting (#80) ([f7ca7af](https://github.com/fxstein/ai-todo/commit/f7ca7af18f269797b2e47221abb165620c63db20))
+- infra: Incorrect branch names for linear issue (#79) ([74f5ad7](https://github.com/fxstein/ai-todo/commit/74f5ad7cf0d9d83314e43e76eaeec98e84b10992))
+- infra: Incorrect branch names for linear issue (#78) ([cfd9153](https://github.com/fxstein/ai-todo/commit/cfd9153611dd1bd0e3b7f51a07ba9e015ff929d9))
+- infra: Refactor release workflow to Cursor Skill (task#270) (#74) ([457430a](https://github.com/fxstein/ai-todo/commit/457430a53293021455afdea8b4009d0dfd93ab7a))
 - Revert "feat: Enable beta release workflow (task#269.3)" ([65b922f](https://github.com/fxstein/ai-todo/commit/65b922f8372e2a520aafa3ae72f4d3624c181280))
 - docs: Add Phase 1 completion summary (task#269.3) ([027dcba](https://github.com/fxstein/ai-todo/commit/027dcbabb8288fdf1457f42193166b48641dff67))
 - docs: Update design with approved decisions (task#269.2) ([3ec0467](https://github.com/fxstein/ai-todo/commit/3ec046734e8e07ca261d3fafe411b618ba96db4e))

@@ -41,12 +41,13 @@ When user asks to "prepare release" or "prepare beta release":
    - `git commit -m "release: Add AI-generated summary for v[version]"`
    - `git push`
 6. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
-7. **Show preview to user:** Display the proposed release notes with link.
-   - Show `release/RELEASE_NOTES.md` summary/preview
-   - Provide link to full release notes for review: `release/RELEASE_NOTES.md`
+7. **Show preview to user:** Display the proposed release notes with clickable link.
+   - Show `release/RELEASE_NOTES.md` summary/preview (first ~20 lines)
+   - Provide clickable markdown link: `[release/RELEASE_NOTES.md](release/RELEASE_NOTES.md)` (not inline code)
 8. **Update Linear issue:**
    - Read `release/RELEASE_NOTES.md` content
    - Post content to Linear issue as comment using `user-linear.create_comment`
+   - **Include clickable link:** Add link to full notes at top of comment: `📋 Full Release Notes: [release/RELEASE_NOTES.md](https://github.com/fxstein/ai-todo/blob/main/release/RELEASE_NOTES.md)`
    - Mark issue as "In Review" using `user-linear.update_issue`
 9. **STOP.** Wait for user approval before proceeding.
 

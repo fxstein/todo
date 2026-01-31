@@ -1,5 +1,0 @@
-This beta release focuses on workflow improvements and agent-facing enhancements. The release process has been refactored into a Cursor Skill, providing better guidance for AI agents preparing releases. The new skill-based approach simplifies the release workflow while maintaining all safety checks and approval gates.
-
-Task management receives significant improvements with two new commands: `empty-trash` automatically removes deleted tasks after 30 days, and `prune` provides flexible cleanup of archived tasks with multiple filtering options (age, task ranges, or archive ranges). Both commands include comprehensive backup mechanisms to preserve task metadata and enable recovery if needed.
-
-Linear integration continues to mature with refined workflow rules, improved branch naming conventions, and better document review processes. Several bug fixes improve robustness including timezone handling in date comparisons, regex escaping for task IDs, and duplicate prevention in subtask operations.

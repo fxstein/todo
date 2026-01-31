@@ -4,6 +4,48 @@
 
 ## Tasks
 
+- [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
+  > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
+  - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
+    > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
+  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-31)
+    > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
+  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-31)
+    > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
+    > Design doc: docs/linear_integration_design.md
+  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-31)
+    > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
+    > Design doc: docs/linear_integration_design.md
+  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-31)
+    > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
+    > Assessment doc: docs/linear_integration_assessment.md
+
+- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
+
+- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
+  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
+  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
+  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
+  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
+  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
+  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
+  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
+
+- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
+
+---
+
+## Archived Tasks
+- [x] **#271** [AIT-15] Incorrect branch names for linear issue (2026-01-31)
+  > When starting to work on a new linear issue, the branch that gets created has the wrong user id as the prefix. The cursor rule needs to explicitly use the GitHub userid and not any name Linear provides in its suggested branch name.
+  > Linear: https://linear.app/fxstein/issue/AIT-15/incorrect-branch-names-for-linear-issue
+  > GitHub: https://github.com/fxstein/ai-todo/issues/77
+  - [x] **#271.3** Fix or clarify: Update rule if needed (2026-01-31)
+    > Based on investigation findings, either fix the rule if there's a bug, or add better documentation/comments to clarify the correct behavior and prevent confusion.
+  - [x] **#271.2** Analysis: Document Linear displayName vs GitHub username mapping (2026-01-31)
+    > Create a document explaining the difference between Linear's displayName/gitBranchName suggestions and the correct GitHub username from git config. Include examples and rationale.
+  - [x] **#271.1** Investigation: Verify the actual branching behavior issue (2026-01-31)
+    > Examine recent git history and Linear integration usage to determine if there's an actual bug or if the current rule is working correctly. Check if previous branches were created with 'oliver' prefix incorrectly.
 - [x] **#272** [AIT-9] ascii-guard linting `#documentation` `#tooling` `#urgent` (2026-01-31)
   > Add fxstein/ascii-guard linting to pre-commit and CICD workflows. Need to make sure all documents are cleaned - especially documentation, and various documents created during analysis and design reviews.
   > Linear Issue: https://linear.app/fxstein/issue/AIT-9/ascii-guard-linting
@@ -37,18 +79,6 @@
     > - Testing approach
     > Document location: docs/design/ascii-guard-integration.md
     > ✅ Design document created: docs/design/ascii-guard-integration.md
-
-- [ ] **#271** [AIT-15] Incorrect branch names for linear issue
-  > When starting to work on a new linear issue, the branch that gets created has the wrong user id as the prefix. The cursor rule needs to explicitly use the GitHub userid and not any name Linear provides in its suggested branch name.
-  > Linear: https://linear.app/fxstein/issue/AIT-15/incorrect-branch-names-for-linear-issue
-  > GitHub: https://github.com/fxstein/ai-todo/issues/77
-  - [x] **#271.3** Fix or clarify: Update rule if needed (2026-01-31)
-    > Based on investigation findings, either fix the rule if there's a bug, or add better documentation/comments to clarify the correct behavior and prevent confusion.
-  - [x] **#271.2** Analysis: Document Linear displayName vs GitHub username mapping (2026-01-31)
-    > Create a document explaining the difference between Linear's displayName/gitBranchName suggestions and the correct GitHub username from git config. Include examples and rationale.
-  - [x] **#271.1** Investigation: Verify the actual branching behavior issue (2026-01-31)
-    > Examine recent git history and Linear integration usage to determine if there's an actual bug or if the current rule is working correctly. Check if previous branches were created with 'oliver' prefix incorrectly.
-
 - [x] **#270** [AIT-12] Refactor Release Workflow to Cursor Skill `#documentation` `#improvement` `#release` (2026-01-31)
   > Migrate static release instructions from global .cursorrules to a dynamic Cursor Skill. This ensures release logic is only loaded when relevant, keeping the default context window clean.
   > Linear: https://linear.app/fxstein/issue/AIT-12/refactor-release-workflow-to-cursor-skill
@@ -62,39 +92,6 @@
   - [x] **#270.1** Discovery: Identify all release-specific logic and scripts `#analysis` (2026-01-31)
     > Audit current .cursorrules and identify all release-related instructions, scripts, and workflows that should be migrated to a Cursor Skill.
     > Discovery Document: docs/design/release_skill_discovery.md
-
-- [ ] **#266** Design and implement full Linear integration `#cursor-rules` `#design` `#github` `#integration` `#linear`
-  > End-to-end: (1) Assessment of current setup (including MCP tool payload verification). (2) Design implementation plan (data model, branching, security). (3) Implementation (Rules, Templates, Secrets). (4) Test & Docs.
-  - [ ] **#266.5** Test and document the implementation `#documentation` `#verification`
-    > Verify end-to-end flow. create a "Day 1" guide for new devs (How to start a task, how to PR).
-  - [x] **#266.4** Implement: settings, Cursor rules, templates, GitHub `#implementation` (2026-01-31)
-    > Implement approved design: .cursor/rules, .github/ workflows, and configure GitHub Repository Secrets (if required for Actions).
-  - [x] **#266.3** Design: implementation plan for REVIEW `#design` `#review` (2026-01-31)
-    > Draft detailed spec. Include: "The Life of a Ticket" flow diagram. STOP for human review.
-    > Design doc: docs/linear_integration_design.md
-  - [x] **#266.2** Best practices: branching, data model, and PR setup `#best-practices` `#design` (2026-01-31)
-    > Define the "Data Model": How Linear Teams/Cycles map to GitHub Repos/Releases. Define Branch naming convention (`user/ID-desc`) and PR title standards.
-    > Design doc: docs/linear_integration_design.md
-  - [x] **#266.1** Assessment: document current Linear setup & MCP audit `#analysis` `#assessment` (2026-01-31)
-    > Inventory current config (Linear workspace, GitHub integration). CRITICAL: Audit `linear` MCP tools to confirm they provide necessary fields (IDs, status, assignee) for automation.
-    > Assessment doc: docs/linear_integration_assessment.md
-
-- [ ] **#51** Add contributor section to release summary: list all contributors for each release `#feature`
-
-- [ ] **#237** Future Enhancements Backlog - Post v3.0 features and improvements `#backlog` `#future` `#meta`
-  - [ ] **#237.19** FUTURE: Add contributor section to releases (task#51) `#feature` `#future`
-  - [ ] **#237.18** FUTURE: Enhance --lint command (task#127) `#feature` `#future`
-  - [ ] **#237.17** FUTURE: Create git commit hook for linting (task#128) `#feature` `#future`
-  - [ ] **#237.16** FUTURE: Implement --prune function (task#129) `#feature` `#future`
-  - [ ] **#237.15** FUTURE: Implement feature request capability (task#47) `#feature` `#future`
-  - [ ] **#237.14** FUTURE: Investigate cybersecurity implications (task#49) `#future` `#security`
-  - [ ] **#237.13** FUTURE: Evaluate Gemini LLM integration (task#236) - v3.1  `#v3.1` `#future`
-
-- [ ] **#236** Evaluate Gemini LLM integration for enhanced task management features (see docs/design/GEMINI_INTEGRATION_USE_CASES.md)  `#v3.1` `#enhancement`
-
----
-
-## Archived Tasks
 - [x] **#268** [AIT-3] Implement Empty Trash on Startup (Deleted Tasks) `#AIT-3` `#cleanup` `#feature` `#linear` (2026-01-29)
   > Linear issue: https://linear.app/fxstein/issue/AIT-3/implement-empty-trash-on-startup-deleted-tasks
   > Startup policy to permanently remove items from "Deleted Tasks" section.
@@ -2127,23 +2124,23 @@ View with: `ai-todo show <task-id>`
 269.4:2026-01-30T03:19:21.417545:2026-01-30T23:45:42.165659
 269.5:2026-01-30T03:19:22.553112:2026-01-30T23:45:42.165658
 269.6:2026-01-30T03:19:23.744384:2026-01-30T23:45:42.165656
-270:2026-01-31T00:17:43.818509:2026-01-31T00:19:36.210764
-270.1:2026-01-31T00:17:48.491684:2026-01-31T00:19:00.806264
-270.2:2026-01-31T00:17:49.574775:2026-01-31T00:19:17.382722
-270.3:2026-01-31T00:17:50.469176:2026-01-31T00:19:24.975626
-270.4:2026-01-31T00:17:51.251369:2026-01-31T00:19:36.210762
-271:2026-01-31T02:47:48.102308:2026-01-31T02:47:48.128097
-271.1:2026-01-31T02:48:27.516905:2026-01-31T02:50:03.561272
-271.2:2026-01-31T02:48:28.906966:2026-01-31T02:50:03.561274
-271.3:2026-01-31T02:48:30.471793:2026-01-31T02:50:35.741187
-272:2026-01-31T03:27:13.275650:2026-01-31T03:42:50.364981
-272.1:2026-01-31T03:27:17.810592:2026-01-31T03:29:52.114908
-272.2:2026-01-31T03:27:19.023195:2026-01-31T03:38:54.198980
-272.3:2026-01-31T03:27:20.050615:2026-01-31T03:39:29.983224
-272.4:2026-01-31T03:27:21.336450:2026-01-31T03:39:55.033984
-272.5:2026-01-31T03:27:22.712250:2026-01-31T03:41:38.413677
-272.6:2026-01-31T03:27:24.206296:2026-01-31T03:42:12.881908
-272.7:2026-01-31T03:27:25.691111:2026-01-31T03:42:50.364979
+270:2026-01-31T00:17:43.818509:2026-01-31T04:03:28.103075
+270.1:2026-01-31T00:17:48.491684:2026-01-31T04:03:28.103067
+270.2:2026-01-31T00:17:49.574775:2026-01-31T04:03:28.103071
+270.3:2026-01-31T00:17:50.469176:2026-01-31T04:03:28.103072
+270.4:2026-01-31T00:17:51.251369:2026-01-31T04:03:28.103074
+271:2026-01-31T02:47:48.102308:2026-01-31T04:04:24.920071
+271.1:2026-01-31T02:48:27.516905:2026-01-31T04:04:24.920067
+271.2:2026-01-31T02:48:28.906966:2026-01-31T04:04:24.920069
+271.3:2026-01-31T02:48:30.471793:2026-01-31T04:04:24.920070
+272:2026-01-31T03:27:13.275650:2026-01-31T04:03:28.608261
+272.1:2026-01-31T03:27:17.810592:2026-01-31T04:03:28.608253
+272.2:2026-01-31T03:27:19.023195:2026-01-31T04:03:28.608254
+272.3:2026-01-31T03:27:20.050615:2026-01-31T04:03:28.608255
+272.4:2026-01-31T03:27:21.336450:2026-01-31T04:03:28.608256
+272.5:2026-01-31T03:27:22.712250:2026-01-31T04:03:28.608257
+272.6:2026-01-31T03:27:24.206296:2026-01-31T04:03:28.608258
+272.7:2026-01-31T03:27:25.691111:2026-01-31T04:03:28.608260
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2211,4 +2208,4 @@ View with: `ai-todo show <task-id>`
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-31 03:42:50
+**ai-todo** | Last Updated: 2026-01-31 04:04:24

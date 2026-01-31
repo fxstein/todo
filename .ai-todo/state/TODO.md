@@ -7,13 +7,13 @@
 - [ ] **#272** [AIT-9] ascii-guard linting `#documentation` `#tooling` `#urgent`
   > Add fxstein/ascii-guard linting to pre-commit and CICD workflows. Need to make sure all documents are cleaned - especially documentation, and various documents created during analysis and design reviews.
   > Linear Issue: https://linear.app/fxstein/issue/AIT-9/ascii-guard-linting
-  - [ ] **#272.7** Verify and document ascii-guard integration `#documentation` `#validation`
+  - [ ] **#272.7** Verify and document ascii-guard integration `#documentation` `#inprogress` `#validation`
     > Final verification:
     > - Test pre-commit hook locally
     > - Verify CI/CD workflow runs successfully
     > - Update relevant documentation
     > - Ensure all documents are clean
-  - [ ] **#272.6** Clean existing documentation files `#cleanup` `#documentation` `#inprogress`
+  - [x] **#272.6** Clean existing documentation files `#cleanup` `#documentation` (2026-01-31)
     > Run ascii-guard on all existing documents and clean up any non-ASCII characters:
     > - Documentation in docs/
     > - Analysis and design documents
@@ -2137,8 +2137,8 @@
 272.3:2026-01-31T03:27:20.050615:2026-01-31T03:39:29.983224
 272.4:2026-01-31T03:27:21.336450:2026-01-31T03:39:55.033984
 272.5:2026-01-31T03:27:22.712250:2026-01-31T03:41:38.413677
-272.6:2026-01-31T03:27:24.206296:2026-01-31T03:41:38.900681
-272.7:2026-01-31T03:27:25.691111:2026-01-31T03:27:25.704595
+272.6:2026-01-31T03:27:24.206296:2026-01-31T03:42:12.881908
+272.7:2026-01-31T03:27:25.691111:2026-01-31T03:42:13.469864
 35:2026-01-27T23:50:41.502304:2026-01-27T23:51:37.630894
 35.1:2026-01-27T23:50:41.502320:2026-01-27T23:50:41.502321
 35.2:2026-01-27T23:50:41.502315:2026-01-27T23:51:37.630903
@@ -2206,4 +2206,4 @@
 -->
 
 ---
-**ai-todo** | Last Updated: 2026-01-31 03:41:38
+**ai-todo** | Last Updated: 2026-01-31 03:42:13

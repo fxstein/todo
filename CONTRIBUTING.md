@@ -56,6 +56,32 @@ If you are not using Cursor:
    - Example: `git checkout -b jdoe/AIT-12-fix-login`.
 3. Open a PR from that branch to `main`. The branch name will be checked by the Linear PR Check workflow.
 
+## Pre-commit Hooks
+
+This project uses pre-commit hooks to ensure code quality:
+
+```bash
+# Install pre-commit hooks (one-time setup)
+pre-commit install
+
+# Run manually on all files
+pre-commit run --all-files
+```
+
+**ASCII Art Guidelines:**
+
+We use [ascii-guard](https://github.com/fxstein/ascii-guard) to ensure consistent ASCII diagram formatting:
+
+```bash
+# Check ASCII art in documentation
+uv run ascii-guard lint docs/
+
+# Auto-fix alignment issues
+uv run ascii-guard fix docs/
+```
+
+When creating diagrams, use Unicode box-drawing characters: `─ │ ┌ ┐ └ ┘`. The pre-commit hook will catch alignment issues automatically.
+
 ---
 
 For other contribution guidelines (code style, tests, release process), see the main [README](README.md) and [docs/](docs/).

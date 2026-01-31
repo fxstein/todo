@@ -36,12 +36,19 @@ When user asks to "prepare release" or "prepare beta release":
    - **For beta-to-beta releases:** Analyze commits since the last beta tag.
    - **For stable releases (graduating from beta):** Analyze ALL commits since the last **stable** release (not the last beta). This ensures the summary covers the entire beta cycle.
    - See "Generating Release Summary" section below for detailed guidance.
-5. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
-6. **Update Linear issue:**
+5. **Commit and push summary:** The release script requires a clean repository.
+   - `git add release/AI_RELEASE_SUMMARY.md`
+   - `git commit -m "release: Add AI-generated summary for v[version]"`
+   - `git push`
+6. **Run prepare:** `./release/release.sh --prepare [--beta] --summary release/AI_RELEASE_SUMMARY.md`
+7. **Show preview to user:** Display the proposed release notes with link.
+   - Show `release/RELEASE_NOTES.md` summary/preview
+   - Provide link to full release notes for review: `release/RELEASE_NOTES.md`
+8. **Update Linear issue:**
    - Read `release/RELEASE_NOTES.md` content
    - Post content to Linear issue as comment using `user-linear.create_comment`
    - Mark issue as "In Review" using `user-linear.update_issue`
-7. **STOP.** Show preview and let user review before proceeding.
+9. **STOP.** Wait for user approval before proceeding.
 
 ## Generating Release Summary
 
